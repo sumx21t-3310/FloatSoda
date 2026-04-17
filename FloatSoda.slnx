@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="samples/FloatSoda.Samples.ExampleApp/FloatSoda.Samples.ExampleApp.csproj" />
+  <Project Path="src/FloatSoda/FloatSoda.csproj" />
+</Solution>
