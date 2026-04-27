@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using Valve.VR;
 
-namespace FloatSoda;
+namespace FloatSoda.Engine;
 
 public class Transform
 {
@@ -18,7 +18,7 @@ public class Transform
         // [ m0, m1, m2,  m3 ]
         // [ m4, m5, m6,  m7 ]
         // [ m8, m9, m10, m11]
-        
+
         float tr = m.m0 + m.m5 + m.m10;
         Quaternion q = new Quaternion();
 
@@ -55,25 +55,24 @@ public class Transform
             q.Z = 0.25f * s;
         }
 
-        return new Transform 
-        { 
-            Position = pos, 
-            Rotation = Quaternion.Normalize(q) 
+        return new Transform
+        {
+            Position = pos,
+            Rotation = Quaternion.Normalize(q)
         };
     }
 
     public HmdMatrix34_t ToHmdMatrix34_t()
     {
-        // クォータニオンから4x4行列を作成
         Matrix4x4 m = Matrix4x4.CreateFromQuaternion(Rotation);
-        
+
         return new HmdMatrix34_t
         {
             // 回転成分の代入
             m0 = m.M11, m1 = m.M12, m2 = m.M13,
             m4 = m.M21, m5 = m.M22, m6 = m.M23,
             m8 = m.M31, m9 = m.M32, m10 = m.M33,
-            
+
             // 位置成分の代入 (4列目)
             m3 = Position.X,
             m7 = Position.Y,
