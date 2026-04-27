@@ -6,15 +6,16 @@ labels: ''
 assignees: ''
 
 ---
+## 翻訳版：機能リクエスト提案
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+**この提案は、何らかの「問題」に関連していますか？**
+解決したい問題について、簡潔に記載してください。（例：[...] のとき、いつも不便に感じている、など）
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+**どのような解決策（機能）を希望しますか？**
+実現したいこと、期待する動作について、簡潔に記載してください。
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+**検討した代替案**
+これまでに試した代替手段や、他に検討した解決策があれば記載してください。
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**補足情報**
+その他、この提案に関する補足資料やスクリーンショットなどがあれば、ここに記載してください。

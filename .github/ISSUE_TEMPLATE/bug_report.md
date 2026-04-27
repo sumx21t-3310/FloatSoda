@@ -6,33 +6,28 @@ labels: ''
 assignees: ''
 
 ---
+## バグ報告テンプレート
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+**バグの概要**
+何が起きているのか、簡潔で分かりやすい説明を記載してください。
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+**再現手順**
+問題が発生するまでの手順を記載してください：
+1. '...' にアクセスする
+2. '....' をクリックする
+3. '....' までスクロールする
+4. エラーが発生する
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+**期待される挙動**
+本来、どのような結果になるのが正解だったのかを簡潔に記載してください。
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+**スクリーンショット**
+可能であれば、問題を説明するのに役立つスクリーンショットを添付してください。
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+**PC環境（以下の情報を入力してください）:**
+- OS: [例: Windows 11, macOS]
+- ブラウザ: [例: Chrome, Safari]
+- バージョン: [例: 124.0.x]
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+**補足情報**
+その他、問題に関する追加の文脈や情報があればここに記載してください。
