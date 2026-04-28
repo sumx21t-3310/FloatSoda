@@ -43,9 +43,3 @@ public class Renderer(string overlayName, string overlayKey, FrameTimer frameTim
         OpenVR.Overlay.SetOverlayTexture(_overlayHandle, ref textureT).ThrowIfError();
     }
 }
-
-public interface ITextureHandle
-{
-    public IntPtr GetHandle();
-    public void Flush();
-}

@@ -9,8 +9,5 @@ public class RenderContext(SKPaint paint, SKCanvas canvas) : IDisposable
 
     public static RenderContext Create(SKSurface surface) => new(new SKPaint(), surface.Canvas);
 
-    public void Dispose()
-    {
-        paint.Dispose();
-    }
+    public void Dispose() => paint.Dispose();
 }

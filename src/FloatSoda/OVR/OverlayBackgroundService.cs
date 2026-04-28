@@ -1,12 +1,12 @@
 ﻿using System.Runtime.InteropServices;
+using FloatSoda.Engine;
 using FloatSoda.Exceptions;
-using FloatSoda.OVR;
 using FloatSoda.Render;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Valve.VR;
 
-namespace FloatSoda.Engine;
+namespace FloatSoda.OVR;
 
 public class OverlayBackgroundService(ILogger<OverlayBackgroundService> logger, EventDispatcher eventDispatcher, Renderer renderer, Element root) : BackgroundService
 {
