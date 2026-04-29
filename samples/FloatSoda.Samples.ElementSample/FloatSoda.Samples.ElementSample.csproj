@@ -11,10 +11,4 @@
       <ProjectReference Include="..\..\src\FloatSoda\FloatSoda.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="OpenTK" Version="4.9.4" />
-      <PackageReference Include="OVRSharp" Version="1.2.0" />
-      <PackageReference Include="SkiaSharp" Version="3.119.2" />
-    </ItemGroup>
-
 </Project>

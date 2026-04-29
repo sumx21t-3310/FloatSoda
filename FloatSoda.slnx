@@ -1,5 +1,6 @@
 <Solution>
-  <Project Path="FloatSoda.Samples.PrototypeApp/FloatSoda.Samples.PrototypeApp.csproj" />
+  <Project Path="samples/FloatSoda.Samples.PrototypeApp/FloatSoda.Samples.PrototypeApp.csproj" />
   <Project Path="samples/FloatSoda.Samples.ElementSample/FloatSoda.Samples.ElementSample.csproj" />
   <Project Path="src/FloatSoda/FloatSoda.csproj" />
 </Solution>
+ 

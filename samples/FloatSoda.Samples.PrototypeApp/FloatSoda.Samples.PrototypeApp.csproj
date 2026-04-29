@@ -9,7 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\FloatSoda\FloatSoda.csproj" />
+      <ProjectReference Include="..\..\src\FloatSoda\FloatSoda.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="bin\Debug\net10.0\FloatSoda.vrmanifest"/>
     </ItemGroup>
 
 </Project>
+

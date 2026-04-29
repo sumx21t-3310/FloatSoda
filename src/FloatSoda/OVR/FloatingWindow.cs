@@ -1,0 +1,78 @@
+﻿using FloatSoda.OVR.Exceptions;
+using FloatSoda.Render;
+using Valve.VR;
+
+namespace FloatSoda.OVR;
+
+public class FloatingWindow : IWindow
+{
+    private readonly Renderer _renderer;
+    private ulong _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
+
+    public Element Root { get; set; }
+
+    public TrackingTransform Transform { get; }
+
+    public FloatingWindow(string key, string name, Renderer renderer, Element root, float width = 0.5f, bool visible = true)
+    {
+        _renderer = renderer;
+        Root = root;
+        OpenVR.Overlay.CreateOverlay(key, name, ref _overlayHandle).ThrowIfError();
+        Width = width;
+        Visible = visible;
+        Transform = new TrackingTransform();
+    }
+
+    public bool Visible
+    {
+        get;
+        set
+        {
+            field = value;
+            if (field)
+            {
+                OpenVR.Overlay.ShowOverlay(_overlayHandle).ThrowIfError();
+            }
+            else
+            {
+                OpenVR.Overlay.HideOverlay(_overlayHandle).ThrowIfError();
+            }
+        }
+    }
+
+    public float Width
+    {
+        get;
+        set
+        {
+            if (Math.Abs(field - value) < float.Epsilon) return;
+
+            field = Math.Max(0.01f, value);
+            OpenVR.Overlay.SetOverlayWidthInMeters(_overlayHandle, field).ThrowIfError();
+        }
+    }
+
+    public void Update()
+    {
+        Transform.Update(_overlayHandle);
+        _renderer.Render(Root);
+
+        var texture = new Texture_t
+        {
+            handle = _renderer.GLView.TextureHandle,
+            eType = ETextureType.OpenGL,
+            eColorSpace = EColorSpace.Auto,
+        };
+
+        OpenVR.Overlay.SetOverlayTexture(_overlayHandle, ref texture).ThrowIfError();
+    }
+
+
+    public void Dispose()
+    {
+        if (_overlayHandle == OpenVR.k_ulOverlayHandleInvalid) return;
+
+        OpenVR.Overlay.DestroyOverlay(_overlayHandle).ThrowIfError();
+        _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
+    }
+}

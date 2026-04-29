@@ -1,4 +1,4 @@
-﻿using FloatSoda;
+﻿using System.Numerics;
 using FloatSoda.Render;
 using SkiaSharp;
 
@@ -12,7 +12,7 @@ var root = new BoxElement()
     {
         Color = SKColors.Aqua,
         Size = new Size(100, 100),
-        Position = Vector2.Down * 200,
+        Position = new Vector2(200, 200),
     }
 };
 

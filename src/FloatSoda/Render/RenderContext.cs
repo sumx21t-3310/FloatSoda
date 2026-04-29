@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Render;
 
-public class RenderContext(SKPaint paint, SKCanvas canvas) : IDisposable
+public readonly struct RenderContext(SKPaint paint, SKCanvas canvas) : IDisposable
 {
     public SKPaint Paint => paint;
     public SKCanvas Canvas => canvas;
