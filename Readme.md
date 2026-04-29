@@ -21,8 +21,10 @@
 
 ### DashboardWindow
 
+
 SteamVR のダッシュボード内に表示されるオーバーレイです。
 > [!NOTE]
+> マニフェストファイルの設定ができておらず現在動作不可です。
 > 作成には適切な設定と初期化が必要です。（詳細な要件は今後のアップデートで追加予定）
 
 ---
@@ -55,6 +57,12 @@ graph TD
 ---
 
 ## 🏁 Getting Started
+
+動作環境
+- .Net 10.0/C# 14
+- OpenTK 4.9.4
+- SkiaSharp 3.119.2
+
 
 ### 1. ビルド・実行方法
 
@@ -99,6 +107,7 @@ var leftHandWindowLayer = new ContainerLayer
 
 // 3. ウィンドウを登録
 // 正面に固定
+// SteamVRのKeyは自動的にアセンブリの名前で生成されます
 app.CreateFloatingWindow("MainPanel", centerWindowLayer, position: new Vector3(0, 1.2f, -1f));
 
 // 左コントローラーに追従
@@ -116,9 +125,17 @@ app.Run();
 
 [ ] Widget システム (Stateless/Stateful) の導入
 
+[ ] CreateWindowでWidgetを渡せるように
+
+[ ] Steam VRのイベント処理と宣言的な入力
+
+[ ] マニフェストファイルの自動生成 (検討中)
+
 [ ] ヒットテスト（入力イベント）の実装
 
 [ ] アニメーションシステムの統合
+
+[ ] Generic Hostの統合
 
 > [!TIP]
 > より詳細なサンプルコードについては、リポジトリ内のサンプルプロジェクトを参照してください。
