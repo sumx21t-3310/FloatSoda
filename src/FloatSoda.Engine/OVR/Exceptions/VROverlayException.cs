@@ -1,6 +1,6 @@
 ﻿using Valve.VR;
 
-namespace FloatSoda.OVR.Exceptions;
+namespace FloatSoda.Engine.OVR.Exceptions;
 
 /// <summary>
 /// OpenVRオーバーレイ操作に関する例外のベースクラス

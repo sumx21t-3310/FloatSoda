@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Engine.Render;
 
 public class FrameLimiter(int targetFrameRate = 30)
 {

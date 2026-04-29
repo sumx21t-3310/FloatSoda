@@ -1,6 +1,6 @@
 ﻿using Valve.VR;
 
-namespace FloatSoda.OVR.Exceptions;
+namespace FloatSoda.Engine.OVR.Exceptions;
 
 public class EVRApplicationException(string message, EVRApplicationError errorCode) : OVRException<EVRApplicationError>(message, errorCode);
 

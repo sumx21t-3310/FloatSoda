@@ -1,16 +1,19 @@
-﻿using System.Numerics;
+﻿using FloatSoda.Engine.Render;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Engine.Painting;
 
-public class BoxElement(Element? child = null) : Element(child)
+public class PaintLayer : ILayer
 {
     public Size Size { get; init; }
-    public Vector2 Position { get; init; }
+    public Offset Offset { get; init; }
     public SKColor Color { get; init; } = SKColors.Transparent;
 
+    public void Layout(RenderContext context, ILayer parent)
+    {
+    }
 
-    protected override void OnDraw(RenderContext context)
+    public void Paint(RenderContext context, ILayer parent)
     {
         context.Paint.Color = Color;
         context.Paint.Style = SKPaintStyle.Fill;

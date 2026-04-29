@@ -1,7 +1,9 @@
 ﻿using System.Numerics;
-using FloatSoda.OVR;
-using FloatSoda.OVR.Exceptions;
-using FloatSoda.Render;
+using FloatSoda.Engine;
+using FloatSoda.Engine.OVR;
+using FloatSoda.Engine.OVR.Exceptions;
+using FloatSoda.Engine.Render;
+using FloatSoda.Engine.Painting;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using Valve.VR;
 
@@ -9,35 +11,48 @@ namespace FloatSoda;
 
 public class FloatSodaApp : IDisposable
 {
+    private string _overlayKey = SteamVRKeyUtil.CreateKeyFromAssembly();
+
     private readonly List<IWindow> _windows = [];
     private readonly List<Action> _windowBuilders = [];
     private readonly List<Action> _builders = [];
 
-    public void CreateFloatingWindow(string key, string name, Element rootElement, float width, Vector3 position, TrackingTarget trackingTarget)
+    public void CreateFloatingWindow(string windowName, ILayer root, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
     {
         _windowBuilders.Add(() =>
         {
-            var floatingWindow = new FloatingWindow(key, name, new Renderer(new GLView()), rootElement);
+            var uniqueKey = SteamVRKeyUtil.CreateWindowKey(_overlayKey, windowName);
 
-            floatingWindow.Transform.Position = position;
+
+            var floatingWindow = new FloatingWindow(uniqueKey, $"{_overlayKey}.{windowName}", new Renderer(new GLView()), root);
+
+            floatingWindow.Transform.Position = position ?? new Vector3(0, 0, 0);
+            floatingWindow.Transform.Rotation = rotation ?? Quaternion.Identity;
             floatingWindow.Transform.TrackingTarget = trackingTarget;
             floatingWindow.Width = width;
             _windows.Add(floatingWindow);
         });
     }
 
-    public void CreateDashboardWindow(string key, string name, string iconPath, Element rootElement)
+
+    public void CreateDashboardWindow(string windowName, string iconPath, ILayer root)
     {
-        _windowBuilders.Add(() => { _windows.Add(new DashboardWindow(key, name, iconPath, new Renderer(new GLView()), rootElement)); });
+        _windowBuilders.Add(() =>
+        {
+            var uniqueKey = SteamVRKeyUtil.CreateWindowKey(_overlayKey, windowName);
+            _windows.Add(new DashboardWindow(uniqueKey, windowName, iconPath, new Renderer(new GLView()), root));
+        });
     }
 
+    public void SetCustomOverlayKey(string overlayKey) => _builders.Add(() => _overlayKey = overlayKey);
     private void AddManifestFile(string manifestPath) => _builders.Add(() => InstallManifest(manifestPath));
 
+    [STAThread]
     public void Run(int targetFrameRate = 30)
     {
         if (!GLFW.Init()) throw new Exception();
-        GLFW.Init();
         InitializeOpenVR();
+
         foreach (var build in _builders) build();
 
         foreach (var build in _windowBuilders) build();
@@ -70,7 +85,6 @@ public class FloatSodaApp : IDisposable
     {
         var error = EVRInitError.None;
         OpenVR.Init(ref error, EVRApplicationType.VRApplication_Overlay);
-
         error.ThrowIfError();
     }
 

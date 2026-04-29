@@ -1,10 +1,11 @@
-﻿using FloatSoda.Render;
+﻿using FloatSoda.Engine.Painting;
+using FloatSoda.Engine.Render;
 
-namespace FloatSoda.OVR;
+namespace FloatSoda.Engine;
 
 public interface IWindow : IDisposable
 {
-    Element Root { get; set; }
+    ILayer Root { get; set; }
     public bool Visible { get; set; }
     public float Width { get; set; }
     void Update();

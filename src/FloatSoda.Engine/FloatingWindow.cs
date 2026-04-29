@@ -1,19 +1,20 @@
-﻿using FloatSoda.OVR.Exceptions;
-using FloatSoda.Render;
+﻿using FloatSoda.Engine.OVR.Exceptions;
+using FloatSoda.Engine.Painting;
+using FloatSoda.Engine.Render;
 using Valve.VR;
 
-namespace FloatSoda.OVR;
+namespace FloatSoda.Engine;
 
 public class FloatingWindow : IWindow
 {
     private readonly Renderer _renderer;
     private ulong _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
 
-    public Element Root { get; set; }
+    public ILayer Root { get; set; }
 
     public TrackingTransform Transform { get; }
 
-    public FloatingWindow(string key, string name, Renderer renderer, Element root, float width = 0.5f, bool visible = true)
+    public FloatingWindow(string key, string name, Renderer renderer, ILayer root, float width = 0.5f, bool visible = true)
     {
         _renderer = renderer;
         Root = root;
@@ -28,6 +29,8 @@ public class FloatingWindow : IWindow
         get;
         set
         {
+            if (field == value) return;
+
             field = value;
             if (field)
             {

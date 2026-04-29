@@ -2,7 +2,7 @@
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Engine.Render;
 
 public class GLView : IDisposable
 {
@@ -47,7 +47,12 @@ public class GLView : IDisposable
         Surface = SKSurface.Create(GrContext, backendTexture, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888) ?? throw new InvalidOperationException("SKSurfaceの作成に失敗しました。");
     }
 
-    public void Clear() => Surface.Canvas.Clear(SKColors.Transparent);
+    public void Clear()
+    {
+        GrContext.ResetContext();
+
+        Surface.Canvas.Clear(SKColors.Transparent);
+    }
 
     public void Flush()
     {

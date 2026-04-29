@@ -1,6 +1,6 @@
 ﻿using Valve.VR;
 
-namespace FloatSoda.OVR.Exceptions;
+namespace FloatSoda.Engine.OVR.Exceptions;
 
 // ReSharper disable once InconsistentNaming
 public class EVRInitializeException(string message, EVRInitError errorCode) : OVRException<EVRInitError>(message, errorCode);

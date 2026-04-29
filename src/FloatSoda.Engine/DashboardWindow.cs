@@ -1,8 +1,9 @@
-﻿using FloatSoda.OVR.Exceptions;
-using FloatSoda.Render;
+﻿using FloatSoda.Engine.OVR.Exceptions;
+using FloatSoda.Engine.Painting;
+using FloatSoda.Engine.Render;
 using Valve.VR;
 
-namespace FloatSoda.OVR;
+namespace FloatSoda.Engine;
 
 public class DashboardWindow : IWindow
 {
@@ -10,9 +11,9 @@ public class DashboardWindow : IWindow
     private ulong _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
     private ulong _thumbnailHandle = OpenVR.k_ulOverlayHandleInvalid;
 
-    public Element Root { get; set; }
+    public ILayer Root { get; set; }
 
-    public DashboardWindow(string key, string name, string iconPath, Renderer renderer, Element root, float width = 0.5f, bool visible = false)
+    public DashboardWindow(string key, string name, string iconPath, Renderer renderer, ILayer root, float width = 0.5f, bool visible = false)
     {
         _renderer = renderer;
         Root = root;

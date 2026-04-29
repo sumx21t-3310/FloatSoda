@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
-using FloatSoda.OVR.Exceptions;
+using FloatSoda.Engine.OVR.Exceptions;
 using Valve.VR;
 
-namespace FloatSoda.OVR;
+namespace FloatSoda.Engine;
 
 public class TrackingTransform
 {

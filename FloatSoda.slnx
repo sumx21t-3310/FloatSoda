@@ -1,6 +1,7 @@
 <Solution>
-  <Project Path="samples/FloatSoda.Samples.PrototypeApp/FloatSoda.Samples.PrototypeApp.csproj" />
-  <Project Path="samples/FloatSoda.Samples.ElementSample/FloatSoda.Samples.ElementSample.csproj" />
+  <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
+  <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
+  <Project Path="src/FloatSoda.Engine/FloatSoda.Engine.csproj" />
   <Project Path="src/FloatSoda/FloatSoda.csproj" />
 </Solution>
  

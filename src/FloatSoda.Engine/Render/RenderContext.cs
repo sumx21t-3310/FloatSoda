@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Engine.Render;
 
 public readonly struct RenderContext(SKPaint paint, SKCanvas canvas) : IDisposable
 {
