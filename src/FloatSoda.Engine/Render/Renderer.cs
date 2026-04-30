@@ -4,8 +4,9 @@ namespace FloatSoda.Engine.Render;
 
 public class Renderer(GLView glView) : IDisposable
 {
-    public GLView GLView => glView;
     private readonly RenderContext _renderContext = RenderContext.Create(glView.Surface);
+
+    public IntPtr GetTextureHandle() => glView.TextureHandle;
 
     public void Render(ILayer root)
     {

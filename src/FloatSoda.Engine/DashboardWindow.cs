@@ -60,7 +60,7 @@ public class DashboardWindow : IWindow
         _renderer.Render(Root);
         var texture = new Texture_t
         {
-            handle = _renderer.GLView.TextureHandle,
+            handle = _renderer.GetTextureHandle(),
             eType = ETextureType.OpenGL,
             eColorSpace = EColorSpace.Auto,
         };
