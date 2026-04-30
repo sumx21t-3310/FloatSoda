@@ -63,7 +63,7 @@ public class TrackingTransform
                 .ThrowIfError();
         }
         else
-        { 
+        {
             var trackingDeviceIndex = TrackingTarget switch
             {
                 TrackingTarget.LeftController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand),
@@ -74,7 +74,9 @@ public class TrackingTransform
 
             if (trackingDeviceIndex == OpenVR.k_unTrackedDeviceIndexInvalid) return;
 
-            OpenVR.Overlay.SetOverlayTransformTrackedDeviceRelative(overlayHandle, trackingDeviceIndex, ref matrix);
+            OpenVR.Overlay
+                .SetOverlayTransformTrackedDeviceRelative(overlayHandle, trackingDeviceIndex, ref matrix)
+                .ThrowIfError();
         }
     }
 
