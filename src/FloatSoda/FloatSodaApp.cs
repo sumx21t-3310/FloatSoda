@@ -16,6 +16,7 @@ public class FloatSodaApp : IDisposable
     private readonly List<IWindow> _windows = [];
     private readonly List<Action> _windowBuilders = [];
     private readonly List<Action> _builders = [];
+    private bool _disposed;
 
     public void CreateFloatingWindow(string windowName, ILayer root, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
     {
@@ -50,34 +51,75 @@ public class FloatSodaApp : IDisposable
     [STAThread]
     public void Run(int targetFrameRate = 30)
     {
-        if (!GLFW.Init()) throw new Exception();
-        InitializeOpenVR();
-
-        foreach (var build in _builders) build();
-
-        foreach (var build in _windowBuilders) build();
-
-        var limiter = new FrameLimiter(targetFrameRate);
-
-        while (true)
+        try
         {
-            foreach (var window in _windows)
+            try
             {
-                window.Update();
+                if (!GLFW.Init()) throw new Exception("GLFWの初期化に失敗しました。");
+                InitializeOpenVR();
+
+                foreach (var build in _builders) build();
+                foreach (var build in _windowBuilders) build();
+            }
+            catch (EVRDriverEVRInitializeException e)
+            {
+                Console.WriteLine($"OpenVRのドライバーの初期化に失敗しました: {e.Message}");
+                return; // throwせずにreturnすることで、直ちにfinally(Dispose)へ移行
+            }
+            catch (EVRInitializeException e)
+            {
+                Console.WriteLine($"OpenVRの初期化に失敗しました: {e.Message}");
+                return;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"致命的な起動エラー: {e.Message}");
+                return;
             }
 
-            limiter.Wait();
+            // --- 2. メインループセクション ---
+            var limiter = new FrameLimiter(targetFrameRate);
+
+            while (!_disposed)
+            {
+                try
+                {
+                    foreach (var window in _windows)
+                    {
+                        window.Update();
+                    }
+
+                    limiter.Wait();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"ループ実行中にエラーが発生しました: {e}");
+                    return;
+                }
+            }
+        }
+        finally
+        {
+            Dispose();
         }
     }
 
     public void Dispose()
     {
+        if (_disposed) return;
+
+        _disposed = true;
+
         foreach (var window in _windows)
         {
             window.Dispose();
         }
 
-        Shutdown();
+        if (OpenVR.System != null)
+        {
+            OpenVR.Shutdown();
+        }
+
         GLFW.Terminate();
     }
 
@@ -92,12 +134,5 @@ public class FloatSodaApp : IDisposable
     {
         OpenVR.Applications.RemoveApplicationManifest(manifestPath).ThrowIfError();
         OpenVR.Applications.AddApplicationManifest(manifestPath, false).ThrowIfError();
-    }
-
-
-    private void Shutdown()
-    {
-        if (OpenVR.System == null) return;
-        OpenVR.Shutdown();
     }
 }
