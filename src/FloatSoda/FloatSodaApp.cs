@@ -104,33 +104,29 @@ public class FloatSodaApp : IDisposable
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
         if (_disposed) return;
 
-        _disposed = true;
-
-        _cts.Cancel();
-
-        while (_renderThreadRunner.IsRunning)
+        if (disposing)
         {
-            Thread.Sleep(10);
+            _cts.Cancel();
+
+            _renderThreadRunner.Stop();
+
+            _cts.Dispose();
         }
 
         if (OpenVR.System != null)
         {
             OpenVR.Shutdown();
         }
-    }
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed)return;
-
-        if (disposing)
-        {
-            _cts.Cancel();
-            
-            _renderThreadRunner.Stop();
-        }
+        _disposed = true;
     }
 
     private void InitializeOpenVR()
