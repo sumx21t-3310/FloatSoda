@@ -1,70 +1,57 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using FloatSoda.Engine;
 using FloatSoda.Engine.OVR;
 using FloatSoda.Engine.OVR.Exceptions;
-using FloatSoda.Engine.Render;
 using FloatSoda.Engine.Painting;
-using OpenTK.Windowing.GraphicsLibraryFramework;
+using FloatSoda.Engine.Tread;
 using Valve.VR;
 
 namespace FloatSoda;
 
 public class FloatSodaApp : IDisposable
 {
-    private string _overlayKey = SteamVRKeyUtil.CreateKeyFromAssembly();
+    private string _overlayKey = SteamVRKeyFactory.CreateKeyFromAssembly();
 
-    private readonly List<IWindow> _windows = [];
-    private readonly List<Action> _windowBuilders = [];
     private readonly List<Action> _builders = [];
+    private readonly RenderThreadRunner _renderThreadRunner = new("RenderThread", 60);
+
+    private readonly CancellationTokenSource _cts = new();
     private bool _disposed;
 
     public void CreateFloatingWindow(string windowName, ILayer root, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
     {
-        _windowBuilders.Add(() =>
-        {
-            var uniqueKey = SteamVRKeyUtil.CreateWindowKey(_overlayKey, windowName);
-
-
-            var floatingWindow = new FloatingWindow(uniqueKey, $"{_overlayKey}.{windowName}", new Renderer(new GLView()), root);
-
-            floatingWindow.Transform.Position = position ?? new Vector3(0, 0, 0);
-            floatingWindow.Transform.Rotation = rotation ?? Quaternion.Identity;
-            floatingWindow.Transform.TrackingTarget = trackingTarget;
-            floatingWindow.Width = width;
-            _windows.Add(floatingWindow);
-        });
+        var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
+        _renderThreadRunner.CreateFloatingWindow(uniqueKey, windowName, root, width, position, rotation, trackingTarget);
     }
 
 
     public void CreateDashboardWindow(string windowName, string iconPath, ILayer root)
     {
-        _windowBuilders.Add(() =>
-        {
-            var uniqueKey = SteamVRKeyUtil.CreateWindowKey(_overlayKey, windowName);
-            _windows.Add(new DashboardWindow(uniqueKey, windowName, iconPath, new Renderer(new GLView()), root));
-        });
+        var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
+        _renderThreadRunner.CreateDashboardWindow(uniqueKey, windowName, iconPath, root);
     }
 
     public void SetCustomOverlayKey(string overlayKey) => _builders.Add(() => _overlayKey = overlayKey);
     private void AddManifestFile(string manifestPath) => _builders.Add(() => InstallManifest(manifestPath));
 
     [STAThread]
-    public void Run(int targetFrameRate = 30)
+    public void Run(int targetFrameRate = 60)
     {
         try
         {
             try
             {
-                if (!GLFW.Init()) throw new Exception("GLFWの初期化に失敗しました。");
                 InitializeOpenVR();
 
                 foreach (var build in _builders) build();
-                foreach (var build in _windowBuilders) build();
+
+                _renderThreadRunner.Start(_cts.Token);
             }
             catch (EVRDriverEVRInitializeException e)
             {
                 Console.WriteLine($"OpenVRのドライバーの初期化に失敗しました: {e.Message}");
-                return; // throwせずにreturnすることで、直ちにfinally(Dispose)へ移行
+                return;
             }
             catch (EVRInitializeException e)
             {
@@ -77,17 +64,28 @@ public class FloatSodaApp : IDisposable
                 return;
             }
 
+
             // --- 2. メインループセクション ---
             var limiter = new FrameLimiter(targetFrameRate);
 
-            while (!_disposed)
+            while (!_disposed && !_cts.Token.IsCancellationRequested)
             {
                 try
                 {
-                    foreach (var window in _windows)
+                    VREvent_t vrEvent = default;
+
+                    while (OpenVR.System?.PollNextEvent(ref vrEvent, (uint)Marshal.SizeOf<VREvent_t>()) ?? false)
                     {
-                        window.Update();
+                        var eventType = (EVREventType)vrEvent.eventType;
+
+                        if (eventType is EVREventType.VREvent_Quit or EVREventType.VREvent_ProcessQuit)
+                        {
+                            OpenVR.System.AcknowledgeQuit_Exiting();
+
+                            _cts.Cancel();
+                        }
                     }
+
 
                     limiter.Wait();
                 }
@@ -110,17 +108,17 @@ public class FloatSodaApp : IDisposable
 
         _disposed = true;
 
-        foreach (var window in _windows)
+        _cts.Cancel();
+
+        while (_renderThreadRunner.IsRunning)
         {
-            window.Dispose();
+            Thread.Sleep(10);
         }
 
         if (OpenVR.System != null)
         {
             OpenVR.Shutdown();
         }
-
-        GLFW.Terminate();
     }
 
     private void InitializeOpenVR()

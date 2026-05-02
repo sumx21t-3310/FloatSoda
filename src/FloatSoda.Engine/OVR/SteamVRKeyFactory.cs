@@ -3,11 +3,11 @@ using System.Text.RegularExpressions;
 
 namespace FloatSoda.Engine.OVR;
 
-public class SteamVRKeyUtil
+public class SteamVRKeyFactory
 {
     public static string CreateKeyFromAssembly()
     {
-        var domain = Assembly.GetExecutingAssembly().GetName().Name ?? "";
+        var domain = Assembly.GetEntryAssembly()?.GetName().Name ?? "";
 
         return !string.IsNullOrEmpty(domain) ? Sanitize(domain) : $"float_soda_app_{Guid.NewGuid():N}";
     }

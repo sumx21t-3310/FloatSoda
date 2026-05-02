@@ -10,18 +10,23 @@ public class FloatingWindow : IWindow
     private readonly Renderer _renderer;
     private ulong _overlayHandle = OpenVR.k_ulOverlayHandleInvalid;
 
+    public string Key { get; }
     public ILayer Root { get; set; }
 
     public TrackingTransform Transform { get; }
 
     public FloatingWindow(string key, string name, Renderer renderer, ILayer root, float width = 0.5f, bool visible = true)
     {
-        _renderer = renderer;
+        Key = key;
+
         Root = root;
+
         OpenVR.Overlay.CreateOverlay(key, name, ref _overlayHandle).ThrowIfError();
+
         Width = width;
         Visible = visible;
         Transform = new TrackingTransform();
+        _renderer = renderer;
     }
 
     public bool Visible
