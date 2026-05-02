@@ -124,11 +124,6 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
 
     public void CreateFloatingWindow(string _overlayKey, string windowName, ILayer root, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
     {
-        if (IsRunning)
-        {
-            throw new InvalidOperationException();
-        }
-
         _pendingTasks.Enqueue(() =>
         {
             var window = new FloatingWindow(_overlayKey, $"{_overlayKey}.{windowName}", new Renderer(new GLView()), root);
@@ -145,11 +140,6 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
 
     public void CreateDashboardWindow(string _overlayKey, string windowName, string iconPath, ILayer root)
     {
-        if (IsRunning)
-        {
-            throw new InvalidOperationException();
-        }
-
         _pendingTasks.Enqueue(() =>
         {
             var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);

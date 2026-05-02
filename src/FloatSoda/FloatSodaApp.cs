@@ -121,6 +121,18 @@ public class FloatSodaApp : IDisposable
         }
     }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed)return;
+
+        if (disposing)
+        {
+            _cts.Cancel();
+            
+            _renderThreadRunner.Stop();
+        }
+    }
+
     private void InitializeOpenVR()
     {
         var error = EVRInitError.None;
