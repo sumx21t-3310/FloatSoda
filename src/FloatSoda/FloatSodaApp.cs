@@ -1,10 +1,11 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using FloatSoda.Engine;
+using FloatSoda.Engine.Layer;
 using FloatSoda.Engine.OVR;
 using FloatSoda.Engine.OVR.Exceptions;
-using FloatSoda.Engine.Painting;
 using FloatSoda.Engine.Tread;
+using SkiaSharp;
 using Valve.VR;
 
 namespace FloatSoda;
@@ -15,20 +16,23 @@ public class FloatSodaApp : IDisposable
 
     private readonly List<Action> _builders = [];
     private readonly RenderThreadRunner _renderThreadRunner = new("RenderThread", 60);
+    private readonly List<string> _windowKeys = [];
 
     private readonly CancellationTokenSource _cts = new();
     private bool _disposed;
 
-    public void CreateFloatingWindow(string windowName, ILayer root, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
+    public void CreateFloatingWindow(string windowName, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
     {
         var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
-        _renderThreadRunner.CreateFloatingWindow(uniqueKey, windowName, root, width, position, rotation, trackingTarget);
+        _windowKeys.Add(uniqueKey);
+        _renderThreadRunner.CreateFloatingWindow(uniqueKey, windowName, CreateRandomLayerTree(1000, 100), width, position, rotation, trackingTarget);
     }
 
 
     public void CreateDashboardWindow(string windowName, string iconPath, ILayer root)
     {
         var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
+        _windowKeys.Add(uniqueKey);
         _renderThreadRunner.CreateDashboardWindow(uniqueKey, windowName, iconPath, root);
     }
 
@@ -86,6 +90,10 @@ public class FloatSodaApp : IDisposable
                         }
                     }
 
+                    foreach (var windowKey in _windowKeys)
+                    {
+                        _renderThreadRunner.PostRender(windowKey, CreateRandomLayerTree(1000, 1000));
+                    }
 
                     limiter.Wait();
                 }
@@ -100,6 +108,40 @@ public class FloatSodaApp : IDisposable
         {
             Dispose();
         }
+    }
+
+
+    ILayer CreateRandomLayerTree(float width, float height)
+    {
+        var root = new ContainerLayer();
+
+        var rect = Rect.LTWH(0, 0, width, height);
+        var leef = new PictureLayer();
+        var recorder = new SKPictureRecorder();
+        var canvas = recorder.BeginRecording(rect);
+
+        var paint = new SKPaint()
+        {
+            Color = SKColors.Red
+        };
+
+        canvas.DrawCircle(Random.Shared.NextSingle() * width, Random.Shared.NextSingle() * height, 40f, paint);
+        leef.Picture = recorder.EndRecording();
+
+        var opacityLayer = new OpacityLayer { Alpha = 150 };
+
+        var opacityPictureLayer = new PictureLayer();
+        var opacityRecoder = new SKPictureRecorder();
+        var opacityCanvas = opacityRecoder.BeginRecording(rect);
+        opacityCanvas.DrawCircle(0, 0, 60f, paint);
+        opacityPictureLayer.Picture = opacityRecoder.EndRecording();
+        root.Children.Add(opacityPictureLayer);
+        root.Children.Add(opacityLayer);
+
+
+        root.Children.Add(leef);
+
+        return root;
     }
 
     public void Dispose()
