@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace FloatSoda.Engine.Painting;
+namespace FloatSoda.Engine.Layer;
 
 public readonly record struct Size(float Width, float Height)
 {
@@ -74,6 +74,31 @@ public readonly record struct Rect(float Left, float Top, float Right, float Bot
         return new Rect(left, top, right, bottom);
     }
 
+    public Rect Union(Rect other)
+    {
+        var left = MathF.Min(Left, other.Left);
+        var top = MathF.Min(Top, other.Top);
+        var right = MathF.Max(Right, other.Right);
+        var bottom = MathF.Max(Bottom, other.Bottom);
+
+        return new Rect(left, top, right, bottom);
+    }
+
+    public Rect Intersection(Rect other)
+    {
+        var left = MathF.Max(Left, other.Left);
+        var top = MathF.Max(Top, other.Top);
+        var right = MathF.Min(Right, other.Right);
+        var bottom = MathF.Min(Bottom, other.Bottom);
+
+        // 重なりがない（幅または高さが0以下になる）場合は Zero を返す
+        if (right <= left || bottom <= top)
+        {
+            return Zero;
+        }
+
+        return new Rect(left, top, right, bottom);
+    }
 
     public Rect Resize(Size size) => FromSizeAndOffset(size, new Offset(Left, Top));
 
@@ -100,7 +125,7 @@ public readonly record struct RRect(Rect Rect, float Rx, float Ry) : IRect
     public RRect Shift(Offset offset) => this with { Rect = Rect.Shift(offset) };
     public RRect Inflate(float delta) => this with { Rect = Rect.Inflate(delta) };
     public RRect Deflate(float delta) => this with { Rect = Rect.Deflate(delta) };
-    
+
     public float Left => Rect.Left;
     public float Top => Rect.Top;
     public float Right => Rect.Right;

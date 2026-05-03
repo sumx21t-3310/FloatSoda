@@ -1,4 +1,4 @@
-﻿using FloatSoda.Engine.Painting;
+﻿using FloatSoda.Engine.Layer;
 using FloatSoda.Engine.Render;
 using SkiaSharp;
 
@@ -12,9 +12,9 @@ public class ImageRenderer
         using var surface = SKSurface.Create(info);
 
         surface.Canvas.Clear(SKColors.Transparent);
-        var renderContext = RenderContext.Create(surface);
+        var renderContext = LayerContext.Create(surface);
 
-        root.Paint(renderContext, root);
+        root.Paint(renderContext);
 
         var image = surface.Snapshot();
 

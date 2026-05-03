@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Numerics;
+using FloatSoda.Engine.Layer;
 using FloatSoda.Engine.OVR;
-using FloatSoda.Engine.Painting;
 using FloatSoda.Engine.Render;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -161,6 +161,10 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
         if (_windows.TryGetValue(key, out var window))
         {
             window.Root = layer;
+        }
+        else
+        {
+            Console.WriteLine($"ウィンドウが見つかりませんでした: {key}");
         }
     }
 
