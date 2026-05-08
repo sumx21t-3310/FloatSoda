@@ -6,14 +6,15 @@ public class ContainerLayer : ILayer
 
     public Rect PaintBounds { get; private set; }
 
-    public virtual void Layout(LayerContext context) => PaintBounds = LayoutChildren();
+    public virtual void Layout(LayerContext context) => PaintBounds = LayoutChildren(context);
 
-    protected Rect LayoutChildren()
+    protected Rect LayoutChildren(LayerContext context)
     {
-        var bounds = new Rect();
+        var bounds = Rect.Zero;
 
         foreach (var child in Children)
         {
+            child.Layout(context);
             bounds = bounds.Union(child.PaintBounds);
         }
 

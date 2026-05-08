@@ -8,7 +8,7 @@ public class ClipRectLayer : ContainerLayer
 
     public override void Layout(LayerContext context)
     {
-        var clipPathBounds = LayoutChildren();
+        var clipPathBounds = LayoutChildren(context);
         context.Canvas.Restore();
     }
 

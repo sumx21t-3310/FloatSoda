@@ -10,11 +10,11 @@ public class OpacityLayer : ContainerLayer
     {
         var paint = new SKPaint()
         {
-            Color = SKColors.Transparent.WithAlpha(Alpha),
+            Color = SKColors.White.WithAlpha(Alpha),
             IsAntialias = true
         };
 
-        context.Canvas.SaveLayer(PaintBounds, paint);
+        context.Canvas.SaveLayer(paint);
 
         base.Paint(context);
 

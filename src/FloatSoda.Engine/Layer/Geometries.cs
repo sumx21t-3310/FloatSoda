@@ -91,7 +91,6 @@ public readonly record struct Rect(float Left, float Top, float Right, float Bot
         var right = MathF.Min(Right, other.Right);
         var bottom = MathF.Min(Bottom, other.Bottom);
 
-        // 重なりがない（幅または高さが0以下になる）場合は Zero を返す
         if (right <= left || bottom <= top)
         {
             return Zero;

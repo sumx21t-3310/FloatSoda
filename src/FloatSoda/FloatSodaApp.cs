@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using FloatSoda.Engine;
 using FloatSoda.Engine.Layer;
@@ -19,13 +20,16 @@ public class FloatSodaApp : IDisposable
     private readonly List<string> _windowKeys = [];
 
     private readonly CancellationTokenSource _cts = new();
+    private Stopwatch _stopwatch = Stopwatch.StartNew();
     private bool _disposed;
 
-    public void CreateFloatingWindow(string windowName, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
+    public void CreateFloatingWindow(string windowName, float width = 0.5f, Vector3? position = null,
+        Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
     {
         var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
         _windowKeys.Add(uniqueKey);
-        _renderThreadRunner.CreateFloatingWindow(uniqueKey, windowName, CreateRandomLayerTree(1000, 100), width, position, rotation, trackingTarget);
+        _renderThreadRunner.CreateFloatingWindow(uniqueKey, windowName, CreateRandomLayerTree(1000, 100), width,
+            position, rotation, trackingTarget);
     }
 
 
@@ -116,7 +120,7 @@ public class FloatSodaApp : IDisposable
         var root = new ContainerLayer();
 
         var rect = Rect.LTWH(0, 0, width, height);
-        var leef = new PictureLayer();
+        var leaf = new PictureLayer();
         var recorder = new SKPictureRecorder();
         var canvas = recorder.BeginRecording(rect);
 
@@ -125,21 +129,24 @@ public class FloatSodaApp : IDisposable
             Color = SKColors.Red
         };
 
-        canvas.DrawCircle(Random.Shared.NextSingle() * width, Random.Shared.NextSingle() * height, 40f, paint);
-        leef.Picture = recorder.EndRecording();
+        var sin = ((float)Math.Sin(_stopwatch.Elapsed.TotalSeconds) + 1) / 2f;
+        var cos = ((float)Math.Cos(_stopwatch.Elapsed.TotalSeconds) + 1) / 2f;
+        canvas.DrawCircle(cos * width, sin * height, 80f, paint);
+        leaf.Picture = recorder.EndRecording();
 
         var opacityLayer = new OpacityLayer { Alpha = 150 };
 
         var opacityPictureLayer = new PictureLayer();
-        var opacityRecoder = new SKPictureRecorder();
-        var opacityCanvas = opacityRecoder.BeginRecording(rect);
+        var opacityRecorder = new SKPictureRecorder();
+        var opacityCanvas = opacityRecorder.BeginRecording(rect);
+
         opacityCanvas.DrawCircle(0, 0, 60f, paint);
-        opacityPictureLayer.Picture = opacityRecoder.EndRecording();
-        root.Children.Add(opacityPictureLayer);
+        opacityPictureLayer.Picture = opacityRecorder.EndRecording();
+
+        opacityLayer.Children.Add(opacityPictureLayer);
         root.Children.Add(opacityLayer);
 
-
-        root.Children.Add(leef);
+        root.Children.Add(leaf);
 
         return root;
     }
