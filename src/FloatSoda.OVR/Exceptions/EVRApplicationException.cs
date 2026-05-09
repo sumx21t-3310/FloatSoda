@@ -1,8 +1,9 @@
-﻿using Valve.VR;
+﻿using OVRSharp.Exceptions;
+using Valve.VR;
 
-namespace FloatSoda.Engine.OVR.Exceptions;
+namespace FloatSoda.OVR.Exceptions;
 
-public class EVRApplicationException(string message, EVRApplicationError errorCode) : OVRException<EVRApplicationError>(message, errorCode);
+public class EVRApplicationException(string message, EVRApplicationError errorCode) : OpenVRSystemException<EVRApplicationError>(message, errorCode);
 
 public static class EVRApplicationExceptionValidator
 {

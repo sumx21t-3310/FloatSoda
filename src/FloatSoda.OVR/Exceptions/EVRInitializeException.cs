@@ -1,9 +1,10 @@
-﻿using Valve.VR;
+﻿using OVRSharp.Exceptions;
+using Valve.VR;
 
-namespace FloatSoda.Engine.OVR.Exceptions;
+namespace FloatSoda.OVR.Exceptions;
 
 // ReSharper disable once InconsistentNaming
-public class EVRInitializeException(string message, EVRInitError errorCode) : OVRException<EVRInitError>(message, errorCode);
+public class EVRInitializeException(string message, EVRInitError errorCode) : OpenVRSystemException<EVRInitError>(message, errorCode);
 
 // ReSharper disable once InconsistentNaming
 public class EVRDriverEVRInitializeException(string message, EVRInitError errorCode) : EVRInitializeException(message, errorCode);

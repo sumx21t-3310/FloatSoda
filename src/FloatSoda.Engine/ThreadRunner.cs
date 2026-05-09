@@ -1,11 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Numerics;
-using FloatSoda.Engine.Layer;
-using FloatSoda.Engine.OVR;
-using FloatSoda.Engine.Render;
+using FloatSoda.Common.Layer;
+using FloatSoda.OVR;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace FloatSoda.Engine.Tread;
+namespace FloatSoda.Engine;
 
 public interface IThreadRunner
 {
@@ -122,31 +121,34 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
     private readonly ConcurrentDictionary<string, IWindow> _windows = [];
     private readonly ConcurrentQueue<Action> _pendingTasks = new();
 
-    public void CreateFloatingWindow(string _overlayKey, string windowName, ILayer root, float width = 0.5f, Vector3? position = null, Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
+    public void CreateOverlayWindow(
+        string overlayKey,
+        string windowName,
+        bool isDashboard,
+        float width = 0.5f,
+        Vector3? position = null,
+        Quaternion? rotation = null,
+        TrackingTarget trackingTarget = TrackingTarget.World)
     {
         _pendingTasks.Enqueue(() =>
         {
-            var window = new FloatingWindow(_overlayKey, $"{_overlayKey}.{windowName}", new Renderer(new GLView()), root);
+            var window = new OverlayWindow(overlayKey, $"{overlayKey}.{windowName}", isDashboard,
+                new Renderer(new GLView()))
+            {
+                Transform =
+                {
+                    Position = position ?? new Vector3(0, 0, 0),
+                    Rotation = rotation ?? Quaternion.Identity,
+                    TrackingTarget = trackingTarget
+                },
+                Width = width,
+                Visible = true
+            };
 
-            window.Transform.Position = position ?? new Vector3(0, 0, 0);
-            window.Transform.Rotation = rotation ?? Quaternion.Identity;
-            window.Transform.TrackingTarget = trackingTarget;
-            window.Width = width;
-
-            _windows.TryAdd(_overlayKey, window);
+            _windows.TryAdd(overlayKey, window);
         });
     }
 
-
-    public void CreateDashboardWindow(string _overlayKey, string windowName, string iconPath, ILayer root)
-    {
-        _pendingTasks.Enqueue(() =>
-        {
-            var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
-            var window = new DashboardWindow(uniqueKey, windowName, iconPath, new Renderer(new GLView()), root);
-            _windows.TryAdd(_overlayKey, window);
-        });
-    }
 
     protected override void PreUpdate()
     {

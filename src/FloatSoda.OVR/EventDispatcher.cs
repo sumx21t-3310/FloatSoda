@@ -1,6 +1,6 @@
 ﻿using Valve.VR;
 
-namespace FloatSoda.Engine.OVR;
+namespace FloatSoda.OVR;
 
 public class EventDispatcher
 {

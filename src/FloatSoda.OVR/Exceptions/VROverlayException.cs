@@ -1,11 +1,12 @@
-﻿using Valve.VR;
+﻿using OVRSharp.Exceptions;
+using Valve.VR;
 
-namespace FloatSoda.Engine.OVR.Exceptions;
+namespace FloatSoda.OVR.Exceptions;
 
 /// <summary>
 /// OpenVRオーバーレイ操作に関する例外のベースクラス
 /// </summary>
-public class VrOverlayException(EVROverlayError error, string message) : OVRException<EVROverlayError>(message, error);
+public class VrOverlayException(EVROverlayError error, string message) : OpenVRSystemException<EVROverlayError>(message, error);
 
 public static class VrOverlayValidator
 {

@@ -1,8 +1,12 @@
-﻿namespace FloatSoda.Engine.Layer;
+﻿using FloatSoda.Common.Geometries;
+
+namespace FloatSoda.Common.Layer;
 
 public class ContainerLayer : ILayer
 {
     public List<ILayer> Children { get; } = [];
+    
+    public bool HasChildren => Children.Count != 0;
 
     public Rect PaintBounds { get; private set; }
 

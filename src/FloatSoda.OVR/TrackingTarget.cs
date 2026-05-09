@@ -1,4 +1,4 @@
-﻿namespace FloatSoda.Engine;
+﻿namespace FloatSoda.OVR;
 
 public enum TrackingTarget
 {

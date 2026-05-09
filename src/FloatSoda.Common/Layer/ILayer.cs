@@ -1,4 +1,6 @@
-﻿namespace FloatSoda.Engine.Layer;
+﻿using FloatSoda.Common.Geometries;
+
+namespace FloatSoda.Common.Layer;
 
 public interface ILayer
 {

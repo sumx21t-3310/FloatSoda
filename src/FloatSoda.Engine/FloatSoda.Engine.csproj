@@ -15,4 +15,9 @@
       <PackageReference Include="SkiaSharp" Version="3.119.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\FloatSoda.Common\FloatSoda.Common.csproj" />
+      <ProjectReference Include="..\FloatSoda.OVR\FloatSoda.OVR.csproj" />
+    </ItemGroup>
+
 </Project>

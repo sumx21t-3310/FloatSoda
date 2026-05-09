@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
-namespace FloatSoda.Engine.OVR;
+namespace FloatSoda.OVR;
 
 public class SteamVRKeyFactory
 {

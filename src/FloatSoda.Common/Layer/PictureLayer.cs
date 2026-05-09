@@ -1,6 +1,7 @@
-﻿using SkiaSharp;
+﻿using FloatSoda.Common.Geometries;
+using SkiaSharp;
 
-namespace FloatSoda.Engine.Layer;
+namespace FloatSoda.Common.Layer;
 
 public class PictureLayer : ILayer
 {

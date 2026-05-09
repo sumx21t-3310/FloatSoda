@@ -1,7 +1,13 @@
 <Solution>
-  <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
-  <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
-  <Project Path="src/FloatSoda.Engine/FloatSoda.Engine.csproj" />
-  <Project Path="src/FloatSoda/FloatSoda.csproj" />
+    <Folder Name="/src/">
+        <Project Path="src/FloatSoda.Common/FloatSoda.Common.csproj" />
+        <Project Path="src/FloatSoda.Engine/FloatSoda.Engine.csproj" />
+        <Project Path="src/FloatSoda.OVR/FloatSoda.OVR.csproj" />
+        <Project Path="src/FloatSoda/FloatSoda.csproj" />
+    </Folder>
+    <Folder Name="/samples/">
+        <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
+        <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
+    </Folder>
 </Solution>
  

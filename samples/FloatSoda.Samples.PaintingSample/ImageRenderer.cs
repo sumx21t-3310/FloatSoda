@@ -1,5 +1,5 @@
-﻿using FloatSoda.Engine.Layer;
-using FloatSoda.Engine.Render;
+﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Common.Layer;
 using SkiaSharp;
 
 namespace FloatSoda.Samples.PaintingSample;

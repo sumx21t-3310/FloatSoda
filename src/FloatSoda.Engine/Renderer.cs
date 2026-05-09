@@ -1,6 +1,6 @@
-﻿using FloatSoda.Engine.Layer;
+﻿using FloatSoda.Common.Layer;
 
-namespace FloatSoda.Engine.Render;
+namespace FloatSoda.Engine;
 
 public class Renderer(GLView glView) : IDisposable
 {

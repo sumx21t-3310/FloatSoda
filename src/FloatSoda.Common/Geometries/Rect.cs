@@ -1,35 +1,8 @@
 ﻿using SkiaSharp;
+using static System.MathF;
 
-namespace FloatSoda.Engine.Layer;
 
-public readonly record struct Size(float Width, float Height)
-{
-    public static readonly Size Zero = new(0, 0);
-    public static readonly Size One = new(1, 1);
-
-    public static Size FromRect(Rect rect) => new(
-        Math.Abs(rect.Right - rect.Left),
-        Math.Abs(rect.Bottom - rect.Top)
-    );
-
-    public static Size operator *(Size size, float x) => new Size(size.Width * x, size.Height * x);
-    public static Size operator /(Size size, float x) => new(size.Width / x, size.Height / x);
-}
-
-public readonly record struct Offset(float X, float Y)
-{
-    public static Offset Zero => new(0, 0);
-    public static Offset One => new(1, 1);
-
-    public static Offset operator +(Offset a, Offset b) => new(a.X + b.X, a.Y + b.Y);
-
-    public static Offset operator -(Offset a, Offset b) => new(a.X - b.X, a.Y - b.Y);
-
-    public static Offset operator *(Offset a, float b) => new(a.X * b, a.Y * b);
-    public static Offset operator *(float a, Offset b) => b * a;
-
-    public static Offset operator /(Offset a, float b) => new(a.X / b, a.Y / b);
-}
+namespace FloatSoda.Common.Geometries;
 
 public interface IRect
 {
@@ -39,6 +12,7 @@ public interface IRect
     float Bottom { get; }
 
     Size Size { get; }
+    
 }
 
 public readonly record struct Rect(float Left, float Top, float Right, float Bottom) : IRect
@@ -56,9 +30,11 @@ public readonly record struct Rect(float Left, float Top, float Right, float Bot
 
     public static Rect LTRB(float left, float top, float right, float bottom) => new(left, top, right, bottom);
 
-    public static Rect LTWH(float left, float top, float width, float height) => new(left, top, left + width, top + height);
+    public static Rect LTWH(float left, float top, float width, float height) =>
+        new(left, top, left + width, top + height);
 
-    public static Rect FromCenter(Offset center, Size size) => LTWH(center.X - size.Width / 2f, center.Y - size.Height / 2f, size.Width, size.Height);
+    public static Rect FromCenter(Offset center, Size size) => LTWH(center.X - size.Width / 2f,
+        center.Y - size.Height / 2f, size.Width, size.Height);
 
     public static Rect FromSizeAndOffset(Size size, Offset leftTop) => new(
         leftTop.X,
@@ -74,22 +50,24 @@ public readonly record struct Rect(float Left, float Top, float Right, float Bot
         return new Rect(left, top, right, bottom);
     }
 
+    public Rect Normalized => Normalize(this);
+
     public Rect Union(Rect other)
     {
-        var left = MathF.Min(Left, other.Left);
-        var top = MathF.Min(Top, other.Top);
-        var right = MathF.Max(Right, other.Right);
-        var bottom = MathF.Max(Bottom, other.Bottom);
+        var left = Min(Left, other.Left);
+        var top = Min(Top, other.Top);
+        var right = Max(Right, other.Right);
+        var bottom = Max(Bottom, other.Bottom);
 
         return new Rect(left, top, right, bottom);
     }
 
     public Rect Intersection(Rect other)
     {
-        var left = MathF.Max(Left, other.Left);
-        var top = MathF.Max(Top, other.Top);
-        var right = MathF.Min(Right, other.Right);
-        var bottom = MathF.Min(Bottom, other.Bottom);
+        var left = Max(Left, other.Left);
+        var top = Max(Top, other.Top);
+        var right = Min(Right, other.Right);
+        var bottom = Min(Bottom, other.Bottom);
 
         if (right <= left || bottom <= top)
         {
@@ -97,6 +75,13 @@ public readonly record struct Rect(float Left, float Top, float Right, float Bot
         }
 
         return new Rect(left, top, right, bottom);
+    }
+
+    public bool TryIntersect(Rect other, out Rect intersection)
+    {
+        intersection = Intersection(other);
+
+        return intersection.Normalized != Zero;
     }
 
     public Rect Resize(Size size) => FromSizeAndOffset(size, new Offset(Left, Top));
@@ -133,4 +118,6 @@ public readonly record struct RRect(Rect Rect, float Rx, float Ry) : IRect
 
     public static implicit operator Rect(RRect rect) => rect.Rect;
     public static implicit operator RRect(Rect rect) => new(rect, 0, 0);
+
+    public static implicit operator SKRoundRect(RRect rect) => new(rect.Rect, rect.Rx, rect.Ry);
 }

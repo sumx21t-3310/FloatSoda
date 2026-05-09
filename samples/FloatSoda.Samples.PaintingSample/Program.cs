@@ -1,10 +1,12 @@
-﻿using FloatSoda.Engine.Layer;
+﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Common.Layer;
 using FloatSoda.Samples.PaintingSample;
 using SkiaSharp;
 
 var imageRenderer = new ImageRenderer();
 
 var root = CreateLayerTree(1000, 1000);
+
 
 var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "output.png");
 

@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace FloatSoda.Engine.Layer;
+namespace FloatSoda.Common.Layer;
 
 public class OpacityLayer : ContainerLayer
 {

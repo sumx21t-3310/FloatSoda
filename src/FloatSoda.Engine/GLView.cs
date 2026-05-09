@@ -2,7 +2,7 @@
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using SkiaSharp;
 
-namespace FloatSoda.Engine.Render;
+namespace FloatSoda.Engine;
 
 public class GLView : IDisposable
 {

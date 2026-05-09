@@ -1,15 +1,16 @@
-﻿using System.Diagnostics;
+﻿namespace FloatSoda;
+
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using FloatSoda.Engine;
-using FloatSoda.Engine.Layer;
-using FloatSoda.Engine.OVR;
-using FloatSoda.Engine.OVR.Exceptions;
-using FloatSoda.Engine.Tread;
+using Common.Geometries;
+using Common.Layer;
+using Engine;
+using OVR;
+using OVRSharp;
+using OVRSharp.Exceptions;
 using SkiaSharp;
 using Valve.VR;
-
-namespace FloatSoda;
 
 public class FloatSodaApp : IDisposable
 {
@@ -18,30 +19,28 @@ public class FloatSodaApp : IDisposable
     private readonly List<Action> _builders = [];
     private readonly RenderThreadRunner _renderThreadRunner = new("RenderThread", 60);
     private readonly List<string> _windowKeys = [];
+    private Application? _openVR;
+    private readonly RenderPipeline _pipeline = new();
 
     private readonly CancellationTokenSource _cts = new();
-    private Stopwatch _stopwatch = Stopwatch.StartNew();
     private bool _disposed;
 
-    public void CreateFloatingWindow(string windowName, float width = 0.5f, Vector3? position = null,
-        Quaternion? rotation = null, TrackingTarget trackingTarget = TrackingTarget.World)
+    public void CreateOverlayWindow(
+        string windowName,
+        bool isDashboard = false,
+        float width = 0.5f,
+        Vector3? position = null,
+        Quaternion? rotation = null,
+        TrackingTarget trackingTarget = TrackingTarget.World)
     {
-        var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
-        _windowKeys.Add(uniqueKey);
-        _renderThreadRunner.CreateFloatingWindow(uniqueKey, windowName, CreateRandomLayerTree(1000, 100), width,
-            position, rotation, trackingTarget);
+        _builders.Add(() =>
+        {
+            var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
+            _windowKeys.Add(uniqueKey);
+            _renderThreadRunner.CreateOverlayWindow(uniqueKey, windowName, isDashboard, width, position, rotation, trackingTarget);
+        });
     }
 
-
-    public void CreateDashboardWindow(string windowName, string iconPath, ILayer root)
-    {
-        var uniqueKey = SteamVRKeyFactory.CreateWindowKey(_overlayKey, windowName);
-        _windowKeys.Add(uniqueKey);
-        _renderThreadRunner.CreateDashboardWindow(uniqueKey, windowName, iconPath, root);
-    }
-
-    public void SetCustomOverlayKey(string overlayKey) => _builders.Add(() => _overlayKey = overlayKey);
-    private void AddManifestFile(string manifestPath) => _builders.Add(() => InstallManifest(manifestPath));
 
     [STAThread]
     public void Run(int targetFrameRate = 60)
@@ -50,22 +49,18 @@ public class FloatSodaApp : IDisposable
         {
             try
             {
-                InitializeOpenVR();
+                _openVR = new Application(Application.ApplicationType.Overlay);
 
                 foreach (var build in _builders) build();
 
                 _renderThreadRunner.Start(_cts.Token);
             }
-            catch (EVRDriverEVRInitializeException e)
-            {
-                Console.WriteLine($"OpenVRのドライバーの初期化に失敗しました: {e.Message}");
-                return;
-            }
-            catch (EVRInitializeException e)
+            catch (OpenVRSystemException<EVRInitError> e)
             {
                 Console.WriteLine($"OpenVRの初期化に失敗しました: {e.Message}");
                 return;
             }
+
             catch (Exception e)
             {
                 Console.WriteLine($"致命的な起動エラー: {e.Message}");
@@ -82,21 +77,22 @@ public class FloatSodaApp : IDisposable
                 {
                     VREvent_t vrEvent = default;
 
-                    while (OpenVR.System?.PollNextEvent(ref vrEvent, (uint)Marshal.SizeOf<VREvent_t>()) ?? false)
+                    while (_openVR?.OVRSystem?.PollNextEvent(ref vrEvent, (uint)Marshal.SizeOf<VREvent_t>()) ?? false)
                     {
                         var eventType = (EVREventType)vrEvent.eventType;
 
-                        if (eventType is EVREventType.VREvent_Quit or EVREventType.VREvent_ProcessQuit)
+                        switch (eventType)
                         {
-                            OpenVR.System.AcknowledgeQuit_Exiting();
-
-                            _cts.Cancel();
+                            case EVREventType.VREvent_Quit or EVREventType.VREvent_ProcessQuit:
+                                _openVR?.OVRSystem?.AcknowledgeQuit_Exiting();
+                                _cts.Cancel();
+                                break;
                         }
                     }
 
                     foreach (var windowKey in _windowKeys)
                     {
-                        _renderThreadRunner.PostRender(windowKey, CreateRandomLayerTree(1000, 1000));
+                        _renderThreadRunner.PostRender(windowKey, _pipeline.Render(1000, 1000));
                     }
 
                     limiter.Wait();
@@ -114,42 +110,6 @@ public class FloatSodaApp : IDisposable
         }
     }
 
-
-    ILayer CreateRandomLayerTree(float width, float height)
-    {
-        var root = new ContainerLayer();
-
-        var rect = Rect.LTWH(0, 0, width, height);
-        var leaf = new PictureLayer();
-        var recorder = new SKPictureRecorder();
-        var canvas = recorder.BeginRecording(rect);
-
-        var paint = new SKPaint()
-        {
-            Color = SKColors.Red
-        };
-
-        var sin = ((float)Math.Sin(_stopwatch.Elapsed.TotalSeconds) + 1) / 2f;
-        var cos = ((float)Math.Cos(_stopwatch.Elapsed.TotalSeconds) + 1) / 2f;
-        canvas.DrawCircle(cos * width, sin * height, 80f, paint);
-        leaf.Picture = recorder.EndRecording();
-
-        var opacityLayer = new OpacityLayer { Alpha = 150 };
-
-        var opacityPictureLayer = new PictureLayer();
-        var opacityRecorder = new SKPictureRecorder();
-        var opacityCanvas = opacityRecorder.BeginRecording(rect);
-
-        opacityCanvas.DrawCircle(0, 0, 60f, paint);
-        opacityPictureLayer.Picture = opacityRecorder.EndRecording();
-
-        opacityLayer.Children.Add(opacityPictureLayer);
-        root.Children.Add(opacityLayer);
-
-        root.Children.Add(leaf);
-
-        return root;
-    }
 
     public void Dispose()
     {
@@ -170,24 +130,50 @@ public class FloatSodaApp : IDisposable
             _cts.Dispose();
         }
 
-        if (OpenVR.System != null)
-        {
-            OpenVR.Shutdown();
-        }
+        _openVR?.Shutdown();
+        _openVR = null;
 
         _disposed = true;
     }
+}
 
-    private void InitializeOpenVR()
-    {
-        var error = EVRInitError.None;
-        OpenVR.Init(ref error, EVRApplicationType.VRApplication_Overlay);
-        error.ThrowIfError();
-    }
+public class RenderPipeline
+{
+    private static readonly Stopwatch Stopwatch = Stopwatch.StartNew();
 
-    private void InstallManifest(string manifestPath)
+    public ILayer Render(float width, float height)
     {
-        OpenVR.Applications.RemoveApplicationManifest(manifestPath).ThrowIfError();
-        OpenVR.Applications.AddApplicationManifest(manifestPath, false).ThrowIfError();
+        var root = new ContainerLayer();
+
+        var rect = Rect.LTWH(0, 0, width, height);
+        var leaf = new PictureLayer();
+        var recorder = new SKPictureRecorder();
+        var canvas = recorder.BeginRecording(rect);
+
+        var paint = new SKPaint()
+        {
+            Color = SKColors.Red
+        };
+
+        var sin = ((float)Math.Sin(Stopwatch.Elapsed.TotalSeconds) + 1) / 2f;
+        var cos = ((float)Math.Cos(Stopwatch.Elapsed.TotalSeconds) + 1) / 2f;
+        canvas.DrawCircle(cos * width, sin * height, 80f, paint);
+        leaf.Picture = recorder.EndRecording();
+
+        var opacityLayer = new OpacityLayer { Alpha = 150 };
+
+        var opacityPictureLayer = new PictureLayer();
+        var opacityRecorder = new SKPictureRecorder();
+        var opacityCanvas = opacityRecorder.BeginRecording(rect);
+
+        opacityCanvas.DrawCircle(0, 0, 60f, paint);
+        opacityPictureLayer.Picture = opacityRecorder.EndRecording();
+
+        opacityLayer.Children.Add(opacityPictureLayer);
+        root.Children.Add(opacityLayer);
+
+        root.Children.Add(leaf);
+
+        return root;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
-using FloatSoda.Engine.OVR.Exceptions;
+using FloatSoda.OVR.Exceptions;
 using Valve.VR;
 
-namespace FloatSoda.Engine;
+namespace FloatSoda.OVR;
 
 public class TrackingTransform
 {
@@ -49,7 +49,7 @@ public class TrackingTransform
 
     private bool _isDirty;
 
-    internal void Update(ulong overlayHandle)
+    public void Update(ulong overlayHandle)
     {
         if (_isDirty == false) return;
         _isDirty = false;
@@ -66,8 +66,10 @@ public class TrackingTransform
         {
             var trackingDeviceIndex = TrackingTarget switch
             {
-                TrackingTarget.LeftController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand),
-                TrackingTarget.RightController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.RightHand),
+                TrackingTarget.LeftController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(
+                    ETrackedControllerRole.LeftHand),
+                TrackingTarget.RightController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(
+                    ETrackedControllerRole.RightHand),
                 TrackingTarget.Headset => OpenVR.k_unTrackedDeviceIndex_Hmd,
                 _ => throw new ArgumentOutOfRangeException()
             };
