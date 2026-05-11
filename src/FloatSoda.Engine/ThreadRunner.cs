@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using System.Numerics;
 using FloatSoda.Common.Layer;
-using FloatSoda.OVR;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using OVRSharp;
 
 namespace FloatSoda.Engine;
 
@@ -125,25 +125,20 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
         string overlayKey,
         string windowName,
         bool isDashboard,
-        float width = 0.5f,
+        string? thumbnail = null,
+        float widthInMeters = 0.5f,
         Vector3? position = null,
         Quaternion? rotation = null,
-        TrackingTarget trackingTarget = TrackingTarget.World)
+        Overlay.TrackedDeviceRole trackedDevice = Overlay.TrackedDeviceRole.None)
     {
         _pendingTasks.Enqueue(() =>
         {
-            var window = new OverlayWindow(overlayKey, $"{overlayKey}.{windowName}", isDashboard,
-                new Renderer(new GLView()))
-            {
-                Transform =
-                {
-                    Position = position ?? new Vector3(0, 0, 0),
-                    Rotation = rotation ?? Quaternion.Identity,
-                    TrackingTarget = trackingTarget
-                },
-                Width = width,
-                Visible = true
-            };
+            var window = new OverlayWindow(overlayKey, windowName, isDashboard, new Renderer(new GLView()), thumbnail);
+
+            window.Overlay.TrackedDevice = trackedDevice;
+            window.Transform.Position = position ?? Vector3.Zero;
+            window.Transform.Rotation = rotation ?? Quaternion.Identity;
+            window.Overlay.WidthInMeters = widthInMeters;
 
             _windows.TryAdd(overlayKey, window);
         });

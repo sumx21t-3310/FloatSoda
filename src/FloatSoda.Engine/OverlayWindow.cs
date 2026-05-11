@@ -1,6 +1,7 @@
-﻿using FloatSoda.Common.Layer;
-using FloatSoda.OVR;
+﻿using System.Numerics;
+using FloatSoda.Common.Layer;
 using OVRSharp;
+using OVRSharp.Math;
 using Valve.VR;
 
 namespace FloatSoda.Engine;
@@ -9,68 +10,129 @@ public interface IWindow : IDisposable
 {
     string Key { get; }
     ILayer Root { get; set; }
-    public bool Visible { get; set; }
-    public float Width { get; set; }
+
     void Update();
 }
 
-public class OverlayWindow(string key, string name, bool isDashboard, Renderer renderer) : IWindow
+public enum TrackingDevice
 {
-    private readonly Overlay _overlay = new(key, name, isDashboard);
-    public TrackingTransform Transform { get; } = new();
+    World,
+    HMD,
+    LeftController,
+    RightController,
+}
 
-    public string Key => _overlay.Key;
+public class OverlayWindow : IWindow
+{
+    private readonly Renderer _renderer;
+
+
+    public Overlay Overlay { get; }
+
+    public string Key => Overlay.Key;
     public ILayer? Root { get; set; }
 
-    public bool IsDashboard => _overlay.IsDashboardOverlay;
+    public Transform Transform { get; }
 
-    public bool Visible
+    public OverlayWindow(string key, string name, bool isDashboard, Renderer renderer, string? thumbnail = null)
+    {
+        _renderer = renderer;
+        Overlay = new Overlay(key, name, isDashboard);
+        Transform = new Transform(Overlay);
+
+        if (isDashboard && thumbnail != null)
+        {
+            Overlay.SetTextureFromFile(thumbnail);
+        }
+        else
+        {
+            Overlay.Show();
+        }
+    }
+
+    public void Update()
+    {
+        if (Root == null)
+        {
+            Console.WriteLine($"{Overlay.Key} is no root found.");
+            return;
+        }
+
+        _renderer.Render(Root);
+
+        var texture = new Texture_t
+        {
+            handle = _renderer.GetTextureHandle(),
+            eType = ETextureType.OpenGL,
+            eColorSpace = EColorSpace.Auto,
+        };
+
+        Overlay.SetTexture(texture);
+    }
+
+
+    public void Dispose() => Overlay.Destroy();
+}
+
+public class Transform(Overlay overlay)
+{
+    private uint _deviceIndex = OpenVR.k_unTrackedDeviceIndexInvalid;
+
+    public TrackingDevice TrackingDevice
     {
         get;
         set
         {
             if (field == value) return;
-
             field = value;
-            if (field)
+
+            _deviceIndex = field switch
             {
-                _overlay.Show();
-            }
-            else
-            {
-                _overlay.Hide();
-            }
+                TrackingDevice.World => OpenVR.k_unTrackedDeviceIndexInvalid,
+                TrackingDevice.HMD => OpenVR.k_unTrackedDeviceIndex_Hmd,
+                TrackingDevice.LeftController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(
+                    ETrackedControllerRole.LeftHand),
+                TrackingDevice.RightController => OpenVR.System.GetTrackedDeviceIndexForControllerRole(
+                    ETrackedControllerRole.RightHand),
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 
-    public float Width
+    public Vector3 Position
     {
-        get => _overlay.WidthInMeters;
-        set => _overlay.WidthInMeters = value;
-    }
+        get;
+        set
+        {
+            field = value;
+            Update();
+        }
+    } = Vector3.Zero;
+
+    public Quaternion Rotation
+    {
+        get;
+        set
+        {
+            field = value;
+            Update();
+        }
+    } = Quaternion.Identity;
+
+    public Vector3 Scale
+    {
+        get;
+        set
+        {
+            field = value;
+            Update();
+        }
+    } = Vector3.One;
 
     public void Update()
     {
-        Transform.Update(_overlay.Handle);
-
-        if (Root == null)
-        {
-            Visible = false;
-            return;
-        }
-
-        renderer.Render(Root);
-
-        var texture = new Texture_t
-        {
-            handle = renderer.GetTextureHandle(),
-            eType = ETextureType.OpenGL,
-            eColorSpace = EColorSpace.Auto,
-        };
-
-        _overlay.SetTexture(texture);
+        overlay.Transform = (Matrix4x4.CreateScale(Scale)
+                             * Matrix4x4.CreateFromQuaternion(Rotation)
+                             * Matrix4x4.CreateTranslation(Position)).ToHmdMatrix34_t();
     }
-
-
-    public void Dispose() => _overlay.Destroy();
 }

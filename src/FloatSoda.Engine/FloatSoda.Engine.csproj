@@ -11,12 +11,12 @@
       <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
       <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.6" />
       <PackageReference Include="OpenTK" Version="4.9.4" />
-      <PackageReference Include="OVRSharp" Version="1.2.0" />
       <PackageReference Include="SkiaSharp" Version="3.119.2" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\FloatSoda.Common\FloatSoda.Common.csproj" />
+      <ProjectReference Include="..\..\..\FloatSoda.OVRSharp\FloatSoda.OVRSharp\FloatSoda.OVRSharp.csproj" />
       <ProjectReference Include="..\FloatSoda.OVR\FloatSoda.OVR.csproj" />
     </ItemGroup>
 
