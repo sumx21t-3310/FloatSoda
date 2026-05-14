@@ -1,4 +1,4 @@
-﻿using FloatSoda.Common.Geometries;
+﻿using SkiaSharp;
 
 namespace FloatSoda.Common.Layer;
 
@@ -8,18 +8,18 @@ public class ContainerLayer : ILayer
     
     public bool HasChildren => Children.Count != 0;
 
-    public Rect PaintBounds { get; private set; }
+    public SKRect PaintBounds { get; protected set; }
 
     public virtual void Layout(LayerContext context) => PaintBounds = LayoutChildren(context);
 
-    protected Rect LayoutChildren(LayerContext context)
+    protected SKRect LayoutChildren(LayerContext context)
     {
-        var bounds = Rect.Zero;
+        var bounds = SKRect.Empty;
 
         foreach (var child in Children)
         {
             child.Layout(context);
-            bounds = bounds.Union(child.PaintBounds);
+            bounds.Union(child.PaintBounds);
         }
 
         return bounds;

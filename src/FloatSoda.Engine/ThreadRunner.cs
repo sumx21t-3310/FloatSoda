@@ -125,6 +125,8 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
         string overlayKey,
         string windowName,
         bool isDashboard,
+        int width,
+        int height,
         string? thumbnail = null,
         float widthInMeters = 0.5f,
         Vector3? position = null,
@@ -133,7 +135,8 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
     {
         _pendingTasks.Enqueue(() =>
         {
-            var window = new OverlayWindow(overlayKey, windowName, isDashboard, new Renderer(new GLView()), thumbnail);
+            var window = new OverlayWindow(overlayKey, windowName, isDashboard, new Renderer(new GLView(width, height)),
+                thumbnail);
 
             window.Overlay.TrackedDevice = trackedDevice;
             window.Transform.Position = position ?? Vector3.Zero;
@@ -155,14 +158,17 @@ public class RenderThreadRunner(string threadName, int targetFramerate) : Thread
 
     public void PostRender(string key, ILayer layer)
     {
-        if (_windows.TryGetValue(key, out var window))
+        _pendingTasks.Enqueue(() =>
         {
-            window.Root = layer;
-        }
-        else
-        {
-            Console.WriteLine($"ウィンドウが見つかりませんでした: {key}");
-        }
+            if (_windows.TryGetValue(key, out var window))
+            {
+                window.Root = layer;
+            }
+            else
+            {
+                Console.WriteLine($"ウィンドウが見つかりませんでした: {key}");
+            }
+        });
     }
 
     protected override void OnStart(CancellationToken ct)

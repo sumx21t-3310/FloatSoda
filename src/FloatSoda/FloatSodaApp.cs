@@ -1,21 +1,22 @@
-﻿using OVRSharp;
+﻿using System.Collections.Concurrent;
+using FloatSoda.Common.Geometries;
+using FloatSoda.Render;
+using Microsoft.Extensions.Logging;
+using OVRSharp;
+using SkiaSharp;
 
 namespace FloatSoda;
 
-using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Common.Geometries;
-using Common.Layer;
 using Engine;
 using OVR.Exceptions;
-using SkiaSharp;
 using Valve.VR;
 
-public class FloatSodaApp : IDisposable
+public class FloatSodaApp(ILogger logger = null) : IDisposable
 {
     private readonly RenderThreadRunner _renderThreadRunner = new("RenderThread", 60);
-    private readonly Dictionary<string, RenderPipeline> _windowKeys = [];
+    private readonly ConcurrentDictionary<string, RenderPipeline> _windowKeys = [];
     private Application? _openVR;
 
     private readonly CancellationTokenSource _cts = new();
@@ -23,6 +24,7 @@ public class FloatSodaApp : IDisposable
 
     public void CreateOverlayWindow(
         string windowName,
+        RenderPipeline pipeline,
         bool isDashboard = false,
         string? thumbnailPath = null,
         float widthInMeters = 0.5f,
@@ -31,12 +33,14 @@ public class FloatSodaApp : IDisposable
         Overlay.TrackedDeviceRole trackedDevice = Overlay.TrackedDeviceRole.None
     )
     {
-        var uniqueKey = WindowKeyGenerator.CreateWindowKey(windowName);
-        _windowKeys.Add(uniqueKey, new RenderPipeline());
+        var uniqueKey = WindowKeyGenerator.GenerateKey(windowName);
+        _windowKeys.TryAdd(uniqueKey, pipeline);
         _renderThreadRunner.CreateOverlayWindow(
             uniqueKey,
             windowName,
             isDashboard,
+            (int)pipeline.RenderView.Size.Width,
+            (int)pipeline.RenderView.Size.Height,
             thumbnailPath,
             widthInMeters,
             position,
@@ -86,7 +90,16 @@ public class FloatSodaApp : IDisposable
 
                 foreach (var (windowKey, pipeline) in _windowKeys)
                 {
-                    _renderThreadRunner.PostRender(windowKey, pipeline.Render(1000, 1000));
+                    lock (pipeline)
+                    {
+                        pipeline.RenderView.Child = new RenderConstrainedBox(
+                            BoxConstraints.Tight(new SKSize(100, 100)),
+                            new RenderColoredBox()
+                        );
+                        pipeline.FlushLayout();
+                        pipeline.FlushPaint();
+                        _renderThreadRunner.PostRender(windowKey, pipeline.RenderView.Layer);
+                    }
                 }
 
                 limiter.Wait();
@@ -143,48 +156,5 @@ public class FloatSodaApp : IDisposable
         _openVR = null;
 
         _disposed = true;
-    }
-}
-
-public class RenderPipeline
-{
-    private static readonly Stopwatch Stopwatch = Stopwatch.StartNew();
-
-    private float speed = Random.Shared.NextSingle();
-
-    public ILayer Render(float width, float height)
-    {
-        var root = new ContainerLayer();
-
-        var rect = Rect.LTWH(0, 0, width, height);
-        var leaf = new PictureLayer();
-        var recorder = new SKPictureRecorder();
-        var canvas = recorder.BeginRecording(rect);
-
-        var paint = new SKPaint()
-        {
-            Color = SKColors.Red
-        };
-
-        var sin = ((float)Math.Sin(Stopwatch.Elapsed.TotalSeconds * speed) + 1) / 2f;
-        var cos = ((float)Math.Cos(Stopwatch.Elapsed.TotalSeconds * speed) + 1) / 2f;
-        canvas.DrawCircle(cos * width, sin * height, 80f, paint);
-        leaf.Picture = recorder.EndRecording();
-
-        var opacityLayer = new OpacityLayer { Alpha = 150 };
-
-        var opacityPictureLayer = new PictureLayer();
-        var opacityRecorder = new SKPictureRecorder();
-        var opacityCanvas = opacityRecorder.BeginRecording(rect);
-
-        opacityCanvas.DrawCircle(0, 0, 60f, paint);
-        opacityPictureLayer.Picture = opacityRecorder.EndRecording();
-
-        opacityLayer.Children.Add(opacityPictureLayer);
-        root.Children.Add(opacityLayer);
-
-        root.Children.Add(leaf);
-
-        return root;
     }
 }

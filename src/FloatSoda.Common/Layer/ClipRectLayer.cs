@@ -1,16 +1,21 @@
-﻿using FloatSoda.Common.Geometries;
+﻿using SkiaSharp;
 
 namespace FloatSoda.Common.Layer;
 
 public class ClipRectLayer : ContainerLayer
 {
-    public Rect ClipRect { get; set; }
+    public SKRect ClipRect { get; set; }
     public Clip ClipBehavior { get; set; }
 
 
     public override void Layout(LayerContext context)
     {
         var clipPathBounds = LayoutChildren(context);
+
+        if (!SKRect.Intersect(ClipRect, clipPathBounds).IsEmpty)
+        {
+            PaintBounds = clipPathBounds;
+        }
 
         context.Canvas.Restore();
     }
@@ -25,10 +30,23 @@ public class ClipRectLayer : ContainerLayer
     }
 }
 
-public class ClipRRectLayer : ClipRectLayer
+public class ClipRRectLayer : ContainerLayer
 {
-    public new RRect ClipRect { get; set; }
+    public SKRoundRect ClipRect { get; set; }
+    public Clip ClipBehavior { get; set; }
 
+
+    public override void Layout(LayerContext context)
+    {
+        var clipPathBounds = LayoutChildren(context);
+
+        if (!SKRect.Intersect(ClipRect.Rect, clipPathBounds).IsEmpty)
+        {
+            PaintBounds = clipPathBounds;
+        }
+
+        context.Canvas.Restore();
+    }
 
     public override void Paint(LayerContext context)
     {
@@ -42,14 +60,26 @@ public class ClipRRectLayer : ClipRectLayer
 
 public class ClipPathLayer : ContainerLayer
 {
+    public SKPath clipPath { get; set; }
+    public Clip ClipBehavior { get; set; }
+
     public override void Layout(LayerContext context)
     {
-        base.Layout(context);
+        var clipPathBounds = LayoutChildren(context);
+        var clipPaintBounds = PaintBounds;
+
+        if (!SKRect.Intersect(clipPathBounds, clipPaintBounds).IsEmpty)
+        {
+            PaintBounds = clipPathBounds;
+        }
     }
 
     public override void Paint(LayerContext context)
     {
+        context.Canvas.Save();
+        context.Canvas.ClipPath(clipPath, antialias: ClipBehavior == Clip.Antialias);
         base.Paint(context);
+        context.Canvas.Restore();
     }
 }
 

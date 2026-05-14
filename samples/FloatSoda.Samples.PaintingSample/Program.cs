@@ -1,5 +1,4 @@
-﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Common.Layer;
+﻿using FloatSoda.Common.Layer;
 using FloatSoda.Samples.PaintingSample;
 using SkiaSharp;
 
@@ -10,18 +9,18 @@ var root = CreateLayerTree(1000, 1000);
 
 var savePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "output.png");
 
-imageRenderer.RenderImage(root, new Size(1000, 1000), savePath);
+imageRenderer.RenderImage(root, new SKSize(1000, 1000), savePath);
 
 ILayer CreateLayerTree(float width, float height)
 {
     var root = new ContainerLayer();
 
-    var rect = Rect.LTWH(0, 0, width, height);
+    var rect = SKRect.Create(0, 0, width, height);
     var leef = new PictureLayer();
     var recorder = new SKPictureRecorder();
     var canvas = recorder.BeginRecording(rect);
 
-    var paint = new SKPaint()
+    var paint = new SKPaint
     {
         Color = SKColors.Red
     };

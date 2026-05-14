@@ -4,14 +4,14 @@ using Common.Geometries;
 using Common.Layer;
 using SkiaSharp;
 
-public class PaintingContext(ContainerLayer containerLayer, Rect estimatedBounds)
+public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBounds)
 {
     private PictureLayer? _currentLayer;
     private SKPictureRecorder? _recorder;
     private SKCanvas? _canvas;
     private bool IsRecording => _canvas != null;
 
-    private SKCanvas Canvas
+    public SKCanvas Canvas
     {
         get
         {
@@ -28,7 +28,7 @@ public class PaintingContext(ContainerLayer containerLayer, Rect estimatedBounds
         _canvas = _recorder.BeginRecording(estimatedBounds);
     }
 
-    private void StopRecordingIfNeeded()
+    public void StopRecordingIfNeeded()
     {
         if (!IsRecording) return;
 
@@ -39,7 +39,7 @@ public class PaintingContext(ContainerLayer containerLayer, Rect estimatedBounds
     }
 
     public void PushLayer(ContainerLayer childLayer, Action<PaintingContext, Offset> painter, Offset offset,
-        Rect? childPaintBounds = null)
+        SKRect? childPaintBounds = null)
     {
         if (childLayer.HasChildren)
         {
@@ -55,6 +55,4 @@ public class PaintingContext(ContainerLayer containerLayer, Rect estimatedBounds
         painter(childContext, offset);
         childContext.StopRecordingIfNeeded();
     }
-
-    // TODO: IDisposableを使ったScope構造体を発行するような構造にリファクタリングする
 }
