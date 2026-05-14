@@ -3,7 +3,6 @@
 namespace FloatSoda.Common.Geometries;
 
 using static Double;
-using static MathF;
 
 public readonly record struct BoxConstraints(
     double MinWidth = 0,
