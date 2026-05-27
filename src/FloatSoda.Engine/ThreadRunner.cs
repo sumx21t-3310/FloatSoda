@@ -15,7 +15,7 @@ public interface IThreadRunner
     bool IsRunning { get; }
 }
 
-public abstract class ThreadRunner(string threadName, FrameLimiter limiter, ILogger? logger = null) : IThreadRunner
+public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null) : IThreadRunner
 {
     private Thread? _thread;
 
@@ -122,7 +122,7 @@ public abstract class ThreadRunner(string threadName, FrameLimiter limiter, ILog
     }
 }
 
-public class RenderThreadRunner(string threadName, FrameLimiter limiter, ILogger? logger = null)
+public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
     : ThreadRunner(threadName, limiter, logger)
 {
     private readonly ConcurrentDictionary<string, IWindow> _windows = [];

@@ -24,7 +24,7 @@ public class FloatSodaAppBuilder
     }
 }
 
-public class FloatSodaApp(FrameLimiter limiter, ILoggerFactory? loggerFactory = null) : IDisposable
+public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory = null) : IDisposable
 {
     private readonly RenderThreadRunner _renderThreadRunner =
         new("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
