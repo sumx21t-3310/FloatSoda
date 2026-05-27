@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using FloatSoda.Common.Geometries;
+using FloatSoda.Geometrics;
 using FloatSoda.Render;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OVRSharp;
 using SkiaSharp;
@@ -13,9 +14,22 @@ using Engine;
 using OVR.Exceptions;
 using Valve.VR;
 
-public class FloatSodaApp(ILogger logger = null) : IDisposable
+public class FloatSodaAppBuilder
 {
-    private readonly RenderThreadRunner _renderThreadRunner = new("RenderThread", 60);
+    private readonly IServiceCollection _services = new ServiceCollection();
+
+    public FloatSodaApp Build()
+    {
+        return new FloatSodaApp(new FrameLimiter(60));
+    }
+}
+
+public class FloatSodaApp(FrameLimiter limiter, ILoggerFactory? loggerFactory = null) : IDisposable
+{
+    private readonly RenderThreadRunner _renderThreadRunner =
+        new("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
+
+    private readonly ILogger? _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
     private readonly ConcurrentDictionary<string, RenderPipeline> _windowKeys = [];
     private Application? _openVR;
 
@@ -51,13 +65,13 @@ public class FloatSodaApp(ILogger logger = null) : IDisposable
 
 
     [STAThread]
-    public void Run(int targetFrameRate = 120)
+    public void Run()
     {
         try
         {
             Initialize();
 
-            MainLoop(targetFrameRate);
+            MainLoop();
         }
         finally
         {
@@ -65,49 +79,57 @@ public class FloatSodaApp(ILogger logger = null) : IDisposable
         }
     }
 
-    private void MainLoop(int targetFrameRate)
+    private void MainLoop()
     {
-        var limiter = new FrameLimiter(targetFrameRate);
-
         while (!_disposed && !_cts.Token.IsCancellationRequested)
         {
             try
             {
-                VREvent_t vrEvent = default;
+                PollEvents();
 
-                while (_openVR?.OVRSystem?.PollNextEvent(ref vrEvent, (uint)Marshal.SizeOf<VREvent_t>()) ?? false)
-                {
-                    var eventType = (EVREventType)vrEvent.eventType;
-
-                    switch (eventType)
-                    {
-                        case EVREventType.VREvent_Quit or EVREventType.VREvent_ProcessQuit:
-                            _openVR?.OVRSystem?.AcknowledgeQuit_Exiting();
-                            _cts.Cancel();
-                            break;
-                    }
-                }
-
-                foreach (var (windowKey, pipeline) in _windowKeys)
-                {
-                    lock (pipeline)
-                    {
-                        pipeline.RenderView.Child = new RenderConstrainedBox(
-                            BoxConstraints.Tight(new SKSize(100, 100)),
-                            new RenderColoredBox()
-                        );
-                        pipeline.FlushLayout();
-                        pipeline.FlushPaint();
-                        _renderThreadRunner.PostRender(windowKey, pipeline.RenderView.Layer);
-                    }
-                }
+                DrawFrame();
 
                 limiter.Wait();
             }
             catch (Exception e)
             {
-                Console.WriteLine($"ループ実行中にエラーが発生しました: {e}");
+                _logger?.LogError("ループ実行中にエラーが発生しました: {Exception}", e);
                 return;
+            }
+        }
+    }
+
+    private void PollEvents()
+    {
+        VREvent_t vrEvent = default;
+        while (_openVR?.OVRSystem?.PollNextEvent(ref vrEvent, (uint)Marshal.SizeOf<VREvent_t>()) ?? false)
+        {
+            var eventType = (EVREventType)vrEvent.eventType;
+
+            switch (eventType)
+            {
+                case EVREventType.VREvent_Quit or EVREventType.VREvent_ProcessQuit:
+                    _openVR?.OVRSystem?.AcknowledgeQuit_Exiting();
+                    _cts.Cancel();
+                    break;
+            }
+        }
+    }
+
+    private void DrawFrame()
+    {
+        foreach (var (windowKey, pipeline) in _windowKeys)
+        {
+            lock (pipeline)
+            {
+                pipeline.RenderView?.Child = new RenderPositionedBox( new RenderConstrainedBox(
+                    BoxConstraints.Tight(new SKSize(100, 100)),
+                    new RenderColoredBox() { Color = SKColors.Red }
+                ));
+
+                pipeline.FlushLayout();
+                pipeline.FlushPaint();
+                _renderThreadRunner.PostRender(windowKey, pipeline.RenderView?.Layer.Clone());
             }
         }
     }
@@ -122,12 +144,12 @@ public class FloatSodaApp(ILogger logger = null) : IDisposable
         }
         catch (OpenVRSystemException<EVRInitError> e)
         {
-            Console.WriteLine($"OpenVRの初期化に失敗しました: {e.Message}");
+            _logger?.LogError($"OpenVRの初期化に失敗しました: {e.Message}");
             throw;
         }
         catch (Exception e)
         {
-            Console.WriteLine($"致命的な起動エラー: {e.Message}");
+            _logger?.LogError($"致命的な起動エラー: {e.Message}");
             throw;
         }
     }

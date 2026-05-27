@@ -2,10 +2,10 @@
 
 namespace FloatSoda.Common.Layer;
 
-public class ClipRectLayer : ContainerLayer
+public class ClipRectLayer(SKRect clipRect) : ContainerLayer
 {
-    public SKRect ClipRect { get; set; }
-    public Clip ClipBehavior { get; set; }
+    public SKRect ClipRect { get; set; } = clipRect;
+    public Clip ClipBehavior { get; set; } = Clip.Antialias;
 
 
     public override void Layout(LayerContext context)
@@ -28,12 +28,27 @@ public class ClipRectLayer : ContainerLayer
         base.Paint(context);
         context.Canvas.Restore();
     }
+
+    public override ILayer Clone()
+    {
+        var cloned = new ClipRectLayer(ClipRect)
+        {
+            ClipBehavior = ClipBehavior
+        };
+
+        foreach (var child in Children)
+        {
+            cloned.Children.Add(child.Clone());
+        }
+
+        return cloned;
+    }
 }
 
-public class ClipRRectLayer : ContainerLayer
+public class ClipRRectLayer(SKRoundRect clipRect) : ContainerLayer
 {
-    public SKRoundRect ClipRect { get; set; }
-    public Clip ClipBehavior { get; set; }
+    public SKRoundRect ClipRect { get; set; } = clipRect;
+    public Clip ClipBehavior { get; set; } = Clip.Antialias;
 
 
     public override void Layout(LayerContext context)
@@ -56,17 +71,32 @@ public class ClipRRectLayer : ContainerLayer
         base.Paint(context);
         context.Canvas.Restore();
     }
+
+    public override ILayer Clone()
+    {
+        var cloned = new ClipRRectLayer(ClipRect)
+        {
+            ClipBehavior = ClipBehavior
+        };
+
+        foreach (var child in Children)
+        {
+            cloned.Children.Add(child.Clone());
+        }
+
+        return cloned;
+    }
 }
 
-public class ClipPathLayer : ContainerLayer
+public class ClipPathLayer(SKPath clipPath) : ContainerLayer
 {
-    public SKPath clipPath { get; set; }
-    public Clip ClipBehavior { get; set; }
+    public SKPath ClipPath { get; set; } = clipPath;
+    public Clip ClipBehavior { get; set; } = Clip.Antialias;
 
     public override void Layout(LayerContext context)
     {
-        var clipPathBounds = LayoutChildren(context);
-        var clipPaintBounds = PaintBounds;
+        var clipPathBounds = ClipPath.Bounds;
+        var clipPaintBounds = LayoutChildren(context);
 
         if (!SKRect.Intersect(clipPathBounds, clipPaintBounds).IsEmpty)
         {
@@ -77,9 +107,21 @@ public class ClipPathLayer : ContainerLayer
     public override void Paint(LayerContext context)
     {
         context.Canvas.Save();
-        context.Canvas.ClipPath(clipPath, antialias: ClipBehavior == Clip.Antialias);
+        context.Canvas.ClipPath(ClipPath, antialias: ClipBehavior == Clip.Antialias);
         base.Paint(context);
         context.Canvas.Restore();
+    }
+
+    public override ILayer Clone()
+    {
+        var cloned = new ClipPathLayer(ClipPath) { ClipBehavior = ClipBehavior };
+
+        foreach (var child in Children)
+        {
+            cloned.Children.Add(child.Clone());
+        }
+
+        return cloned;
     }
 }
 

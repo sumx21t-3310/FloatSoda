@@ -20,4 +20,16 @@ public class OpacityLayer : ContainerLayer
 
         context.Canvas.Restore();
     }
+
+    public override ILayer Clone()
+    {
+        var cloned = new OpacityLayer();
+
+        foreach (var child in Children)
+        {
+            cloned.Children.Add(child.Clone());
+        }
+
+        return cloned;
+    }
 }

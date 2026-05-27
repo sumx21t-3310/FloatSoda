@@ -1,10 +1,13 @@
 ﻿using System.Numerics;
 using FloatSoda;
+using FloatSoda.Engine;
 using FloatSoda.Render;
+using Microsoft.Extensions.Logging;
 using OVRSharp;
 
 
-using var app = new FloatSodaApp();
+var factory = LoggerFactory.Create(builder => builder.AddConsole());
+using var app = new FloatSodaApp(new FrameLimiter(60), factory);
 
 
 var thumbnail = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "thumbnail.png");
@@ -27,7 +30,6 @@ var floatSodaLeftHand = new RenderPipeline
 
 app.CreateOverlayWindow("FloatSoda Absolute", floatSodaAbsolute, position: new Vector3(0, 1.2f, -1f));
 app.CreateOverlayWindow("FloatSoda Dashboard", floatSodaDashboard, isDashboard: true, thumbnailPath: thumbnail);
-app.CreateOverlayWindow("FloatSoda Left Hand", floatSodaLeftHand, position: new Vector3(0, 0, -1),
-    trackedDevice: Overlay.TrackedDeviceRole.LeftHand);
+app.CreateOverlayWindow("FloatSoda Left Hand", floatSodaLeftHand, position: new Vector3(0, 0, -1), trackedDevice: Overlay.TrackedDeviceRole.LeftHand);
 
 app.Run();

@@ -8,4 +8,5 @@ public interface ILayer
 
     void Layout(LayerContext context);
     void Paint(LayerContext context);
+    ILayer Clone();
 }

@@ -18,4 +18,9 @@ public class PictureLayer : ILayer
     {
         Picture?.Playback(context.Canvas);
     }
+
+    public ILayer Clone() => new PictureLayer()
+    {
+        Picture = Picture
+    };
 }

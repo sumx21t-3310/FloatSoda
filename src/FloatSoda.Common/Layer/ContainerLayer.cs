@@ -5,7 +5,7 @@ namespace FloatSoda.Common.Layer;
 public class ContainerLayer : ILayer
 {
     public List<ILayer> Children { get; } = [];
-    
+
     public bool HasChildren => Children.Count != 0;
 
     public SKRect PaintBounds { get; protected set; }
@@ -31,5 +31,17 @@ public class ContainerLayer : ILayer
         {
             child.Paint(context);
         }
+    }
+
+    public virtual ILayer Clone()
+    {
+        var cloned = new ContainerLayer();
+
+        foreach (var child in Children)
+        {
+            cloned.Children.Add(child.Clone());
+        }
+
+        return cloned;
     }
 }

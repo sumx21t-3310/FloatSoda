@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Common.Geometries;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Geometrics;
 
 public static class GeometryExtension
 {
