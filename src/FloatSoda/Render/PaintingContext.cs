@@ -4,6 +4,8 @@ using Common.Geometries;
 using Common.Layer;
 using SkiaSharp;
 
+public delegate void PaintingContextCallback(PaintingContext context, Offset offset);
+
 public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBounds)
 {
     private PictureLayer? _currentLayer;
@@ -38,7 +40,7 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         _canvas = null;
     }
 
-    public void PushLayer(ContainerLayer childLayer, Action<PaintingContext, Offset> painter, Offset offset,
+    public void PushLayer(ContainerLayer childLayer, PaintingContextCallback painter, Offset offset,
         SKRect? childPaintBounds = null)
     {
         if (childLayer.HasChildren)
@@ -54,5 +56,32 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         var childContext = new PaintingContext(childLayer, childPaintBounds ?? estimatedBounds);
         painter(childContext, offset);
         childContext.StopRecordingIfNeeded();
+    }
+
+    public ClipPathLayer ClipPath()
+    {
+        throw new NotImplementedException();
+    }
+
+    public ClipRoundRectLayer PushClipRoundRect(
+        Offset offset,
+        SKRect clipRect,
+        SKRect bounds,
+        PaintingContextCallback painter,
+        Clip clipBehavior = Clip.Antialias, 
+        ClipRoundRectLayer? clipPathLayer = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public ClipRectLayer PushClipRect(
+        Offset offset,
+        SKRect clipRect,
+        PaintingContextCallback painter,
+        Clip clipBehavior = Clip.Antialias,
+        ClipRectLayer? oldLayer = null)
+    {
+        var offsetClipRect = clipRect.MakeOffset(offset);
+        throw new NotImplementedException();
     }
 }

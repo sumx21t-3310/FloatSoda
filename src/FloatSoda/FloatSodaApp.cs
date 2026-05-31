@@ -16,11 +16,14 @@ using Valve.VR;
 
 public class FloatSodaAppBuilder
 {
-    private readonly IServiceCollection _services = new ServiceCollection();
+    public IServiceCollection Services { get; } = new ServiceCollection();
 
     public FloatSodaApp Build()
     {
-        return new FloatSodaApp(new FrameLimiter(60));
+        var provider = Services.BuildServiceProvider();
+        var limiter = provider.GetRequiredService<IFrameLimiter>();
+        var loggerFactory = provider.GetService<ILoggerFactory>();
+        return new FloatSodaApp(limiter, loggerFactory);
     }
 }
 
@@ -122,14 +125,36 @@ public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory =
         {
             lock (pipeline)
             {
-                pipeline.RenderView?.Child = new RenderPositionedBox( new RenderConstrainedBox(
-                    BoxConstraints.Tight(new SKSize(100, 100)),
-                    new RenderColoredBox() { Color = SKColors.Red }
-                ));
+                pipeline.RenderView?.Child = new RenderPositionedBox
+                {
+                    Child = new RenderFlex
+                    {
+                        Children =
+                        [
+                            new RenderConstrainedBox
+                            {
+                                AdditionalConstraints = BoxConstraints.Tight(100, 100),
+                                Child = new RenderColoredBox {Color = SKColors.Tomato}
+                            },
+                            new RenderConstrainedBox
+                            {
+                                AdditionalConstraints = BoxConstraints.Tight(100, 100),
+                                Child = new RenderColoredBox {Color = SKColors.Yellow}
+                            },
+                            new RenderConstrainedBox
+                            {
+                                AdditionalConstraints = BoxConstraints.Tight(100, 100),
+                                Child = new RenderColoredBox {Color = SKColors.DarkSeaGreen}
+                            }
+                        ]
+                    }
+                };
 
                 pipeline.FlushLayout();
                 pipeline.FlushPaint();
+                
                 _renderThreadRunner.PostRender(windowKey, pipeline.RenderView?.Layer.Clone());
+                
             }
         }
     }

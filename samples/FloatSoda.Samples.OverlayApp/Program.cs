@@ -2,13 +2,16 @@
 using FloatSoda;
 using FloatSoda.Engine;
 using FloatSoda.Render;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OVRSharp;
 
+var builder = new FloatSodaAppBuilder();
 
-var factory = LoggerFactory.Create(builder => builder.AddConsole());
-using var app = new FloatSodaApp(new FrameLimiter(60), factory);
+builder.Services.AddSingleton(LoggerFactory.Create(builder => builder.AddConsole()));
+builder.Services.AddScoped<IFrameLimiter, OpenVRFrameLimiter>();
 
+using var app = builder.Build();
 
 var thumbnail = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "thumbnail.png");
 
@@ -30,6 +33,7 @@ var floatSodaLeftHand = new RenderPipeline
 
 app.CreateOverlayWindow("FloatSoda Absolute", floatSodaAbsolute, position: new Vector3(0, 1.2f, -1f));
 app.CreateOverlayWindow("FloatSoda Dashboard", floatSodaDashboard, isDashboard: true, thumbnailPath: thumbnail);
-app.CreateOverlayWindow("FloatSoda Left Hand", floatSodaLeftHand, position: new Vector3(0, 0, -1), trackedDevice: Overlay.TrackedDeviceRole.LeftHand);
+app.CreateOverlayWindow("FloatSoda Left Hand", floatSodaLeftHand, position: new Vector3(0, 0, -1),
+    trackedDevice: Overlay.TrackedDeviceRole.LeftHand);
 
 app.Run();

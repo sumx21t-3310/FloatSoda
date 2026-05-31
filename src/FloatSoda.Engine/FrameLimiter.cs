@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Valve.VR;
 
 namespace FloatSoda.Engine;
@@ -8,32 +9,27 @@ public interface IFrameLimiter
     void Wait();
 }
 
-public class OpenVRFrameLimiter : IFrameLimiter
+public class OpenVRFrameLimiter(ILogger logger) : IFrameLimiter
 {
     private readonly TrackedDevicePose_t[] _renderPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
     private readonly TrackedDevicePose_t[] _gamePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
 
-    /// <summary>
-    /// WaitGetPoses後のレンダリング用ポーズ（現在フレーム向け予測済み）
-    /// </summary>
     public ReadOnlySpan<TrackedDevicePose_t> RenderPoses => _renderPoses;
 
-    /// <summary>
-    /// ゲームロジック用ポーズ（物理演算・AI等に使う）
-    /// </summary>
     public ReadOnlySpan<TrackedDevicePose_t> GamePoses => _gamePoses;
 
     public void Wait()
     {
         var error = OpenVR.Compositor.WaitGetPoses(_renderPoses, _gamePoses);
 
-        if (error != EVRCompositorError.None)
+        switch (error)
         {
-            // DoNotHaveFocus は一時的な状態なので警告どまりでOK
-            // それ以外は深刻なエラーとして扱う
-            if (error == EVRCompositorError.DoNotHaveFocus)
+            case EVRCompositorError.None: return;
+            case EVRCompositorError.DoNotHaveFocus:
                 Console.WriteLine($"[OpenVR] Compositor warning: {error}");
-            else
+                logger.LogWarning("[OpenVR] Compositor warning: {error}", error);
+                break;
+            default:
                 throw new InvalidOperationException($"[OpenVR] WaitGetPoses failed: {error}");
         }
     }

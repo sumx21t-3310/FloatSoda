@@ -3,7 +3,7 @@ using SkiaSharp;
 
 namespace FloatSoda.Geometrics;
 
-public static class GeometryExtension
+public static class RectExtension
 {
     public static SKRect And(this SKSize rect, Offset other) => new(
         (float)other.X,

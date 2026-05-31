@@ -11,6 +11,8 @@ public readonly record struct BoxConstraints(
     double MaxHeight = PositiveInfinity)
 {
     public static BoxConstraints Tight(SKSize size) => new(size.Width, size.Width, size.Height, size.Height);
+    
+    public static BoxConstraints Tight(double width, double height) => new(width, width, height, height);
 
     public static BoxConstraints TightFor(double? width = null, double? height = null) => new(
         width ?? 0,

@@ -5,7 +5,7 @@ namespace FloatSoda.Common.Layer;
 public class ClipRectLayer(SKRect clipRect) : ContainerLayer
 {
     public SKRect ClipRect { get; set; } = clipRect;
-    public Clip ClipBehavior { get; set; } = Clip.Antialias;
+    public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
 
     public override void Layout(LayerContext context)
@@ -45,7 +45,7 @@ public class ClipRectLayer(SKRect clipRect) : ContainerLayer
     }
 }
 
-public class ClipRRectLayer(SKRoundRect clipRect) : ContainerLayer
+public class ClipRoundRectLayer(SKRoundRect clipRect) : ContainerLayer
 {
     public SKRoundRect ClipRect { get; set; } = clipRect;
     public Clip ClipBehavior { get; set; } = Clip.Antialias;
@@ -74,7 +74,7 @@ public class ClipRRectLayer(SKRoundRect clipRect) : ContainerLayer
 
     public override ILayer Clone()
     {
-        var cloned = new ClipRRectLayer(ClipRect)
+        var cloned = new ClipRoundRectLayer(ClipRect)
         {
             ClipBehavior = ClipBehavior
         };
