@@ -6,15 +6,7 @@ namespace FloatSoda.Render;
 
 public class RenderPositionedBox : RenderBox
 {
-    public RenderObject? Child
-    {
-        get;
-        init
-        {
-            field = value;
-            value?.ParentData = new BoxParentData();
-        }
-    } = null;
+    public RenderObject? Child { get; init; } = null;
 
     public double? WidthFactor { get; init; } = null;
     public double? HeightFactor { get; init; } = null;
@@ -28,6 +20,7 @@ public class RenderPositionedBox : RenderBox
 
         if (Child != null)
         {
+            Child.ParentData ??= new BoxParentData();
             Child.Layout(constraints.Loosen);
             Size = constraints.Constrain(new SKSize
             {
@@ -97,7 +90,7 @@ public class RenderFlex : RenderBox
     public MainAxisSize MainAxisSize { get; init; } = MainAxisSize.Max;
     public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
     public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
-    
+
     public override void Layout(BoxConstraints constraints)
     {
         var mainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;

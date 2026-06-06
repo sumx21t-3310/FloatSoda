@@ -66,7 +66,8 @@ public class FloatSodaApp : IDisposable
 
     public void CreateOverlayWindow(
         string windowName,
-        RenderPipeline pipeline,
+        RenderBox root,
+        SKSize overlaySize,
         bool isDashboard = false,
         string? thumbnailPath = null,
         float widthInMeters = 0.5f,
@@ -75,8 +76,20 @@ public class FloatSodaApp : IDisposable
         Overlay.TrackedDeviceRole trackedDevice = Overlay.TrackedDeviceRole.None
     )
     {
+        var pipeline = new RenderPipeline
+        {
+            RenderView = new RenderView(overlaySize.Width, overlaySize.Height)
+            {
+                Child = new RenderPositionedBox
+                {
+                    Child = root
+                }
+            }
+        };
         var uniqueKey = WindowKeyGenerator.GenerateKey(windowName);
+        
         _windowKeys.TryAdd(uniqueKey, pipeline);
+        
         _renderThreadRunner.CreateOverlayWindow(
             uniqueKey,
             windowName,
@@ -150,34 +163,6 @@ public class FloatSodaApp : IDisposable
         {
             lock (pipeline)
             {
-                pipeline.RenderView?.Child = new RenderPositionedBox
-                {
-                    Child = new RenderFlex
-                    {
-                        MainAxisAlignment = MainAxisAlignment.SpaceBetween,
-                        CrossAxisAlignment = CrossAxisAlignment.Center,
-                        Direction = Axis.Vertical,
-                        Children =
-                        [
-                            new RenderConstrainedBox
-                            {
-                                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                                Child = new RenderColoredBox() { Color = SKColors.Tomato }
-                            },
-                            new RenderConstrainedBox
-                            {
-                                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                                Child = new RenderColoredBox() { Color = SKColors.Gold }
-                            },
-                            new RenderConstrainedBox
-                            {
-                                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                                Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
-                            }
-                        ]
-                    }
-                };
-
                 pipeline.FlushLayout();
                 pipeline.FlushPaint();
 

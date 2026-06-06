@@ -14,15 +14,19 @@ public abstract class StatelessWidget : Widget
     public abstract Widget Build(BuildContext context);
 }
 
+
+/// <summary>
+/// ElementのRebuild Observable Stream Treeを購読するSubject/ReactiveProperty/ReactiveCollectionを返却します
+/// </summary>
 public static class HookExtension
 {
-    public static ReactiveProperty<T> UseState<T>(this BuildContext context, T initState) =>
+    public static ReactiveProperty<T> UseState<T>(this BuildContext context, Func<T> initState) =>
         throw new NotImplementedException(); // React のuseState相当
 
     public static void UseEffect<T>(this BuildContext context, Func<IObserver<T>> onMount) =>
         throw new NotImplementedException();
 
-    public static T Depends<T>(this BuildContext context) =>
+    public static T Depends<T>(this BuildContext context, Func<IServiceProvider ,T> provider) =>
         throw new NotImplementedException(); // ServiceProviderから依存性を注入
 
     public static T UseMemo<T>(this BuildContext context, Func<T> func) => throw new NotImplementedException();

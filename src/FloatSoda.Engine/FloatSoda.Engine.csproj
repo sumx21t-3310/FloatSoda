@@ -17,7 +17,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\FloatSoda.Common\FloatSoda.Common.csproj" />
-      <ProjectReference Include="..\..\..\FloatSoda.OVRSharp\FloatSoda.OVRSharp\FloatSoda.OVRSharp.csproj" />
       <ProjectReference Include="..\FloatSoda.OVR\FloatSoda.OVR.csproj" />
     </ItemGroup>
 

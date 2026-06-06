@@ -5,6 +5,7 @@ using SkiaSharp;
 
 namespace FloatSoda.Render;
 
+
 public class RenderView(float width, float height) : RenderObject
 {
     public override SKSize Size { get; protected set; } = new(width, height);
