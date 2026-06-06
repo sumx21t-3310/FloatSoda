@@ -15,18 +15,25 @@ public readonly record struct Alignment(float X = 0, float Y = 0)
     public static readonly Alignment BottomCenter = new(0, 1);
     public static readonly Alignment BottomRight = new(1, 1);
 
+    public Offset Pivot(SKSize size)
+    {
+        var centerX = size.Width / 2f;
+        var centerY = size.Height / 2f;
+
+        var offsetX = centerX * X;
+        var offsetY = centerY * Y;
+
+        return new Offset(offsetX, offsetY);
+    }
 
     public Offset ComputeOffset(SKSize parent, SKSize child)
     {
-        var offset = (parent - child).ToPoint();
-        return new Offset(
-            (1 + X) * offset.X / 2,
-            (1 + Y) * offset.Y / 2
-        );
+        var remainingSpace = new SKSize(parent.Width - child.Width, parent.Height - child.Height);
+        var centerSpace = new Offset(remainingSpace.Width / 2f, remainingSpace.Height / 2f);
+        return centerSpace + Pivot(remainingSpace);
     }
 
     public Alignment FlipAll() => new(-X, -Y);
     public Alignment FlipX() => this with { X = -X };
     public Alignment FlipY() => this with { Y = -Y };
 }
-

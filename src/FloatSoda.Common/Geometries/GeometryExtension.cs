@@ -14,7 +14,7 @@ public static class GeometryExtension
             Right = rect.Right + dx,
         };
 
-        public SKRect MakeOffset(Offset offset) => rect.MakeOffset((float)offset.X, (float)offset.Y);
+        public SKRect MakeOffset(SKPoint offset) => rect.MakeOffset(offset.X, offset.Y);
 
         public SKRect RoundOut() => new()
         {
