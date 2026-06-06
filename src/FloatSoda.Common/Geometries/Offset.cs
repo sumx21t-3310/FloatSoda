@@ -1,6 +1,8 @@
-﻿namespace FloatSoda.Common.Geometries;
+﻿using SkiaSharp;
 
-public readonly record struct Offset(double X = 0, double Y=0)
+namespace FloatSoda.Common.Geometries;
+
+public readonly record struct Offset(double X = 0, double Y = 0)
 {
     public static Offset Zero => default;
     public static Offset One => new(1, 1);
@@ -13,4 +15,6 @@ public readonly record struct Offset(double X = 0, double Y=0)
     public static Offset operator *(double a, Offset b) => b * a;
 
     public static Offset operator /(Offset a, double b) => new(a.X / b, a.Y / b);
+
+    public static implicit operator Offset(SKPoint point) => new(point.X, point.Y);
 }
