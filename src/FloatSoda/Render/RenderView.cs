@@ -13,8 +13,9 @@ public class RenderView(float width, float height) : RenderObject
     public ContainerLayer Layer { get; } = new TransformLayer();
 
 
-    public void PerformLayout() => Layout(BoxConstraints.Tight(Size));
-    public override void Layout(BoxConstraints constraints) => Child?.Layout(constraints);
+    public void PerformLayout() => Child?.Layout(BoxConstraints.Tight(Size));
+
+    public override void Layout(BoxConstraints constraints) => throw new NotImplementedException();
 
     public override void Paint(PaintingContext context, Offset offset) => Child?.Paint(context, offset);
 }

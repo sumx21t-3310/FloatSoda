@@ -11,7 +11,7 @@ public readonly record struct BoxConstraints(
     double MaxHeight = PositiveInfinity)
 {
     public static BoxConstraints Tight(SKSize size) => new(size.Width, size.Width, size.Height, size.Height);
-    
+
     public static BoxConstraints Tight(double width, double height) => new(width, width, height, height);
 
     public static BoxConstraints TightFor(double? width = null, double? height = null) => new(
@@ -24,8 +24,8 @@ public readonly record struct BoxConstraints(
     public BoxConstraints Enforce(BoxConstraints constraints) => new(
         Math.Clamp(MinWidth, constraints.MinWidth, constraints.MaxWidth),
         Math.Clamp(MaxWidth, constraints.MinWidth, constraints.MaxWidth),
-        Math.Clamp(MinHeight, constraints.MinHeight, constraints.MaxHeight), // ← 修正
-        Math.Clamp(MaxHeight, constraints.MinHeight, constraints.MaxHeight) // ← 修正
+        Math.Clamp(MinHeight, constraints.MinHeight, constraints.MaxHeight),
+        Math.Clamp(MaxHeight, constraints.MinHeight, constraints.MaxHeight)
     );
 
 
@@ -38,5 +38,10 @@ public readonly record struct BoxConstraints(
     public SKSize Constrain(SKSize size)
     {
         return new SKSize((float)ConstrainWidth(size.Width), (float)ConstrainHeight(size.Height));
+    }
+
+    public override string ToString()
+    {
+        return $"BoxConstraints {{ width: (min = {MinWidth}, max = {MaxWidth}), height: (min = {MinHeight}, max = {MaxHeight}) }}";
     }
 }

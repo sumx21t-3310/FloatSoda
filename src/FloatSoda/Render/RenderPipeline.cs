@@ -1,4 +1,5 @@
 ﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Common.Layer;
 using FloatSoda.Geometrics;
 
 namespace FloatSoda.Render;
@@ -18,4 +19,6 @@ public class RenderPipeline
         RenderView?.Paint(context, Offset.Zero);
         context.StopRecordingIfNeeded();
     }
+    
+    public ILayer Publish() => RenderView?.Layer.Clone() ?? throw new Exception("RenderView is null");
 }

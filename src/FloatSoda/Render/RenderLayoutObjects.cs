@@ -6,12 +6,20 @@ namespace FloatSoda.Render;
 
 public class RenderPositionedBox : RenderBox
 {
-    public RenderObject? Child { get; init; } = null;
+    public RenderObject? Child
+    {
+        get;
+        init
+        {
+            field = value;
+            value?.ParentData = new BoxParentData();
+        }
+    } = null;
+
     public double? WidthFactor { get; init; } = null;
     public double? HeightFactor { get; init; } = null;
     public Alignment Alignment { get; init; } = default;
 
-    public RenderPositionedBox() => Child?.ParentData = new BoxParentData();
 
     public override void Layout(BoxConstraints constraints)
     {
@@ -42,7 +50,8 @@ public class RenderPositionedBox : RenderBox
     private void AlignChild()
     {
         if (Child?.ParentData is not BoxParentData childParentData) return;
-        childParentData.Offset = Alignment.ComputeOffset(Size, Child.Size);
+        var offset = Alignment.ComputeOffset(Size, Child.Size);
+        childParentData.Offset = offset;
     }
 
     public override void Paint(PaintingContext context, Offset offset)
@@ -73,16 +82,22 @@ public class RenderConstrainedBox : RenderProxyBox
 
 public class RenderFlex : RenderBox
 {
-    public List<RenderBox> Children { get; init; } = [];
+    public List<RenderBox> Children
+    {
+        get;
+        init
+        {
+            field = value;
+            value.ForEach(child => child.ParentData = new BoxParentData());
+        }
+    } = [];
 
     public Axis Direction { get; init; } = Axis.Vertical;
     public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
     public MainAxisSize MainAxisSize { get; init; } = MainAxisSize.Max;
     public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
     public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
-
-    public RenderFlex() => Children?.ForEach(child => child.ParentData = new BoxParentData());
-
+    
     public override void Layout(BoxConstraints constraints)
     {
         var mainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;

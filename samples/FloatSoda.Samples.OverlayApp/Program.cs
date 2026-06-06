@@ -1,15 +1,9 @@
 ﻿using System.Numerics;
 using FloatSoda;
-using FloatSoda.Engine;
 using FloatSoda.Render;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using OVRSharp;
 
-var builder = new FloatSodaAppBuilder();
-
-builder.Services.AddSingleton(LoggerFactory.Create(builder => builder.AddConsole()));
-builder.Services.AddScoped<IFrameLimiter, OpenVRFrameLimiter>();
+var builder = FloatSodaAppBuilder.CreateDefault();
 
 using var app = builder.Build();
 

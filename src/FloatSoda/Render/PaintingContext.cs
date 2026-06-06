@@ -4,7 +4,7 @@ using Common.Geometries;
 using Common.Layer;
 using SkiaSharp;
 
-public delegate void PaintingContextCallback(PaintingContext context, Offset offset);
+public delegate void PaintingContextCallback(PaintingContext context, SKPoint offset);
 
 public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBounds)
 {
@@ -40,7 +40,7 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         _canvas = null;
     }
 
-    public void PushLayer(ContainerLayer childLayer, PaintingContextCallback painter, Offset offset,
+    public void PushLayer(ContainerLayer childLayer, PaintingContextCallback painter, SKPoint offset,
         SKRect? childPaintBounds = null)
     {
         if (childLayer.HasChildren)
@@ -58,24 +58,38 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         childContext.StopRecordingIfNeeded();
     }
 
-    public ClipPathLayer ClipPath()
+    public ClipPathLayer PushClipPath(
+        SKPoint offset,
+        SKRect bounds,
+        SKPath clipPath,
+        PaintingContextCallback painter,
+        Clip clipBehavior = Clip.Antialias,
+        ClipPathLayer? oldLayer = null
+    )
     {
-        throw new NotImplementedException();
+        bounds.Offset((float)offset.X, (float)offset.Y);
+
+        var layer = oldLayer ?? new ClipPathLayer(clipPath);
+
+        layer.ClipBehavior = clipBehavior;
+        layer.ClipPath = clipPath;
+
+        return layer;
     }
 
     public ClipRoundRectLayer PushClipRoundRect(
-        Offset offset,
+        SKPoint offset,
         SKRect clipRect,
         SKRect bounds,
         PaintingContextCallback painter,
-        Clip clipBehavior = Clip.Antialias, 
+        Clip clipBehavior = Clip.Antialias,
         ClipRoundRectLayer? clipPathLayer = null)
     {
         throw new NotImplementedException();
     }
 
     public ClipRectLayer PushClipRect(
-        Offset offset,
+        SKPoint offset,
         SKRect clipRect,
         PaintingContextCallback painter,
         Clip clipBehavior = Clip.Antialias,

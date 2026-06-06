@@ -9,7 +9,7 @@ public interface IFrameLimiter
     void Wait();
 }
 
-public class OpenVRFrameLimiter(ILogger logger) : IFrameLimiter
+public class OpenVRFrameLimiter(ILogger<OpenVRFrameLimiter> logger) : IFrameLimiter
 {
     private readonly TrackedDevicePose_t[] _renderPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
     private readonly TrackedDevicePose_t[] _gamePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];

@@ -16,6 +16,23 @@ using Valve.VR;
 
 public class FloatSodaAppBuilder
 {
+    // 利用者が手軽にデフォルト構成で始められるようにするスタティックメソッド
+    public static FloatSodaAppBuilder CreateDefault()
+    {
+        var builder = new FloatSodaAppBuilder();
+        builder.Services.AddLogging(logging => { logging.AddConsole(); });
+
+        builder.Services.AddSingleton<ILogger>(sp =>
+        {
+            var factory = sp.GetRequiredService<ILoggerFactory>();
+            return factory.CreateLogger("FloatSoda");
+        });
+
+        builder.Services.AddScoped<IFrameLimiter, FrameLimiter>();
+
+        return builder;
+    }
+
     public IServiceCollection Services { get; } = new ServiceCollection();
 
     public FloatSodaApp Build()
@@ -27,17 +44,25 @@ public class FloatSodaAppBuilder
     }
 }
 
-public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory = null) : IDisposable
+public class FloatSodaApp : IDisposable
 {
-    private readonly RenderThreadRunner _renderThreadRunner =
-        new("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
+    private readonly RenderThreadRunner _renderThreadRunner;
 
-    private readonly ILogger? _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
+    private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<string, RenderPipeline> _windowKeys = [];
     private Application? _openVR;
 
     private readonly CancellationTokenSource _cts = new();
     private bool _disposed;
+    private readonly IFrameLimiter _limiter;
+
+    internal FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory = null)
+    {
+        _limiter = limiter;
+        _renderThreadRunner =
+            new RenderThreadRunner("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
+        _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
+    }
 
     public void CreateOverlayWindow(
         string windowName,
@@ -92,7 +117,7 @@ public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory =
 
                 DrawFrame();
 
-                limiter.Wait();
+                _limiter.Wait();
             }
             catch (Exception e)
             {
@@ -129,22 +154,25 @@ public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory =
                 {
                     Child = new RenderFlex
                     {
+                        MainAxisAlignment = MainAxisAlignment.SpaceBetween,
+                        CrossAxisAlignment = CrossAxisAlignment.Center,
+                        Direction = Axis.Vertical,
                         Children =
                         [
                             new RenderConstrainedBox
                             {
-                                AdditionalConstraints = BoxConstraints.Tight(100, 100),
-                                Child = new RenderColoredBox {Color = SKColors.Tomato}
+                                AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                                Child = new RenderColoredBox() { Color = SKColors.Tomato }
                             },
                             new RenderConstrainedBox
                             {
-                                AdditionalConstraints = BoxConstraints.Tight(100, 100),
-                                Child = new RenderColoredBox {Color = SKColors.Yellow}
+                                AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                                Child = new RenderColoredBox() { Color = SKColors.Gold }
                             },
                             new RenderConstrainedBox
                             {
-                                AdditionalConstraints = BoxConstraints.Tight(100, 100),
-                                Child = new RenderColoredBox {Color = SKColors.DarkSeaGreen}
+                                AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                                Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
                             }
                         ]
                     }
@@ -152,9 +180,8 @@ public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory =
 
                 pipeline.FlushLayout();
                 pipeline.FlushPaint();
-                
+
                 _renderThreadRunner.PostRender(windowKey, pipeline.RenderView?.Layer.Clone());
-                
             }
         }
     }
@@ -186,7 +213,7 @@ public class FloatSodaApp(IFrameLimiter limiter, ILoggerFactory? loggerFactory =
         GC.SuppressFinalize(this);
     }
 
-    protected virtual void Dispose(bool disposing)
+    private void Dispose(bool disposing)
     {
         if (_disposed) return;
 

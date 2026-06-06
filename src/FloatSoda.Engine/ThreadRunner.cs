@@ -32,7 +32,6 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
     {
         lock (this)
         {
-            // すでに実行中の場合は何もしない
             if (_thread is { IsAlive: true }) return;
 
             _isRunning = true;
@@ -55,7 +54,7 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
         lock (this)
         {
             targetThread = _thread;
-            _thread = null; // ← lockの中に移動
+            _thread = null;
             _isRunning = false;
             _linkedTokenSource?.Cancel();
             _linkedTokenSource?.Dispose();
