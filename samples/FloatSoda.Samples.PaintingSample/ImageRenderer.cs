@@ -1,12 +1,11 @@
-﻿using FloatSoda.Engine.Layer;
-using FloatSoda.Engine.Render;
+﻿using FloatSoda.Common.Layer;
 using SkiaSharp;
 
 namespace FloatSoda.Samples.PaintingSample;
 
 public class ImageRenderer
 {
-    public void RenderImage(ILayer root, Size imageSize, string savePath)
+    public void RenderImage(ILayer root, SKSize imageSize, string savePath)
     {
         SKImageInfo info = new((int)imageSize.Width, (int)imageSize.Height);
         using var surface = SKSurface.Create(info);

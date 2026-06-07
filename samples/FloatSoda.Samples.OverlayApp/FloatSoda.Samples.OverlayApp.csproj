@@ -17,5 +17,11 @@
         <None Include="bin\Debug\net10.0\FloatSoda.vrmanifest"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="FloatSoda.OVRSharp">
+        <HintPath>..\..\..\FloatSoda.OVRSharp\FloatSoda.OVRSharp\bin\Debug\netstandard2.0\FloatSoda.OVRSharp.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
 
