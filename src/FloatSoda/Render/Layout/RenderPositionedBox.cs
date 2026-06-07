@@ -22,11 +22,11 @@ public class RenderPositionedBox : RenderBox
         {
             Child.ParentData ??= new BoxParentData();
             Child.Layout(constraints.Loosen);
-            Size = constraints.Constrain(new SKSize
-            {
-                Width = shrinkWrapWidth ? (float)(Child.Size.Width * (WidthFactor ?? 1)) : float.PositiveInfinity,
-                Height = shrinkWrapHeight ? (float)(Child.Size.Height * (HeightFactor ?? 1)) : float.PositiveInfinity
-            });
+            
+            Size = constraints.Constrain(
+                width: shrinkWrapWidth ? Child.Size.Width * (WidthFactor ?? 1) : double.PositiveInfinity,
+                height: shrinkWrapHeight ? Child.Size.Height * (HeightFactor ?? 1) : double.PositiveInfinity
+            );
 
             AlignChild();
         }
