@@ -26,32 +26,20 @@ public class RenderFlex : RenderBox
     {
         Axis.Horizontal => size.Width,
         Axis.Vertical => size.Height,
-        _ => throw new ArgumentOutOfRangeException()
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
     };
 
     private float GetCrossSize(SKSize size) => Direction switch
     {
         Axis.Horizontal => size.Height,
         Axis.Vertical => size.Width,
-        _ => throw new ArgumentOutOfRangeException()
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
     };
 
-    private bool StartIsTopLeft(Axis direction, VerticalDirection verticalDirection)
+    private void MeasureCrossAxis(BoxConstraints constraints, out double allocatedSize, out double crossSize)
     {
-        return (direction, verticalDirection) switch
-        {
-            (Axis.Horizontal, _) => true,
-            (_, VerticalDirection.Down) => true,
-            (_, VerticalDirection.Up) => false,
-        };
-    }
-
-    public override void Layout(BoxConstraints constraints)
-    {
-        var mainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;
-        var canFlex = mainSize < double.PositiveInfinity;
-        var crossSize = 0.0;
-        var allocatedSize = 0.0;
+        crossSize = 0.0;
+        allocatedSize = 0.0;
 
         foreach (var child in Children)
         {
@@ -67,70 +55,51 @@ public class RenderFlex : RenderBox
             allocatedSize += GetMainSize(child.Size);
             crossSize = Math.Max(crossSize, GetCrossSize(child.Size));
         }
+    }
 
-        var idealMainSize = canFlex && MainAxisSize == MainAxisSize.Max ? mainSize : allocatedSize;
+    private double CalcBetweenSpace(double remainingSpace) => MainAxisAlignment switch
+    {
+        MainAxisAlignment.Start or MainAxisAlignment.End or MainAxisAlignment.Center => 0.0,
+        MainAxisAlignment.SpaceBetween => Children.Count > 1 ? remainingSpace / (Children.Count - 1) : 0.0,
+        MainAxisAlignment.SpaceAround => Children.Count > 0 ? remainingSpace / Children.Count : 0.0,
+        MainAxisAlignment.SpaceEvenly => Children.Count > 0 ? remainingSpace / (Children.Count + 1) : 0.0,
+        _ => 0
+    };
 
-        Size = Direction switch
-        {
-            Axis.Horizontal =>
-                constraints.Constrain(new SKSize((float)idealMainSize, (float)crossSize)),
-            Axis.Vertical =>
-                constraints.Constrain(new SKSize((float)crossSize, (float)idealMainSize)),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+    private double CalcLeadingSpace(double remainingSpace, double betweenSpace) => MainAxisAlignment switch
+    {
+        MainAxisAlignment.Start => 0,
+        MainAxisAlignment.End => remainingSpace,
+        MainAxisAlignment.Center => remainingSpace / 2.0,
+        MainAxisAlignment.SpaceBetween => 0,
+        MainAxisAlignment.SpaceAround => betweenSpace / 2.0,
+        MainAxisAlignment.SpaceEvenly => betweenSpace,
+        _ => 0
+    };
 
-        (idealMainSize, crossSize) = Direction switch
-        {
-            Axis.Horizontal => (Size.Width, Size.Height),
-            Axis.Vertical => (Size.Height, Size.Width),
-            _ => throw new ArgumentOutOfRangeException()
-        };
+    private double CalcChildCrossPosition(double crossSize, RenderBox child) => CrossAxisAlignment switch
+    {
+        CrossAxisAlignment.Start => Direction.Flip().StartIsTopLeft(VerticalDirection)
+            ? 0
+            : crossSize - GetCrossSize(child.Size),
+        CrossAxisAlignment.End => !Direction.Flip().StartIsTopLeft(VerticalDirection)
+            ? 0
+            : crossSize - GetCrossSize(child.Size),
+        CrossAxisAlignment.Center => crossSize / 2 - GetCrossSize(child.Size) / 2,
+        CrossAxisAlignment.Stretch => 0,
+        CrossAxisAlignment.Baseline => throw new NotImplementedException(),
+        _ => throw new ArgumentOutOfRangeException()
+    };
 
-        var remainingSpace = Math.Max(0, mainSize - idealMainSize);
-
-        double betweenSpace = MainAxisAlignment switch
-        {
-            MainAxisAlignment.Start => 0,
-            MainAxisAlignment.End => 0,
-            MainAxisAlignment.Center => 0,
-            MainAxisAlignment.SpaceBetween => Children.Count > 1 ? remainingSpace / (Children.Count - 1) : 0,
-            MainAxisAlignment.SpaceAround => Children.Count > 0 ? remainingSpace / Children.Count : 0,
-            MainAxisAlignment.SpaceEvenly => Children.Count > 0 ? remainingSpace / (Children.Count + 1) : 0,
-            _ => 0
-        };
-
-
-        double leadingSpace = MainAxisAlignment switch
-        {
-            MainAxisAlignment.Start => 0,
-            MainAxisAlignment.End => remainingSpace,
-            MainAxisAlignment.Center => remainingSpace / 2,
-            MainAxisAlignment.SpaceBetween => 0,
-            MainAxisAlignment.SpaceAround => betweenSpace / 2,
-            MainAxisAlignment.SpaceEvenly => betweenSpace,
-            _ => 0
-        };
-
-
-        var flipMainAxis = !StartIsTopLeft(Direction, VerticalDirection);
+    private void ArrangeChildren(double crossSize, double idealMainSize, double leadingSpace, double betweenSpace)
+    {
+        var flipMainAxis = !Direction.StartIsTopLeft(VerticalDirection);
         var childMainPosition = flipMainAxis ? idealMainSize - leadingSpace : leadingSpace;
 
         foreach (var child in Children)
         {
             var childParentData = child.ParentData as BoxParentData;
-            double childCrossPosition = CrossAxisAlignment switch
-            {
-                CrossAxisAlignment.Start => StartIsTopLeft(Direction.Flip(), VerticalDirection)
-                    ? 0
-                    : crossSize - GetCrossSize(child.Size),
-                CrossAxisAlignment.End => StartIsTopLeft(Direction.Flip(), VerticalDirection)
-                    ? crossSize - GetCrossSize(child.Size)
-                    : 0,
-                CrossAxisAlignment.Center => crossSize / 2 - GetCrossSize(child.Size) / 2,
-                CrossAxisAlignment.Stretch => 0,
-                CrossAxisAlignment.Baseline => throw new NotImplementedException(),
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            var childCrossPosition = CalcChildCrossPosition(crossSize, child);
 
             if (flipMainAxis)
             {
@@ -141,10 +110,49 @@ public class RenderFlex : RenderBox
             {
                 Axis.Horizontal => new Offset((float)childMainPosition, (float)childCrossPosition),
                 Axis.Vertical => new Offset((float)childCrossPosition, (float)childMainPosition),
+                _ => throw new ArgumentOutOfRangeException()
             };
 
-            childMainPosition += flipMainAxis ? -betweenSpace : GetMainSize(child.Size) + betweenSpace;
+            if (flipMainAxis)
+            {
+                childMainPosition -= betweenSpace;
+            }
+            else
+            {
+                childMainPosition += GetMainSize(child.Size) + betweenSpace;
+            }
         }
+    }
+
+    public override void Layout(BoxConstraints constraints)
+    {
+        MeasureCrossAxis(constraints, out var allocatedSize, out var crossSize);
+
+        var mainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;
+        var canFlex = mainSize < double.PositiveInfinity;
+
+        var idealMainSize = canFlex && MainAxisSize == MainAxisSize.Max ? mainSize : allocatedSize;
+
+        Size = Direction switch
+        {
+            Axis.Horizontal => constraints.Constrain(idealMainSize, crossSize),
+            Axis.Vertical => constraints.Constrain(crossSize, idealMainSize),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        (idealMainSize, crossSize) = Direction switch
+        {
+            Axis.Horizontal => (Size.Width, Size.Height),
+            Axis.Vertical => (Size.Height, Size.Width),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        var remainingSpace = Math.Max(0, idealMainSize - allocatedSize);
+
+        var betweenSpace = CalcBetweenSpace(remainingSpace);
+        var leadingSpace = CalcLeadingSpace(remainingSpace, betweenSpace);
+
+        ArrangeChildren(crossSize, idealMainSize, leadingSpace, betweenSpace);
     }
 
 

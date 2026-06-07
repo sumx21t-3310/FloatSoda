@@ -10,7 +10,7 @@ public static class GeometryExtension
         {
             Top = rect.Top + dy,
             Bottom = rect.Bottom + dy,
-            Left = rect.Right + dx,
+            Left = rect.Left + dx,
             Right = rect.Right + dx,
         };
 

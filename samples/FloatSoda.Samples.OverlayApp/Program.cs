@@ -18,8 +18,8 @@ var floatSodaAbsolute = new RenderPositionedBox
 {
     Child = new RenderFlex
     {
-        MainAxisAlignment = MainAxisAlignment.SpaceBetween,
-        CrossAxisAlignment = CrossAxisAlignment.Center,
+        MainAxisAlignment = MainAxisAlignment.Center,
+        CrossAxisAlignment = CrossAxisAlignment.Stretch,
         Direction = Axis.Vertical,
         Children =
         [
@@ -35,7 +35,7 @@ var floatSodaAbsolute = new RenderPositionedBox
             },
             new RenderConstrainedBox
             {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                AdditionalConstraints = BoxConstraints.Tight(400, 300),
                 Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
             }
         ]
@@ -47,9 +47,9 @@ var floatSodaDashboard = new RenderPositionedBox
 {
     Child = new RenderFlex
     {
-        MainAxisAlignment = MainAxisAlignment.SpaceBetween,
-        CrossAxisAlignment = CrossAxisAlignment.Center,
-        Direction = Axis.Vertical,
+        MainAxisAlignment = MainAxisAlignment.Start,
+        CrossAxisAlignment = CrossAxisAlignment.End,
+        Direction = Axis.Horizontal,
         Children =
         [
             new RenderConstrainedBox
@@ -76,7 +76,8 @@ var floatSodaLeftHand = new RenderPositionedBox
     Child = new RenderFlex
     {
         MainAxisAlignment = MainAxisAlignment.SpaceBetween,
-        CrossAxisAlignment = CrossAxisAlignment.Center,
+        CrossAxisAlignment = CrossAxisAlignment.Start,
+        MainAxisSize = MainAxisSize.Max,
         Direction = Axis.Vertical,
         Children =
         [
