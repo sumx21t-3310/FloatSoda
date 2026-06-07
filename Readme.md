@@ -1,4 +1,4 @@
-﻿# FloatSoda: SteamVR Overlay UI Framework (v0.0.0)
+# FloatSoda: SteamVR Overlay UI Framework (v0.0.0)
 
 **FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。VR
 空間内のオーバーレイを `Window` という単位で抽象化し、直感的な UI 構築を可能にします。
@@ -8,110 +8,153 @@
 ## 🚀 特徴
 
 * **Flutter-like な開発体験**: 宣言的な UI 構築を目指しています。
-* **抽象化された Window**: `FloatingWindow` や `DashboardWindow` など、用途に合わせたウィンドウ管理が可能です。
-* **Skia による描画**: `ILayer` インタフェースを介して、Skia を使用した高品質なレンダリングを行います。
+* **抽象化された Overlay**: `CreateOverlayWindow` で Floating / Dashboard ウィンドウを統一的に管理できます。
+* **Skia による描画**: SkiaSharp を使用した高品質なレンダリングを行います。
+* **RenderObject ツリー**: Flutter の RenderObject に相当するレイアウト・描画ツリーを実装しています。
 
 ---
 
 ## 🪟 ウィンドウの種類
 
-### FloatingWindow
+### Floating Window
 
-特定の `TrackingTarget` を指定することで、デバイス（HMD、コントローラー、トラッカーなど）に追従するウィンドウを作成できます。
+特定の `trackedDevice` を指定することで、デバイス（HMD、コントローラー、トラッカーなど）に追従するウィンドウを作成できます。
 
-### DashboardWindow
+### Dashboard Window
 
+`isDashboard: true` を指定すると、SteamVR のダッシュボード内に表示されるオーバーレイになります。
 
-SteamVR のダッシュボード内に表示されるオーバーレイです。
 > [!NOTE]
-> マニフェストファイルの設定ができておらず現在動作不可です。
-> 作成には適切な設定と初期化が必要です。（詳細な要件は今後のアップデートで追加予定）
+> マニフェストファイルの設定ができておらず現在動作が不安定な場合があります。
 
 ---
 
-## 🛠 UI の宣言方法 (Layer システム)
+## 🛠 UI の構築方法 (RenderObject システム)
 
-現在は内部表現である **Layer** を直接構築する構成になっています。
-※このセクションは将来的に **破壊的な変更** が予定されています。
+現在は **RenderObject** ツリーを直接構築する構成になっています。
 
-[Layerの実装の参考](https://zenn.dev/fastriver/books/reimpl-flutter/viewer/layer-tree)
+[Flutter の RenderObject 設計の参考](https://zenn.dev/fastriver/books/reimpl-flutter/viewer/layer-tree)
+
 ### 描画の仕組み
-ILayer が子要素の Paint メソッドを再帰的に呼び出すことで、描画ツリーを処理します。
-```mermaid  
 
+```mermaid
 graph TD
-    A[FloatSodaApp.Run メインループ] --> B[Window.Update]
-    B --> C[Renderer.Render / GLView.Clear]
-    C --> D[ILayer.Layout 再帰呼び出し]
-    D --> E[ILayer.Paint 再帰呼び出し]
-    E --> F[GLView.Flush]
-    F --> G[OpenVR Overlay SetRenderTexture]
-    G[FlameLimiter.Wait] --> A
+    A[FloatSodaApp.Run メインループ] --> B[PollEvents VREvent処理]
+    B --> C[DrawFrame 各ウィンドウ処理]
+    C --> D[RenderPipeline.FlushLayout]
+    D --> E[RenderPipeline.FlushPaint]
+    E --> F[RenderThreadRunner.PostRender]
+    F --> G[GLView.Clear / ILayer.Paint]
+    G --> H[GLView.Flush]
+    H --> I[OpenVR Overlay SetRenderTexture]
+    I --> J[FrameLimiter.Wait]
+    J --> A
 ```
 
-### 実装済みのレイヤー
+### 実装済みの RenderObject
 
-* **ContainerLayer**: 他のレイヤーを子要素として持ち、構造を管理します。
-* **PaintLayer**: 色やサイズを指定し、実際の描画内容を定義します。
+**レイアウト系**
+
+| クラス | 説明 |
+|---|---|
+| `RenderView` | ルートノード。Overlay のサイズを定義 |
+| `RenderPositionedBox` | 子を中央配置 (`Alignment` 指定可) |
+| `RenderFlex` | `Row` / `Column` 相当。`Axis`, `MainAxisAlignment`, `CrossAxisAlignment` などを指定可 |
+| `RenderConstrainedBox` | 子に `BoxConstraints` を付与してサイズを強制 |
+
+**描画系**
+
+| クラス | 説明 |
+|---|---|
+| `RenderColoredBox` | 矩形を指定色で塗りつぶす |
+
+**クリップ系**
+
+| クラス | 説明 |
+|---|---|
+| `RenderClipRect` | 矩形でクリップ |
+| `RenderClipRoundRect` | 角丸矩形でクリップ (`BorderRadius` 指定可) |
+| `RenderClipPath` | 任意の `SKPath` でクリップ (`CustomClipper<SKPath>` を渡す) |
+| `RenderClipOval` | 楕円でクリップ |
 
 ---
 
 ## 🏁 Getting Started
 
-動作環境
-- .Net 10.0/C# 14
+### 動作環境
+
+- .NET 10.0 / C# 14
 - OpenTK 4.9.4
 - SkiaSharp 3.119.2
-
+- SteamVR (OpenVR)
 
 ### 1. ビルド・実行方法
 
 CLI から実行する場合は、プロジェクトのルートディレクトリで以下のコマンドを使用します。
 
 ```bash
-dotnet run
+dotnet run --project samples/FloatSoda.Samples.OverlayApp
 ```
 
 ### 2. 実装例
 
-以下は、HMD の正面と左コントローラーにウィンドウを表示する最小限の構成例です。
+以下は、HMD 正面・左コントローラー・ダッシュボードにウィンドウを表示する構成例です。
 
 ```csharp
 using System.Numerics;
 using FloatSoda;
-using FloatSoda.Engine;
-using FloatSoda.Engine.Painting;
+using FloatSoda.Geometrics;
+using FloatSoda.Render.Layout;
+using FloatSoda.Render.Painting;
+using OVRSharp;
 using SkiaSharp;
 
-// 1. Appのインスタンスを作成
-using var app = new FloatSodaApp();
+// 1. Builder でアプリを構成・生成
+var builder = FloatSodaAppBuilder.CreateDefault();
+using var app = builder.Build();
 
-// 2. Layerを作成 (※将来的にWidgetを渡すよう書き方が変更される予定です)
-var centerWindowLayer = new ContainerLayer
+// 2. RenderObject ツリーを構築
+var floatingWindow = new RenderPositionedBox
 {
-    Children =
+    Child = new RenderFlex
     {
-        new PaintLayer { Color = SKColors.Tomato, Size = new Size(1000, 1000) },
-        new PaintLayer { Color = SKColors.AliceBlue, Size = new Size(1000, 700) },
-        new PaintLayer { Color = SKColors.CornflowerBlue, Size = new Size(1000, 300) }
+        Direction = Axis.Vertical,
+        MainAxisAlignment = MainAxisAlignment.Center,
+        Children =
+        [
+            new RenderClipRoundRect
+            {
+                BorderRadius = BorderRadius.Circular(20),
+                Child = new RenderConstrainedBox
+                {
+                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                    Child = new RenderColoredBox { Color = SKColors.CornflowerBlue }
+                }
+            },
+            new RenderClipOval
+            {
+                Child = new RenderConstrainedBox
+                {
+                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                    Child = new RenderColoredBox { Color = SKColors.Tomato }
+                }
+            }
+        ]
     }
 };
 
-var leftHandWindowLayer = new ContainerLayer
-{
-    Children =
-    {
-        new PaintLayer { Color = SKColors.Tomato, Size = new Size(1000, 1000) },
-    }
-};
+// 3. ウィンドウを登録して実行
+// Floating: HMD 正面に固定
+app.CreateOverlayWindow("MainPanel", floatingWindow, new SKSize(1000, 1000),
+    position: new Vector3(0, 1.2f, -1f));
 
-// 3. ウィンドウを登録
-// 正面に固定
-// SteamVRのKeyは自動的にアセンブリの名前で生成されます
-app.CreateFloatingWindow("MainPanel", centerWindowLayer, position: new Vector3(0, 1.2f, -1f));
+// Floating: 左コントローラーに追従
+app.CreateOverlayWindow("LeftHandPanel", floatingWindow, new SKSize(1000, 1000),
+    trackedDevice: Overlay.TrackedDeviceRole.LeftHand);
 
-// 左コントローラーに追従
-app.CreateFloatingWindow("SubPanel", leftHandWindowLayer, trackingTarget: TrackingTarget.LeftController);
+// Dashboard: SteamVR ダッシュボード内に表示
+app.CreateOverlayWindow("DashboardPanel", floatingWindow, new SKSize(1000, 1000),
+    isDashboard: true);
 
 // 4. 実行
 app.Run();
@@ -119,23 +162,16 @@ app.Run();
 
 ---
 
-⚠️ 開発ステータス (v0.0.0 Alpha)
-本プロジェクトは現在 概念実証（PoC）段階 です。
-[Flutter の Layer Tree設計](https://zenn.dev/fastriver/books/reimpl-flutter/viewer/layer-tree)に基づき、基盤部分を構築中です。API は予告なく変更されます。
+## ⚠️ 開発ステータス (v0.0.0 Alpha)
 
-[ ] Widget システム (Stateless/Stateful) の導入
+本プロジェクトは現在 **概念実証（PoC）段階** です。API は予告なく変更されます。
 
-[ ] CreateWindowでWidgetを渡せるように
-
-[ ] Steam VRのイベント処理と宣言的な入力
-
-[ ] マニフェストファイルの自動生成 (検討中)
-
-[ ] ヒットテスト（入力イベント）の実装
-
-[ ] アニメーションシステムの統合
-
-[ ] Generic Hostの統合
+- [ ] Widget システム (Stateless/Stateful) の導入
+- [ ] Widget → RenderObject への inflate パイプラインの実装
+- [ ] SteamVR のイベント処理と宣言的な入力 (ヒットテスト)
+- [ ] マニフェストファイルの自動生成 (検討中)
+- [ ] アニメーションシステムの統合
+- [ ] Generic Host の統合
 
 > [!TIP]
-> より詳細なサンプルコードについては、リポジトリ内のサンプルプロジェクトを参照してください。
+> より詳細なサンプルコードは `samples/FloatSoda.Samples.OverlayApp` を参照してください。
