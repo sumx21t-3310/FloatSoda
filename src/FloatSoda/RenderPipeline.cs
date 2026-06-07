@@ -1,8 +1,9 @@
 ﻿using FloatSoda.Common.Geometries;
 using FloatSoda.Common.Layer;
 using FloatSoda.Geometrics;
+using FloatSoda.Render;
 
-namespace FloatSoda.Render;
+namespace FloatSoda;
 
 public class RenderPipeline
 {

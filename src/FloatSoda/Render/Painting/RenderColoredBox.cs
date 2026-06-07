@@ -2,7 +2,7 @@
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Render.Painting;
 
 public class RenderColoredBox : RenderProxyBox
 {

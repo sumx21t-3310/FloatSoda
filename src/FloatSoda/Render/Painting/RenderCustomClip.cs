@@ -3,7 +3,7 @@ using FloatSoda.Common.Layer;
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Render.Painting;
 
 public abstract class CustomClipper<T>
 {

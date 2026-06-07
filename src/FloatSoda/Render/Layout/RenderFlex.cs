@@ -2,79 +2,16 @@
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
-
-public class RenderPositionedBox : RenderBox
-{
-    public RenderObject? Child { get; init; } = null;
-
-    public double? WidthFactor { get; init; } = null;
-    public double? HeightFactor { get; init; } = null;
-    public Alignment Alignment { get; init; } = default;
-
-
-    public override void Layout(BoxConstraints constraints)
-    {
-        var shrinkWrapWidth = WidthFactor != null || double.IsPositiveInfinity(constraints.MaxWidth);
-        var shrinkWrapHeight = HeightFactor != null || double.IsPositiveInfinity(constraints.MaxHeight);
-
-        if (Child != null)
-        {
-            Child.ParentData ??= new BoxParentData();
-            Child.Layout(constraints.Loosen);
-            Size = constraints.Constrain(new SKSize
-            {
-                Width = shrinkWrapWidth ? (float)(Child.Size.Width * (WidthFactor ?? 1)) : float.PositiveInfinity,
-                Height = shrinkWrapHeight ? (float)(Child.Size.Height * (HeightFactor ?? 1)) : float.PositiveInfinity
-            });
-
-            AlignChild();
-        }
-        else
-        {
-            Size = constraints.Constrain(new SKSize
-            {
-                Width = shrinkWrapWidth ? 0 : float.PositiveInfinity,
-                Height = shrinkWrapHeight ? 0 : float.PositiveInfinity
-            });
-        }
-    }
-
-    private void AlignChild()
-    {
-        if (Child?.ParentData is not BoxParentData childParentData) return;
-        var offset = Alignment.ComputeOffset(Size, Child.Size);
-        childParentData.Offset = offset;
-    }
-
-    public override void Paint(PaintingContext context, Offset offset)
-    {
-        if (Child == null) return;
-
-        var childParentData = Child.ParentData as BoxParentData;
-        Child.Paint(context, offset + (childParentData?.Offset ?? Offset.Zero));
-    }
-}
-
-public class RenderConstrainedBox : RenderProxyBox
-{
-    public required BoxConstraints AdditionalConstraints { get; init; }
-
-    public RenderConstrainedBox() => Child?.ParentData = new BoxParentData();
-
-    public override void Layout(BoxConstraints constraints)
-    {
-        var enforcedConstraints = AdditionalConstraints.Enforce(constraints);
-        Child?.Layout(enforcedConstraints);
-
-        Size = Child?.Size ?? enforcedConstraints.Constrain(Size);
-    }
-
-    public override void Paint(PaintingContext context, Offset offset) => Child?.Paint(context, offset);
-}
+namespace FloatSoda.Render.Layout;
 
 public class RenderFlex : RenderBox
 {
+    public Axis Direction { get; init; } = Axis.Vertical;
+    public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
+    public MainAxisSize MainAxisSize { get; init; } = MainAxisSize.Max;
+    public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
+    public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
+
     public List<RenderBox> Children
     {
         get;
@@ -85,11 +22,29 @@ public class RenderFlex : RenderBox
         }
     } = [];
 
-    public Axis Direction { get; init; } = Axis.Vertical;
-    public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
-    public MainAxisSize MainAxisSize { get; init; } = MainAxisSize.Max;
-    public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
-    public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
+    private float GetMainSize(SKSize size) => Direction switch
+    {
+        Axis.Horizontal => size.Width,
+        Axis.Vertical => size.Height,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
+    private float GetCrossSize(SKSize size) => Direction switch
+    {
+        Axis.Horizontal => size.Height,
+        Axis.Vertical => size.Width,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+
+    private bool StartIsTopLeft(Axis direction, VerticalDirection verticalDirection)
+    {
+        return (direction, verticalDirection) switch
+        {
+            (Axis.Horizontal, _) => true,
+            (_, VerticalDirection.Down) => true,
+            (_, VerticalDirection.Up) => false,
+        };
+    }
 
     public override void Layout(BoxConstraints constraints)
     {
@@ -192,6 +147,7 @@ public class RenderFlex : RenderBox
         }
     }
 
+
     public override void Paint(PaintingContext context, Offset offset)
     {
         foreach (var child in Children)
@@ -201,29 +157,5 @@ public class RenderFlex : RenderBox
                 child.Paint(context, offset + childParentData.Offset);
             }
         }
-    }
-
-    private float GetMainSize(SKSize size) => Direction switch
-    {
-        Axis.Horizontal => size.Width,
-        Axis.Vertical => size.Height,
-        _ => throw new ArgumentOutOfRangeException()
-    };
-
-    private float GetCrossSize(SKSize size) => Direction switch
-    {
-        Axis.Horizontal => size.Height,
-        Axis.Vertical => size.Width,
-        _ => throw new ArgumentOutOfRangeException()
-    };
-
-    private bool StartIsTopLeft(Axis direction, VerticalDirection verticalDirection)
-    {
-        return (direction, verticalDirection) switch
-        {
-            (Axis.Horizontal, _) => true,
-            (_, VerticalDirection.Down) => true,
-            (_, VerticalDirection.Up) => false,
-        };
     }
 }

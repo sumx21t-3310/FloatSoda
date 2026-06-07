@@ -2,6 +2,8 @@
 using FloatSoda;
 using FloatSoda.Geometrics;
 using FloatSoda.Render;
+using FloatSoda.Render.Layout;
+using FloatSoda.Render.Painting;
 using OVRSharp;
 using SkiaSharp;
 
