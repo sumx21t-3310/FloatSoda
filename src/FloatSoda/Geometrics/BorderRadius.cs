@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace FloatSoda;
+namespace FloatSoda.Geometrics;
 
 public record struct BorderRadius(
     Radius TopLeft = default,
@@ -13,11 +13,6 @@ public record struct BorderRadius(
 
     public static BorderRadius Circular(float radius) => All(Radius.Circular(radius));
 
-    public static BorderRadius Only(
-        Radius topLeft = default,
-        Radius topRight = default,
-        Radius bottomRight = default,
-        Radius bottomLeft = default) => new(topLeft, topRight, bottomRight, bottomLeft);
 
     public SKRoundRect ToRoundRect(SKRect rect)
     {
@@ -32,7 +27,6 @@ public record struct BorderRadius(
 public record struct Radius(float X = 0, float Y = 0)
 {
     public static Radius Circular(float radius) => new(radius, radius);
-    public static Radius Elliptical(float x, float y) => new(x, y);
     public static readonly Radius Zero = new(0, 0);
     public static implicit operator SKPoint(Radius radius) => new(radius.X, radius.Y);
 }

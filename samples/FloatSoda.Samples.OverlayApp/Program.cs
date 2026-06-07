@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
 using FloatSoda;
 using FloatSoda.Geometrics;
-using FloatSoda.Render;
 using FloatSoda.Render.Layout;
 using FloatSoda.Render.Painting;
+using FloatSoda.Samples.OverlayApp;
 using OVRSharp;
 using SkiaSharp;
 
@@ -19,25 +19,38 @@ var floatSodaAbsolute = new RenderPositionedBox
     Child = new RenderFlex
     {
         MainAxisAlignment = MainAxisAlignment.Center,
-        CrossAxisAlignment = CrossAxisAlignment.Stretch,
         Direction = Axis.Vertical,
         Children =
         [
-            new RenderConstrainedBox
+            new RenderClipPath
             {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.Tomato }
+                Clipper = new ArcClipper(),
+                Child = new RenderConstrainedBox
+                {
+                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                    Child = new RenderColoredBox() { Color = SKColors.Tomato }
+                },
             },
-            new RenderConstrainedBox
+            new RenderClipRoundRect
             {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.Blue }
+                BorderRadius = BorderRadius.Circular(20),
+                Child = new RenderConstrainedBox
+                {
+                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                    Child = new RenderColoredBox()
+                    {
+                        Color = SKColors.Yellow
+                    }
+                },
             },
-            new RenderConstrainedBox
+            new RenderClipOval
             {
-                AdditionalConstraints = BoxConstraints.Tight(400, 300),
-                Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
-            }
+                Child = new RenderConstrainedBox
+                {
+                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
+                    Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
+                }
+            },
         ]
     }
 };
@@ -75,10 +88,7 @@ var floatSodaLeftHand = new RenderPositionedBox
 {
     Child = new RenderFlex
     {
-        MainAxisAlignment = MainAxisAlignment.SpaceBetween,
-        CrossAxisAlignment = CrossAxisAlignment.Start,
-        MainAxisSize = MainAxisSize.Max,
-        Direction = Axis.Vertical,
+        MainAxisSize = MainAxisSize.Min,
         Children =
         [
             new RenderConstrainedBox

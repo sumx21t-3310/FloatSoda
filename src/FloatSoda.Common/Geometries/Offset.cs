@@ -17,4 +17,6 @@ public readonly record struct Offset(double X = 0, double Y = 0)
     public static Offset operator /(Offset a, double b) => new(a.X / b, a.Y / b);
 
     public static implicit operator Offset(SKPoint point) => new(point.X, point.Y);
+    
+    public static implicit operator SKPoint(Offset offset) => new ((float)offset.X, (float)offset.Y);
 }

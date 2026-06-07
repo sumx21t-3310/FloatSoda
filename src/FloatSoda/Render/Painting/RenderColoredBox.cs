@@ -1,5 +1,4 @@
 ﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Geometrics;
 using SkiaSharp;
 
 namespace FloatSoda.Render.Painting;
@@ -12,7 +11,7 @@ public class RenderColoredBox : RenderProxyBox
     {
         if (!Size.IsEmpty)
         {
-            context.Canvas.DrawRect(Size.And(offset), new SKPaint { Color = Color });
+            context.Canvas.DrawRect(SKRect.Create(offset, Size), new SKPaint { Color = Color });
         }
 
         Child?.Paint(context, offset);

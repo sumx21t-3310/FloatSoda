@@ -4,24 +4,16 @@ namespace FloatSoda.Common.Geometries;
 
 public static class GeometryExtension
 {
-    extension(SKRect rect)
+    public static SKRoundRect MakeOffset(this SKRoundRect roundRect, float dx, float dy)
     {
-        public SKRect MakeOffset(float dx, float dy) => new()
-        {
-            Top = rect.Top + dy,
-            Bottom = rect.Bottom + dy,
-            Left = rect.Left + dx,
-            Right = rect.Right + dx,
-        };
+        var rect = roundRect.Rect;
+        rect.Offset(dx, dy);
+        
+        var copy = new SKRoundRect();
+        copy.SetRectRadii(rect, roundRect.Radii);
 
-        public SKRect MakeOffset(SKPoint offset) => rect.MakeOffset(offset.X, offset.Y);
-
-        public SKRect RoundOut() => new()
-        {
-            Top = MathF.Round(rect.Top),
-            Bottom = MathF.Round(rect.Bottom),
-            Left = MathF.Round(rect.Left),
-            Right = MathF.Round(rect.Right)
-        };
+        return copy;
     }
+
+    public static SKRoundRect MakeOffset(this SKRoundRect roundRect, Offset offset) => roundRect.MakeOffset((float)offset.X, (float)offset.Y);
 }

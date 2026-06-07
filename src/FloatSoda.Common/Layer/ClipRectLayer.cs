@@ -5,7 +5,7 @@ namespace FloatSoda.Common.Layer;
 public class ClipRectLayer(SKRect clipRect) : ContainerLayer
 {
     public SKRect ClipRect { get; set; } = clipRect;
-    public Clip ClipBehavior { get; init; } = Clip.Antialias;
+    public Clip ClipBehavior { get; set; } = Clip.Antialias;
 
 
     public override void Layout(LayerContext context)

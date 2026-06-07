@@ -4,7 +4,7 @@ using Common.Geometries;
 using Common.Layer;
 using SkiaSharp;
 
-public delegate void PaintingContextCallback(PaintingContext context, SKPoint offset);
+public delegate void PaintingContextCallback(PaintingContext context, Offset offset);
 
 public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBounds)
 {
@@ -40,7 +40,10 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         _canvas = null;
     }
 
-    public void PushLayer(ContainerLayer childLayer, PaintingContextCallback painter, SKPoint offset,
+    public void PushLayer(
+        ContainerLayer childLayer,
+        PaintingContextCallback painter,
+        Offset offset,
         SKRect? childPaintBounds = null)
     {
         if (childLayer.HasChildren)
@@ -52,14 +55,13 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
 
         containerLayer.Children.Add(childLayer);
 
-
         var childContext = new PaintingContext(childLayer, childPaintBounds ?? estimatedBounds);
         painter(childContext, offset);
         childContext.StopRecordingIfNeeded();
     }
 
     public ClipPathLayer PushClipPath(
-        SKPoint offset,
+        Offset offset,
         SKRect bounds,
         SKPath clipPath,
         PaintingContextCallback painter,
@@ -67,35 +69,61 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         ClipPathLayer? oldLayer = null
     )
     {
-        bounds.Offset((float)offset.X, (float)offset.Y);
+        var offsetBounds = bounds;
+        offsetBounds.Offset(offset);
+
+        var offsetClipPath = new SKPath(clipPath);
+        offsetClipPath.Offset(offset);
 
         var layer = oldLayer ?? new ClipPathLayer(clipPath);
 
         layer.ClipBehavior = clipBehavior;
-        layer.ClipPath = clipPath;
+        layer.ClipPath = offsetClipPath;
+
+        PushLayer(layer, painter, offset, offsetBounds);
 
         return layer;
     }
 
     public ClipRoundRectLayer PushClipRoundRect(
-        SKPoint offset,
-        SKRect clipRect,
+        Offset offset,
         SKRect bounds,
+        SKRoundRect clipRect,
         PaintingContextCallback painter,
         Clip clipBehavior = Clip.Antialias,
-        ClipRoundRectLayer? clipPathLayer = null)
+        ClipRoundRectLayer? oldLayer = null)
     {
-        throw new NotImplementedException();
+        var offsetBounds = bounds;
+        offsetBounds.Offset(offset);
+
+        var offsetClipRoundRect = clipRect.MakeOffset(offset);
+
+        var layer = oldLayer ?? new ClipRoundRectLayer(offsetClipRoundRect);
+
+        layer.ClipRect = offsetClipRoundRect;
+        layer.ClipBehavior = clipBehavior;
+
+        PushLayer(layer, painter, offset, bounds);
+
+        return layer;
     }
 
     public ClipRectLayer PushClipRect(
-        SKPoint offset,
+        Offset offset,
         SKRect clipRect,
         PaintingContextCallback painter,
         Clip clipBehavior = Clip.Antialias,
         ClipRectLayer? oldLayer = null)
     {
-        var offsetClipRect = clipRect.MakeOffset(offset);
-        throw new NotImplementedException();
+        var offsetClipRect = clipRect;
+        offsetClipRect.Offset(offset);
+        
+        var layer = oldLayer ?? new ClipRectLayer(offsetClipRect);
+        layer.ClipRect = offsetClipRect;
+        layer.ClipBehavior = clipBehavior;
+
+        PushLayer(layer, painter, offset, offsetClipRect);
+
+        return layer;
     }
 }

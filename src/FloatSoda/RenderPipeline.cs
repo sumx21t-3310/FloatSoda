@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Common.Geometries;
 using FloatSoda.Common.Layer;
-using FloatSoda.Geometrics;
 using FloatSoda.Render;
+using SkiaSharp;
 
 namespace FloatSoda;
 
@@ -16,7 +16,8 @@ public class RenderPipeline
     {
         if (RenderView == null) return;
         var root = RenderView.Layer;
-        var context = new PaintingContext(root, RenderView.Size.And(Offset.Zero));
+        var context = new PaintingContext(root, SKRect.Create(Offset.Zero, RenderView.Size));
+
         RenderView?.Paint(context, Offset.Zero);
         context.StopRecordingIfNeeded();
     }

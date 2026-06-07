@@ -16,7 +16,7 @@ ILayer CreateLayerTree(float width, float height)
     var root = new ContainerLayer();
 
     var rect = SKRect.Create(0, 0, width, height);
-    var leef = new PictureLayer();
+    var leaf = new PictureLayer();
     var recorder = new SKPictureRecorder();
     var canvas = recorder.BeginRecording(rect);
 
@@ -26,9 +26,9 @@ ILayer CreateLayerTree(float width, float height)
     };
 
     canvas.DrawCircle(Random.Shared.NextSingle() * width, Random.Shared.NextSingle() * height, 40f, paint);
-    leef.Picture = recorder.EndRecording();
+    leaf.Picture = recorder.EndRecording();
     
-    root.Children.Add(leef);
+    root.Children.Add(leaf);
 
     return root;
 }
