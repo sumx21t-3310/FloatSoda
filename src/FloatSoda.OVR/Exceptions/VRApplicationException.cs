@@ -1,16 +1,14 @@
-﻿using Valve.VR;
-
 namespace FloatSoda.OVR.Exceptions;
 
-public class EVRApplicationException(string message, EVRApplicationError errorCode)
+public class VRApplicationException(string message, EVRApplicationError errorCode)
     : OpenVRSystemException<EVRApplicationError>(message, errorCode)
 {
-    public EVRApplicationException(EVRApplicationError error) : this(GetMessage(error), error)
+    public VRApplicationException(EVRApplicationError errorCode) : this(GetMessage(errorCode), errorCode)
     {
     }
 
 
-    public static string GetMessage(EVRApplicationError error)
+    private static string GetMessage(EVRApplicationError error)
     {
         return error switch
         {
@@ -45,11 +43,6 @@ public class EVRApplicationException(string message, EVRApplicationError errorCo
     {
         if (error == EVRApplicationError.None) return;
 
-        throw new EVRApplicationException(error);
+        throw new VRApplicationException(error);
     }
-}
-
-public static class EVRApplicationExceptionValidator
-{
-    public static void ThrowIfError(this EVRApplicationError error) => EVRApplicationException.ThrowIfError(error);
 }

@@ -1,12 +1,13 @@
 ﻿using FloatSoda.Common.Geometries;
 using FloatSoda.Common.Layer;
 using FloatSoda.Geometrics;
+using FloatSoda.Render.Mixin;
 using SkiaSharp;
 
 namespace FloatSoda.Render;
 
 
-public class RenderView(float width, float height) : RenderObject
+public class RenderView(float width, float height) : RenderObject, IRenderObjectWithChild<RenderBox>
 {
     public override SKSize Size { get; protected set; } = new(width, height);
 

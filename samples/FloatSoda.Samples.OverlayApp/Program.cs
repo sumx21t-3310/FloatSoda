@@ -1,20 +1,18 @@
 ﻿using System.Numerics;
 using FloatSoda;
 using FloatSoda.Geometrics;
+using FloatSoda.OVR.Overlay;
 using FloatSoda.Render.Layout;
 using FloatSoda.Render.Painting;
 using FloatSoda.Samples.OverlayApp;
-using OVRSharp;
 using SkiaSharp;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
 
 using var app = builder.Build();
 
-var thumbnail = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "thumbnail.png");
 
-
-var floatSodaAbsolute = new RenderPositionedBox
+var floatSodaWorldSpace = new RenderPositionedBox
 {
     Child = new RenderFlex
     {
@@ -110,11 +108,9 @@ var floatSodaLeftHand = new RenderPositionedBox
     }
 };
 
-app.CreateOverlayWindow("FloatSoda Absolute", floatSodaAbsolute, new SKSize(1000, 1000),
-    position: new Vector3(0, 1.2f, -1f));
-app.CreateOverlayWindow("FloatSoda Dashboard", floatSodaDashboard, new SKSize(1000, 1000), isDashboard: true,
-    thumbnailPath: thumbnail);
-app.CreateOverlayWindow("FloatSoda Left Hand", floatSodaLeftHand, new SKSize(1000, 1000),
-    position: new Vector3(0, 0, -1), trackedDevice: Overlay.TrackedDeviceRole.LeftHand);
+
+app.CreateWorldSpaceOverlay("FloatSodaWorldSpace", floatSodaWorldSpace, 1000, 1000, new Vector3(0, 1, -1));
+app.CreateDashboardOverlay("FloatSodaDashboard", floatSodaDashboard, 1000, 1000);
+app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.LeftController);
 
 app.Run();

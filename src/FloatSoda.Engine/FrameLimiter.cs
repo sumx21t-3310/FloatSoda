@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
+using FloatSoda.OVR;
 using Microsoft.Extensions.Logging;
-using Valve.VR;
 
 namespace FloatSoda.Engine;
 

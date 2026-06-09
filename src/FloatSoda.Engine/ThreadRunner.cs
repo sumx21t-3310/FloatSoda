@@ -1,21 +1,23 @@
 ﻿using System.Collections.Concurrent;
-using System.Numerics;
 using FloatSoda.Common.Layer;
 using Microsoft.Extensions.Logging;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using OVRSharp;
 
 namespace FloatSoda.Engine;
 
-public interface IThreadRunner
+public interface IThreadRunner<TContext>
 {
     void Start(CancellationToken token);
     void Stop();
+
+    void PostTask(Action<TContext> action);
+
     string ThreadName { get; }
     bool IsRunning { get; }
 }
 
-public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null) : IThreadRunner
+public abstract class ThreadRunner<TContext>(string threadName, IFrameLimiter limiter, ILogger? logger = null)
+    : IThreadRunner<TContext>
 {
     private Thread? _thread;
 
@@ -25,6 +27,7 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
     private CancellationTokenSource? _linkedTokenSource;
 
     public bool IsRunning => _isRunning && (_thread?.IsAlive ?? false);
+
 
     public string ThreadName => threadName;
 
@@ -70,6 +73,8 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
             Logger?.LogWarning("{ThreadName} の停止がタイムアウトしました", ThreadName);
         }
     }
+
+    public abstract void PostTask(Action<TContext> action);
 
     private void RunLoop(CancellationToken ct)
     {
@@ -121,36 +126,34 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
     }
 }
 
+public record struct RenderThreadContext(ConcurrentDictionary<string, IWindow> Windows, bool IsRunning = true);
+
 public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
-    : ThreadRunner(threadName, limiter, logger)
+    : ThreadRunner<RenderThreadContext>(threadName, limiter, logger)
 {
     private readonly ConcurrentDictionary<string, IWindow> _windows = [];
     private readonly ConcurrentQueue<Action> _pendingTasks = new();
 
-    public void CreateOverlayWindow(
-        string overlayKey,
-        string windowName,
-        bool isDashboard,
-        int width,
-        int height,
-        string? thumbnail = null,
-        float widthInMeters = 0.5f,
-        Vector3? position = null,
-        Quaternion? rotation = null,
-        Overlay.TrackedDeviceRole trackedDevice = Overlay.TrackedDeviceRole.None)
+    public void PostRender(string key, ILayer? layer)
     {
-        _pendingTasks.Enqueue(() =>
+        PostTask(context =>
         {
-            var window = new OverlayWindow(overlayKey, windowName, isDashboard, new Renderer(new GLView(width, height)),
-                thumbnail);
+            if (!context.IsRunning) return;
+            if (layer == null) return;
+            if (!context.Windows.TryGetValue(key, out var window))
+            {
+                Logger?.LogWarning("ウィンドウが見つかりませんでした: {Key}", key);
+                return;
+            }
 
-            window.Overlay.TrackedDevice = trackedDevice;
-            window.Transform.Position = position ?? Vector3.Zero;
-            window.Transform.Rotation = rotation ?? Quaternion.Identity;
-            window.Overlay.WidthInMeters = widthInMeters;
-
-            _windows.TryAdd(overlayKey, window);
+            window.Root = layer;
+            window.Update();
         });
+    }
+
+    public override void PostTask(Action<RenderThreadContext> action)
+    {
+        _pendingTasks.Enqueue(() => action(new RenderThreadContext(_windows)));
     }
 
 
@@ -161,20 +164,6 @@ public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogge
             task();
         }
     }
-
-    public void PostRender(string key, ILayer? layer) => _pendingTasks.Enqueue(() =>
-    {
-        if (!IsRunning) return;
-        if (layer == null) return;
-        if (!_windows.TryGetValue(key, out var window))
-        {
-            Logger?.LogWarning("ウィンドウが見つかりませんでした: {Key}", key);
-            return;
-        }
-
-        window.Root = layer;
-        window.Update();
-    });
 
     protected override void OnStart(CancellationToken ct)
     {

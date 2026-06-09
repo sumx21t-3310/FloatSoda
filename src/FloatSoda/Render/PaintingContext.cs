@@ -4,8 +4,6 @@ using Common.Geometries;
 using Common.Layer;
 using SkiaSharp;
 
-public delegate void PaintingContextCallback(PaintingContext context, Offset offset);
-
 public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBounds)
 {
     private PictureLayer? _currentLayer;
@@ -42,7 +40,7 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
 
     public void PushLayer(
         ContainerLayer childLayer,
-        PaintingContextCallback painter,
+        Action<PaintingContext, Offset> painter,
         Offset offset,
         SKRect? childPaintBounds = null)
     {
@@ -64,7 +62,7 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         Offset offset,
         SKRect bounds,
         SKPath clipPath,
-        PaintingContextCallback painter,
+        Action<PaintingContext, Offset> painter,
         Clip clipBehavior = Clip.Antialias,
         ClipPathLayer? oldLayer = null
     )
@@ -89,7 +87,7 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         Offset offset,
         SKRect bounds,
         SKRoundRect clipRect,
-        PaintingContextCallback painter,
+        Action<PaintingContext, Offset> painter,
         Clip clipBehavior = Clip.Antialias,
         ClipRoundRectLayer? oldLayer = null)
     {
@@ -111,13 +109,13 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
     public ClipRectLayer PushClipRect(
         Offset offset,
         SKRect clipRect,
-        PaintingContextCallback painter,
+        Action<PaintingContext, Offset> painter,
         Clip clipBehavior = Clip.Antialias,
         ClipRectLayer? oldLayer = null)
     {
         var offsetClipRect = clipRect;
         offsetClipRect.Offset(offset);
-        
+
         var layer = oldLayer ?? new ClipRectLayer(offsetClipRect);
         layer.ClipRect = offsetClipRect;
         layer.ClipBehavior = clipBehavior;

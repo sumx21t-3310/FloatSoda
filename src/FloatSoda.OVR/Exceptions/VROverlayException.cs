@@ -1,17 +1,13 @@
-﻿using Valve.VR;
-
 namespace FloatSoda.OVR.Exceptions;
 
-/// <summary>
-/// OpenVRオーバーレイ操作に関する例外のベースクラス
-/// </summary>
-public class OverlayException(string message, EVROverlayError error) : OpenVRSystemException<EVROverlayError>(message, error)
+public class VROverlayException(string message, EVROverlayError errorCode)
+    : OpenVRSystemException<EVROverlayError>(message, errorCode)
 {
-    public OverlayException(EVROverlayError error) : this(GetMessage(error), error)
+    public VROverlayException(EVROverlayError errorCode) : this(GetMessage(errorCode), errorCode)
     {
     }
 
-    public static string GetMessage(EVROverlayError error)
+    private static string GetMessage(EVROverlayError error)
     {
         return error switch
         {
@@ -38,7 +34,6 @@ public class OverlayException(string message, EVROverlayError error) : OpenVRSys
             EVROverlayError.TextureAlreadyLocked => "テクスチャは既にロックされています。",
             EVROverlayError.TextureLockCapacityReached => "テクスチャロックのキャパシティに達しました。",
             EVROverlayError.TextureNotLocked => "操作前にテクスチャをロックする必要があります。",
-
             _ => $"予期しないエラーが発生しました: {error}"
         };
     }
@@ -47,15 +42,11 @@ public class OverlayException(string message, EVROverlayError error) : OpenVRSys
     {
         if (error == EVROverlayError.None) return;
 
-        throw new OverlayException(error);
+        throw new VROverlayException(error);
     }
-}
 
-public static class VrOverlayValidator
-{
-    /// <summary>
-    /// EVROverlayErrorを評価し、エラーがある場合は適切な例外をスローします。
-    /// </summary>
-    /// <param name="error">OpenVR APIから返されたエラーコード</param>
-    public static void ThrowIfError(this EVROverlayError error) => OverlayException.ThrowIfError(error);
+    public static void ThrowIfInvalidHandle(ulong handle)
+    {
+        if (handle == OpenVR.k_ulOverlayHandleInvalid) throw new VROverlayException(EVROverlayError.InvalidHandle);
+    }
 }
