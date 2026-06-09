@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Elements;
 using FloatSoda.Render;
 
-namespace FloatSoda.Widgets;
+namespace FloatSoda.Widgets.Core;
 
 public record RenderObjectToWidgetAdapter : RenderObjectWidget
 {

@@ -3,7 +3,7 @@ using FloatSoda.Geometrics;
 using FloatSoda.Render;
 using FloatSoda.Render.Layout;
 
-namespace FloatSoda.Widgets;
+namespace FloatSoda.Widgets.Layout;
 
 public record Align : SingleChildRenderObjectWidget
 {

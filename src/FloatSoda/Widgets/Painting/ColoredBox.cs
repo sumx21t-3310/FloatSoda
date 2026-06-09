@@ -3,7 +3,7 @@ using FloatSoda.Render;
 using FloatSoda.Render.Painting;
 using SkiaSharp;
 
-namespace FloatSoda.Widgets;
+namespace FloatSoda.Widgets.Painting;
 
 public record ColoredBox : SingleChildRenderObjectWidget
 {

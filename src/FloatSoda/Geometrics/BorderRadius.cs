@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Geometrics;
 
-public record struct BorderRadius(
+public readonly record struct BorderRadius(
     Radius TopLeft = default,
     Radius TopRight = default,
     Radius BottomRight = default,
