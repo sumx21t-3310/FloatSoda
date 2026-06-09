@@ -1,5 +1,6 @@
 ﻿using FloatSoda.Common.Geometries;
 using FloatSoda.Geometrics;
+using FloatSoda.Render.Mixin;
 using SkiaSharp;
 
 namespace FloatSoda.Render;
@@ -9,9 +10,9 @@ public abstract class RenderBox : RenderObject
     public override SKSize Size { get; protected set; } = SKSize.Empty;
 }
 
-public abstract class RenderProxyBox : RenderBox
+public abstract class RenderProxyBox : RenderBox, IRenderObjectWithChild<RenderBox>
 {
-    public RenderBox? Child { get; init; } = null;
+    public RenderBox? Child { get; set; } = null;
 
     public override void Layout(BoxConstraints constraints)
     {
