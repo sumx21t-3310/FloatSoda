@@ -1,6 +1,11 @@
-﻿namespace FloatSoda.Widgets.Gesture;
+﻿using FloatSoda.Elements;
 
-public class GestureDetector
+namespace FloatSoda.Widgets.Gesture;
+
+public record GestureDetector : Widget
 {
-    
+    public override Element CreateElement()
+    {
+        throw new NotImplementedException();
+    }
 }

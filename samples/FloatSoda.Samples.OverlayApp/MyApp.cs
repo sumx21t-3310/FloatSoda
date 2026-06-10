@@ -1,8 +1,10 @@
-﻿using FloatSoda.Widgets;
+﻿using FloatSoda.OVR.Overlay;
+using FloatSoda.Widgets;
 using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using R3;
 
 namespace FloatSoda.Samples.OverlayApp;
 
@@ -15,6 +17,7 @@ public record MyApp : StatelessWidget
 
         return new OverlayWindow
         {
+            Overlay = new DashboardOverlay(new DashboardOverlayIdentity("Float Soda", "Dashboard")),
             Child = new Center
             {
                 Child = new Column

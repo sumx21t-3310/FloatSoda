@@ -2,6 +2,7 @@
 using FloatSoda;
 using FloatSoda.Geometrics;
 using FloatSoda.OVR.Overlay;
+using FloatSoda.Render;
 using FloatSoda.Render.Layout;
 using FloatSoda.Render.Painting;
 using FloatSoda.Samples.OverlayApp;
@@ -53,6 +54,8 @@ var floatSodaWorldSpace = new RenderPositionedBox
     }
 };
 
+var iconPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/thumbnail.png";
+var image = new FileImageProvider(iconPath).Load();
 
 var floatSodaDashboard = new RenderPositionedBox
 {
@@ -60,7 +63,7 @@ var floatSodaDashboard = new RenderPositionedBox
     {
         MainAxisAlignment = MainAxisAlignment.Start,
         CrossAxisAlignment = CrossAxisAlignment.End,
-        Direction = Axis.Horizontal,
+        Direction = Axis.Vertical,
         Children =
         [
             new RenderConstrainedBox
@@ -73,10 +76,9 @@ var floatSodaDashboard = new RenderPositionedBox
                 AdditionalConstraints = BoxConstraints.Tight(300, 300),
                 Child = new RenderColoredBox() { Color = SKColors.Bisque }
             },
-            new RenderConstrainedBox
+            new RenderImage
             {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
+                Image = image
             }
         ]
     }

@@ -1,8 +1,8 @@
 ﻿using FloatSoda.Elements;
 
-namespace FloatSoda.Widgets.Gesture;
+namespace FloatSoda.Widgets.Painting;
 
-public record Listener : Widget
+public record ClipOval : Widget
 {
     public override Element CreateElement()
     {
