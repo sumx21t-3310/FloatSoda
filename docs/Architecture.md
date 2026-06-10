@@ -63,26 +63,61 @@ graph LR
 
 ---
 
-## フレームパイプライン
+## レンダリングライフサイクル
 
 ```mermaid
 sequenceDiagram
     participant Main as メインスレッド
+    participant Pipeline as RenderPipeline
+    participant RV as RenderView
+    participant RO as RenderObject 群
+    participant PC as PaintingContext
+    participant Layer as レイヤーツリー
     participant RT as レンダースレッド
+    participant Renderer as Renderer
+    participant GL as GLView (GLFW/OpenGL)
     participant VR as OpenVR Compositor
 
-    loop メインループ
-        Main->>Main: PollEvents() — VRイベント処理
-        Main->>Main: RenderPipeline.FlushLayout()
-        Note over Main: RenderView.PerformLayout()<br/>BoxConstraints を子に伝播
-        Main->>Main: RenderPipeline.FlushPaint()
-        Note over Main: PaintingContext で SKPicture 記録<br/>ContainerLayer ツリーを構築
-        Main->>Main: Layer.Clone() — スレッドセーフコピー
-        Main-->>RT: PostTask(layer)
-        RT->>RT: Renderer.Render(layer)
-        Note over RT: LayerContext.Layout/Paint<br/>SkiaSharp → GL FBO
-        RT-->>VR: SetOverlayTexture(GL texture handle)
+    loop メインループ (FloatSodaApp.MainLoop)
+        Main->>Main: VREventDispatcher.PollEvents()
+        Note over Main: VREvent_Quit → CancellationToken をキャンセル
+
+        alt pipeline.NeedsRebuild == true
+            Main->>Pipeline: FlushLayout()
+            Pipeline->>RV: PerformLayout()
+            RV->>RO: Layout(BoxConstraints) [再帰]
+            Note over RO: 制約を子へ伝播し<br/>SKSize を親に返す
+
+            Main->>Pipeline: FlushPaint()
+            Pipeline->>PC: new PaintingContext(RenderView.Layer, bounds)
+            Pipeline->>RV: Paint(context, Offset.Zero)
+            RV->>RO: Paint(context, offset) [再帰]
+            Note over RO: context.Canvas に Skia ドローコール記録<br/>クリップ等は PushLayer で子 ContainerLayer に分岐
+            RO->>PC: Canvas アクセス → StartRecording()
+            PC->>Layer: PictureLayer を ContainerLayer に追加
+            Pipeline->>PC: StopRecordingIfNeeded()
+            Note over PC: SKPictureRecorder.EndRecording()<br/>→ PictureLayer.Picture に保存
+
+            Main->>Layer: Layer.Clone() — スレッドセーフコピー
+            Main-->>RT: PostTask(capturedLayer)
+        end
+
         Main->>Main: FrameLimiter.Wait()
+    end
+
+    loop レンダースレッド (RenderThreadRunner)
+        RT->>RT: ConcurrentQueue からタスクを取り出す
+        RT->>Renderer: Render(layer)
+        Renderer->>GL: Clear()
+        Note over GL: GRContext.ResetContext()<br/>SKSurface.Canvas.Clear(Transparent)
+        Renderer->>Layer: layer.Layout(LayerContext)
+        Note over Layer: PaintBounds を再帰的に計算
+        Renderer->>Layer: layer.Paint(LayerContext)
+        Note over Layer: ContainerLayer → PictureLayer の順に<br/>SKCanvas.DrawPicture() で描画<br/>ClipLayer は SaveLayer/ClipXxx を挿入
+        Renderer->>GL: Flush()
+        Note over GL: SKSurface.Flush() → GRContext.Flush()<br/>→ GL.Flush() で GL テクスチャに書き込み完了
+        RT->>VR: Overlay.Texture.FromTexture_t(GL texture handle)
+        Note over VR: ETextureType.OpenGL / EColorSpace.Auto
     end
 ```
 
