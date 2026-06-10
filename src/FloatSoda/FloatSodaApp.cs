@@ -1,16 +1,15 @@
-﻿using System.Collections.Concurrent;
+﻿using FloatSoda.Common.Layer;
 using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Render;
 using FloatSoda.Render.Layout;
+using FloatSoda.Engine;
+using FloatSoda.OVR.Exceptions;
+using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace FloatSoda;
-
-using System.Runtime.InteropServices;
-using Engine;
-using OVR.Exceptions;
 
 public class FloatSodaAppBuilder
 {
@@ -52,6 +51,7 @@ public class FloatSodaApp : IDisposable
     private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<string, RenderPipeline> _windowKeys = [];
     private Application? _openVR;
+    private VREventDispatcher? _dispatcher;
 
     private readonly CancellationTokenSource _cts = new();
     private bool _disposed;
@@ -82,7 +82,7 @@ public class FloatSodaApp : IDisposable
 
         var overlayKey = WindowKeyGenerator.GenerateKey(windowName);
 
-        _logger?.LogInformation($"{windowName} : {overlayKey}を作成しました");
+        _logger?.LogInformation("{WindowName} : {OverlayKey}を作成しました", windowName, overlayKey);
         _windowKeys.TryAdd(overlayKey, pipeline);
 
         _renderThreadRunner.PostTask(context =>
@@ -114,71 +114,29 @@ public class FloatSodaApp : IDisposable
 
     private void MainLoop()
     {
-        _logger?.LogInformation($"");
-        while (!_disposed && !_cts.Token.IsCancellationRequested)
+        while (!_cts.Token.IsCancellationRequested)
         {
             try
             {
                 PollEvents();
-
-                DrawFrame();
-
-                _limiter.Wait();
             }
             catch (Exception e)
             {
-                _logger?.LogError("ループ実行中にエラーが発生しました: {Exception}", e);
-                return;
+                _logger?.LogError("イベント処理エラー: {Exception}", e);
+                break;
             }
-        }
-    }
 
-    private void PollEvents()
-    {
-        VREvent_t vrEvent = default;
-        while (_openVR?.OVRSystem.PollNextEvent(ref vrEvent, (uint)Marshal.SizeOf<VREvent_t>()) ?? false)
-        {
-            var eventType = (EVREventType)vrEvent.eventType;
-
-            switch (eventType)
+            try
             {
-                case EVREventType.VREvent_Quit or EVREventType.VREvent_ProcessQuit:
-                    _openVR?.OVRSystem.AcknowledgeQuit_Exiting();
-                    _cts.Cancel();
-                    break;
+                DrawFrame();
             }
-        }
-    }
-
-    private void DrawFrame()
-    {
-        foreach (var (windowKey, pipeline) in _windowKeys)
-        {
-            lock (pipeline)
+            catch (Exception e)
             {
-                if (!pipeline.NeedsRebuild) continue;
-
-                pipeline.FlushLayout();
-                pipeline.FlushPaint();
-
-                _renderThreadRunner.PostTask(context =>
-                {
-                    if (!context.IsRunning) return;
-                    if (pipeline.RenderView?.Layer == null) return;
-
-                    if (!context.Windows.TryGetValue(windowKey, out var window))
-                    {
-                        return;
-                    }
-
-                    var layer = pipeline.RenderView?.Layer.Clone();
-
-                    if (layer == null) return;
-
-                    window.Root = layer;
-                    window.Update();
-                });
+                _logger?.LogError("描画エラー: {Exception}", e);
+                break;
             }
+
+            _limiter.Wait();
         }
     }
 
@@ -187,18 +145,61 @@ public class FloatSodaApp : IDisposable
         try
         {
             _openVR = new Application(ApplicationType.Overlay);
+            _dispatcher = new VREventDispatcher(_openVR.OVRSystem);
+
+            _dispatcher.Register(EVREventType.VREvent_Quit, (in _) =>
+            {
+                _openVR?.OVRSystem.AcknowledgeQuit_Exiting();
+                _cts.Cancel();
+            });
+
+            _dispatcher.Register(EVREventType.VREvent_ProcessQuit, (in _) => _cts.Cancel());
 
             _renderThreadRunner.Start(_cts.Token);
         }
         catch (OpenVRSystemException<EVRInitError> e)
         {
-            _logger?.LogError($"OpenVRの初期化に失敗しました: {e.Message}");
+            _logger?.LogError("OpenVRの初期化に失敗しました: {Message}", e.Message);
             throw;
         }
         catch (Exception e)
         {
-            _logger?.LogError($"致命的な起動エラー: {e.Message}");
+            _logger?.LogError("致命的な起動エラー: {Message}", e.Message);
             throw;
+        }
+    }
+
+    private void PollEvents() => _dispatcher?.PollEvents();
+
+
+    private void DrawFrame()
+    {
+        foreach (var (windowKey, pipeline) in _windowKeys)
+        {
+            if (!pipeline.NeedsRebuild) continue;
+
+            ILayer? layer;
+            lock (pipeline)
+            {
+                if (!pipeline.NeedsRebuild) continue;
+
+                pipeline.FlushLayout();
+                pipeline.FlushPaint();
+                layer = pipeline.RenderView?.Layer.Clone();
+            }
+
+            if (layer == null) continue;
+
+            var capturedKey = windowKey;
+            var capturedLayer = layer;
+            _renderThreadRunner.PostTask(context =>
+            {
+                if (!context.IsRunning) return;
+                if (!context.Windows.TryGetValue(capturedKey, out var window)) return;
+
+                window.Root = capturedLayer;
+                window.Update();
+            });
         }
     }
 
