@@ -86,6 +86,46 @@ app.Run();
 
 ---
 
+## レンダリングライフサイクル
+
+```mermaid
+sequenceDiagram
+    participant Main as メインスレッド
+    participant Pipeline as RenderPipeline
+    participant RO as RenderObject 群
+    participant Layer as レイヤーツリー
+    participant RT as レンダースレッド
+    participant GL as GLView (OpenGL)
+    participant VR as OpenVR Compositor
+
+    loop メインループ
+        Main->>Main: VREventDispatcher.PollEvents()
+        Main->>Pipeline: FlushLayout()
+        Pipeline->>RO: Layout(BoxConstraints) [再帰]
+        Note over RO: 制約↓ サイズ↑
+        Main->>Pipeline: FlushPaint()
+        Pipeline->>RO: Paint(PaintingContext, Offset) [再帰]
+        Note over RO: Skia ドローコールを記録<br/>→ PictureLayer に格納
+        Main->>Layer: Clone() — スレッドセーフコピー
+        Main-->>RT: PostTask(layer)
+        Main->>Main: FrameLimiter.Wait()
+    end
+
+    loop レンダースレッド
+        RT->>GL: Clear()
+        RT->>Layer: Layout(LayerContext)
+        RT->>Layer: Paint(LayerContext)
+        Note over Layer: DrawPicture / SaveLayer<br/>でレイヤーを合成
+        RT->>GL: Flush()
+        Note over GL: SKSurface → GRContext → GL テクスチャ
+        RT->>VR: Overlay.Texture.FromTexture_t(GL texture handle)
+    end
+```
+
+> 詳細は [docs/Architecture.md](docs/Architecture.md) を参照。
+
+---
+
 ## 実装済みの RenderObject
 
 **レイアウト系**
