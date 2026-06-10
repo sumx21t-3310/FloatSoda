@@ -1,17 +1,13 @@
 ﻿using FloatSoda.Elements;
-using FloatSoda.Widgets.Core;
+using FloatSoda.OVR.Overlay;
 
 namespace FloatSoda.Widgets;
 
-public abstract record Widget
-{
-    public abstract Element CreateElement();
-}
-
-public abstract record SingleChildRenderObjectWidget : RenderObjectWidget
+public record OverlayWindow : Widget
 {
     public Widget? Child { get; init; }
-
+    public IOverlay Overlay { get; init; }
+    
     public override Element CreateElement()
     {
         throw new NotImplementedException();
