@@ -4,14 +4,6 @@ using FloatSoda.OVR.Overlay;
 
 namespace FloatSoda.Engine;
 
-public interface IWindow : IDisposable
-{
-    string Key { get; }
-    ILayer Root { get; set; }
-
-    void Update();
-}
-
 public class OverlayWindow(IOverlay overlay, Renderer renderer) : IWindow
 {
     public IOverlay Overlay { get; } = overlay;

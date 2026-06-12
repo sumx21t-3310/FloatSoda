@@ -76,6 +76,7 @@ var floatSodaDashboard = new RenderPositionedBox
                 AdditionalConstraints = BoxConstraints.Tight(300, 300),
                 Child = new RenderColoredBox() { Color = SKColors.Bisque }
             },
+            
             new RenderImage
             {
                 Image = image
@@ -114,5 +115,9 @@ var floatSodaLeftHand = new RenderPositionedBox
 app.CreateWorldSpaceOverlay("FloatSodaWorldSpace", floatSodaWorldSpace, 1000, 1000, new Vector3(0, 1, -1));
 app.CreateDashboardOverlay("FloatSodaDashboard", floatSodaDashboard, 1000, 1000);
 app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.LeftController);
+app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.RightController);
+app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.HMD, new Vector3(0, 1, -1));
+
+
 
 app.Run();

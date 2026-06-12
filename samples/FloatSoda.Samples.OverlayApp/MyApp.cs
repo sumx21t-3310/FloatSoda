@@ -12,7 +12,7 @@ public record MyApp : StatelessWidget
 {
     public override Widget Build(IBuildContext context)
     {
-        var count = context.UseState(() => 0);
+        ReactiveProperty<int> count = context.UseState(() => 0);
         var logger = context.Depends(provider => provider.GetService<ILogger>());
 
         return new OverlayWindow
