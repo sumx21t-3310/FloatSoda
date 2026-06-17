@@ -14,6 +14,6 @@ public class RenderColoredBox : RenderProxyBox
             context.Canvas.DrawRect(SKRect.Create(offset, Size), new SKPaint { Color = Color });
         }
 
-        Child?.Paint(context, offset);
+        if (Child != null) context.PaintChild(Child, offset);
     }
 }

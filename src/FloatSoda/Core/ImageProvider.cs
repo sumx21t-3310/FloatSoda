@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.Core;
 
 public abstract record ImageProvider
 {

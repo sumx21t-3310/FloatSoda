@@ -124,4 +124,49 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
 
         return layer;
     }
+
+    public void PaintChild(RenderObject child, Offset offset)
+    {
+        if (child.IsRepaintBoundary)
+        {
+            StopRecordingIfNeeded();
+            CompositeChild(child, offset);
+        }
+        else
+        {
+            child.NeedsPaint = false;
+            child.Paint(this, offset);
+        }
+    }
+
+    public void CompositeChild(RenderObject child, Offset offset)
+    {
+        if (child.NeedsPaint)
+        {
+            RepaintCompositedChild(child);
+        }
+
+        if (child.Layer is not TransformLayer childTransformLayer) return;
+        
+        childTransformLayer.Transform = SKMatrix.CreateTranslation((float)offset.X, (float)offset.Y);
+        containerLayer.Children.Add(childTransformLayer);
+    }
+
+    public static void RepaintCompositedChild(RenderObject child)
+    {
+        if (child.Layer is not TransformLayer childLayer)
+        {
+            childLayer = new TransformLayer();
+            child.Layer = childLayer;
+        }
+        else
+        {
+            childLayer.Children.Clear();
+        }
+
+        var childContext = new PaintingContext(childLayer, SKRect.Create(Offset.Zero, size: child.Size));
+        child.NeedsPaint = false;
+        child.Paint(childContext, Offset.Zero);
+        childContext.StopRecordingIfNeeded();
+    }
 }

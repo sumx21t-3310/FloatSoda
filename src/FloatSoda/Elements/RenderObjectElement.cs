@@ -1,18 +1,19 @@
 ﻿using FloatSoda.Render;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Core;
 
 namespace FloatSoda.Elements;
 
 public abstract class RenderObjectElement : Element
 {
+    public override RenderObject? RenderObject { get; protected set; }
+
     public override void Mount(Element? parent)
     {
         base.Mount(parent);
 
         if (Widget is RenderObjectWidget renderObjectWidget)
         {
-            renderObjectWidget.CreateRenderObject();
+            RenderObject = renderObjectWidget.CreateRenderObject();
         }
 
         AttachRenderObject();

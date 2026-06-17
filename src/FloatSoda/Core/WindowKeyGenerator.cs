@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace FloatSoda;
+namespace FloatSoda.Core;
 
 internal class WindowKeyGenerator
 {

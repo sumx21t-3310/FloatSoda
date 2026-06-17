@@ -6,7 +6,7 @@ namespace FloatSoda.Elements;
 
 public abstract class Element : IBuildContext
 {
-    public virtual Widget? Widget { get; set; }
+    public Widget? Widget { get; set; }
 
     public Element? Parent { get; set; }
 
@@ -15,11 +15,25 @@ public abstract class Element : IBuildContext
         get
         {
             RenderObject? result = null;
-            VisitChildren(child => result = child.RenderObject);
+
+            void Visit(Element element)
+            {
+                if (element is RenderObjectElement renderObjectElement)
+                {
+                    result = renderObjectElement.RenderObject;
+                }
+                else
+                {
+                    element.VisitChildren(Visit);
+                }
+            }
+
+            Visit(this);
+
             return result;
         }
-        protected set;
-    } = null;
+        protected set => field = value;
+    }
 
     public virtual void VisitChildren(Action<Element> visitor)
     {
@@ -36,6 +50,7 @@ public abstract class Element : IBuildContext
     protected Element InflateWidget(Widget newWidget)
     {
         var newChild = newWidget.CreateElement();
+        newChild.Widget = newWidget;
         newChild.Mount(this);
         return newChild;
     }

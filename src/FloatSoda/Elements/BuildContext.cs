@@ -1,4 +1,6 @@
-﻿namespace FloatSoda.Widgets;
+﻿using FloatSoda.Widgets;
+
+namespace FloatSoda.Elements;
 
 public interface IBuildContext
 {

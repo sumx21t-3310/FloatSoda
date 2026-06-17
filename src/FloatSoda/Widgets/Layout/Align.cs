@@ -7,19 +7,32 @@ namespace FloatSoda.Widgets.Layout;
 
 public record Align : SingleChildRenderObjectWidget
 {
-    public virtual Alignment Alignment { get; init; } = Alignment.Center;
+    public Alignment Alignment { get; init; } = Alignment.Center;
     public double? WidthFactor { get; init; } = null;
     public double? HeightFactor { get; init; } = null;
 
-    public override Element CreateElement()
-    {
-        throw new NotImplementedException();
-    }
 
-    public override RenderObject CreateRenderObject() => new RenderPositionedBox
+    public override RenderObject CreateRenderObject()
     {
-        Alignment = Alignment,
-        WidthFactor = WidthFactor,
-        HeightFactor = HeightFactor
-    };
+        return new RenderPositionedBox()
+        {
+            Alignment = Alignment,
+            WidthFactor = WidthFactor,
+            HeightFactor = HeightFactor
+        };
+    }
+}
+
+public record Center : StatelessWidget
+{
+    public Widget? Child { get; init; } = null;
+
+    public override Widget Build(IBuildContext context)
+    {
+        return new Align()
+        {
+            Child = Child,
+            Alignment = Alignment.Center
+        };
+    }
 }

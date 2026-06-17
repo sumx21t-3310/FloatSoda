@@ -1,10 +1,10 @@
 ﻿using FloatSoda.Elements;
 
-namespace FloatSoda.Widgets.Layout;
+namespace FloatSoda.Widgets.Paint;
 
-public record Column : Widget
+public record Opacity : Widget
 {
-    public List<Widget> Children { get; init; } = [];
+    public Widget Child { get; init; }
     public override Element CreateElement()
     {
         throw new NotImplementedException();

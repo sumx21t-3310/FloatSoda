@@ -1,12 +1,13 @@
 ﻿using System.Runtime.InteropServices;
+using FloatSoda.OVR.Overlay;
 
 namespace FloatSoda.OVR;
 
 public delegate void VREventHandler(in VREvent_t vrEvent);
 
-public class VREventDispatcher(CVRSystem system)
+public abstract class VREventDispatcher
 {
-    private static readonly uint EventSize = (uint)Marshal.SizeOf<VREvent_t>();
+    protected static readonly uint EventSize = (uint)Marshal.SizeOf<VREvent_t>();
     private readonly Dictionary<EVREventType, List<VREventHandler>> _handlers = new();
 
     public void Register(EVREventType eventType, VREventHandler handler)
@@ -23,17 +24,34 @@ public class VREventDispatcher(CVRSystem system)
 
     public void Unregister(EVREventType eventType) => _handlers.Remove(eventType);
 
-    private void Dispatch(VREvent_t vrEvent)
+    protected void Dispatch(VREvent_t vrEvent)
     {
         var eventType = (EVREventType)vrEvent.eventType;
         if (!_handlers.TryGetValue(eventType, out var list)) return;
         foreach (var handler in list.ToList()) handler(vrEvent);
     }
 
-    public void PollEvents()
+    public abstract void PollEvents();
+}
+
+public class VRSystemEventDispatcher : VREventDispatcher
+{
+    public override void PollEvents()
     {
         var vrEvent = new VREvent_t();
-        while (system.PollNextEvent(ref vrEvent, EventSize))
+        while (OpenVR.System.PollNextEvent(ref vrEvent, EventSize))
+        {
+            Dispatch(vrEvent);
+        }
+    }
+}
+
+public class OverlayEventDispatcher(IOverlayIdentity identity) : VREventDispatcher
+{
+    public override void PollEvents()
+    {
+        var vrEvent = new VREvent_t();
+        while (OpenVR.Overlay.PollNextOverlayEvent(identity.Handle, ref vrEvent, EventSize))
         {
             Dispatch(vrEvent);
         }

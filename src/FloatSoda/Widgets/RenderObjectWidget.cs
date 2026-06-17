@@ -1,6 +1,6 @@
 ﻿using FloatSoda.Render;
 
-namespace FloatSoda.Widgets.Core;
+namespace FloatSoda.Widgets;
 
 public abstract record RenderObjectWidget : Widget
 {

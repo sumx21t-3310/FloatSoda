@@ -5,19 +5,19 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace FloatSoda.Engine;
 
-public interface IThreadRunner<TContext>
+public interface IThreadRunner
 {
     void Start(CancellationToken token);
     void Stop();
 
-    void PostTask(Action<TContext> action);
+    void PostTask(Action action);
 
     string ThreadName { get; }
     bool IsRunning { get; }
 }
 
-public abstract class ThreadRunner<TContext>(string threadName, IFrameLimiter limiter, ILogger? logger = null)
-    : IThreadRunner<TContext>
+public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
+    : IThreadRunner
 {
     private Thread? _thread;
 
@@ -74,7 +74,7 @@ public abstract class ThreadRunner<TContext>(string threadName, IFrameLimiter li
         }
     }
 
-    public abstract void PostTask(Action<TContext> action);
+    public abstract void PostTask(Action action);
 
     private void RunLoop(CancellationToken ct)
     {
@@ -126,34 +126,26 @@ public abstract class ThreadRunner<TContext>(string threadName, IFrameLimiter li
     }
 }
 
-public record struct RenderThreadContext(ConcurrentDictionary<string, IWindow> Windows, bool IsRunning = true);
-
 public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
-    : ThreadRunner<RenderThreadContext>(threadName, limiter, logger)
+    : ThreadRunner(threadName, limiter, logger)
 {
-    private readonly ConcurrentDictionary<string, IWindow> _windows = [];
     private readonly ConcurrentQueue<Action> _pendingTasks = new();
 
-    public void PostRender(string key, ILayer? layer)
+
+    public void PostRender(IWindow window, ILayer layer)
     {
-        PostTask(context =>
+        PostTask(() =>
         {
-            if (!context.IsRunning) return;
-            if (layer == null) return;
-            if (!context.Windows.TryGetValue(key, out var window))
-            {
-                Logger?.LogWarning("ウィンドウが見つかりませんでした: {Key}", key);
-                return;
-            }
+            if (!IsRunning) return;
 
             window.Root = layer;
             window.Update();
         });
     }
 
-    public override void PostTask(Action<RenderThreadContext> action)
+    public override void PostTask(Action action)
     {
-        _pendingTasks.Enqueue(() => action(new RenderThreadContext(_windows)));
+        _pendingTasks.Enqueue(action);
     }
 
 
@@ -171,19 +163,7 @@ public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogge
         if (!GLFW.Init()) throw new Exception("GLFWの初期化に失敗しました。");
     }
 
-    protected override void Update()
-    {
-        GLFW.PollEvents();
-        GLFW.WaitEventsTimeout(1000);
-    }
+    protected override void Update() => GLFW.PollEvents();
 
-    protected override void OnStop()
-    {
-        foreach (var window in _windows.Values)
-        {
-            window.Dispose();
-        }
-
-        GLFW.Terminate();
-    }
+    protected override void OnStop() => GLFW.Terminate();
 }

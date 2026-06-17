@@ -1,13 +1,14 @@
-﻿using FloatSoda.Common.Layer;
-using FloatSoda.OVR;
+﻿using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
-using FloatSoda.Render;
-using FloatSoda.Render.Layout;
 using FloatSoda.Engine;
 using FloatSoda.OVR.Exceptions;
 using System.Collections.Concurrent;
+using FloatSoda.Core;
+using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SkiaSharp;
+
 
 namespace FloatSoda;
 
@@ -49,13 +50,15 @@ public class FloatSodaApp : IDisposable
     private readonly RenderThreadRunner _renderThreadRunner;
 
     private readonly ILogger? _logger;
-    private readonly ConcurrentDictionary<string, RenderPipeline> _windowKeys = [];
+    private readonly ConcurrentDictionary<string, WidgetBinding> _bindings = [];
+
     private Application? _openVR;
-    private VREventDispatcher? _dispatcher;
+    private VRSystemEventDispatcher? _dispatcher;
 
     private readonly CancellationTokenSource _cts = new();
-    private bool _disposed;
     private readonly IFrameLimiter _limiter;
+    private bool _disposed;
+    private readonly ConcurrentQueue<Action> _pendingTasks = new();
 
     internal FloatSodaApp(IFrameLimiter limiter, string appName, ILoggerFactory? loggerFactory = null)
     {
@@ -66,33 +69,16 @@ public class FloatSodaApp : IDisposable
         _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
     }
 
-    public void CreateOverlayWindow(string windowName, RenderBox root, int width, int height,
-        Func<IOverlay> overlayFactory)
+    public void CreateOverlayWindow(string windowName, Widget root, int width, int height,
+        Func<string, IOverlay> overlayFactory)
     {
-        var pipeline = new RenderPipeline
+        _pendingTasks.Enqueue(() =>
         {
-            RenderView = new RenderView(width, height)
-            {
-                Child = new RenderPositionedBox
-                {
-                    Child = root
-                }
-            }
-        };
-
-        var overlayKey = WindowKeyGenerator.GenerateKey(windowName);
-
-        _logger?.LogInformation("{WindowName} : {OverlayKey}を作成しました", windowName, overlayKey);
-        _windowKeys.TryAdd(overlayKey, pipeline);
-
-        _renderThreadRunner.PostTask(context =>
-        {
-            var render = new Renderer(new GLView(width, height));
-            var overlay = overlayFactory();
-
-            var window = new OverlayWindow(overlay, render);
-
-            context.Windows.TryAdd(overlayKey, window);
+            var widgetBinding = new WidgetBinding();
+            _bindings.TryAdd(windowName, widgetBinding);
+            widgetBinding.EnsureInitialized(windowName, new SKSize(width, height), _renderThreadRunner, overlayFactory);
+            widgetBinding.AttachRootWidget(root);
+            _logger?.LogInformation("{WindowName}を作成しました", windowName);
         });
     }
 
@@ -112,10 +98,24 @@ public class FloatSodaApp : IDisposable
         }
     }
 
+
     private void MainLoop()
     {
         while (!_cts.Token.IsCancellationRequested)
         {
+            try
+            {
+                while (_pendingTasks.TryDequeue(out var task))
+                {
+                    task();
+                }
+            }
+            catch (Exception e)
+            {
+                _logger?.LogError("タスクエラー: {Exception}", e);
+                break;
+            }
+
             try
             {
                 PollEvents();
@@ -145,7 +145,7 @@ public class FloatSodaApp : IDisposable
         try
         {
             _openVR = new Application(ApplicationType.Overlay);
-            _dispatcher = new VREventDispatcher(_openVR.OVRSystem);
+            _dispatcher = new VRSystemEventDispatcher();
 
             _dispatcher.Register(EVREventType.VREvent_Quit, (in _) =>
             {
@@ -154,6 +154,7 @@ public class FloatSodaApp : IDisposable
             });
 
             _dispatcher.Register(EVREventType.VREvent_ProcessQuit, (in _) => _cts.Cancel());
+
 
             _renderThreadRunner.Start(_cts.Token);
         }
@@ -174,35 +175,11 @@ public class FloatSodaApp : IDisposable
 
     private void DrawFrame()
     {
-        foreach (var (windowKey, pipeline) in _windowKeys)
+        foreach (var (_, binding) in _bindings)
         {
-            if (!pipeline.NeedsRebuild) continue;
-
-            ILayer? layer;
-            lock (pipeline)
-            {
-                if (!pipeline.NeedsRebuild) continue;
-
-                pipeline.FlushLayout();
-                pipeline.FlushPaint();
-                layer = pipeline.RenderView?.Layer.Clone();
-            }
-
-            if (layer == null) continue;
-
-            var capturedKey = windowKey;
-            var capturedLayer = layer;
-            _renderThreadRunner.PostTask(context =>
-            {
-                if (!context.IsRunning) return;
-                if (!context.Windows.TryGetValue(capturedKey, out var window)) return;
-
-                window.Root = capturedLayer;
-                window.Update();
-            });
+            binding.DrawFrame();
         }
     }
-
 
     public void Dispose()
     {

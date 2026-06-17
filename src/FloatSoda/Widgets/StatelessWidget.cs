@@ -4,10 +4,10 @@ namespace FloatSoda.Widgets;
 
 public abstract record StatelessWidget : Widget
 {
-    public override Element CreateElement()
+    public override Element CreateElement() => new StatelessElement
     {
-        throw new NotImplementedException();
-    }
-    
+        Widget = this
+    };
+
     public abstract Widget Build(IBuildContext context);
 }

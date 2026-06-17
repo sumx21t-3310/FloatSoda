@@ -4,7 +4,7 @@ namespace FloatSoda.Common.Layer;
 
 public class TransformLayer : ContainerLayer
 {
-    public SKMatrix Transform { get; init; } = SKMatrix.Identity;
+    public SKMatrix Transform { get; set; } = SKMatrix.Identity;
 
     public override void Layout(LayerContext context)
     {

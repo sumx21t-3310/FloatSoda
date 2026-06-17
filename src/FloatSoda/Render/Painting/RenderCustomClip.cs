@@ -29,14 +29,18 @@ public class RenderClipRect : RenderCustomClip<SKRect>
     {
         if (Child != null)
         {
-            context.PushClipRect(offset, Clip, (c, o) => base.Paint(c, o), ClipBehavior);
+            Layer = context.PushClipRect(offset, Clip, (c, o) => base.Paint(c, o), ClipBehavior, Layer as ClipRectLayer);
+        }
+        else
+        {
+            Layer = null;
         }
     }
 }
 
 public class RenderClipRoundRect : RenderCustomClip<SKRoundRect>
 {
-    public required BorderRadius BorderRadius { get; init; }
+    public BorderRadius BorderRadius { get; set; }
 
     protected override SKRoundRect DefaultClip => BorderRadius.ToRoundRect(SKRect.Create(Offset.Zero, Size));
 
@@ -44,7 +48,18 @@ public class RenderClipRoundRect : RenderCustomClip<SKRoundRect>
     {
         if (Child != null)
         {
-            context.PushClipRoundRect(offset, Clip.Rect, Clip, (c, o) => base.Paint(c, o), ClipBehavior);
+            Layer = context.PushClipRoundRect(
+                offset,
+                Clip.Rect,
+                Clip,
+                (c, o) => base.Paint(c, o),
+                ClipBehavior,
+                Layer as ClipRoundRectLayer
+            );
+        }
+        else
+        {
+            Layer = null;
         }
     }
 }
@@ -63,16 +78,16 @@ public class RenderClipPath : RenderCustomClip<SKPath>
 
     public override void Paint(PaintingContext context, Offset offset)
     {
-        if (Child != null)
-        {
-            context.PushClipPath(
-                offset,
-                SKRect.Create(Offset.Zero, Size),
-                Clip,
-                (c, o) => base.Paint(c, o),
-                ClipBehavior
-            );
-        }
+        if (Child == null) return;
+
+        Layer = context.PushClipPath(
+            offset,
+            SKRect.Create(Offset.Zero, Size),
+            Clip,
+            (c, o) => base.Paint(c, o),
+            ClipBehavior,
+            Layer as ClipPathLayer
+        );
     }
 }
 
@@ -84,6 +99,14 @@ public class RenderClipOval : RenderCustomClip<SKRect>
     {
         var path = new SKPath();
         path.AddOval(Clip);
-        context.PushClipPath(offset, Clip, path, (c, o) => base.Paint(c, o), ClipBehavior);
+
+        Layer = context.PushClipPath(
+            offset,
+            Clip,
+            path,
+            (c, o) => base.Paint(c, o),
+            ClipBehavior,
+            Layer as ClipPathLayer
+        );
     }
 }

@@ -1,11 +1,8 @@
-﻿using System.Numerics;
-using FloatSoda;
-using FloatSoda.Geometrics;
-using FloatSoda.OVR.Overlay;
-using FloatSoda.Render;
-using FloatSoda.Render.Layout;
-using FloatSoda.Render.Painting;
-using FloatSoda.Samples.OverlayApp;
+﻿using FloatSoda;
+using FloatSoda.Core;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Layout;
+using FloatSoda.Widgets.Paint;
 using SkiaSharp;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
@@ -13,111 +10,20 @@ var builder = FloatSodaAppBuilder.CreateDefault();
 using var app = builder.Build();
 
 
-var floatSodaWorldSpace = new RenderPositionedBox
+Widget floatSodaDashboard = new Align
 {
-    Child = new RenderFlex
+    Child = new SizedBox
     {
-        MainAxisAlignment = MainAxisAlignment.Center,
-        Direction = Axis.Vertical,
-        Children =
-        [
-            new RenderClipPath
-            {
-                Clipper = new ArcClipper(),
-                Child = new RenderConstrainedBox
-                {
-                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                    Child = new RenderColoredBox() { Color = SKColors.Tomato }
-                },
-            },
-            new RenderClipRoundRect
-            {
-                BorderRadius = BorderRadius.Circular(20),
-                Child = new RenderConstrainedBox
-                {
-                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                    Child = new RenderColoredBox()
-                    {
-                        Color = SKColors.Yellow
-                    }
-                },
-            },
-            new RenderClipOval
-            {
-                Child = new RenderConstrainedBox
-                {
-                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                    Child = new RenderColoredBox() { Color = SKColors.LimeGreen }
-                }
-            },
-        ]
-    }
-};
-
-var iconPath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + "/thumbnail.png";
-var image = new FileImageProvider(iconPath).Load();
-
-var floatSodaDashboard = new RenderPositionedBox
-{
-    Child = new RenderFlex
-    {
-        MainAxisAlignment = MainAxisAlignment.Start,
-        CrossAxisAlignment = CrossAxisAlignment.End,
-        Direction = Axis.Vertical,
-        Children =
-        [
-            new RenderConstrainedBox
-            {
-                AdditionalConstraints = BoxConstraints.Tight(550, 300),
-                Child = new RenderColoredBox() { Color = SKColor.FromHsv(250, 255, 100) }
-            },
-            new RenderConstrainedBox
-            {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.Bisque }
-            },
-            
-            new RenderImage
-            {
-                Image = image
-            }
-        ]
-    }
-};
-
-var floatSodaLeftHand = new RenderPositionedBox
-{
-    Child = new RenderFlex
-    {
-        MainAxisSize = MainAxisSize.Min,
-        Children =
-        [
-            new RenderConstrainedBox
-            {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.Tomato }
-            },
-            new RenderConstrainedBox
-            {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.Yellow }
-            },
-            new RenderConstrainedBox
-            {
-                AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                Child = new RenderColoredBox() { Color = SKColors.BlueViolet }
-            }
-        ]
+        Width = 100,
+        Height = 100,
+        Child = new ColoredBox
+        {
+            Color = SKColors.Tomato
+        }
     }
 };
 
 
-app.CreateWorldSpaceOverlay("FloatSodaWorldSpace", floatSodaWorldSpace, 1000, 1000, new Vector3(0, 1, -1));
 app.CreateDashboardOverlay("FloatSodaDashboard", floatSodaDashboard, 1000, 1000);
-app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.LeftController);
-app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.RightController);
-app.CreateTrackingOverlay("FloatSodaTracking", floatSodaLeftHand, 1000, 1000, TrackedDevice.HMD, new Vector3(0, 1, -1));
-
-
 
 app.Run();

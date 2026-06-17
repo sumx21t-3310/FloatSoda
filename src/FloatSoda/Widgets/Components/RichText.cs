@@ -1,7 +1,4 @@
-﻿using FloatSoda.Widgets.Core;
+﻿using FloatSoda.Render;
 
 namespace FloatSoda.Widgets.Components;
 
-public record RichText : MultiChildRenderObjectWidget
-{
-}
