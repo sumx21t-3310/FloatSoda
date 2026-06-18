@@ -37,19 +37,13 @@ ILayer CreateLayerTree(float width, float height)
     var recorder = new SKPictureRecorder();
     var canvas = recorder.BeginRecording(rect);
 
-    var paint = new SKPaint
-    {
-        Color = SKColors.Tomato
-    };
-
-    var alignment = new Alignment();
+    canvas.DrawRect(rect, new SKPaint { Color = SKColors.AliceBlue });
 
     var parentSize = new SKSize(width, height);
-    var childSize = new SKSize(width / 4, height / 4);
+    var childSize = new SKSize(width / 2, height / 2);
+    var location = new Alignment().ComputeOffset(parentSize, childSize);
 
-    var location = alignment.ComputeOffset(parentSize, childSize);
-
-    canvas.DrawRect(SKRect.Create(location, parentSize), paint);
+    canvas.DrawRect(SKRect.Create(location, childSize), new SKPaint { Color = SKColors.CornflowerBlue });
 
     leaf.Picture = recorder.EndRecording();
 
