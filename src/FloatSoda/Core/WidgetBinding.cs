@@ -58,10 +58,7 @@ public class WidgetBinding
 
     }
 
-    public void EnsureVisualUpdate()
-    {
-        NeedsVisualUpdate = true;
-    }
+    public void EnsureVisualUpdate() => NeedsVisualUpdate = true;
 
     public void AttachRootWidget(Widget rootWidget)
     {

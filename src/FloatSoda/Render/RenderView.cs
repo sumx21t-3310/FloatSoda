@@ -26,11 +26,26 @@ public class RenderView(float width, float height) : RenderObject, IHasSingleChi
         Child?.Attach(owner);
     }
 
-    public void PrepareInitialFrame() => ScheduleInitialPaint(new TransformLayer());
+    public override void VisitChildren(Action<RenderObject> visitor)
+    {
+        if (Child != null) visitor(Child);
+    }
+
+    public void PrepareInitialFrame()
+    {
+        ScheduleInitialLayout();
+        ScheduleInitialPaint(new TransformLayer());
+    }
 
     private void ScheduleInitialPaint(ContainerLayer rootLayer)
     {
         Layer = rootLayer;
         Owner?.NodesNeedingPaint.Add(this);
+    }
+
+    private void ScheduleInitialLayout()
+    {
+        RelayoutBoundary = this;
+        Owner?.NodesNeedingLayout.Add(this);
     }
 }

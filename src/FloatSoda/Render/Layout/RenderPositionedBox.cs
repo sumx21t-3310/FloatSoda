@@ -23,7 +23,7 @@ public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject<Render
         if (Child != null)
         {
             Child.ParentData ??= new BoxParentData();
-            Child.Layout(Constraints.Loosen);
+            Child.Layout(Constraints.Loosen, parentUseSize: true);
 
             Size = Constraints.Constrain(
                 width: shrinkWrapWidth ? Child.Size.Width * (WidthFactor ?? 1) : PositiveInfinity,
@@ -60,5 +60,10 @@ public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject<Render
     {
         base.Attach(owner);
         Child?.Attach(owner);
+    }
+
+    public override void VisitChildren(Action<RenderObject> visitor)
+    {
+        if (Child != null) visitor(Child);
     }
 }

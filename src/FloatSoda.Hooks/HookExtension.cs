@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Elements;
 using R3;
 
-namespace FloatSoda.Widgets;
+namespace FloatSoda.Hooks;
 
 /// <summary>
 /// ElementのRebuild Observable Stream Treeを購読するSubject/ReactiveProperty/ReactiveCollectionを返却します

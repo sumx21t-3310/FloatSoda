@@ -22,7 +22,7 @@ public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject<Re
     {
         if (Child != null)
         {
-            Child.Layout(Constraints);
+            Child.Layout(Constraints, parentUseSize: true);
             Size = Child.Size;
         }
         else
@@ -40,5 +40,10 @@ public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject<Re
     {
         base.Attach(owner);
         Child?.Attach(owner);
+    }
+
+    public override void VisitChildren(Action<RenderObject> visitor)
+    {
+        if (Child != null) visitor(Child);
     }
 }

@@ -1,11 +1,17 @@
-﻿namespace FloatSoda.Render;
+namespace FloatSoda.Render;
 
-public interface IHasSingleChildRenderObject
+public interface IHasSingleChildRenderObjectBase
 {
     void SetChildObject(RenderObject child);
 }
 
-public interface IHasSingleChildRenderObject<T> : IHasSingleChildRenderObject where T : RenderObject
+public interface IHasMultiChildrenRenderObjectBase
+{
+    void Insert(RenderObject child);
+}
+
+public interface IHasSingleChildRenderObject<T> : IHasSingleChildRenderObjectBase
+    where T : RenderObject
 {
     T? Child { get; protected set; }
 
@@ -17,16 +23,30 @@ public interface IHasSingleChildRenderObject<T> : IHasSingleChildRenderObject wh
         ThisRef.AdoptChild(child);
     }
 
-    void IHasSingleChildRenderObject.SetChildObject(RenderObject child)
+    void IHasSingleChildRenderObjectBase.SetChildObject(RenderObject child)
     {
         if (child is T typed) SetChild(typed);
     }
+
+    void RedepthChild(Action<RenderObject> callback)
+    {
+        if (Child != null)
+        {
+            callback(Child);
+        }
+    }
 }
 
-public interface IHasMultiChildrenRenderObject<T> where T : RenderObject
+public interface IHasMultiChildrenRenderObject<T> : IHasMultiChildrenRenderObjectBase
+    where T : RenderObject
 {
     List<T> Children { get; }
     RenderObject ThisRef { get; }
+
+    void IHasMultiChildrenRenderObjectBase.Insert(RenderObject child)
+    {
+        if (child is T typed) Insert(typed);
+    }
 
     void Insert(T child)
     {
@@ -34,6 +54,13 @@ public interface IHasMultiChildrenRenderObject<T> where T : RenderObject
         Children.Add(child);
     }
 
-
     void VisitChildren(Action<RenderObject> visitor) => Children.ForEach(visitor);
+
+    public void RedepthChildren(Action<RenderObject> callback)
+    {
+        foreach (var child in Children)
+        {
+            callback(child);
+        }
+    }
 }

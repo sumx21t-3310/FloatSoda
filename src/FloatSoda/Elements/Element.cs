@@ -58,4 +58,8 @@ public abstract class Element : IBuildContext
     protected virtual void AttachRenderObject()
     {
     }
+
+    public virtual void PerformRebuild()
+    {
+    }
 }

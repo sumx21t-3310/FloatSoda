@@ -45,7 +45,7 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
                 (_, Axis.Vertical) => new BoxConstraints(MaxWidth: constraints.MaxWidth),
             };
 
-            child.Layout(innerAxisSize);
+            child.Layout(innerAxisSize, parentUseSize: true);
             allocatedSize += GetMainSize(child.Size);
             crossSize = Math.Max(crossSize, GetCrossSize(child.Size));
         }
@@ -170,4 +170,10 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
             child.Attach(owner);
         }
     }
+
+    public override void VisitChildren(Action<RenderObject> visitor)
+        => Children.ForEach(visitor);
+
+    public override void RedepthChildren()
+        => VisitChildren(RedepthChild);
 }

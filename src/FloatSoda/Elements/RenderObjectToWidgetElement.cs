@@ -17,9 +17,12 @@ public class RenderObjectToWidgetElement : RenderObjectElement
 
     protected override void InsertRenderObjectChild(RenderObject child)
     {
-        if (RenderObject is IHasSingleChildRenderObject ro)
-        {
+        if (RenderObject is IHasSingleChildRenderObjectBase ro)
             ro.SetChildObject(child);
-        }
+    }
+
+    public override void VisitChildren(Action<Element> visitor)
+    {
+        if (Child != null) visitor(Child);
     }
 }

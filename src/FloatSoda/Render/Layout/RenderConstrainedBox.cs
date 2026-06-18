@@ -11,7 +11,7 @@ public class RenderConstrainedBox : RenderProxyBox
     public override void PerformLayout()
     {
         var enforcedConstraints = AdditionalConstraints.Enforce(Constraints);
-        Child?.Layout(enforcedConstraints);
+        Child?.Layout(enforcedConstraints, parentUseSize: true);
 
         Size = Child?.Size ?? enforcedConstraints.Constrain(Size);
     }

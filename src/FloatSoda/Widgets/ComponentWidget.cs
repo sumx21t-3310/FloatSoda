@@ -2,6 +2,16 @@
 
 namespace FloatSoda.Widgets;
 
+public abstract record StatelessWidget : Widget
+{
+    public override Element CreateElement() => new StatelessElement
+    {
+        Widget = this
+    };
+
+    public abstract Widget Build(IBuildContext context);
+}
+
 public abstract record StatefulWidget<T> : Widget where T : StatefulWidget<T>
 {
     public override Element CreateElement() => new StatefulElement
@@ -27,7 +37,7 @@ public abstract record State<T> where T : StatefulWidget<T>
         action();
         Element.MarkNeedsBuild();
     }
-    
+
     public virtual void DidUpdateWidget(T oldWidget)
     {
     }

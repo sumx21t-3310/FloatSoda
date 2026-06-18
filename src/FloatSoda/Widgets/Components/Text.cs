@@ -1,8 +1,14 @@
 ﻿using FloatSoda.Elements;
+using FloatSoda.Render;
+using FloatSoda.Widgets;
 
-namespace FloatSoda.Widgets.Components;
+public sealed record RichText : MultiChildRenderObjectWidget
+{
+    public required TextSpan Text { get; init; }
+    public override RenderObject CreateRenderObject() => new RenderParagraph(Text);
+}
 
-public record Text(string Data) : StatelessWidget 
+public sealed record Text : StatelessWidget
 {
     public override Widget Build(IBuildContext context)
     {

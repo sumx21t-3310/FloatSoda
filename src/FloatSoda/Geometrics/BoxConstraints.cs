@@ -10,16 +10,26 @@ public readonly record struct BoxConstraints(
     double MinHeight = 0,
     double MaxHeight = PositiveInfinity)
 {
-    public static BoxConstraints Tight(SKSize size) => new(size.Width, size.Width, size.Height, size.Height);
+    public static BoxConstraints Tight(SKSize size) => Tight(size.Width, size.Height);
 
     public static BoxConstraints Tight(double width, double height) => new(width, width, height, height);
 
-    public static BoxConstraints TightFor(double? width = null, double? height = null) => new(
-        width ?? 0,
-        width ?? PositiveInfinity,
-        height ?? 0,
-        height ?? PositiveInfinity
-    );
+    public static BoxConstraints TightFor(double? width = null, double? height = null) => new()
+    {
+        MinWidth = width ?? 0,
+        MaxWidth = width ?? PositiveInfinity,
+        MinHeight = height ?? 0,
+        MaxHeight = height ?? PositiveInfinity
+    };
+
+    public static BoxConstraints Loose(double width, double height) => new()
+    {
+        MaxHeight = height,
+        MaxWidth = width
+    };
+
+    public static BoxConstraints Loose(SKSize size) => Loose(size.Width, size.Height);
+
 
     public BoxConstraints Enforce(BoxConstraints constraints) => new(
         Math.Clamp(MinWidth, constraints.MinWidth, constraints.MaxWidth),
@@ -41,6 +51,11 @@ public readonly record struct BoxConstraints(
         (float)ConstrainHeight(height)
     );
 
+
+    public bool HasTightWidth => MinWidth >= MaxHeight;
+    public bool HasTightHeight => MinHeight >= MaxHeight;
+
+    public bool IsTight => HasTightWidth && HasTightHeight;
 
     public override string ToString()
     {

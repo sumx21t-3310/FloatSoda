@@ -85,16 +85,3 @@ public class TextPainter(TextSpan text)
     public void Paint(SKCanvas canvas, Offset offset) => _textBlock?.Paint(canvas, offset);
 }
 
-public record RichText : MultiChildRenderObjectWidget
-{
-    public required TextSpan Text { get; init; }
-    public override RenderObject CreateRenderObject() => new RenderParagraph(Text);
-}
-
-public record Text : StatelessWidget
-{
-    public override Widget Build(IBuildContext context)
-    {
-        throw new NotImplementedException();
-    }
-}
