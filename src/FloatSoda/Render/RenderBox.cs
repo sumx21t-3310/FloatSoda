@@ -1,6 +1,6 @@
 ﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Geometrics;
-using FloatSoda.Render.Mixin;
+using FloatSoda.Common.Layer;
+using FloatSoda.Core;
 using SkiaSharp;
 
 namespace FloatSoda.Render;
@@ -10,22 +10,40 @@ public abstract class RenderBox : RenderObject
     public override SKSize Size { get; protected set; } = SKSize.Empty;
 }
 
-public abstract class RenderProxyBox : RenderBox, IRenderObjectWithChild<RenderBox>
+public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject<RenderBox>
 {
-    public RenderBox? Child { get; set; } = null;
+    public RenderBox? Child { get; set; }
 
-    public override void Layout(BoxConstraints constraints)
+    public RenderObject ThisRef => this;
+
+    public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
+
+    public override void PerformLayout()
     {
         if (Child != null)
         {
-            Child.Layout(constraints);
+            Child.Layout(Constraints, parentUseSize: true);
             Size = Child.Size;
         }
         else
         {
-            Size = constraints.Smallest;
+            Size = Constraints.Smallest;
         }
     }
 
-    public override void Paint(PaintingContext context, Offset offset) => Child?.Paint(context, offset);
+    public override void Paint(PaintingContext context, Offset offset)
+    {
+        if (Child != null) context.PaintChild(Child, offset);
+    }
+
+    public override void Attach(RenderPipeline? owner)
+    {
+        base.Attach(owner);
+        Child?.Attach(owner);
+    }
+
+    public override void VisitChildren(Action<RenderObject> visitor)
+    {
+        if (Child != null) visitor(Child);
+    }
 }

@@ -2,21 +2,22 @@
 
 namespace FloatSoda.Engine;
 
-public class Renderer(GLView glView) : IDisposable
+public class Renderer : IDisposable
 {
-    public IntPtr GetTextureHandle() => glView.TextureHandle;
+    public required GLView GLView { get; init; }
+    public IntPtr GetTextureHandle() => GLView.TextureHandle;
 
     public void Render(ILayer root)
     {
-        var renderContext = LayerContext.Create(glView.Surface);
+        var renderContext = LayerContext.Create(GLView.Surface);
 
-        glView.Clear();
+        GLView.Clear();
 
         root.Layout(renderContext);
         root.Paint(renderContext);
 
-        glView.Flush();
+        GLView.Flush();
     }
 
-    public void Dispose() => glView.Dispose();
+    public void Dispose() => GLView.Dispose();
 }

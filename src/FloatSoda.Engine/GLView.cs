@@ -9,17 +9,18 @@ public class GLView : IDisposable
     public GRContext GrContext { get; }
     public SKSurface Surface { get; }
     public int TextureHandle { get; }
+    public SKSizeI Size { get; set; } = new(1000, 1000);
 
     private readonly unsafe Window* _window;
     private bool _disposed;
 
-    public GLView(int width = 1000, int height = 1000)
+    public GLView()
     {
         unsafe
         {
             GLFW.WindowHint(WindowHintBool.Visible, false);
 
-            _window = GLFW.CreateWindow(width, height, "", null, null);
+            _window = GLFW.CreateWindow(Size.Width, Size.Height, "", null, null);
             if (_window == null) throw new InvalidOperationException("GLFWウィンドウの作成に失敗しました。");
 
             GLFW.MakeContextCurrent(_window);
@@ -27,7 +28,8 @@ public class GLView : IDisposable
             GL.LoadBindings(new GLFWBindingsContext());
         }
 
-        GrContext = GRContext.CreateGl(GRGlInterface.Create()) ?? throw new InvalidOperationException("GRGContextの作成に失敗しました");
+        GrContext = GRContext.CreateGl(GRGlInterface.Create()) ??
+                    throw new InvalidOperationException("GRGContextの作成に失敗しました");
 
 
         TextureHandle = GL.GenTexture();
@@ -35,16 +37,19 @@ public class GLView : IDisposable
         GL.BindTexture(TextureTarget.Texture2D, TextureHandle);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, IntPtr.Zero);
+        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.Width, Size.Height, 0,
+            PixelFormat.Rgba,
+            PixelType.UnsignedByte, IntPtr.Zero);
 
-        var backendTexture = new GRBackendTexture(width, height, false, new GRGlTextureInfo
+        var backendTexture = new GRBackendTexture(Size.Width, Size.Height, false, new GRGlTextureInfo
         {
             Id = (uint)TextureHandle,
             Target = (uint)TextureTarget.Texture2D,
             Format = (uint)InternalFormat.Rgba8
         });
 
-        Surface = SKSurface.Create(GrContext, backendTexture, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888) ?? throw new InvalidOperationException("SKSurfaceの作成に失敗しました。");
+        Surface = SKSurface.Create(GrContext, backendTexture, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888) ??
+                  throw new InvalidOperationException("SKSurfaceの作成に失敗しました。");
     }
 
     public void Clear()

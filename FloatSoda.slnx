@@ -2,6 +2,7 @@
     <Folder Name="/src/">
         <Project Path="src/FloatSoda.Common/FloatSoda.Common.csproj" />
         <Project Path="src/FloatSoda.Engine/FloatSoda.Engine.csproj" />
+        <Project Path="src/FloatSoda.Hooks/FloatSoda.Hooks.csproj" />
         <Project Path="src/FloatSoda.OVR/FloatSoda.OVR.csproj" />
         <Project Path="src/FloatSoda/FloatSoda.csproj" />
     </Folder>

@@ -1,4 +1,6 @@
-﻿namespace FloatSoda.Widgets.Components;
+﻿using FloatSoda.Elements;
+
+namespace FloatSoda.Widgets.Components;
 
 public record Button : StatefulWidget<Button>
 {

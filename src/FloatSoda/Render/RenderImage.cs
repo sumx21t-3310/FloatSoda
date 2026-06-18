@@ -1,5 +1,4 @@
 ﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Geometrics;
 using SkiaSharp;
 
 namespace FloatSoda.Render;
@@ -8,16 +7,16 @@ public class RenderImage : RenderProxyBox
 {
     public required SKImage Image { get; init; }
 
-    public override void Layout(BoxConstraints constraints)
+    public override void PerformLayout()
     {
         if (Child != null)
         {
-            Child.Layout(constraints);
+            Child.Layout(Constraints);
             Size = Child.Size;
         }
         else
         {
-            Size = constraints.Constrain(new SKSize(Image.Width, Image.Height));
+            Size = Constraints.Constrain(new SKSize(Image.Width, Image.Height));
         }
     }
 

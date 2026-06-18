@@ -1,10 +1,11 @@
 ﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Core;
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
 namespace FloatSoda.Render.Layout;
 
-public class RenderFlex : RenderBox
+public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
 {
     public Axis Direction { get; init; } = Axis.Vertical;
     public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
@@ -12,15 +13,8 @@ public class RenderFlex : RenderBox
     public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
     public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
 
-    public List<RenderBox> Children
-    {
-        get;
-        init
-        {
-            field = value;
-            value.ForEach(child => child.ParentData = new BoxParentData());
-        }
-    } = [];
+    public List<RenderBox> Children { get; set; } = [];
+    public RenderObject ThisRef => this;
 
     private float GetMainSize(SKSize size) => Direction switch
     {
@@ -51,7 +45,7 @@ public class RenderFlex : RenderBox
                 (_, Axis.Vertical) => new BoxConstraints(MaxWidth: constraints.MaxWidth),
             };
 
-            child.Layout(innerAxisSize);
+            child.Layout(innerAxisSize, parentUseSize: true);
             allocatedSize += GetMainSize(child.Size);
             crossSize = Math.Max(crossSize, GetCrossSize(child.Size));
         }
@@ -124,19 +118,19 @@ public class RenderFlex : RenderBox
         }
     }
 
-    public override void Layout(BoxConstraints constraints)
+    public override void PerformLayout()
     {
-        MeasureCrossAxis(constraints, out var allocatedSize, out var crossSize);
+        MeasureCrossAxis(Constraints, out var allocatedSize, out var crossSize);
 
-        var mainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;
+        var mainSize = Direction == Axis.Horizontal ? Constraints.MaxWidth : Constraints.MaxHeight;
         var canFlex = mainSize < double.PositiveInfinity;
 
         var idealMainSize = canFlex && MainAxisSize == MainAxisSize.Max ? mainSize : allocatedSize;
 
         Size = Direction switch
         {
-            Axis.Horizontal => constraints.Constrain(idealMainSize, crossSize),
-            Axis.Vertical => constraints.Constrain(crossSize, idealMainSize),
+            Axis.Horizontal => Constraints.Constrain(idealMainSize, crossSize),
+            Axis.Vertical => Constraints.Constrain(crossSize, idealMainSize),
             _ => throw new ArgumentOutOfRangeException()
         };
 
@@ -162,8 +156,24 @@ public class RenderFlex : RenderBox
         {
             if (child.ParentData is BoxParentData childParentData)
             {
-                child.Paint(context, offset + childParentData.Offset);
+                context.PaintChild(child, offset + childParentData.Offset);
             }
         }
     }
+
+    public override void Attach(RenderPipeline? owner)
+    {
+        base.Attach(owner);
+
+        foreach (var child in Children)
+        {
+            child.Attach(owner);
+        }
+    }
+
+    public override void VisitChildren(Action<RenderObject> visitor)
+        => Children.ForEach(visitor);
+
+    public override void RedepthChildren()
+        => VisitChildren(RedepthChild);
 }
