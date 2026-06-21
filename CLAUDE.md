@@ -19,13 +19,14 @@ dotnet build
 dotnet test
 
 # Run a specific test project
-dotnet test tests/FloatSoda.GeometryTest
+dotnet test tests/FloatSoda.Test
+dotnet test tests/FloatSoda.Common.Test
 
 # Run a specific test by name
-dotnet test tests/FloatSoda.GeometryTest --filter "FullyQualifiedName~AlignmentTest.TopLeft"
+dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.TopLeft"
 ```
 
-Tests use xunit. The test project references `FloatSoda.Common` and `FloatSoda`.
+Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widgets. `FloatSoda.Common.Test` tests the Layer tree.
 
 ## Project Structure
 
@@ -36,14 +37,15 @@ Tests use xunit. The test project references `FloatSoda.Common` and `FloatSoda`.
 | `src/FloatSoda.OVR` | OpenVR wrappers, overlay types (`DashboardOverlay`, `WorldSpaceOverlay`, `DeviceTrackedOverlay`), `VREventDispatcher`, and exception types |
 | `src/FloatSoda` | Framework core: RenderObject tree, Widget/Element system, `RenderPipeline`, `FloatSodaApp` |
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
-| `tests/FloatSoda.GeometryTest` | xunit geometry tests |
+| `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
+| `tests/FloatSoda.Common.Test` | xunit tests for the Layer tree |
 | `docs/` | Developer documentation (Architecture, GettingStarted, RenderObjects, WidgetSystem, OVRIntegration, APIDesign) |
 
 ## Architecture: Two Parallel Trees
 
 FloatSoda mirrors Flutter's three-tree model, currently with two trees implemented:
 
-### 1. RenderObject Tree (`src/FloatSoda/Render/`)
+### 1. RenderObject Tree (`src/FloatSoda/RenderObjects/`)
 
 The low-level layout-and-paint tree. Every frame:
 1. `RenderPipeline.FlushLayout()` → calls `RenderView.PerformLayout()` top-down, passing `BoxConstraints`
@@ -65,15 +67,17 @@ Produced by the RenderObject tree's paint phase. Represents composited draw oper
 
 The layer tree is **cloned** (`ILayer.Clone()`) before being handed to the render thread to avoid data races.
 
-### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — WIP
+### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Partially implemented
 
-Flutter-style declarative layer being built on top of the RenderObject tree. Currently scaffolded but not yet wired end-to-end:
+Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatelessElement` are fully wired. `StatefulWidget` / `StatefulElement` are WIP (build loop not yet driven):
 - `Widget` — immutable `abstract record`; declares `CreateElement()`
 - `RenderObjectWidget` — widget that owns a `RenderObject`; declares `CreateRenderObject()`
-- `StatelessWidget` / `StatefulWidget` — compositional widgets; `Build()` not yet called by the framework
+- `StatelessWidget` — `Build()` is called by `StatelessElement`; usable today
+- `StatefulWidget` — state lifecycle scaffolded but `StatefulElement.Build()` not yet implemented
 - `Element` — mutable tree node; `Mount()` / `UpdateChild()` / `InflateWidget()`
 - `RenderObjectElement` — element that attaches its `RenderObject` into the render tree
 - `RenderObjectToWidgetAdapter` — bridges the widget tree root to a `RenderView`
+- `WidgetBinding` — per-window coordinator; calls `AttachRootWidget()` then `DrawFrame()` each frame
 
 ## Frame Pipeline
 

@@ -104,6 +104,7 @@ context.PushClipRect(childOffset, clipRect, Clip.Antialias, (ctx, off) =>
 
 | クラス | 説明 | 主なプロパティ |
 |---|---|---|
+| `RenderParagraph` | `RichText` のテキストレイアウト・描画エンジン（Topten.RichTextKit 使用） | `Texts` (`IList<InlineSpan>`) |
 | `RenderImage` | `SKImage` を描画 | `Image` (required) |
 
 ---

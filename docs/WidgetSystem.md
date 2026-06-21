@@ -1,6 +1,9 @@
 # ウィジェット/エレメントシステム
 
-> **実装状況:** ウィジェット/エレメントシステムは現在 WIP です。`StatelessWidget.CreateElement()` および `StatefulWidget` 関連のフレームワーク駆動部分は `NotImplementedException` を投げます。現時点では `StatelessWidget.Build()` を直接呼び出すか、RenderObject レベルの API を使ってください。
+> **実装状況:**
+> - **実装済み:** `StatelessWidget` / `StatelessElement` は完全に動作します。`Build()` はフレームワークから自動的に呼ばれます。`SingleChildRenderObjectWidget` / `MultiChildRenderObjectWidget` ベースのウィジェット（`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `RichText` など）も使用可能です。
+> - **WIP:** `StatefulWidget` / `StatefulElement` はスケルトン実装のみです。`StatefulElement.Build()` は `NotImplementedException` を投げます。`UseState` フックは `StatefulElement` に依存しているため現時点では使用不可です。
+> - **スタブ:** `Text`, `Button`, `Icon`, `Opacity`, `GestureDetector`, `Listener`, `Container`, `ConstrainedBox`, `ListView`, `GridView`, `SingleChildScrollView`, `Padding` は `NotImplementedException` を投げます。
 
 ## 三ツリーの役割
 
@@ -41,6 +44,8 @@ public record MyWidget : StatelessWidget
 
 ### UseState フック
 
+> **WIP:** `UseState` は `StatefulWidget` の状態管理に依存しており、`StatefulElement` が未実装のため現時点では使用できません。
+
 R3 ライブラリを使ったリアクティブな状態管理です。`context.UseState<T>()` が返す `ReactiveProperty<T>` の `.Value` を読み書きすると自動的に再ビルドをスケジュールします。
 
 ```csharp
@@ -69,7 +74,9 @@ logger?.LogInformation("clicked");
 
 ## StatefulWidget / State
 
-`StatefulWidget<T>` は外部から `State<T>` を分離するパターンです。スケルトン実装は以下のとおりです（フレームワーク駆動は WIP）。
+> **WIP:** `StatefulWidget` のフレームワーク駆動（`StatefulElement.Build()` の呼び出し）は未実装です。`SetState()` による再ビルドトリガーも機能しません。
+
+`StatefulWidget<T>` は外部から `State<T>` を分離するパターンです。スケルトン実装は以下のとおりです。
 
 ```csharp
 public record MyCounter : StatefulWidget<MyCounterState>
@@ -96,48 +103,48 @@ public class MyCounterState : State<MyCounter>
 
 ### Layout
 
-| ウィジェット | 説明 | 主なプロパティ |
-|---|---|---|
-| `Center` | 子を中央に配置 | `Child` |
-| `Align` | 子を指定の `Alignment` で配置 | `Alignment`, `Child` |
-| `Column` | 垂直方向に並べる | `Children`, `MainAxisAlignment`, `CrossAxisAlignment` |
-| `Row` | 水平方向に並べる | `Children`, `MainAxisAlignment`, `CrossAxisAlignment` |
-| `Flex` | 方向指定のフレックスレイアウト | `Direction`, `Children` |
-| `Padding` | 子に余白を追加 | `Padding` (`EdgeInsets`), `Child` |
-| `SizedBox` | 固定サイズのボックス | `Width`, `Height`, `Child` |
-| `ConstrainedBox` | 追加制約を適用 | `AdditionalConstraints`, `Child` |
-| `Container` | パディング・色・サイズなどを一括指定 | `Child` など |
-| `ListView` | スクロール可能なリスト（スタブ） | `Children` |
-| `GridView` | グリッドレイアウト（スタブ） | `Children` |
-| `SingleChildScrollView` | 単一子をスクロール（スタブ） | `Child` |
+| ウィジェット | 実装状況 | 説明 | 主なプロパティ |
+|---|---|---|---|
+| `Center` | ✓ | 子を中央に配置 | `Child` |
+| `Align` | ✓ | 子を指定の `Alignment` で配置 | `Alignment`, `Child` |
+| `Column` | ✓ | 垂直方向に並べる | `Children`, `MainAxisAlignment`, `CrossAxisAlignment` |
+| `Row` | ✓ | 水平方向に並べる | `Children`, `MainAxisAlignment`, `CrossAxisAlignment` |
+| `Flex` | ✓ | 方向指定のフレックスレイアウト | `Direction`, `Children` |
+| `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
+| `Padding` | ✗ スタブ | 子に余白を追加 | `Padding` (`EdgeInsets`), `Child` |
+| `ConstrainedBox` | ✗ スタブ | 追加制約を適用 | `AdditionalConstraints`, `Child` |
+| `Container` | ✗ スタブ | パディング・色・サイズなどを一括指定 | `Child` など |
+| `ListView` | ✗ スタブ | スクロール可能なリスト | `Children` |
+| `GridView` | ✗ スタブ | グリッドレイアウト | `Children` |
+| `SingleChildScrollView` | ✗ スタブ | 単一子をスクロール | `Child` |
 
 ### Painting
 
-| ウィジェット | 説明 | 主なプロパティ |
-|---|---|---|
-| `ColoredBox` | 単色背景 | `Color` (`SKColor`) |
-| `Opacity` | 透明度を適用 | `Opacity` (0.0–1.0), `Child` |
-| `ClipRect` | 矩形クリップ | `Child` |
-| `ClipRoundRect` | 角丸矩形クリップ | `BorderRadius`, `Child` |
-| `ClipOval` | 楕円クリップ | `Child` |
-| `ClipCustomPath` | カスタムパスクリップ | `Clipper`, `Child` |
+| ウィジェット | 実装状況 | 説明 | 主なプロパティ |
+|---|---|---|---|
+| `ColoredBox` | ✓ | 単色背景 | `Color` (`SKColor`) |
+| `ClipRect` | ✓ | 矩形クリップ | `Child` |
+| `ClipRoundRect` | ✓ | 角丸矩形クリップ | `BorderRadius`, `Child` |
+| `ClipOval` | ✓ | 楕円クリップ | `Child` |
+| `ClipCustomPath` | ✓ | カスタムパスクリップ | `Clipper`, `Child` |
+| `Opacity` | ✗ スタブ | 透明度を適用 | `Opacity` (0.0–1.0), `Child` |
 
 ### Components
 
-| ウィジェット | 説明 | 主なプロパティ |
-|---|---|---|
-| `Text` | テキスト表示（`RichText` に委譲） | `Data` (string) |
-| `RichText` | スタイル付きテキスト | `Text` |
-| `Image` | 画像表示 | `Image` (`ImageProvider`) |
-| `Icon` | アイコン（スタブ） | — |
-| `Button` | タップイベント付きボタン | `Child`, `OnPressed` |
+| ウィジェット | 実装状況 | 説明 | 主なプロパティ |
+|---|---|---|---|
+| `RichText` | ✓ | スタイル付きテキスト | `Text` |
+| `Image` (Paint) | ✓ | 画像表示 | `Image` (`SKImage`) |
+| `Text` | ✗ スタブ | テキスト表示（`RichText` に委譲予定） | `Data` (string) |
+| `Icon` | ✗ スタブ | アイコン | — |
+| `Button` | ✗ スタブ | タップイベント付きボタン（`StatefulWidget` 依存） | `Child`, `OnPressed` |
 
 ### Gesture
 
-| ウィジェット | 説明 | 主なプロパティ |
-|---|---|---|
-| `GestureDetector` | タップ・ドラッグ検知（スタブ） | `Child`, `OnTap` |
-| `Listener` | 低レベル入力ハンドラ | `Child`, `OnPointerDown` など |
+| ウィジェット | 実装状況 | 説明 | 主なプロパティ |
+|---|---|---|---|
+| `GestureDetector` | ✗ スタブ | タップ・ドラッグ検知 | `Child`, `OnTap` |
+| `Listener` | ✗ スタブ | 低レベル入力ハンドラ | `Child`, `OnPointerDown` など |
 
 ### Root
 

@@ -28,7 +28,7 @@ graph TD
 
 ## ツリー構造
 
-FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が実装済みです。ウィジェット/エレメントツリーは WIP です。
+FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が完全実装済みです。ウィジェット/エレメントツリーは `StatelessWidget` / `StatelessElement` が実装済みで、`StatefulWidget` / `StatefulElement` は WIP です。
 
 ```mermaid
 graph LR
@@ -50,14 +50,14 @@ graph LR
         CL --> PL
     end
 
-    E -->|"AttachRenderObject (WIP)"| RV
+    E -->|"AttachRenderObject\n(StatelessWidget ✓ / StatefulWidget WIP)"| RV
     RB -->|"Paint → PaintingContext"| CL
 ```
 
 各ツリーの役割:
 
 - **Widget** — 宣言的な UI の設計図。`abstract record` で不変。
-- **Element** — Widget と RenderObject を橋渡しするミュータブルなノード。（現在 `NotImplementedException`）
+- **Element** — Widget と RenderObject を橋渡しするミュータブルなノード。`StatelessElement` は実装済み。`StatefulElement` は WIP。
 - **RenderObject** — レイアウト計算（`Layout`）と描画コマンド記録（`Paint`）を担う。
 - **Layer** — `Paint` フェーズが生成する合成操作のツリー。クローンしてレンダースレッドに渡す。
 
