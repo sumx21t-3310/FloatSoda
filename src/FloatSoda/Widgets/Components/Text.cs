@@ -2,10 +2,10 @@
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 
-public sealed record RichText : MultiChildRenderObjectWidget
+public sealed record RichText : MultiChildRenderObjectWidget<RenderParagraph>
 {
     public required TextSpan Text { get; init; }
-    public override RenderObject CreateRenderObject() => new RenderParagraph(Text);
+    public override RenderParagraph CreateRenderObject() => new(Text);
 }
 
 public sealed record Text : StatelessWidget

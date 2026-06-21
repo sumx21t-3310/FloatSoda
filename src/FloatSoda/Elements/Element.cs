@@ -6,7 +6,7 @@ namespace FloatSoda.Elements;
 
 public abstract class Element : IBuildContext
 {
-    public Widget? Widget { get; set; }
+    public virtual Widget? Widget { get; set; }
 
     public Element? Parent { get; set; }
 

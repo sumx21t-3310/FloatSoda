@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Widgets;
 
-public abstract record RenderObjectWidget : Widget
+public abstract record RenderObjectWidget<T> : Widget where T : RenderObject
 {
-    public abstract RenderObject CreateRenderObject();
+    public abstract T CreateRenderObject();
 }

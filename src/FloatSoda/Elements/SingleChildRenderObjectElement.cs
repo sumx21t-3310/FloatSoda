@@ -3,12 +3,12 @@ using FloatSoda.Widgets;
 
 namespace FloatSoda.Elements;
 
-public class SingleChildRenderObjectElement : RenderObjectElement
+public class SingleChildRenderObjectElement<T> : RenderObjectElement<T> where T : RenderObject
 {
-    public SingleChildRenderObjectWidget? WidgetCascade => Widget as SingleChildRenderObjectWidget;
-    
+    public SingleChildRenderObjectWidget<T>? WidgetCascade => Widget as SingleChildRenderObjectWidget<T>;
+
     private Element? Child { get; set; }
-    
+
     public override void Mount(Element? parent)
     {
         base.Mount(parent);

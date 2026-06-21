@@ -3,7 +3,7 @@ using FloatSoda.Widgets;
 
 namespace FloatSoda.Elements;
 
-public class RenderObjectToWidgetElement : RenderObjectElement
+public class RenderObjectToWidgetElement<T> : RenderObjectElement<T> where T : RenderObject
 {
     private Element? Child { get; set; }
 

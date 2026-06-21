@@ -17,7 +17,7 @@ var layerTree = CreateLayerTree(imageSize.Width, imageSize.Height);
 
 var savePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-imageRenderer.RenderLayerTreeToBitmap(layerTree, imageSize).Save(Path.Combine(savePath, "layer_tree_output.png"));
+imageRenderer.RenderLayerTree(layerTree, imageSize).Save(Path.Combine(savePath, "layer_tree_output.png"));
 
 var renderTree = CreateRenderObject(imageSize.Width, imageSize.Width);
 

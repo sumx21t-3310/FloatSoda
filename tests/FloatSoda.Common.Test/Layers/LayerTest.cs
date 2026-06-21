@@ -23,7 +23,7 @@ public class LayerTest
     {
         var layer = MakePicture(SKColors.Red, SKRect.Create(0, 0, 100, 100));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(layer, Size);
+        using var bitmap = Renderer.RenderLayerTree(layer, Size);
 
         Assert.Equal(SKColors.Red, bitmap.GetPixel(50, 50));
     }
@@ -35,7 +35,7 @@ public class LayerTest
         container.Children.Add(MakePicture(SKColors.Red, SKRect.Create(0, 0, 50, 100)));
         container.Children.Add(MakePicture(SKColors.Blue, SKRect.Create(50, 0, 50, 100)));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(container, Size);
+        using var bitmap = Renderer.RenderLayerTree(container, Size);
 
         Assert.Equal(SKColors.Red, bitmap.GetPixel(25, 50));
         Assert.Equal(SKColors.Blue, bitmap.GetPixel(75, 50));
@@ -47,7 +47,7 @@ public class LayerTest
         var clip = new ClipRectLayer(SKRect.Create(0, 0, 50, 100)) { ClipBehavior = Clip.HardEdge };
         clip.Children.Add(MakePicture(SKColors.Red, SKRect.Create(0, 0, 100, 100)));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(clip, Size);
+        using var bitmap = Renderer.RenderLayerTree(clip, Size);
 
         Assert.Equal(SKColors.Red, bitmap.GetPixel(25, 50));
         Assert.Equal(SKColors.Empty, bitmap.GetPixel(75, 50));
@@ -60,7 +60,7 @@ public class LayerTest
         var clip = new ClipRoundRectLayer(roundRect) { ClipBehavior = Clip.HardEdge };
         clip.Children.Add(MakePicture(SKColors.Red, SKRect.Create(0, 0, 100, 100)));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(clip, Size);
+        using var bitmap = Renderer.RenderLayerTree(clip, Size);
 
         Assert.Equal(SKColors.Red, bitmap.GetPixel(50, 50));
         Assert.Equal(SKColors.Empty, bitmap.GetPixel(2, 2));
@@ -74,7 +74,7 @@ public class LayerTest
         var clip = new ClipPathLayer(path) { ClipBehavior = Clip.HardEdge };
         clip.Children.Add(MakePicture(SKColors.Red, SKRect.Create(0, 0, 100, 100)));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(clip, Size);
+        using var bitmap = Renderer.RenderLayerTree(clip, Size);
 
         Assert.Equal(SKColors.Red, bitmap.GetPixel(25, 50));
         Assert.Equal(SKColors.Empty, bitmap.GetPixel(75, 50));
@@ -86,7 +86,7 @@ public class LayerTest
         var opacity = new OpacityLayer { Alpha = 128 };
         opacity.Children.Add(MakePicture(SKColors.Red, SKRect.Create(0, 0, 100, 100)));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(opacity, Size);
+        using var bitmap = Renderer.RenderLayerTree(opacity, Size);
         var pixel = bitmap.GetPixel(50, 50);
 
         Assert.InRange(pixel.Alpha, 120, 136);
@@ -99,7 +99,7 @@ public class LayerTest
         var transform = new TransformLayer { Transform = SKMatrix.CreateTranslation(50, 50) };
         transform.Children.Add(MakePicture(SKColors.Blue, SKRect.Create(0, 0, 10, 10)));
 
-        using var bitmap = Renderer.RenderLayerTreeToBitmap(transform, Size);
+        using var bitmap = Renderer.RenderLayerTree(transform, Size);
 
         Assert.Equal(SKColors.Blue, bitmap.GetPixel(55, 55));
         Assert.Equal(SKColors.Empty, bitmap.GetPixel(5, 5));

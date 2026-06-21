@@ -41,24 +41,24 @@ dotnet add reference ../path/to/FloatSoda/src/FloatSoda/FloatSoda.csproj
 
 ### 2. 最小構成のコードを書く
 
-`Program.cs` を以下のように書き換えます。
+`Program.cs` を以下のように書き換えます。Widget ベースの書き方が推奨です。
 
 ```csharp
 using FloatSoda;
-using FloatSoda.Geometrics;
-using FloatSoda.Render.Layout;
-using FloatSoda.Render.Painting;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Layout;
+using FloatSoda.Widgets.Paint;
 using SkiaSharp;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
 using var app = builder.Build();
 
-var root = new RenderPositionedBox
+Widget root = new Center
 {
-    Child = new RenderConstrainedBox
+    Child = new ColoredBox
     {
-        AdditionalConstraints = BoxConstraints.Tight(400, 200),
-        Child = new RenderColoredBox { Color = SKColors.CornflowerBlue }
+        Color = SKColors.CornflowerBlue,
+        Child = new SizedBox { Width = 400, Height = 200 }
     }
 };
 
@@ -74,7 +74,34 @@ dotnet run
 
 `app.Run()` は SteamVR が終了するまでブロックします。
 
-> **Widget システムについて:** `StatelessWidget` などの宣言的 API は現在 WIP です。`CreateElement()` は `NotImplementedException` を投げるため、現時点では RenderObject を直接組み合わせる上記の方法を使ってください。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
+> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `Clip*`, `RichText` などは使用可能です。`Text`, `Button`, `StatefulWidget` 系は WIP（`NotImplementedException`）です。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
+
+<details>
+<summary>RenderObject レベルの直接操作（低レベル API）</summary>
+
+```csharp
+using FloatSoda;
+using FloatSoda.Geometrics;
+using FloatSoda.RenderObjects.Layout;
+using FloatSoda.RenderObjects.Painting;
+using SkiaSharp;
+
+var builder = FloatSodaAppBuilder.CreateDefault();
+using var app = builder.Build();
+
+var root = new RenderPositionedBox
+{
+    Child = new RenderConstrainedBox
+    {
+        AdditionalConstraints = BoxConstraints.Tight(400, 200),
+        Child = new RenderColoredBox { Color = SKColors.CornflowerBlue }
+    }
+};
+
+app.CreateDashboardOverlay("HelloWorld", root, 1000, 1000);
+app.Run();
+```
+</details>
 
 ---
 

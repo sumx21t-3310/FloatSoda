@@ -4,13 +4,13 @@ using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
 
-public record SizedBox : SingleChildRenderObjectWidget
+public record SizedBox : SingleChildRenderObjectWidget<RenderConstrainedBox>
 {
     public double? Width { get; init; } = null;
     public double? Height { get; init; } = null;
 
 
-    public override RenderObject CreateRenderObject()
+    public override RenderConstrainedBox CreateRenderObject()
     {
         return new RenderConstrainedBox
         {
