@@ -23,8 +23,5 @@
     <ProjectReference Include="..\..\src\FloatSoda\FloatSoda.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Geometrics\" />
-  </ItemGroup>
 
 </Project>
