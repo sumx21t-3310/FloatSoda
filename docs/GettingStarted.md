@@ -45,6 +45,7 @@ dotnet add reference ../path/to/FloatSoda/src/FloatSoda/FloatSoda.csproj
 
 ```csharp
 using FloatSoda;
+using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
