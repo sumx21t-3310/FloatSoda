@@ -18,7 +18,7 @@ public abstract class Element : IBuildContext
 
             void Visit(Element element)
             {
-                if (element is RenderObjectElement<RenderObject> renderObjectElement)
+                if (element is RenderObjectElement renderObjectElement)
                 {
                     result = renderObjectElement.RenderObject;
                 }
