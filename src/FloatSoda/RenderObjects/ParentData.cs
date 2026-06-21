@@ -1,6 +1,6 @@
 ﻿using FloatSoda.Common.Geometries;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.RenderObjects;
 
 public interface IParentData;
 

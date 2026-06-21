@@ -52,14 +52,13 @@ public readonly record struct BoxConstraints(
     );
 
 
-    public bool HasTightWidth => MinWidth >= MaxHeight;
+    public bool HasTightWidth => MinWidth >= MaxWidth;
     public bool HasTightHeight => MinHeight >= MaxHeight;
 
     public bool IsTight => HasTightWidth && HasTightHeight;
 
     public override string ToString()
     {
-        return
-            $"BoxConstraints {{ width: (min = {MinWidth}, max = {MaxWidth}), height: (min = {MinHeight}, max = {MaxHeight}) }}";
+        return $"BoxConstraints {{ width: (min = {MinWidth}, max = {MaxWidth}), height: (min = {MinHeight}, max = {MaxHeight}) }}";
     }
 }

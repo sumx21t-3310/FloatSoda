@@ -9,9 +9,11 @@
     <Folder Name="/samples/">
         <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
         <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
+        <Project Path="samples/FloatSoda.Samples.PrimitiveOverlay/FloatSoda.Samples.PrimitiveOverlay.csproj" />
     </Folder>
     <Folder Name="/tests/">
-        <Project Path="tests/FloatSoda.GeometryTest/FloatSoda.GeometryTest.csproj" />
+        <Project Path="tests/FloatSoda.Common.Test/FloatSoda.Common.Test.csproj" />
+        <Project Path="tests/FloatSoda.Test/FloatSoda.Test.csproj" />
     </Folder>
 </Solution>
  

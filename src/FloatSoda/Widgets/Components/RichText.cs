@@ -1,4 +1,2 @@
-﻿using FloatSoda.Render;
-
-namespace FloatSoda.Widgets.Components;
+﻿namespace FloatSoda.Widgets.Components;
 

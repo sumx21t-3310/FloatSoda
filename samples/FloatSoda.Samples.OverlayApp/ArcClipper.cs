@@ -1,4 +1,4 @@
-﻿using FloatSoda.Render.Painting;
+﻿using FloatSoda.RenderObjects.Painting;
 using SkiaSharp;
 
 namespace FloatSoda.Samples.OverlayApp;

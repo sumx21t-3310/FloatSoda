@@ -33,7 +33,9 @@ public enum ApplicationType
 public class Application : IDisposable
 {
     public readonly ApplicationType Type;
-    public CVRSystem OVRSystem { get; private set; }
+    public CVRSystem OVRSystem { get; init; }
+
+    public string AppKey { get; set; }
 
     /// <summary>
     /// Instantiate and initialize a new <see cref="Application"/>.
@@ -52,6 +54,20 @@ public class Application : IDisposable
         OVRSystem = OpenVR.Init(ref err, (EVRApplicationType)type, startupInfo);
 
         err.ThrowIfError();
+    }
+
+    public void AddManifest(string path, VRManifest manifest, bool temporal = true)
+    {
+        var json = manifest;
+
+
+        OpenVR.Applications.AddApplicationManifest(path, temporal).ThrowIfError();
+    }
+
+    public bool IsAutoLaunch
+    {
+        get => OpenVR.Applications.GetApplicationAutoLaunch(AppKey);
+        set => OpenVR.Applications.SetApplicationAutoLaunch(AppKey, value);
     }
 
     public void Dispose()

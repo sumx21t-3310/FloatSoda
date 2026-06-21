@@ -1,8 +1,8 @@
-﻿namespace FloatSoda.Render;
-
-using Common.Geometries;
-using Common.Layer;
+﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Common.Layer;
 using SkiaSharp;
+
+namespace FloatSoda.RenderObjects;
 
 public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBounds)
 {

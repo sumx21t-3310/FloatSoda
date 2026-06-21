@@ -7,7 +7,11 @@ public interface IOverlay : IDisposable
     OverlayWidthInMeters WidthInMeters { get; }
     OverlayCurvature Curvature { get; }
     OverlayTexture Texture { get; }
-    OverlayFlags Flags { get; }
+    OverlayState State { get; }
+    OverlayVibration Vibration { get; }
+    OverlayInput Input { get; }
+
+    OverlayEventDispatcher EventDispatcher { get; }
 }
 
 public interface IOverlay<out TIdentity> : IOverlay where TIdentity : IOverlayIdentity
@@ -27,6 +31,7 @@ public interface IDashboardOverlay : IOverlay<DashboardOverlayIdentity>
 public interface IMovableOverlay : IOverlay
 {
     OverlayVisibility Visibility { get; }
+    OverlayIntersection Intersection { get; }
 
     OverlayTransform Transform { get; }
 }
@@ -45,11 +50,15 @@ public class DashboardOverlay(DashboardOverlayIdentity identity) : IDashboardOve
     public OverlayWidthInMeters WidthInMeters { get; } = new(identity.Handle);
     public OverlayCurvature Curvature { get; } = new(identity.Handle);
     public OverlayTexture Texture { get; } = new(identity.Handle);
-    public OverlayFlags Flags { get; } = new(identity.Handle);
+    public OverlayState State { get; } = new(identity.Handle);
+    public OverlayVibration Vibration { get; } = new(identity.Handle);
+    public OverlayInput Input { get; } = new(identity.Handle);
+    public OverlayEventDispatcher EventDispatcher { get; } = new(identity.Handle);
     public OverlayTexture Thumbnail { get; } = new(identity.ThumbnailHandle);
 }
 
-public abstract class MovableOverlay<TTransform>(OverlayIdentity identity) : IMovableOverlay< TTransform> where TTransform : OverlayTransform
+public abstract class MovableOverlay<TTransform>(OverlayIdentity identity)
+    : IMovableOverlay<TTransform> where TTransform : OverlayTransform
 {
     public void Dispose() => Identity.Dispose();
 
@@ -59,9 +68,14 @@ public abstract class MovableOverlay<TTransform>(OverlayIdentity identity) : IMo
     public OverlayWidthInMeters WidthInMeters { get; } = new(identity.Handle);
     public OverlayCurvature Curvature { get; } = new(identity.Handle);
     public OverlayTexture Texture { get; } = new(identity.Handle);
-    public OverlayFlags Flags { get; } = new(identity.Handle);
+    public OverlayState State { get; } = new(identity.Handle);
+    public OverlayVibration Vibration { get; } = new(identity.Handle);
+    public OverlayInput Input { get; } = new(identity.Handle);
+    public OverlayEventDispatcher EventDispatcher { get; } = new(identity.Handle);
+
     public OverlayVisibility Visibility { get; } = new(identity.Handle);
-    
+    public OverlayIntersection Intersection { get; } = new(identity.Handle);
+
     OverlayTransform IMovableOverlay.Transform => Transform;
     public abstract TTransform Transform { get; }
 }

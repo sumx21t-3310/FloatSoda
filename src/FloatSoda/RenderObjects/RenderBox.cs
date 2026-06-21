@@ -1,9 +1,8 @@
 ﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Common.Layer;
 using FloatSoda.Core;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.RenderObjects;
 
 public abstract class RenderBox : RenderObject
 {

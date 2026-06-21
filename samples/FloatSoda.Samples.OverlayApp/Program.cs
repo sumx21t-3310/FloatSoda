@@ -1,5 +1,4 @@
 ﻿using FloatSoda;
-using FloatSoda.Core;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
@@ -16,7 +15,7 @@ Widget floatSodaDashboard = new Align
     {
         Width = 100,
         Height = 100,
-        Child = new ColoredBox
+        Child = new ColoredBox()
         {
             Color = SKColors.Tomato
         }

@@ -1,14 +1,14 @@
-﻿using FloatSoda.Common.Layer;
+using FloatSoda.Common.Layer;
 using FloatSoda.Core;
-using FloatSoda.Render;
+using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using SkiaSharp;
 
-namespace FloatSoda.Samples.PaintingSample;
+namespace FloatSoda.Rendering;
 
 public class ImageRenderer
 {
-    public void RenderWidgetTree(Widget widget, SKSizeI imageSize, string imagePath)
+    public SKBitmap RenderWidgetTree(Widget widget, SKSizeI imageSize)
     {
         var renderView = new RenderView(imageSize.Width, imageSize.Height);
         var pipeline = new RenderPipeline
@@ -22,18 +22,17 @@ public class ImageRenderer
             Container = renderView,
             Child = widget
         }.AttachToRenderTree();
-        
-        pipeline.RenderView.PrepareInitialFrame();
 
+        pipeline.RenderView.PrepareInitialFrame();
         pipeline.FlushLayout();
         pipeline.FlushPaint();
 
         var layer = renderView.Layer?.Clone();
-        if (layer == null) return;
-        RenderLayerTree(layer, imageSize, imagePath);
+        if (layer == null) return new SKBitmap(imageSize.Width, imageSize.Height);
+        return RenderLayerTreeToBitmap(layer, imageSize);
     }
 
-    public void RenderObjectTree(RenderBox renderObject, SKSizeI imageSize, string imagePath)
+    public SKBitmap RenderObjectTree(RenderBox renderObject, SKSizeI imageSize)
     {
         var pipeline = new RenderPipeline
         {
@@ -43,32 +42,28 @@ public class ImageRenderer
                 Child = renderObject
             }
         };
-        
+
         pipeline.RenderView.PrepareInitialFrame();
-        
         pipeline.FlushLayout();
         pipeline.FlushPaint();
 
         var layer = pipeline.RenderView.Layer?.Clone();
-
-        if (layer == null) return;
-        RenderLayerTree(layer, imageSize, imagePath);
+        if (layer == null) return new SKBitmap(imageSize.Width, imageSize.Height);
+        return RenderLayerTreeToBitmap(layer, imageSize);
     }
 
-    public void RenderLayerTree(ILayer root, SKSizeI imageSize, string savePath)
+    public SKBitmap RenderLayerTreeToBitmap(ILayer root, SKSizeI imageSize)
     {
-        SKImageInfo info = new(imageSize.Width, imageSize.Height);
+        var info = new SKImageInfo(imageSize.Width, imageSize.Height);
         using var surface = SKSurface.Create(info);
-
         surface.Canvas.Clear(SKColors.Transparent);
-        var renderContext = LayerContext.Create(surface);
 
+        var renderContext = LayerContext.Create(surface);
         root.Paint(renderContext);
 
-        var image = surface.Snapshot();
-
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-        using var stream = File.Create(savePath);
-        data.SaveTo(stream);
+        var bitmap = new SKBitmap(info);
+        using var image = surface.Snapshot();
+        image.ReadPixels(bitmap.Info, bitmap.GetPixels(), bitmap.RowBytes, 0, 0);
+        return bitmap;
     }
 }

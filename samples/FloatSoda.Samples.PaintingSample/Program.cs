@@ -1,9 +1,9 @@
 ﻿using FloatSoda.Common.Layer;
+using FloatSoda.Rendering;
 using FloatSoda.Geometrics;
-using FloatSoda.Render;
-using FloatSoda.Render.Layout;
-using FloatSoda.Render.Painting;
-using FloatSoda.Samples.PaintingSample;
+using FloatSoda.RenderObjects;
+using FloatSoda.RenderObjects.Layout;
+using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
@@ -17,14 +17,14 @@ var layerTree = CreateLayerTree(imageSize.Width, imageSize.Height);
 
 var savePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-imageRenderer.RenderLayerTree(layerTree, imageSize, Path.Combine(savePath, "layer_tree_output.png"));
+imageRenderer.RenderLayerTreeToBitmap(layerTree, imageSize).Save(Path.Combine(savePath, "layer_tree_output.png"));
 
 var renderTree = CreateRenderObject(imageSize.Width, imageSize.Width);
 
-imageRenderer.RenderObjectTree(renderTree, imageSize, Path.Combine(savePath, "render_tree_output.png"));
+imageRenderer.RenderObjectTree(renderTree, imageSize).Save(Path.Combine(savePath, "render_tree_output.png"));
 
 var widgetTree = CreateWidgetTree(imageSize.Width, imageSize.Height);
-imageRenderer.RenderWidgetTree(widgetTree, imageSize, Path.Combine(savePath, "widget_tree_output.png"));
+imageRenderer.RenderWidgetTree(widgetTree, imageSize).Save(Path.Combine(savePath, "widget_tree_output.png"));
 
 return;
 
@@ -37,13 +37,13 @@ ILayer CreateLayerTree(float width, float height)
     var recorder = new SKPictureRecorder();
     var canvas = recorder.BeginRecording(rect);
 
-    canvas.DrawRect(rect, new SKPaint { Color = SKColors.AliceBlue });
+    canvas.DrawRect(rect, new SKPaint { Color = SKColors.WhiteSmoke });
 
     var parentSize = new SKSize(width, height);
     var childSize = new SKSize(width / 2, height / 2);
     var location = new Alignment().ComputeOffset(parentSize, childSize);
 
-    canvas.DrawRect(SKRect.Create(location, childSize), new SKPaint { Color = SKColors.CornflowerBlue });
+    canvas.DrawRect(SKRect.Create(location, childSize), new SKPaint { Color = SKColors.DarkSeaGreen });
 
     leaf.Picture = recorder.EndRecording();
 
@@ -62,19 +62,55 @@ RenderBox CreateRenderObject(float width, float height)
             AdditionalConstraints = BoxConstraints.Tight(width, height),
             Child = new RenderColoredBox
             {
-                Color = SKColors.AliceBlue,
-                Child = new RenderPositionedBox
+                Color = SKColors.WhiteSmoke,
+                Child = new RenderFlex
                 {
-                    Child = new RenderConstrainedBox
-                    {
-                        AdditionalConstraints = BoxConstraints.Tight(width / 2, height / 2),
-                        Child = new RenderColoredBox
+                    MainAxisSize = MainAxisSize.Min,
+                    MainAxisAlignment = MainAxisAlignment.Center,
+                    Children =
+                    [
+                        new RenderClipRoundRect
                         {
-                            Color = SKColors.Tomato
+                            BorderRadius = BorderRadius.Circular(20),
+                            Child = new RenderConstrainedBox
+                            {
+                                AdditionalConstraints = BoxConstraints.Tight(width / 4,
+                                    height / 4),
+                                Child = new RenderColoredBox
+                                {
+                                    Color = SKColors.DarkSeaGreen
+                                }
+                            }
+                        },
+                        new RenderClipRoundRect
+                        {
+                            BorderRadius = BorderRadius.Circular(20),
+                            Child = new RenderConstrainedBox
+                            {
+                                AdditionalConstraints = BoxConstraints.Tight(width / 4,
+                                    height / 4),
+                                Child = new RenderColoredBox
+                                {
+                                    Color = SKColors.Tomato
+                                }
+                            }
+                        },
+                        new RenderClipRoundRect
+                        {
+                            BorderRadius = BorderRadius.Circular(20),
+                            Child = new RenderConstrainedBox
+                            {
+                                AdditionalConstraints = BoxConstraints.Tight(width / 4,
+                                    height / 4),
+                                Child = new RenderColoredBox
+                                {
+                                    Color = SKColors.CornflowerBlue
+                                }
+                            }
                         }
-                    }
-                }
-            }
+                    ]
+                },
+            },
         }
     };
 }
@@ -83,24 +119,15 @@ Widget CreateWidgetTree(double width, double height)
 {
     return new Align
     {
-        Child = new SizedBox
+        Child = new Flex()
         {
-            Width = width,
-            Height = height,
-            Child = new ColoredBox
+            MainAxisSize = MainAxisSize.Min,
+            MainAxisAlignment = MainAxisAlignment.Center,
+            Children =
             {
-                Color = SKColors.AliceBlue,
-                Child = new Align
+                new SizedBox()
                 {
-                    Child = new SizedBox
-                    {
-                        Width = width / 2,
-                        Height = height / 2,
-                        Child = new ColoredBox
-                        {
-                            Color = SKColors.CornflowerBlue
-                        }
-                    }
+                    Child = new ColoredBox() {}
                 }
             }
         }

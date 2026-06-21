@@ -1,6 +1,6 @@
 ﻿using FloatSoda.Geometrics;
 
-namespace FloatSoda.Render.Layout;
+namespace FloatSoda.RenderObjects.Layout;
 
 public class RenderConstrainedBox : RenderProxyBox
 {

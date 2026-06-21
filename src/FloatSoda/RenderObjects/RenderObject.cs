@@ -5,7 +5,7 @@ using FloatSoda.Core;
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.RenderObjects;
 
 public abstract partial class RenderObject
 {

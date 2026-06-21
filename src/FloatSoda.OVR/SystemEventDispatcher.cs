@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using FloatSoda.OVR.Overlay;
 
 namespace FloatSoda.OVR;
 
@@ -46,12 +45,12 @@ public class VRSystemEventDispatcher : VREventDispatcher
     }
 }
 
-public class OverlayEventDispatcher(IOverlayIdentity identity) : VREventDispatcher
+public class OverlayEventDispatcher(ulong overlayHandle) : VREventDispatcher
 {
     public override void PollEvents()
     {
         var vrEvent = new VREvent_t();
-        while (OpenVR.Overlay.PollNextOverlayEvent(identity.Handle, ref vrEvent, EventSize))
+        while (OpenVR.Overlay.PollNextOverlayEvent(overlayHandle, ref vrEvent, EventSize))
         {
             Dispatch(vrEvent);
         }

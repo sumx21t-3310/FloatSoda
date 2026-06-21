@@ -3,7 +3,7 @@ using FloatSoda.Core;
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
-namespace FloatSoda.Render.Layout;
+namespace FloatSoda.RenderObjects.Layout;
 
 public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
 {
@@ -15,6 +15,9 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
 
     public List<RenderBox> Children { get; set; } = [];
     public RenderObject ThisRef => this;
+
+    public override void SetupParentData(RenderObject child)
+        => child.ParentData = new BoxParentData();
 
     private float GetMainSize(SKSize size) => Direction switch
     {
@@ -37,6 +40,8 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
 
         foreach (var child in Children)
         {
+            child.ParentData ??= new BoxParentData();
+
             var innerAxisSize = (CrossAxisAlignment, Direction) switch
             {
                 (CrossAxisAlignment.Stretch, Axis.Horizontal) => BoxConstraints.TightFor(height: constraints.MaxHeight),
@@ -171,9 +176,7 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
         }
     }
 
-    public override void VisitChildren(Action<RenderObject> visitor)
-        => Children.ForEach(visitor);
+    public override void VisitChildren(Action<RenderObject> visitor) => Children.ForEach(visitor);
 
-    public override void RedepthChildren()
-        => VisitChildren(RedepthChild);
+    public override void RedepthChildren() => VisitChildren(RedepthChild);
 }

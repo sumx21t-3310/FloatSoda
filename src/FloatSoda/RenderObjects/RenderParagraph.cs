@@ -1,11 +1,9 @@
 ﻿using FloatSoda.Common.Geometries;
 using FloatSoda.Core;
-using FloatSoda.Elements;
-using FloatSoda.Widgets;
 using SkiaSharp;
 using Topten.RichTextKit;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.RenderObjects;
 
 public class RenderParagraph(TextSpan text) : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
 {
