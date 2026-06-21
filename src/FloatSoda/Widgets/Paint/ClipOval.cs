@@ -5,12 +5,12 @@ using SkiaSharp;
 
 namespace FloatSoda.Widgets.Paint;
 
-public record ClipOval : SingleChildRenderObjectWidget
+public record ClipOval : SingleChildRenderObjectWidget<RenderClipOval>
 {
     public CustomClipper<SKRect>? CustomClipper { get; init; } = null;
     public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
-    public override RenderObject CreateRenderObject()
+    public override RenderClipOval CreateRenderObject()
     {
         return new RenderClipOval
         {
@@ -20,13 +20,13 @@ public record ClipOval : SingleChildRenderObjectWidget
     }
 }
 
-public record ClipRect : SingleChildRenderObjectWidget
+public record ClipRect : SingleChildRenderObjectWidget<RenderClipRect>
 {
     public CustomClipper<SKRect>? Clipper { get; init; } = null;
     public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
 
-    public override RenderObject CreateRenderObject()
+    public override RenderClipRect CreateRenderObject()
     {
         return new RenderClipRect
         {
@@ -36,13 +36,13 @@ public record ClipRect : SingleChildRenderObjectWidget
     }
 }
 
-public record ClipRoundRect : SingleChildRenderObjectWidget
+public record ClipRoundRect : SingleChildRenderObjectWidget<RenderClipRoundRect>
 {
     public CustomClipper<SKRoundRect>? Clipper { get; init; } = null;
     public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
 
-    public override RenderObject CreateRenderObject()
+    public override RenderClipRoundRect CreateRenderObject()
     {
         return new RenderClipRoundRect
         {
@@ -52,13 +52,13 @@ public record ClipRoundRect : SingleChildRenderObjectWidget
     }
 }
 
-public record ClipCustomPath : SingleChildRenderObjectWidget
+public record ClipCustomPath : SingleChildRenderObjectWidget<RenderClipPath>
 {
     public CustomClipper<SKPath>? Clipper { get; init; } = null;
     public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
 
-    public override RenderObject CreateRenderObject()
+    public override RenderClipPath CreateRenderObject()
     {
         return new RenderClipPath()
         {

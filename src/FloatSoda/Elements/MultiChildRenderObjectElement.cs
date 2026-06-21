@@ -3,9 +3,9 @@ using FloatSoda.Widgets;
 
 namespace FloatSoda.Elements;
 
-public class MultiChildRenderObjectElement : RenderObjectElement
+public class MultiChildRenderObjectElement<T> : RenderObjectElement<T> where T : RenderObject
 {
-    public MultiChildRenderObjectWidget WidgetCascade => (MultiChildRenderObjectWidget)Widget!;
+    public MultiChildRenderObjectWidget<T> WidgetCascade => (MultiChildRenderObjectWidget<T>)Widget!;
 
     private List<Element> Children { get; set; } = [];
 

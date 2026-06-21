@@ -3,11 +3,11 @@ using FloatSoda.RenderObjects;
 
 namespace FloatSoda.Widgets.Paint;
 
-public record Image : SingleChildRenderObjectWidget
+public record Image : SingleChildRenderObjectWidget<RenderImage>
 {
     public required ImageProvider ImageProvider { get; init; }
 
-    public override RenderObject CreateRenderObject()
+    public override RenderImage CreateRenderObject()
     {
         return new RenderImage()
         {

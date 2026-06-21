@@ -29,7 +29,7 @@ public class ImageRenderer
 
         var layer = renderView.Layer?.Clone();
         if (layer == null) return new SKBitmap(imageSize.Width, imageSize.Height);
-        return RenderLayerTreeToBitmap(layer, imageSize);
+        return RenderLayerTree(layer, imageSize);
     }
 
     public SKBitmap RenderObjectTree(RenderBox renderObject, SKSizeI imageSize)
@@ -49,10 +49,10 @@ public class ImageRenderer
 
         var layer = pipeline.RenderView.Layer?.Clone();
         if (layer == null) return new SKBitmap(imageSize.Width, imageSize.Height);
-        return RenderLayerTreeToBitmap(layer, imageSize);
+        return RenderLayerTree(layer, imageSize);
     }
 
-    public SKBitmap RenderLayerTreeToBitmap(ILayer root, SKSizeI imageSize)
+    public SKBitmap RenderLayerTree(ILayer root, SKSizeI imageSize)
     {
         var info = new SKImageInfo(imageSize.Width, imageSize.Height);
         using var surface = SKSurface.Create(info);

@@ -3,7 +3,7 @@ using FloatSoda.Widgets;
 
 namespace FloatSoda.Elements;
 
-public abstract class RenderObjectElement : Element
+public abstract class RenderObjectElement<T> : Element where T : RenderObject
 {
     public override RenderObject? RenderObject { get; protected set; }
 
@@ -11,7 +11,7 @@ public abstract class RenderObjectElement : Element
     {
         base.Mount(parent);
 
-        if (Widget is RenderObjectWidget renderObjectWidget)
+        if (Widget is RenderObjectWidget<T> renderObjectWidget)
         {
             RenderObject = renderObjectWidget.CreateRenderObject();
         }
@@ -25,16 +25,16 @@ public abstract class RenderObjectElement : Element
         ancestorRenderObjectElement?.InsertRenderObjectChild(RenderObject);
     }
 
-    private RenderObjectElement? FindAncestorRenderObjectElement()
+    private RenderObjectElement<T>? FindAncestorRenderObjectElement()
     {
         var ancestor = Parent;
 
-        while (ancestor != null && ancestor is not RenderObjectElement)
+        while (ancestor != null && ancestor is not RenderObjectElement<T>)
         {
             ancestor = ancestor.Parent;
         }
 
-        return ancestor as RenderObjectElement;
+        return ancestor as RenderObjectElement<T>;
     }
 
     protected virtual void InsertRenderObjectChild(RenderObject child)

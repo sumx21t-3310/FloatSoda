@@ -5,7 +5,7 @@ using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
 
-public sealed record Flex : MultiChildRenderObjectWidget
+public sealed record Flex : MultiChildRenderObjectWidget<RenderFlex>
 {
     public Axis Direction { get; init; } = Axis.Vertical;
     public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
@@ -14,7 +14,7 @@ public sealed record Flex : MultiChildRenderObjectWidget
     public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Start;
     public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
 
-    public override RenderObject CreateRenderObject()
+    public override RenderFlex CreateRenderObject()
     {
         return new RenderFlex()
         {

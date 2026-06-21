@@ -5,14 +5,14 @@ using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
 
-public record Align : SingleChildRenderObjectWidget
+public record Align : SingleChildRenderObjectWidget<RenderPositionedBox>
 {
     public Alignment Alignment { get; init; } = Alignment.Center;
     public double? WidthFactor { get; init; } = null;
     public double? HeightFactor { get; init; } = null;
 
 
-    public override RenderObject CreateRenderObject()
+    public override RenderPositionedBox CreateRenderObject()
     {
         return new RenderPositionedBox()
         {

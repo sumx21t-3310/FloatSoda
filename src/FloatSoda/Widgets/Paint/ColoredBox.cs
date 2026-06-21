@@ -1,15 +1,14 @@
-﻿using FloatSoda.RenderObjects;
-using FloatSoda.RenderObjects.Painting;
+﻿using FloatSoda.RenderObjects.Painting;
 using SkiaSharp;
 
 namespace FloatSoda.Widgets.Paint;
 
-public record ColoredBox : SingleChildRenderObjectWidget
+public record ColoredBox : SingleChildRenderObjectWidget<RenderColoredBox>
 {
     public SKColor Color { get; init; }
 
 
-    public override RenderObject CreateRenderObject()
+    public override RenderColoredBox CreateRenderObject()
     {
         return new RenderColoredBox
         {
