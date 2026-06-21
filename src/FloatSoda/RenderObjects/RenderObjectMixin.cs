@@ -1,4 +1,4 @@
-namespace FloatSoda.Render;
+namespace FloatSoda.RenderObjects;
 
 public interface IHasSingleChildRenderObjectBase
 {

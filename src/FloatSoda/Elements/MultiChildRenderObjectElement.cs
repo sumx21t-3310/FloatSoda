@@ -1,4 +1,4 @@
-using FloatSoda.Render;
+using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 
 namespace FloatSoda.Elements;
@@ -12,7 +12,7 @@ public class MultiChildRenderObjectElement : RenderObjectElement
     public override void Mount(Element? parent)
     {
         base.Mount(parent);
-        Children = WidgetCascade.Children.Select(InflateWidget).ToList();
+        Children = (WidgetCascade.Children ?? []).Select(InflateWidget).ToList();
     }
 
     protected override void InsertRenderObjectChild(RenderObject child)

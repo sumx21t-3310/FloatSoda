@@ -3,7 +3,7 @@ using FloatSoda.Core;
 using FloatSoda.Geometrics;
 using static System.Double;
 
-namespace FloatSoda.Render.Layout;
+namespace FloatSoda.RenderObjects.Layout;
 
 public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject<RenderObject>
 {

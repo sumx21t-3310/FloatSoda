@@ -4,6 +4,8 @@ namespace FloatSoda.Core;
 
 internal class WindowKeyGenerator
 {
+    private string _pattern = "";
+    
     private static readonly string Endpoint = 
         Assembly.GetEntryAssembly()?.GetName().Name ?? $"overlay_app.{Guid.NewGuid().ToString("N").ToLower()}";
 

@@ -1,5 +1,5 @@
-﻿using FloatSoda.Render;
-using FloatSoda.Render.Painting;
+﻿using FloatSoda.RenderObjects;
+using FloatSoda.RenderObjects.Painting;
 using SkiaSharp;
 
 namespace FloatSoda.Widgets.Paint;

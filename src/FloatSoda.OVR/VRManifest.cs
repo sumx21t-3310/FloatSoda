@@ -25,10 +25,11 @@ public class VRManifest
                throw new JsonException("Failed to deserialize VRManifest: result was null.");
     }
 
-    public static VRManifest FromFile(string path) => FromJson(File.ReadAllText(path));
+
+    public override string ToString() => ToJson();
 }
 
-public class VRApplication
+public record VRApplication
 {
     [JsonPropertyName("app_key")] public required AppKey AppKey { get; init; }
 
@@ -63,7 +64,7 @@ public class VRApplication
     [JsonPropertyName("strings")] public Dictionary<string, AppStrings>? Strings { get; init; }
 }
 
-public class AppKey(params string[] parts)
+public record AppKey(params string[] parts)
 {
     public override string ToString() => string.Join(".", parts.Select(p => p.ToLowerInvariant().Split(' ', '_')));
 }
@@ -75,7 +76,7 @@ public enum LaunchType
     Scene
 }
 
-public class AppStrings
+public record class AppStrings
 {
     [JsonPropertyName("name")] public required string Name { get; init; }
 

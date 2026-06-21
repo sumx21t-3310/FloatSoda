@@ -4,7 +4,7 @@ namespace FloatSoda.Widgets;
 
 public abstract record MultiChildRenderObjectWidget : RenderObjectWidget
 {
-    public required List<Widget> Children { get; init; }
+    public List<Widget> Children { get; init; } = [];
 
     public override Element CreateElement()
     {

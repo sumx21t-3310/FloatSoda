@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Common.Geometries;
 using SkiaSharp;
 
-namespace FloatSoda.Render;
+namespace FloatSoda.RenderObjects;
 
 public class RenderImage : RenderProxyBox
 {

@@ -34,12 +34,10 @@
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="C:\Users\sumx21t\.nuget\packages\ovrsharp\1.2.0\lib\netstandard2.0\OVRSharp.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ea32432b_002Ddec5_002D47ba_002Db4d9_002D1fa573b046f7/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::70B9F635-C87D-71E5-C2A1-A2FABF4FDFC4::net10.0::FloatSoda.GeometryTest.AlignmentTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::70B9F635-C87D-71E5-C2A1-A2FABF4FDFC4::net10.0::FloatSoda.GeometryTest.BoxConstraintsTest&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=3ccf654d_002D01a6_002D474b_002Da40c_002De4d06d02ba09/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="&amp;lt;tests&amp;gt; 内のすべてのテスト" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Project Location="C:\Users\sumx21t\projects\libs\FloatSoda" Presentation="&amp;lt;tests&amp;gt;" /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	
 	
 	<s:Boolean x:Key="/Default/UnloadedProject/UnloadedProjects/=66bc1879_002Df9b7_002Dcb4b_002D5963_002D64327d25301c_0023FloatSoda_002EApp/@EntryIndexedValue">True</s:Boolean>
 	</wpf:ResourceDictionary>Z

@@ -8,6 +8,7 @@ using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
+using Action = System.Action;
 
 
 namespace FloatSoda;

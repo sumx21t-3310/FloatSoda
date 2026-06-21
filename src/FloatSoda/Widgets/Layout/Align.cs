@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Elements;
 using FloatSoda.Geometrics;
-using FloatSoda.Render;
-using FloatSoda.Render.Layout;
+using FloatSoda.RenderObjects;
+using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
 
