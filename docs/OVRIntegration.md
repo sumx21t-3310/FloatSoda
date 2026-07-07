@@ -1,3 +1,5 @@
+← [Home](Home.md)
+
 # OpenVR インテグレーション
 
 `FloatSoda.OVR` アセンブリは OpenVR API をラップし、型安全なオーバーレイ操作を提供します。
@@ -161,3 +163,10 @@ OpenVR.Overlay.SetOverlayTransformAbsolute(handle, origin, ref hmd);
 ```
 
 `OverlayTransform` サブクラスを実装する場合は `GetMatrix()` が `Position` + `Rotation` から `Matrix4x4` を生成するので、`Apply()` で `ToHmdMatrix34_t()` を呼ぶだけで済みます。
+
+---
+
+## 関連ページ
+
+- [GettingStarted](GettingStarted.md) — オーバーレイ作成の高レベル API(`CreateDashboardOverlay` など)
+- [Architecture](Architecture.md) — オーバーレイテクスチャへのレンダリング経路

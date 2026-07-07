@@ -1,6 +1,10 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to coding agents (Codex etc.) when working with code in this repository.
+
+## Working Style
+
+The repository owner develops hands-on and tracks the implementation themselves. By default, **investigate and explain — do not modify code.** When asked about a bug or behavior, report the root cause, the relevant files/lines, and (optionally) how a fix would look, but leave the actual implementation to the owner unless they explicitly ask you to make the change.
 
 ## Project Overview
 
@@ -19,13 +23,14 @@ dotnet build
 dotnet test
 
 # Run a specific test project
-dotnet test tests/FloatSoda.GeometryTest
+dotnet test tests/FloatSoda.Test
+dotnet test tests/FloatSoda.Common.Test
 
 # Run a specific test by name
-dotnet test tests/FloatSoda.GeometryTest --filter "FullyQualifiedName~AlignmentTest.TopLeft"
+dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.TopLeft"
 ```
 
-Tests use xunit. The test project references `FloatSoda.Common` and `FloatSoda`.
+Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widgets. `FloatSoda.Common.Test` tests the Layer tree.
 
 ## Project Structure
 
@@ -36,24 +41,27 @@ Tests use xunit. The test project references `FloatSoda.Common` and `FloatSoda`.
 | `src/FloatSoda.OVR` | OpenVR wrappers, overlay types (`DashboardOverlay`, `WorldSpaceOverlay`, `DeviceTrackedOverlay`), `VREventDispatcher`, and exception types |
 | `src/FloatSoda` | Framework core: RenderObject tree, Widget/Element system, `RenderPipeline`, `FloatSodaApp` |
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
-| `tests/FloatSoda.GeometryTest` | xunit geometry tests |
-| `docs/` | Developer documentation (Architecture, GettingStarted, RenderObjects, WidgetSystem, OVRIntegration, APIDesign) |
+| `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
+| `tests/FloatSoda.Common.Test` | xunit tests for the Layer tree |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, GettingStarted, Architecture, WidgetSystem, BuildPipeline, RenderObjects, OVRIntegration, APIDesign). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
 
-## Architecture: Two Parallel Trees
+## Architecture: Three Trees
 
-FloatSoda mirrors Flutter's three-tree model, currently with two trees implemented:
+FloatSoda mirrors Flutter's three-tree model. The RenderObject and Layer trees are fully implemented; the Widget/Element tree has incremental (dirty-list) rebuilds working for `StatelessWidget`:
 
-### 1. RenderObject Tree (`src/FloatSoda/Render/`)
+### 1. RenderObject Tree (`src/FloatSoda/RenderObjects/`)
 
-The low-level layout-and-paint tree. Every frame:
-1. `RenderPipeline.FlushLayout()` → calls `RenderView.PerformLayout()` top-down, passing `BoxConstraints`
-2. `RenderPipeline.FlushPaint()` → walks the tree calling `Paint(PaintingContext, Offset)`, which records Skia draw calls into `PictureLayer`s inside a `ContainerLayer` tree
+The low-level layout-and-paint tree with incremental updates. Property changes call `MarkNeedsLayout()` / `MarkNeedsPaint()`, which propagate to the nearest relayout/repaint boundary and register that node on `RenderPipeline.NodesNeedingLayout` / `NodesNeedingPaint`. Each frame:
+1. `RenderPipeline.FlushLayout()` → processes dirty nodes in `Depth` order via `LayoutWithoutResize()`
+2. `RenderPipeline.FlushPaint()` → repaints dirty nodes via `PaintingContext.RepaintCompositedChild()`, recording Skia draw calls into `PictureLayer`s inside a `ContainerLayer` tree
+
+`RenderView.PrepareInitialFrame()` seeds both lists for the first frame. Frames with no dirty nodes skip layout/paint entirely.
 
 Key classes:
-- `RenderObject` — abstract base with `Layout(BoxConstraints)` + `Paint(PaintingContext, Offset)`
+- `RenderObject` — abstract base; subclasses implement `PerformLayout()` + `Paint(PaintingContext, Offset)`; `Layout(BoxConstraints)` is the non-virtual entry point that handles relayout boundaries
 - `RenderBox` — adds `SKSize Size`; most layout objects extend this
 - `RenderProxyBox` — single-child passthrough base (delegates layout/paint to child)
-- `RenderObjectWithChild<T>` mixin — typed `Child` property helper
+- `SingleChildContainer<T>` / `MultiChildrenCollection<T>` — composition helpers for child holding (adopt/drop on assignment, attach/detach/visit forwarding)
 - `RenderImage` — renders an `SKImage` loaded via `FileImageProvider`
 
 ### 2. Layer Tree (`src/FloatSoda.Common/Layer/`)
@@ -65,24 +73,30 @@ Produced by the RenderObject tree's paint phase. Represents composited draw oper
 
 The layer tree is **cloned** (`ILayer.Clone()`) before being handed to the render thread to avoid data races.
 
-### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — WIP
+### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Partially implemented
 
-Flutter-style declarative layer being built on top of the RenderObject tree. Currently scaffolded but not yet wired end-to-end:
-- `Widget` — immutable `abstract record`; declares `CreateElement()`
-- `RenderObjectWidget` — widget that owns a `RenderObject`; declares `CreateRenderObject()`
-- `StatelessWidget` / `StatefulWidget` — compositional widgets; `Build()` not yet called by the framework
-- `Element` — mutable tree node; `Mount()` / `UpdateChild()` / `InflateWidget()`
+Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatelessElement` are fully wired, including incremental rebuilds via `BuildOwner`. `StatefulWidget` / `StatefulElement` and `InheritedWidget` / `InheritedElement` are skeletons (`NotImplementedException`); `MultiChildRenderObjectElement.PerformRebuild()` (children diffing) is also not implemented yet:
+- `Widget` — immutable `abstract record`; declares `CreateElement()`. `Widget.CanUpdate` is currently full record equality (not Flutter's type+key check); `Key` types exist but aren't wired in
+- `RenderObjectWidget<T>` — widget that owns a `RenderObject`; declares `CreateRenderObject()` / `UpdateRenderObject(T)`
+- `StatelessWidget` — `Build()` is called by `StatelessElement`; usable today
+- `StatefulWidget<T>` — state lifecycle scaffolded but `StatefulElement.Build()` not yet implemented
+- `Element` — mutable tree node; `Mount()` / `UpdateChild()` / `InflateWidget()` / `MarkNeedsBuild()` / `Rebuild()`
+- `BuildOwner` — per-window rebuild scheduler; holds the dirty-element list, `BuildScope()` rebuilds dirty elements in `Depth` order (parents first)
 - `RenderObjectElement` — element that attaches its `RenderObject` into the render tree
-- `RenderObjectToWidgetAdapter` — bridges the widget tree root to a `RenderView`
+- `RenderObjectToWidgetAdapter` — bridges the widget tree root to a `RenderView`; `AttachToRenderTree(owner, element)` mounts on first call and schedules a rebuild (via `NewWidget` + `MarkNeedsBuild`) on re-attach
+- `WidgetBinding` — per-window coordinator; owns the `BuildOwner`; `DrawFrame()` runs `BuildOwner.BuildScope()` then flushes layout/paint only when `NeedsVisualUpdate` is set
+- `src/FloatSoda.Hooks` — R3-based `HookWidget` / `HookElement` (`UseState` via `ReactiveProperty`), partially implemented, not yet integrated with the build loop
 
 ## Frame Pipeline
 
 ```
 FloatSodaApp.Run() [main thread, STA]
   └─ PollEvents()          — VREvent_Quit etc.
-  └─ DrawFrame()
-       └─ RenderPipeline.FlushLayout()   — RenderObject layout pass
-       └─ RenderPipeline.FlushPaint()    — RenderObject paint pass → Layer tree
+  └─ DrawFrame()           — per WidgetBinding (window)
+       └─ BuildOwner.BuildScope()        — rebuild dirty Elements → UpdateRenderObject
+       └─ (skip rest unless NeedsVisualUpdate)
+       └─ RenderPipeline.FlushLayout()   — layout dirty RenderObjects (Depth order)
+       └─ RenderPipeline.FlushPaint()    — repaint dirty RenderObjects → Layer tree
        └─ RenderThreadRunner.PostRender(layer.Clone())
             └─ [render thread] OverlayWindow.Update()
                  └─ Renderer.Render(layer)

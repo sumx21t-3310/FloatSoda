@@ -6,7 +6,8 @@
 
 ## 特徴
 
-- **Flutter-like な開発体験**: 宣言的な UI 構築を目指しています（Widget システムは WIP）
+- **Flutter-like な開発体験**: `StatelessWidget` による宣言的な UI 構築が可能です（`StatefulWidget` は WIP）
+- **差分更新**: `BuildOwner` による Widget の差分ビルドと、dirty フラグによる RenderObject の差分レイアウト・差分ペイント
 - **RenderObject ツリー**: Flutter の RenderObject に相当するレイアウト・描画ツリーを実装
 - **複数オーバーレイ対応**: ダッシュボード・ワールド座標固定・デバイス追従を同時に管理
 - **Skia による描画**: SkiaSharp を使用した高品質なレンダリング
@@ -29,46 +30,30 @@
 dotnet run --project samples/FloatSoda.Samples.OverlayApp
 ```
 
-ダッシュボード・ワールド座標・左コントローラー追従の 3 つのオーバーレイが同時に表示されます。
+SteamVR ダッシュボードにカラーボックスを表示するオーバーレイが起動します。
 
 ### 最小構成のコード
 
 ```csharp
 using FloatSoda;
-using FloatSoda.Geometrics;
-using FloatSoda.Render.Layout;
-using FloatSoda.Render.Painting;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Layout;
+using FloatSoda.Widgets.Paint;
 using SkiaSharp;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
 using var app = builder.Build();
 
-var root = new RenderPositionedBox
+Widget root = new Align
 {
-    Child = new RenderFlex
+    Child = new SizedBox
     {
-        Direction = Axis.Vertical,
-        MainAxisAlignment = MainAxisAlignment.Center,
-        Children =
-        [
-            new RenderClipRoundRect
-            {
-                BorderRadius = BorderRadius.Circular(20),
-                Child = new RenderConstrainedBox
-                {
-                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                    Child = new RenderColoredBox { Color = SKColors.CornflowerBlue }
-                }
-            },
-            new RenderClipOval
-            {
-                Child = new RenderConstrainedBox
-                {
-                    AdditionalConstraints = BoxConstraints.Tight(300, 300),
-                    Child = new RenderColoredBox { Color = SKColors.Tomato }
-                }
-            }
-        ]
+        Width = 100,
+        Height = 100,
+        Child = new ColoredBox
+        {
+            Color = SKColors.Tomato
+        }
     }
 };
 
@@ -157,12 +142,16 @@ sequenceDiagram
 
 ## ドキュメント
 
+入り口は **[docs/Home.md](docs/Home.md)** です(GitHub Wiki にも自動同期されます)。
+
 | ドキュメント | 内容 |
 |---|---|
-| [docs/Architecture.md](docs/Architecture.md) | アーキテクチャ概要・フレームパイプライン・スレッドモデル |
+| [docs/Home.md](docs/Home.md) | ドキュメントトップ・全体像・実装状況サマリ |
 | [docs/GettingStarted.md](docs/GettingStarted.md) | クイックスタートガイド |
+| [docs/Architecture.md](docs/Architecture.md) | アーキテクチャ概要・フレームパイプライン・スレッドモデル |
+| [docs/WidgetSystem.md](docs/WidgetSystem.md) | ウィジェット/エレメントシステム |
+| [docs/BuildPipeline.md](docs/BuildPipeline.md) | BuildOwner による Widget 差分更新の仕組み |
 | [docs/RenderObjects.md](docs/RenderObjects.md) | RenderObject ツリーのリファレンス |
-| [docs/WidgetSystem.md](docs/WidgetSystem.md) | ウィジェット/エレメントシステム（WIP） |
 | [docs/OVRIntegration.md](docs/OVRIntegration.md) | OpenVR インテグレーションリファレンス |
 | [docs/APIDesign.md](docs/APIDesign.md) | API 設計規約 |
 
@@ -172,11 +161,13 @@ sequenceDiagram
 
 本プロジェクトは現在 **概念実証（PoC）段階** です。API は予告なく変更されます。
 
-- [x] RenderObject ツリー（レイアウト・描画・クリップ・画像）
+- [x] RenderObject ツリー（レイアウト・描画・クリップ・画像・差分更新）
 - [x] レイヤーツリー（ContainerLayer / PictureLayer / ClipLayer / OpacityLayer）
 - [x] 複数オーバーレイ（ダッシュボード / ワールド座標 / デバイス追従）
-- [x] Widget/Element システムのスキャフォールド
-- [ ] Widget → RenderObject への inflate パイプラインの実装
+- [x] Widget → RenderObject への inflate パイプライン（StatelessWidget）
+- [x] BuildOwner による Widget 差分ビルド
+- [ ] StatefulWidget / InheritedWidget / Key（スケルトンのみ）
+- [ ] MultiChildRenderObjectElement の再ビルド（子リストの差分更新）
 - [ ] SteamVR のイベント処理と宣言的な入力（ヒットテスト）
 - [ ] アニメーションシステムの統合
 - [ ] マニフェストファイルの自動生成（検討中）
