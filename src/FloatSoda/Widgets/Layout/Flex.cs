@@ -1,6 +1,5 @@
 ﻿using FloatSoda.Elements;
 using FloatSoda.Geometrics;
-using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
@@ -8,15 +7,15 @@ namespace FloatSoda.Widgets.Layout;
 public sealed record Flex : MultiChildRenderObjectWidget<RenderFlex>
 {
     public Axis Direction { get; init; } = Axis.Vertical;
-    public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
+    public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Center;
 
     public MainAxisSize MainAxisSize { get; init; } = MainAxisSize.Max;
-    public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Start;
+    public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
     public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
 
     public override RenderFlex CreateRenderObject()
     {
-        return new RenderFlex()
+        return new RenderFlex
         {
             Direction = Direction,
             MainAxisAlignment = MainAxisAlignment,
@@ -24,6 +23,11 @@ public sealed record Flex : MultiChildRenderObjectWidget<RenderFlex>
             CrossAxisAlignment = CrossAxisAlignment,
             VerticalDirection = VerticalDirection,
         };
+    }
+
+    public override void UpdateRenderObject(RenderFlex renderObject)
+    {
+        throw new NotImplementedException();
     }
 }
 
@@ -36,7 +40,7 @@ public abstract record FlexWrapper(Axis Direction) : StatelessWidget
 
     public override Widget Build(IBuildContext context)
     {
-        return new Flex()
+        return new Flex
         {
             MainAxisAlignment = MainAxisAlignment,
             CrossAxisAlignment = CrossAxisAlignment,

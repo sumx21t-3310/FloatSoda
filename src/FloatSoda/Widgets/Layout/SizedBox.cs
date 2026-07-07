@@ -1,5 +1,4 @@
 ﻿using FloatSoda.Geometrics;
-using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
@@ -17,4 +16,6 @@ public record SizedBox : SingleChildRenderObjectWidget<RenderConstrainedBox>
             AdditionalConstraints = BoxConstraints.TightFor(Width, Height)
         };
     }
+
+    public override void UpdateRenderObject(RenderConstrainedBox renderObject) => renderObject.AdditionalConstraints = BoxConstraints.TightFor(Width, Height);
 }

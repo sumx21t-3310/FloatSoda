@@ -15,4 +15,6 @@ public record ColoredBox : SingleChildRenderObjectWidget<RenderColoredBox>
             Color = Color
         };
     }
+
+    public override void UpdateRenderObject(RenderColoredBox renderObject) => renderObject.Color = Color;
 }

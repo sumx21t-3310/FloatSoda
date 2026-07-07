@@ -5,14 +5,54 @@ using static System.Double;
 
 namespace FloatSoda.RenderObjects.Layout;
 
-public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject<RenderObject>
+public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject
 {
-    public RenderObject? Child { get; set; } = null;
-    public RenderObject ThisRef => this;
+    private readonly SingleChildContainer<RenderObject> _child;
 
-    public double? WidthFactor { get; init; } = null;
-    public double? HeightFactor { get; init; } = null;
-    public Alignment Alignment { get; init; } = default;
+    public RenderPositionedBox() => _child = new SingleChildContainer<RenderObject>(this);
+
+    public RenderObject? Child
+    {
+        get => _child.Child;
+        set => _child.Child = value;
+    }
+
+    public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
+
+    public double? WidthFactor
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    }
+
+    public double? HeightFactor
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    }
+
+
+    public Alignment Alignment
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+
+            field = value;
+            MarkNeedsLayout();
+        }
+    } = default;
 
 
     public override void PerformLayout()
@@ -55,15 +95,20 @@ public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject<Render
         var childParentData = Child.ParentData as BoxParentData;
         Child.Paint(context, offset + (childParentData?.Offset ?? Offset.Zero));
     }
-    
+
     public override void Attach(RenderPipeline? owner)
     {
         base.Attach(owner);
-        Child?.Attach(owner);
+        _child.Attach(owner);
     }
 
-    public override void VisitChildren(Action<RenderObject> visitor)
+    public override void Detach()
     {
-        if (Child != null) visitor(Child);
+        base.Detach();
+        _child.Detach();
     }
+
+    public override void VisitChildren(Action<RenderObject> visitor) => _child.VisitChildren(visitor);
+
+    public override void RedepthChildren() => VisitChildren(RedepthChild);
 }

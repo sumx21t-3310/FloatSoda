@@ -24,9 +24,9 @@ public abstract record StatefulWidget<T> : Widget where T : StatefulWidget<T>
 
 public abstract record State<T> where T : StatefulWidget<T>
 {
-    public T Widget { get; set; }
+    public T? Widget { get; init; }
     public StatefulElement? Element { get; set; }
-    public IBuildContext Context => Element;
+    public IBuildContext Context => Element!;
 
     public virtual void InitState()
     {

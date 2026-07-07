@@ -1,4 +1,4 @@
-﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Common.Geometries;
 using FloatSoda.Core;
 using SkiaSharp;
 
@@ -9,11 +9,23 @@ public abstract class RenderBox : RenderObject
     public override SKSize Size { get; protected set; } = SKSize.Empty;
 }
 
-public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject<RenderBox>
+public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject
 {
-    public RenderBox? Child { get; set; }
+    private readonly SingleChildContainer<RenderBox> _child;
 
-    public RenderObject ThisRef => this;
+    protected RenderProxyBox() => _child = new SingleChildContainer<RenderBox>(this);
+
+    public RenderBox? Child
+    {
+        get => _child.Child;
+        set => _child.Child = value;
+    }
+
+    RenderObject? IHasSingleChildRenderObject.Child
+    {
+        get => Child;
+        set => Child = (RenderBox?)value;
+    }
 
     public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
 
@@ -38,11 +50,16 @@ public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject<Re
     public override void Attach(RenderPipeline? owner)
     {
         base.Attach(owner);
-        Child?.Attach(owner);
+        _child.Attach(owner);
     }
 
-    public override void VisitChildren(Action<RenderObject> visitor)
+    public override void Detach()
     {
-        if (Child != null) visitor(Child);
+        base.Detach();
+        _child.Detach();
     }
+
+    public override void VisitChildren(Action<RenderObject> visitor) => _child.VisitChildren(visitor);
+
+    public override void RedepthChildren() => VisitChildren(RedepthChild);
 }

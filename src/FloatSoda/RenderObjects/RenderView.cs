@@ -6,12 +6,29 @@ using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;
 
-public class RenderView(float width, float height) : RenderObject, IHasSingleChildRenderObject<RenderBox>
+public class RenderView : RenderObject, IHasSingleChildRenderObject
 {
-    public override SKSize Size { get; protected set; } = new(width, height);
+    public override SKSize Size { get; protected set; }
 
-    public RenderBox? Child { get; set; }
-    public RenderObject ThisRef => this;
+    private readonly SingleChildContainer<RenderBox> _child;
+
+    public RenderBox? Child
+    {
+        get => _child.Child;
+        set => _child.Child = value;
+    }
+
+    RenderObject? IHasSingleChildRenderObject.Child
+    {
+        get => Child;
+        set => Child = (RenderBox?)value;
+    }
+
+    public RenderView(float width, float height)
+    {
+        Size = new SKSize(width, height);
+        _child = new SingleChildContainer<RenderBox>(this);
+    }
 
     public override bool IsRepaintBoundary => true;
 
@@ -23,13 +40,18 @@ public class RenderView(float width, float height) : RenderObject, IHasSingleChi
     public override void Attach(RenderPipeline? owner)
     {
         base.Attach(owner);
-        Child?.Attach(owner);
+        _child.Attach(owner);
     }
 
-    public override void VisitChildren(Action<RenderObject> visitor)
+    public override void Detach()
     {
-        if (Child != null) visitor(Child);
+        base.Detach();
+        _child.Detach();
     }
+
+    public override void VisitChildren(Action<RenderObject> visitor) => _child.VisitChildren(visitor);
+
+    public override void RedepthChildren() => VisitChildren(RedepthChild);
 
     public void PrepareInitialFrame()
     {

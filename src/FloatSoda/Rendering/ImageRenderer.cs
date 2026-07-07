@@ -1,5 +1,6 @@
 using FloatSoda.Common.Layer;
 using FloatSoda.Core;
+using FloatSoda.Elements;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using SkiaSharp;
@@ -17,11 +18,13 @@ public class ImageRenderer
             RenderView = renderView
         };
 
+        var owner = new BuildOwner(() => { });
+        
         new RenderObjectToWidgetAdapter
         {
             Container = renderView,
             Child = widget
-        }.AttachToRenderTree();
+        }.AttachToRenderTree(owner, null);
 
         pipeline.RenderView.PrepareInitialFrame();
         pipeline.FlushLayout();

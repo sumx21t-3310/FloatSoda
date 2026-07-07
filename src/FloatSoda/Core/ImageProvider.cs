@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Microsoft.Extensions.Hosting;
+using SkiaSharp;
 
 namespace FloatSoda.Core;
 
@@ -11,6 +12,8 @@ public record FileImageProvider(string Path) : ImageProvider
 {
     public override SKImage Load()
     {
+        IHost host;
+        
         using var stream = File.OpenRead(Path);
         return SKImage.FromEncodedData(stream);
     }

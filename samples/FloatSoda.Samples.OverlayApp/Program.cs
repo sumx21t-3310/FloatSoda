@@ -1,4 +1,6 @@
 ﻿using FloatSoda;
+using FloatSoda.OVR.Overlay;
+using FloatSoda.Samples.OverlayApp;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
@@ -24,5 +26,6 @@ Widget floatSodaDashboard = new Align
 
 
 app.CreateDashboardOverlay("FloatSodaDashboard", floatSodaDashboard, 1000, 1000);
+// app.CreateTrackingOverlay("watch", new WatchWidget(), 1000, 1000, TrackedDevice.LeftController);
 
 app.Run();

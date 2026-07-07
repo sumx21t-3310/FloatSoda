@@ -1,6 +1,5 @@
 ﻿using FloatSoda.Elements;
 using FloatSoda.Geometrics;
-using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
@@ -14,12 +13,19 @@ public record Align : SingleChildRenderObjectWidget<RenderPositionedBox>
 
     public override RenderPositionedBox CreateRenderObject()
     {
-        return new RenderPositionedBox()
+        return new RenderPositionedBox
         {
             Alignment = Alignment,
             WidthFactor = WidthFactor,
             HeightFactor = HeightFactor
         };
+    }
+
+    public override void UpdateRenderObject(RenderPositionedBox renderObject)
+    {
+        renderObject.WidthFactor = WidthFactor;
+        renderObject.HeightFactor = HeightFactor;
+        renderObject.Alignment = Alignment;
     }
 }
 

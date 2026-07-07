@@ -11,13 +11,23 @@ public record RenderObjectToWidgetAdapter : RenderObjectWidget<RenderView>
 
     public override RenderView CreateRenderObject() => Container;
 
-    public RenderObjectToWidgetElement<RenderView> AttachToRenderTree()
+    public RenderObjectToWidgetElement<RenderView> AttachToRenderTree(BuildOwner owner, RenderObjectToWidgetElement<RenderView>? element)
     {
-        var element = CreateElement() as RenderObjectToWidgetElement<RenderView>;
+        RenderObjectToWidgetElement<RenderView> result;
+        if (element == null)
+        {
+            result = (RenderObjectToWidgetElement<RenderView>)CreateElement();
+            result.Widget = this;
+            result.Owner = owner;
+            owner.BuildScope(() => result.Mount(null));
+        }
+        else
+        {
+            result = element;
+            result.NewWidget = this;
+            result.MarkNeedsBuild();
+        }
 
-        element!.Widget = this;
-        element!.Mount(null);
-
-        return element;
+        return result;
     }
 }
