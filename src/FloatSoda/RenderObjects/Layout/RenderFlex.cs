@@ -11,7 +11,8 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
 
     public RenderFlex() => Children = new MultiChildrenCollection<RenderBox>(this);
 
-    void IHasMultiChildrenRenderObject.AddChild(RenderObject child) => Children.Add((RenderBox)child);
+    public void AddChild(RenderObject child) => Children.Add((RenderBox)child);
+    public bool RemoveChild(RenderObject child) => Children.Remove((RenderBox)child);
 
     public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
 
@@ -232,5 +233,4 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
             }
         }
     }
-
 }

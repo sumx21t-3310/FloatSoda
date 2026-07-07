@@ -17,15 +17,21 @@ public class MultiChildRenderObjectElement<T> : RenderObjectElement<T> where T :
         Children = WidgetCasted.Children.Select(InflateWidget).ToList();
     }
 
-    public override void PerformRebuild()
+    public override void Update(Widget newWidget)
     {
-        throw new NotImplementedException();
+        base.Update(newWidget);
+        Children = UpdateChildren(Children, WidgetCasted.Children);
     }
+
+    public override void VisitChildren(Action<Element> visitor) => Children.ForEach(visitor);
 
     public override void InsertRenderObjectChild(RenderObject child)
     {
         if (RenderObject is IHasMultiChildrenRenderObject ro) ro.AddChild(child);
     }
 
-    public override void VisitChildren(Action<Element> visitor) => Children.ForEach(visitor);
+    public override void RemoveRenderObjectChild(RenderObject? child)
+    {
+        if (child != null && RenderObject is IHasMultiChildrenRenderObject ro) ro.RemoveChild(child);
+    }
 }

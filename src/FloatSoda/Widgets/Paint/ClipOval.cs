@@ -7,16 +7,22 @@ namespace FloatSoda.Widgets.Paint;
 
 public record ClipOval : SingleChildRenderObjectWidget<RenderClipOval>
 {
-    public CustomClipper<SKRect>? CustomClipper { get; init; } = null;
+    public CustomClipper<SKRect>? Clipper { get; init; } = null;
     public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
     public override RenderClipOval CreateRenderObject()
     {
         return new RenderClipOval
         {
-            Clipper = CustomClipper,
+            Clipper = Clipper,
             ClipBehavior = ClipBehavior
         };
+    }
+
+    public override void UpdateRenderObject(RenderClipOval renderObject)
+    {
+        renderObject.Clipper = Clipper;
+        renderObject.ClipBehavior = ClipBehavior;
     }
 }
 
@@ -33,6 +39,12 @@ public record ClipRect : SingleChildRenderObjectWidget<RenderClipRect>
             Clipper = Clipper,
             ClipBehavior = ClipBehavior
         };
+    }
+
+    public override void UpdateRenderObject(RenderClipRect renderObject)
+    {
+        renderObject.Clipper = Clipper;
+        renderObject.ClipBehavior = ClipBehavior;
     }
 }
 
@@ -52,6 +64,13 @@ public record ClipRoundRect : SingleChildRenderObjectWidget<RenderClipRoundRect>
             ClipBehavior = ClipBehavior
         };
     }
+
+    public override void UpdateRenderObject(RenderClipRoundRect renderObject)
+    {
+        renderObject.BorderRadius = BorderRadius;
+        renderObject.Clipper = Clipper;
+        renderObject.ClipBehavior = ClipBehavior;
+    }
 }
 
 public record ClipCustomPath : SingleChildRenderObjectWidget<RenderClipPath>
@@ -67,5 +86,11 @@ public record ClipCustomPath : SingleChildRenderObjectWidget<RenderClipPath>
             Clipper = Clipper,
             ClipBehavior = ClipBehavior
         };
+    }
+
+    public override void UpdateRenderObject(RenderClipPath renderObject)
+    {
+        renderObject.Clipper = Clipper;
+        renderObject.ClipBehavior = ClipBehavior;
     }
 }

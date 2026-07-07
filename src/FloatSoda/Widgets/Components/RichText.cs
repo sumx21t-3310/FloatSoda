@@ -1,2 +1,0 @@
-﻿namespace FloatSoda.Widgets.Components;
-
