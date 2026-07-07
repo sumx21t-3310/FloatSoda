@@ -175,7 +175,7 @@ if (Child != null) context.PaintChild(Child, offset);
 すべてのプロパティは原則として `init` アクセサを使い、構築後の変更を不可にします。状態変化はフレームワークの状態管理レイヤーに委ねてください。
 
 ```csharp
-public class Text : Widget
+public record Text : Widget
 {
     public string Content { get; init; } = string.Empty;
     public double FontSize { get; init; } = 14;
@@ -192,7 +192,7 @@ public class Text : Widget
 - 必須プロパティは `required` キーワードで明示する
 
 ```csharp
-public class Image : Widget
+public record Image : Widget
 {
     public required string Src { get; init; }   // 必須
     public string? Alt { get; init; }           // 省略可
