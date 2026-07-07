@@ -13,11 +13,12 @@ public abstract class ComponentElement : Element
     }
 
     public virtual void FirstBuild() => Rebuild();
-    protected abstract void Rebuild();
+
 
     public override void PerformRebuild()
     {
         var built = Build();
+        Dirty = false;
         Child = UpdateChild(Child, built);
     }
 
@@ -36,10 +37,6 @@ public class StatefulElement : ComponentElement
         throw new NotImplementedException();
     }
 
-    protected override void Rebuild()
-    {
-        throw new NotImplementedException();
-    }
 
     public override Widget Build()
     {
@@ -49,7 +46,5 @@ public class StatefulElement : ComponentElement
 
 public class StatelessElement : ComponentElement
 {
-    protected override void Rebuild() => PerformRebuild();
-
     public override Widget Build() => ((StatelessWidget)Widget!).Build(this);
 }

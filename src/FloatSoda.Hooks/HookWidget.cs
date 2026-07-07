@@ -27,7 +27,7 @@ public abstract record HookWidget : Widget
 
 public class HookElement : ComponentElement, IDisposable
 {
-    public DisposableBag Bag  = new();
+    public DisposableBag Bag = new();
     private readonly Subject<Unit> _rebuildSubject = new();
     public Observable<Unit> OnRebuildRequired => _rebuildSubject;
 
@@ -84,7 +84,8 @@ public class HookElement : ComponentElement, IDisposable
     }
 
     // 外部のObservableと紐付けて再描画させるユーティリティ
-    public void SubscribeBuildEvent<T>(Observable<T> observer) => observer.Subscribe(_ => _rebuildSubject.OnNext(Unit.Default)).AddTo(ref Bag);
+    public void SubscribeBuildEvent<T>(Observable<T> observer) =>
+        observer.Subscribe(_ => _rebuildSubject.OnNext(Unit.Default)).AddTo(ref Bag);
 
     public void Dispose()
     {
@@ -92,10 +93,6 @@ public class HookElement : ComponentElement, IDisposable
         Bag.Dispose();
     }
 
-    protected override void Rebuild()
-    {
-        throw new NotImplementedException();
-    }
 
     public override Widget Build()
     {

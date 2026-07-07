@@ -57,6 +57,7 @@ RenderBox CreateRenderObject(float width, float height)
 {
     return new RenderPositionedBox
     {
+        Alignment = Alignment.Center,
         Child = new RenderConstrainedBox
         {
             AdditionalConstraints = BoxConstraints.Tight(width, height),
@@ -68,7 +69,7 @@ RenderBox CreateRenderObject(float width, float height)
                     MainAxisSize = MainAxisSize.Min,
                     MainAxisAlignment = MainAxisAlignment.Center,
                     Children =
-                    [
+                    {
                         new RenderClipRoundRect
                         {
                             BorderRadius = BorderRadius.Circular(20),
@@ -108,7 +109,7 @@ RenderBox CreateRenderObject(float width, float height)
                                 }
                             }
                         }
-                    ]
+                    }
                 },
             },
         }
@@ -119,15 +120,51 @@ Widget CreateWidgetTree(double width, double height)
 {
     return new Align
     {
-        Child = new Flex()
+        Alignment = Alignment.Center,
+        Child = new SizedBox
         {
-            MainAxisSize = MainAxisSize.Min,
-            MainAxisAlignment = MainAxisAlignment.Center,
-            Children =
+            Width = width,
+            Height = height,
+            Child = new ColoredBox
             {
-                new SizedBox()
+                Color = SKColors.WhiteSmoke,
+                Child = new Flex
                 {
-                    Child = new ColoredBox() {}
+                    MainAxisAlignment = MainAxisAlignment.Center,
+                    CrossAxisAlignment = CrossAxisAlignment.Center,
+                    Children =
+                    {
+                        new ClipRoundRect
+                        {
+                            BorderRadius = BorderRadius.Circular(20),
+                            Child = new SizedBox
+                            {
+                                Child = new ColoredBox { Color = SKColors.DarkSeaGreen },
+                                Width = width / 4,
+                                Height = height / 4
+                            }
+                        },
+                        new ClipRoundRect
+                        {
+                            BorderRadius = BorderRadius.Circular(20),
+                            Child = new SizedBox
+                            {
+                                Child = new ColoredBox { Color = SKColors.Tomato },
+                                Width = width / 4,
+                                Height = height / 4
+                            },
+                        },
+                        new ClipRoundRect
+                        {
+                            BorderRadius = BorderRadius.Circular(20),
+                            Child = new SizedBox
+                            {
+                                Child = new ColoredBox { Color = SKColors.CornflowerBlue },
+                                Width = width / 4,
+                                Height = height / 4
+                            },
+                        },
+                    }
                 }
             }
         }

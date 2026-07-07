@@ -5,19 +5,86 @@ using SkiaSharp;
 
 namespace FloatSoda.RenderObjects.Layout;
 
-public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
+public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
 {
-    public Axis Direction { get; init; } = Axis.Vertical;
-    public MainAxisAlignment MainAxisAlignment { get; init; } = MainAxisAlignment.Start;
-    public MainAxisSize MainAxisSize { get; init; } = MainAxisSize.Max;
-    public CrossAxisAlignment CrossAxisAlignment { get; init; } = CrossAxisAlignment.Center;
-    public VerticalDirection VerticalDirection { get; init; } = VerticalDirection.Down;
+    public MultiChildrenCollection<RenderBox> Children { get; }
 
-    public List<RenderBox> Children { get; set; } = [];
-    public RenderObject ThisRef => this;
+    public RenderFlex() => Children = new MultiChildrenCollection<RenderBox>(this);
 
-    public override void SetupParentData(RenderObject child)
-        => child.ParentData = new BoxParentData();
+    void IHasMultiChildrenRenderObject.AddChild(RenderObject child) => Children.Add((RenderBox)child);
+
+    public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
+
+    public override void Attach(RenderPipeline? owner)
+    {
+        base.Attach(owner);
+        Children.Attach(owner);
+    }
+
+    public override void Detach()
+    {
+        base.Detach();
+        Children.Detach();
+    }
+
+    public override void VisitChildren(Action<RenderObject> visitor) => Children.VisitChildren(visitor);
+
+    public override void RedepthChildren() => VisitChildren(RedepthChild);
+
+    public Axis Direction
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    } = Axis.Vertical;
+
+    public MainAxisAlignment MainAxisAlignment
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    } = MainAxisAlignment.Start;
+
+    public MainAxisSize MainAxisSize
+    {
+        get;
+        set
+        {
+            if (value == field) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    } = MainAxisSize.Max;
+
+    public CrossAxisAlignment CrossAxisAlignment
+    {
+        get;
+        set
+        {
+            if (value == field) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    } = CrossAxisAlignment.Center;
+
+    public VerticalDirection VerticalDirection
+    {
+        get;
+        set
+        {
+            if (value == field) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    } = VerticalDirection.Down;
 
     private float GetMainSize(SKSize size) => Direction switch
     {
@@ -166,17 +233,4 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
         }
     }
 
-    public override void Attach(RenderPipeline? owner)
-    {
-        base.Attach(owner);
-
-        foreach (var child in Children)
-        {
-            child.Attach(owner);
-        }
-    }
-
-    public override void VisitChildren(Action<RenderObject> visitor) => Children.ForEach(visitor);
-
-    public override void RedepthChildren() => VisitChildren(RedepthChild);
 }

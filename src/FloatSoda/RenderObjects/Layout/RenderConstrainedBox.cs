@@ -4,9 +4,17 @@ namespace FloatSoda.RenderObjects.Layout;
 
 public class RenderConstrainedBox : RenderProxyBox
 {
-    public required BoxConstraints AdditionalConstraints { get; init; }
+    public BoxConstraints AdditionalConstraints
+    {
+        get;
+        set
+        {
+            if (value == field) return;
 
-    public RenderConstrainedBox() => Child?.ParentData = new BoxParentData();
+            field = value;
+            MarkNeedsLayout();
+        }
+    }
 
     public override void PerformLayout()
     {

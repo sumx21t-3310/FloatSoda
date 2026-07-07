@@ -1,3 +1,5 @@
+← [Home](Home.md)
+
 # Getting Started
 
 ## 前提条件
@@ -17,15 +19,11 @@
 dotnet run --project samples/FloatSoda.Samples.OverlayApp
 ```
 
-起動すると以下の 3 つのオーバーレイが同時に表示されます。
-
-| オーバーレイ | 種別 | 内容 |
-|---|---|---|
-| FloatSodaDashboard | ダッシュボード | カラーボックスと画像の縦並び |
-| FloatSodaWorldSpace | ワールド座標 (0, 1, -1) | パスクリップ・角丸クリップ・楕円クリップのデモ |
-| FloatSodaTracking | 左コントローラー追従 | 3 色ボックスの横並び |
+起動すると SteamVR ダッシュボードに `FloatSodaDashboard` タブが追加され、中央に 100×100 のカラーボックスが表示されます(`samples/FloatSoda.Samples.OverlayApp/Program.cs`)。
 
 SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動終了します。
+
+> サンプルには `StatefulWidget` を使った時計ウィジェット(`WatchWidget.cs`)も含まれていますが、`StatefulElement` が未実装のため現在はコメントアウトされています。
 
 ---
 
@@ -74,7 +72,7 @@ dotnet run
 
 `app.Run()` は SteamVR が終了するまでブロックします。
 
-> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `Clip*`, `RichText` などは使用可能です。`Text`, `Button`, `StatefulWidget` 系は WIP（`NotImplementedException`）です。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
+> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能です。`Padding`, `Button`, `StatefulWidget` 系は WIP（`NotImplementedException`）です。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
 
 <details>
 <summary>RenderObject レベルの直接操作（低レベル API）</summary>
@@ -143,4 +141,12 @@ builder.WithOpenVRFrameLimiter();
 using var app = builder.Build();
 ```
 
-VR アプリでは `WithOpenVRFrameLimiter()` を使うと Compositor のリフレッシュレートに同期できます。
+VR アプリでは `WithOpenVRFrameLimiter()` を使うと Compositor のリフレッシュレートに同期できます。`WithTargetFrameRate()` を指定しない場合のデフォルトは 30fps です。
+
+---
+
+## 関連ページ
+
+- [WidgetSystem](WidgetSystem.md) — 使えるウィジェットの一覧と実装状況
+- [OVRIntegration](OVRIntegration.md) — オーバーレイ種別・プロパティ・イベント処理の詳細
+- [Architecture](Architecture.md) — フレームワーク内部の全体像

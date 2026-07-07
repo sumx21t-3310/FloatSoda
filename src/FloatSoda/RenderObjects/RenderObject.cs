@@ -7,7 +7,7 @@ using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;
 
-public abstract partial class RenderObject
+public abstract class RenderObject
 {
     public BoxConstraints Constraints { get; private set; }
     public IParentData? ParentData { get; set; }
@@ -67,10 +67,10 @@ public abstract partial class RenderObject
         PerformLayout();
 
         NeedsLayout = false;
-        
+
         MarkNeedsPaint();
     }
-    
+
     public void CleanChildRelayoutBoundary()
     {
         if (RelayoutBoundary != this)
@@ -83,7 +83,7 @@ public abstract partial class RenderObject
 
     public void MarkNeedsLayout()
     {
-        if (NeedsLayout)return;
+        if (NeedsLayout) return;
         if (RelayoutBoundary != this)
         {
             MarkParentNeedsLayout();
@@ -112,7 +112,7 @@ public abstract partial class RenderObject
         if (NeedsLayout && RelayoutBoundary != null)
         {
             NeedsLayout = false;
-            
+
             MarkNeedsLayout();
         }
 
@@ -125,9 +125,9 @@ public abstract partial class RenderObject
     public void AdoptChild(RenderObject child)
     {
         SetupParentData(child);
-        
+
         MarkNeedsLayout();
-        
+
         child.Parent = this;
 
         if (Attached)
@@ -147,18 +147,12 @@ public abstract partial class RenderObject
         }
     }
 
-    public virtual void RedepthChildren()
-    {
-    }
+    public virtual void RedepthChildren() { }
 
-    public virtual void VisitChildren(Action<RenderObject> visitor)
-    {
-    }
+    public virtual void VisitChildren(Action<RenderObject> visitor) { }
 
 
-    public virtual void SetupParentData(RenderObject child)
-    {
-    }
+    public virtual void SetupParentData(RenderObject child) { }
 
 
     public abstract void Paint(PaintingContext context, Offset offset);
@@ -178,5 +172,21 @@ public abstract partial class RenderObject
         {
             Parent?.MarkNeedsPaint();
         }
+    }
+
+    public virtual void Detach() => Owner = null;
+
+    public void DropChild(RenderObject child)
+    {
+        child.CleanChildRelayoutBoundary();
+        child.ParentData = null;
+        child.Parent = null;
+
+        if (Attached)
+        {
+            child.Detach();
+        }
+
+        MarkNeedsLayout();
     }
 }

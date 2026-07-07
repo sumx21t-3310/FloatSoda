@@ -10,7 +10,13 @@ namespace FloatSoda.Core;
 
 public class WidgetBinding
 {
+    public WidgetBinding()
+    {
+        BuildOwner = new BuildOwner(EnsureVisualUpdate);
+    }
+
     private RenderPipeline? Pipeline { get; set; }
+    private BuildOwner BuildOwner { get; set; }
     public Element? RenderViewElement { get; private set; }
     private RenderThreadRunner? RenderThreadRunner { get; set; }
     private IWindow? Window { get; set; }
@@ -29,9 +35,9 @@ public class WidgetBinding
         Initialized = true;
 
         WindowName = windowName;
-        
+
         RenderThreadRunner = renderThreadRunner;
-        
+
         RenderThreadRunner.PostTask(() =>
         {
             var renderer = new Renderer
@@ -55,7 +61,6 @@ public class WidgetBinding
         };
 
         Pipeline.RenderView.PrepareInitialFrame();
-
     }
 
     public void EnsureVisualUpdate() => NeedsVisualUpdate = true;
@@ -69,7 +74,7 @@ public class WidgetBinding
                 Child = rootWidget,
                 Container = Pipeline.RenderView
             }
-            .AttachToRenderTree();
+            .AttachToRenderTree(BuildOwner, RenderViewElement as RenderObjectToWidgetElement<RenderView>);
 
         if (isBootStrapFrame)
         {
@@ -79,9 +84,14 @@ public class WidgetBinding
 
     public void DrawFrame()
     {
+        if (RenderViewElement != null)
+        {
+            BuildOwner.BuildScope();
+        }
+
         if (!NeedsVisualUpdate || Window == null) return;
         NeedsVisualUpdate = false;
-        
+
         Pipeline?.RenderView.PrepareInitialFrame();
 
         Pipeline?.FlushLayout();

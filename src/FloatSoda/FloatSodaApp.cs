@@ -1,21 +1,18 @@
 ﻿using FloatSoda.OVR;
-using FloatSoda.OVR.Overlay;
-using FloatSoda.Engine;
 using FloatSoda.OVR.Exceptions;
 using System.Collections.Concurrent;
 using FloatSoda.Core;
+using FloatSoda.Engine;
+using FloatSoda.OVR.Overlay;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
-using Action = System.Action;
-
 
 namespace FloatSoda;
 
 public class FloatSodaAppBuilder
 {
-    // 利用者が手軽にデフォルト構成で始められるようにするスタティックメソッド
     public static FloatSodaAppBuilder CreateDefault(string appName = "FloatSoda")
     {
         var builder = new FloatSodaAppBuilder();

@@ -5,7 +5,16 @@ namespace FloatSoda.RenderObjects.Painting;
 
 public class RenderColoredBox : RenderProxyBox
 {
-    public SKColor Color { get; init; } = SKColors.Black;
+    public SKColor Color
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsPaint();
+        }
+    } = SKColors.Black;
 
     public override void Paint(PaintingContext context, Offset offset)
     {

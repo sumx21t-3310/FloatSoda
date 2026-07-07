@@ -1,5 +1,5 @@
 ﻿using FloatSoda.Common.Layer;
-using FloatSoda.RenderObjects;
+using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects.Painting;
 using SkiaSharp;
 
@@ -38,6 +38,7 @@ public record ClipRect : SingleChildRenderObjectWidget<RenderClipRect>
 
 public record ClipRoundRect : SingleChildRenderObjectWidget<RenderClipRoundRect>
 {
+    public BorderRadius BorderRadius;
     public CustomClipper<SKRoundRect>? Clipper { get; init; } = null;
     public Clip ClipBehavior { get; init; } = Clip.Antialias;
 
@@ -46,6 +47,7 @@ public record ClipRoundRect : SingleChildRenderObjectWidget<RenderClipRoundRect>
     {
         return new RenderClipRoundRect
         {
+            BorderRadius = BorderRadius,
             Clipper = Clipper,
             ClipBehavior = ClipBehavior
         };

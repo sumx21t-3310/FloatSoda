@@ -1,3 +1,5 @@
+← [Home](Home.md)
+
 # API Design Guidelines
 
 このドキュメントは、本フレームワークのコンポーネントAPIを設計・実装する際の規約とベストプラクティスをまとめたものです。
@@ -142,6 +144,29 @@ public Action<string>? OnChanged { get; init; }
 // キャンセル可能な非同期処理
 public Func<Task>? OnSubmitAsync { get; init; }
 ```
+
+---
+
+## 3.5 null チェックは `is null` / `is not null` を使う
+
+参照の null 判定には `==` / `!=` 演算子ではなく、パターンマッチの `is null` / `is not null` を使用します。
+
+```csharp
+// ✅ 推奨
+if (Child is null) return;
+if (Child is not null) context.PaintChild(Child, offset);
+
+// ❌ 避ける
+if (Child == null) return;
+if (Child != null) context.PaintChild(Child, offset);
+```
+
+**理由:**
+- `==` / `!=` はユーザー定義の演算子オーバーロードに解決される可能性があり、意図しない比較ロジックが走ることがある。`is null` は常に参照の同一性（厳密な null 判定）を見るため、型に依存せず安全。
+- `is null` / `is not null` は意図が「null かどうか」であることを明確に表現する。
+- 等値演算子をオーバーロードする `record` / `record struct`（セクション8・9）が多い本フレームワークでは、特にこの差が問題になりやすい。
+
+> **補足:** 値型（`record struct` 等）の比較や、null 以外の値との比較は従来どおり `==` / `!=` を使います。本ルールは **参照の null 判定** に限定した規約です。
 
 ---
 
@@ -375,3 +400,10 @@ var darkSection = parentTheme with
 /// </example>
 public string Label { get; init; } = string.Empty;
 ```
+
+---
+
+## 関連ページ
+
+- [WidgetSystem](WidgetSystem.md) — この規約で実装された組み込みウィジェット
+- [Home](Home.md) — ドキュメント一覧

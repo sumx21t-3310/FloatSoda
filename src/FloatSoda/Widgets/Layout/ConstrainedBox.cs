@@ -1,11 +1,13 @@
-﻿using FloatSoda.Elements;
+﻿using FloatSoda.Geometrics;
+using FloatSoda.RenderObjects.Layout;
 
 namespace FloatSoda.Widgets.Layout;
 
-public record ConstrainedBox : Widget
+public record ConstrainedBox : SingleChildRenderObjectWidget<RenderConstrainedBox>
 {
-    public override Element CreateElement()
+    public BoxConstraints  Constraints { get; init; }
+    public override RenderConstrainedBox CreateRenderObject() => new RenderConstrainedBox
     {
-        throw new NotImplementedException();
-    }
+        AdditionalConstraints = Constraints
+    };
 }

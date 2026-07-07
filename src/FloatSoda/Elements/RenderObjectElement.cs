@@ -5,35 +5,72 @@ namespace FloatSoda.Elements;
 
 public abstract class RenderObjectElement : Element
 {
-    public abstract override RenderObject? RenderObject { get; protected set; }
+    private RenderObjectElement? _ancestorRenderObjectElement;
 
-    protected override void AttachRenderObject()
+
+    public override void AttachRenderObject()
     {
-        FindAncestorRenderObjectElement()?.InsertRenderObjectChild(RenderObject);
+        _ancestorRenderObjectElement = FindAncestorRenderObjectElement();
+        _ancestorRenderObjectElement?.InsertRenderObjectChild(RenderObject);
     }
 
-    private RenderObjectElement? FindAncestorRenderObjectElement()
+
+    public override void DetachRenderObject()
+    {
+        if (_ancestorRenderObjectElement == null) return;
+        _ancestorRenderObjectElement.RemoveRenderObjectChild(RenderObject);
+        _ancestorRenderObjectElement = null;
+    }
+
+
+    public virtual void InsertRenderObjectChild(RenderObject? child)
+    {
+    }
+
+
+    public virtual void RemoveRenderObjectChild(RenderObject? child)
+    {
+    }
+
+
+    public RenderObjectElement? FindAncestorRenderObjectElement()
     {
         var ancestor = Parent;
+
         while (ancestor != null && ancestor is not RenderObjectElement)
+        {
             ancestor = ancestor.Parent;
+        }
+
         return ancestor as RenderObjectElement;
     }
-
-    protected virtual void InsertRenderObjectChild(RenderObject child) { }
 }
 
 public abstract class RenderObjectElement<T> : RenderObjectElement where T : RenderObject
 {
-    public override RenderObject? RenderObject { get; protected set; }
+    public abstract override RenderObject? RenderObject { get; protected set; }
+    private RenderObjectWidget<T>? WidgetCascaded => Widget as RenderObjectWidget<T>;
+
 
     public override void Mount(Element? parent)
     {
         base.Mount(parent);
-
-        if (Widget is RenderObjectWidget<T> renderObjectWidget)
-            RenderObject = renderObjectWidget.CreateRenderObject();
-
+        if (Widget is RenderObjectWidget<T> renderObjectWidget) RenderObject = renderObjectWidget.CreateRenderObject();
         AttachRenderObject();
+        Dirty = false;
+    }
+
+
+    public override void Update(Widget newWidget)
+    {
+        base.Update(newWidget);
+        PerformRebuild();
+    }
+
+
+    public override void PerformRebuild()
+    {
+        WidgetCascaded?.UpdateRenderObject(RenderObject as T);
+        Dirty = false;
     }
 }

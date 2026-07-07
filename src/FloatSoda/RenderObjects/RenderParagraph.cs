@@ -5,11 +5,48 @@ using Topten.RichTextKit;
 
 namespace FloatSoda.RenderObjects;
 
-public class RenderParagraph(TextSpan text) : RenderBox, IHasMultiChildrenRenderObject<RenderBox>
+public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
 {
-    private readonly TextPainter _textPainter = new(text);
-    public List<RenderBox> Children { get; } = [];
-    public RenderObject ThisRef => this;
+    public MultiChildrenCollection<RenderBox> Children { get; }
+
+    void IHasMultiChildrenRenderObject.AddChild(RenderObject child) => Children.Add((RenderBox)child);
+
+    public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
+
+    public override void Attach(RenderPipeline? owner)
+    {
+        base.Attach(owner);
+        Children.Attach(owner);
+    }
+
+    public override void Detach()
+    {
+        base.Detach();
+        Children.Detach();
+    }
+
+    public override void VisitChildren(Action<RenderObject> visitor) => Children.VisitChildren(visitor);
+
+    public override void RedepthChildren() => VisitChildren(RedepthChild);
+
+    public required TextSpan Text
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsPaint();
+        }
+    }
+
+    private readonly TextPainter _textPainter;
+
+    public RenderParagraph()
+    {
+        _textPainter = new TextPainter(Text);
+        Children = new MultiChildrenCollection<RenderBox>(this);
+    }
 
     public override void PerformLayout()
     {
@@ -18,16 +55,6 @@ public class RenderParagraph(TextSpan text) : RenderBox, IHasMultiChildrenRender
     }
 
     public override void Paint(PaintingContext context, Offset offset) => _textPainter.Paint(context.Canvas, offset);
-
-    public override void Attach(RenderPipeline? owner)
-    {
-        base.Attach(owner);
-        
-        foreach (var child in Children)
-        {
-            child.Attach(owner);
-        }
-    }
 }
 
 public record TextSpan(string Text)
@@ -82,4 +109,3 @@ public class TextPainter(TextSpan text)
 
     public void Paint(SKCanvas canvas, Offset offset) => _textBlock?.Paint(canvas, offset);
 }
-
