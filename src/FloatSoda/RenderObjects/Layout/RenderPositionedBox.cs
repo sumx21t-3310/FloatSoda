@@ -93,7 +93,7 @@ public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject
         if (Child == null) return;
 
         var childParentData = Child.ParentData as BoxParentData;
-        Child.Paint(context, offset + (childParentData?.Offset ?? Offset.Zero));
+        context.PaintChild(Child, offset + (childParentData?.Offset ?? Offset.Zero));
     }
 
     public override void Attach(RenderPipeline? owner)

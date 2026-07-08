@@ -38,15 +38,15 @@ public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
         {
             if (field == value) return;
             field = value;
-            MarkNeedsPaint();
+            _textPainter.Text = value;
+            MarkNeedsLayout();
         }
     }
 
-    private readonly TextPainter _textPainter;
+    private readonly TextPainter _textPainter = new();
 
     public RenderParagraph()
     {
-        _textPainter = new TextPainter(Text);
         Children = new MultiChildrenCollection<RenderBox>(this);
     }
 
@@ -66,14 +66,14 @@ public record TextSpan(string Text)
     public void Build(TextBlock textBlock, Style defaultStyle) => textBlock.AddText(Text, Style ?? defaultStyle);
 }
 
-public class TextPainter(TextSpan text)
+public class TextPainter
 {
-    public TextSpan Text
+    public TextSpan? Text
     {
         get;
         set
         {
-            if (field.Text == value.Text) return;
+            if (field == value) return;
             field = value;
             MarkNeedsLayout();
         }
@@ -95,7 +95,7 @@ public class TextPainter(TextSpan text)
     private TextBlock CreateTextBlock()
     {
         var textBlock = new TextBlock();
-        text.Build(textBlock, CreateDefaultStyle());
+        Text?.Build(textBlock, CreateDefaultStyle());
         return textBlock;
     }
 

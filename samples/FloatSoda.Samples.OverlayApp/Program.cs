@@ -1,31 +1,19 @@
 ﻿using FloatSoda;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Samples.OverlayApp;
-using FloatSoda.Widgets;
-using FloatSoda.Widgets.Layout;
-using FloatSoda.Widgets.Paint;
 using SkiaSharp;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
 
 using var app = builder.Build();
 
-
-Widget floatSodaDashboard = new Align
-{
-    Child = new SizedBox
-    {
-        Width = 100,
-        Height = 100,
-        Child = new ColoredBox()
-        {
-            Color = SKColors.Tomato
-        }
-    }
-};
+var size = new SKSizeI(1000, 1000);
 
 
-app.CreateDashboardOverlay("FloatSodaDashboard", floatSodaDashboard, 1000, 1000);
-// app.CreateTrackingOverlay("watch", new WatchWidget(), 1000, 1000, TrackedDevice.LeftController);
+app.CreateDashboardOverlay("FloatSodaDashboard", new StackWidget { Width = size.Width, Height = size.Height },
+    size.Width, size.Width);
+
+app.CreateDashboardOverlay("WatchDashBoard", new WatchWidget(), size.Width, size.Height);
+app.CreateTrackingOverlay("Left Hand", new WatchWidget(), size.Width, size.Height, TrackedDevice.LeftController);
 
 app.Run();

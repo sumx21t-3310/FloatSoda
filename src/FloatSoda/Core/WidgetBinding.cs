@@ -92,8 +92,6 @@ public class WidgetBinding
         if (!NeedsVisualUpdate || Window == null) return;
         NeedsVisualUpdate = false;
 
-        Pipeline?.RenderView.PrepareInitialFrame();
-
         Pipeline?.FlushLayout();
         Pipeline?.FlushPaint();
 
