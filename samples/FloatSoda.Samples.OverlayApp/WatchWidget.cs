@@ -39,15 +39,22 @@ public record WatchState : State<WatchWidget>
                 Height = 500,
                 Child = new ClipRoundRect
                 {
-                    BorderRadius = BorderRadius.All(Radius.Circular(20)),
+                    BorderRadius = BorderRadius.All(Radius.Circular(200)),
                     Child = new ColoredBox
                     {
-                        Color = SKColors.PowderBlue,
-                        Child = new RichText
+                        Color = SKColors.WhiteSmoke,
+                        Child = new Center()
                         {
-                            Text = new TextSpan(_time)
+                            Child = new RichText
                             {
-                                Style = new Style { TextColor = SKColor.FromHsv(0, 0, 10) }
+                                Text = new TextSpan(_time)
+                                {
+                                    Style = new Style
+                                    {
+                                        TextColor = SKColor.FromHsv(0, 0, 10),
+                                        FontSize = 100
+                                    }
+                                }
                             }
                         }
                     }

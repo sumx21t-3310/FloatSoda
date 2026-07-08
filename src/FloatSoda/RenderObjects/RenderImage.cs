@@ -23,6 +23,6 @@ public class RenderImage : RenderProxyBox
     public override void Paint(PaintingContext context, Offset offset)
     {
         context.Canvas.DrawImage(Image, SKRect.Create(offset, Size));
-        Child?.Paint(context, offset);
+        if (Child != null) context.PaintChild(Child, offset);
     }
 }

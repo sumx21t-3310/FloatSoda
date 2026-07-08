@@ -21,13 +21,13 @@ public abstract class RenderCustomClip<T> : RenderProxyBox
         {
             if (field == value) return;
 
-            var oldClipper = value;
+            var oldClipper = field;
             field = value;
 
             if (value == null || oldClipper == null || value.GetType() != oldClipper.GetType() ||
                 value.ShouldReclip(oldClipper))
             {
-                MarkNeedsLayout();
+                MarkNeedsClip();
             }
         }
     }
@@ -44,19 +44,11 @@ public abstract class RenderCustomClip<T> : RenderProxyBox
         }
     } = Common.Layer.Clip.Antialias;
 
-    protected T? Clip
-    {
-        get => Clipper != null ? Clipper.GetClip(Size) : DefaultClip;
-        set => throw new NotImplementedException();
-    }
+    protected T Clip => Clipper != null ? Clipper.GetClip(Size) : DefaultClip;
 
     protected abstract T DefaultClip { get; }
 
-    protected void MarkNeedsClip()
-    {
-        Clip = default;
-        MarkNeedsPaint();
-    }
+    protected void MarkNeedsClip() => MarkNeedsPaint();
 
     public override void PerformLayout()
     {
@@ -64,12 +56,7 @@ public abstract class RenderCustomClip<T> : RenderProxyBox
 
         base.PerformLayout();
 
-        if (oldSize != Size) Clip = default;
-    }
-
-    protected void UpdateClip()
-    {
-        if (Clipper != null) Clip ??= Clipper.GetClip(Size) ?? DefaultClip;
+        if (oldSize != Size) MarkNeedsClip();
     }
 }
 
@@ -81,7 +68,6 @@ public class RenderClipRect : RenderCustomClip<SKRect>
     {
         if (Child != null)
         {
-            UpdateClip();
             Layer = context.PushClipRect(
                 offset,
                 Clip,
@@ -105,7 +91,6 @@ public class RenderClipRoundRect : RenderCustomClip<SKRoundRect>
     {
         if (Child != null)
         {
-            UpdateClip();
             Layer = context.PushClipRoundRect(
                 offset,
                 Clip.Rect,
@@ -136,9 +121,8 @@ public class RenderClipPath : RenderCustomClip<SKPath>
 
     public override void Paint(PaintingContext context, Offset offset)
     {
-        if (Child == null)
+        if (Child != null)
         {
-            UpdateClip();
             Layer = context.PushClipPath(
                 offset,
                 SKRect.Create(Offset.Zero, Size),
@@ -162,8 +146,6 @@ public class RenderClipOval : RenderCustomClip<SKRect>
     public override void Paint(PaintingContext context, Offset offset)
     {
         if (Child == null) return;
-
-        UpdateClip();
 
         var path = new SKPath();
         path.AddOval(Clip);

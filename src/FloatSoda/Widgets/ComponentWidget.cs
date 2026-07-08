@@ -14,7 +14,7 @@ public abstract record StatelessWidget : Widget
 
 public abstract record StatefulWidget<T> : Widget where T : StatefulWidget<T>
 {
-    public override Element CreateElement() => new StatefulElement
+    public override Element CreateElement() => new StatefulElement<T>
     {
         Widget = this
     };
@@ -24,27 +24,23 @@ public abstract record StatefulWidget<T> : Widget where T : StatefulWidget<T>
 
 public abstract record State<T> where T : StatefulWidget<T>
 {
-    public T? Widget { get; init; }
-    public StatefulElement? Element { get; set; }
+    public T? Widget { get; set; }
+
+
+    public StatefulElement<T>? Element { get; set; }
     public IBuildContext Context => Element!;
 
-    public virtual void InitState()
-    {
-    }
+    public virtual void InitState() { }
 
     protected virtual void SetState(Action action)
     {
         action();
-        Element.MarkNeedsBuild();
+        Element?.MarkNeedsBuild();
     }
 
-    public virtual void DidUpdateWidget(T oldWidget)
-    {
-    }
+    public virtual void DidUpdateWidget(T oldWidget) { }
 
-    protected virtual void DidChangeDependencies()
-    {
-    }
+    public virtual void DidChangeDependencies() { }
 
     public abstract Widget Build(IBuildContext context);
 }

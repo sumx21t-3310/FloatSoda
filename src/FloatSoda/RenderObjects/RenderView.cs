@@ -35,7 +35,10 @@ public class RenderView : RenderObject, IHasSingleChildRenderObject
     public override void PerformLayout() => Child?.Layout(BoxConstraints.Tight(Size));
 
 
-    public override void Paint(PaintingContext context, Offset offset) => Child?.Paint(context, offset);
+    public override void Paint(PaintingContext context, Offset offset)
+    {
+        if (Child != null) context.PaintChild(Child, offset);
+    }
 
     public override void Attach(RenderPipeline? owner)
     {
