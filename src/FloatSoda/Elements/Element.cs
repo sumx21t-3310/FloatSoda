@@ -120,6 +120,16 @@ public abstract class Element : IBuildContext, IComparable<Element>
         Owner?.ScheduledBuildFor(this);
     }
 
+    /// <summary>
+    /// ホットリロード時に呼ばれ、このElement以下のサブツリー全体を再ビルド対象にする。
+    /// Widgetのrecord等価による差分スキップに関わらず、全ComponentElementのBuild()が再実行される。
+    /// </summary>
+    public void Reassemble()
+    {
+        MarkNeedsBuild();
+        VisitChildren(child => child.Reassemble());
+    }
+
     public void Rebuild() => PerformRebuild();
 
     public abstract void PerformRebuild();
