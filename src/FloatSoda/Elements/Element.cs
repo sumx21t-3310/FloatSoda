@@ -5,7 +5,7 @@ namespace FloatSoda.Elements;
 
 public abstract class Element : IBuildContext, IComparable<Element>
 {
-    public virtual Widget? Widget { get; set; }
+    public Widget? Widget { get; set; }
 
     public Element? Parent { get; set; }
 
@@ -40,9 +40,7 @@ public abstract class Element : IBuildContext, IComparable<Element>
     public bool InDirtyList { get; set; }
     public bool Dirty { get; set; }
 
-    public virtual void VisitChildren(Action<Element> visitor)
-    {
-    }
+    public virtual void VisitChildren(Action<Element> visitor) { }
 
     public virtual void Mount(Element? parent)
     {
@@ -99,9 +97,7 @@ public abstract class Element : IBuildContext, IComparable<Element>
         return newChild;
     }
 
-    public virtual void AttachRenderObject()
-    {
-    }
+    public virtual void AttachRenderObject() { }
 
     public virtual void DetachRenderObject()
     {
@@ -114,7 +110,7 @@ public abstract class Element : IBuildContext, IComparable<Element>
         child.DetachRenderObject();
     }
 
-    public void DidChangeDependencies() => MarkNeedsBuild();
+    public virtual void DidChangeDependencies() => MarkNeedsBuild();
 
     public void MarkNeedsBuild()
     {
