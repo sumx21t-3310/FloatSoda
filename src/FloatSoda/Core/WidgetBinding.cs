@@ -82,6 +82,12 @@ public class WidgetBinding
         }
     }
 
+    /// <summary>
+    /// ホットリロード時にWidgetツリー全体を再ビルド対象にする。
+    /// 実際の再ビルドは次の<see cref="DrawFrame"/>のBuildScopeで行われる。
+    /// </summary>
+    public void Reassemble() => RenderViewElement?.Reassemble();
+
     public void DrawFrame()
     {
         if (RenderViewElement != null)

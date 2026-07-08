@@ -58,6 +58,8 @@ public class FloatSodaApp : IDisposable
     private bool _disposed;
     private readonly ConcurrentQueue<Action> _pendingTasks = new();
 
+    private static readonly ConcurrentDictionary<FloatSodaApp, byte> ActiveApps = new();
+
     internal FloatSodaApp(IFrameLimiter limiter, string appName, ILoggerFactory? loggerFactory = null)
     {
         _limiter = limiter;
@@ -65,6 +67,29 @@ public class FloatSodaApp : IDisposable
         _renderThreadRunner =
             new RenderThreadRunner("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
         _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
+        ActiveApps.TryAdd(this, 0);
+    }
+
+    /// <summary>
+    /// ホットリロード（MetadataUpdateHandler）から任意スレッドで呼ばれる。
+    /// 各アプリのメインループにReassembleを積み、次フレームで全Widgetツリーを再ビルドさせる。
+    /// </summary>
+    internal static void ScheduleReassembleAll()
+    {
+        foreach (var app in ActiveApps.Keys)
+        {
+            app._pendingTasks.Enqueue(app.Reassemble);
+        }
+    }
+
+    private void Reassemble()
+    {
+        foreach (var (_, binding) in _bindings)
+        {
+            binding.Reassemble();
+        }
+
+        _logger?.LogInformation("ホットリロード: 全Widgetツリーを再ビルドします");
     }
 
     public void CreateOverlayWindow(string windowName, Widget root, int width, int height,
@@ -188,6 +213,8 @@ public class FloatSodaApp : IDisposable
     private void Dispose(bool disposing)
     {
         if (_disposed) return;
+
+        ActiveApps.TryRemove(this, out _);
 
         if (disposing)
         {
