@@ -27,7 +27,11 @@ public sealed record Flex : MultiChildRenderObjectWidget<RenderFlex>
 
     public override void UpdateRenderObject(RenderFlex renderObject)
     {
-        throw new NotImplementedException();
+        renderObject.Direction = Direction;
+        renderObject.MainAxisAlignment = MainAxisAlignment;
+        renderObject.MainAxisSize = MainAxisSize;
+        renderObject.CrossAxisAlignment = CrossAxisAlignment;
+        renderObject.VerticalDirection = VerticalDirection;
     }
 }
 

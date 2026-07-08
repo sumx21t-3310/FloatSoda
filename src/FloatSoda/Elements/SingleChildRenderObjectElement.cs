@@ -5,7 +5,6 @@ namespace FloatSoda.Elements;
 
 public class SingleChildRenderObjectElement<T> : RenderObjectElement<T> where T : RenderObject
 {
-
     public SingleChildRenderObjectWidget<T>? WidgetCasted => Widget as SingleChildRenderObjectWidget<T>;
 
     private Element? Child { get; set; }
@@ -17,17 +16,22 @@ public class SingleChildRenderObjectElement<T> : RenderObjectElement<T> where T 
         base.Mount(parent);
         Child = UpdateChild(Child, WidgetCasted?.Child);
     }
-    
+
 
     public override void Update(Widget newWidget)
     {
         base.Update(newWidget);
-        PerformRebuild();
+        Child = UpdateChild(Child, WidgetCasted?.Child);
     }
 
     public override void InsertRenderObjectChild(RenderObject? child)
     {
         if (RenderObject is IHasSingleChildRenderObject ro) ro.Child = child;
+    }
+
+    public override void RemoveRenderObjectChild(RenderObject? child)
+    {
+        if (RenderObject is IHasSingleChildRenderObject ro) ro.Child = null;
     }
 
     public override void VisitChildren(Action<Element> visitor)

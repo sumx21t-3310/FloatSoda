@@ -19,7 +19,11 @@ public interface IHasMultiChildrenRenderObject
 {
     /// <summary>子を末尾に追加する。</summary>
     void AddChild(RenderObject child);
+
+    /// <summary>指定した子を取り除く。取り除けたら true。</summary>
+    bool RemoveChild(RenderObject child);
 }
+
 
 /// <summary>
 /// 単一の子の保持をコンポジションで提供するコンテナ。子の差し替え時にownerへのAdopt/Dropを行い、
@@ -56,13 +60,12 @@ public class SingleChildContainer<T>(RenderObject owner) where T : RenderObject
 /// 複数の子の保持をコンポジションで提供するコレクション。追加・削除時にownerへのAdopt/Dropを行い、
 /// ライフサイクル(Attach/Detach/Visit)の転送ヘルパーを提供する。
 /// </summary>
-public class MultiChildrenCollection<T>(RenderObject owner) : IReadOnlyList<T> where T : RenderObject
+public class MultiChildrenCollection<T>(RenderObject owner) : ICollection<T> where T : RenderObject
 {
     private readonly List<T> _children = [];
 
     public int Count => _children.Count;
-
-    public T this[int index] => _children[index];
+    public bool IsReadOnly => false;
 
     /// <summary>子を末尾に追加する。</summary>
     public void Add(T child)
@@ -70,6 +73,8 @@ public class MultiChildrenCollection<T>(RenderObject owner) : IReadOnlyList<T> w
         owner.AdoptChild(child);
         _children.Add(child);
     }
+
+    public void CopyTo(T[] array, int arrayIndex) => _children.CopyTo(array, arrayIndex);
 
     /// <summary>子を取り除く。</summary>
     public bool Remove(T child)
@@ -90,6 +95,8 @@ public class MultiChildrenCollection<T>(RenderObject owner) : IReadOnlyList<T> w
 
         _children.Clear();
     }
+
+    public bool Contains(T item) => _children.Contains(item);
 
     /// <summary>全ての子をRenderPipelineへアタッチする。ownerのAttachから呼ぶ。</summary>
     public void Attach(RenderPipeline? pipeline)
@@ -139,4 +146,12 @@ public static class MultiChildrenCollectionExtensions
             collection.Add(child);
         }
     }
+
+    /// <summary><see cref="RenderObject"/>を要素型へ変換して末尾に追加する。Element境界の非総称な挿入に使う。</summary>
+    public static void AddErased<T>(this MultiChildrenCollection<T> collection, RenderObject child)
+        where T : RenderObject => collection.Add((T)child);
+
+    /// <summary><see cref="RenderObject"/>を要素型として取り除く。要素型でない・保持していない場合は false。</summary>
+    public static bool RemoveErased<T>(this MultiChildrenCollection<T> collection, RenderObject child)
+        where T : RenderObject => child is T typed && collection.Remove(typed);
 }

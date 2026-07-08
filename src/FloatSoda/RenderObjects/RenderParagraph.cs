@@ -9,7 +9,9 @@ public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
 {
     public MultiChildrenCollection<RenderBox> Children { get; }
 
-    void IHasMultiChildrenRenderObject.AddChild(RenderObject child) => Children.Add((RenderBox)child);
+    void IHasMultiChildrenRenderObject.AddChild(RenderObject child) => Children.AddErased(child);
+
+    bool IHasMultiChildrenRenderObject.RemoveChild(RenderObject child) => Children.RemoveErased(child);
 
     public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
 
