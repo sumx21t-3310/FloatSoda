@@ -145,6 +145,25 @@ public abstract class Element : IBuildContext, IComparable<Element>
     {
         child.Parent = null;
         child.DetachRenderObject();
+        child.Deactivate();
+    }
+
+    /// <summary>
+    /// このElement以下のサブツリーをツリーから切り離す際に、依存していた
+    /// <see cref="InheritedElement"/> の被依存リストから自身を除去する。
+    /// これを行わないと、破棄済みElementへ<see cref="DidChangeDependencies"/>が
+    /// 呼ばれ続け、リークの原因になる。
+    /// </summary>
+    protected virtual void Deactivate()
+    {
+        foreach (var dependency in Dependencies)
+        {
+            dependency.RemoveDependent(this);
+        }
+
+        Dependencies.Clear();
+
+        VisitChildren(child => child.Deactivate());
     }
 
     public virtual void DidChangeDependencies() => MarkNeedsBuild();

@@ -4,7 +4,7 @@ namespace FloatSoda.Elements;
 
 public class InheritedElement : ComponentElement
 {
-    private HashSet<Element> Dependents { get; } = [];
+    internal HashSet<Element> Dependents { get; } = [];
     public override Widget Build() => (Widget as InheritedWidget)!.Child;
 
     protected override void UpdateInheritance()
@@ -20,6 +20,8 @@ public class InheritedElement : ComponentElement
     }
 
     public void UpdateDependencies(Element dependent) => Dependents.Add(dependent);
+
+    public void RemoveDependent(Element dependent) => Dependents.Remove(dependent);
 
     public override void Update(Widget newWidget)
     {

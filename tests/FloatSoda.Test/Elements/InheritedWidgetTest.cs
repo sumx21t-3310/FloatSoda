@@ -36,7 +36,7 @@ public class InheritedWidgetTest
         }
     }
 
-    private static (RenderObjectToWidgetElement<RenderView> Root, BuildOwner Owner) MountTree(Widget widget)
+    private static (RenderObjectToWidgetElement<RenderView> Root, BuildOwner Owner, RenderView RenderView) MountTree(Widget widget)
     {
         var renderView = new RenderView(100, 100);
         _ = new RenderPipeline
@@ -53,7 +53,21 @@ public class InheritedWidgetTest
             Child = widget
         }.AttachToRenderTree(owner, null);
 
-        return (root, owner);
+        return (root, owner, renderView);
+    }
+
+    /// <summary>ルートWidgetを差し替えて再ビルドまで実行する。</summary>
+    private static void ReattachRoot(
+        (RenderObjectToWidgetElement<RenderView> Root, BuildOwner Owner, RenderView RenderView) tree,
+        Widget widget)
+    {
+        new RenderObjectToWidgetAdapter
+        {
+            Container = tree.RenderView,
+            Child = widget
+        }.AttachToRenderTree(tree.Owner, tree.Root);
+
+        tree.Owner.BuildScope();
     }
 
     [Fact]
@@ -140,6 +154,69 @@ public class InheritedWidgetTest
         });
 
         Assert.Null(found);
+    }
+
+    [Fact]
+    public void DeactivatedDependent_IsRemovedFromDependents()
+    {
+        InheritedElement? scopeElement = null;
+        var buildCount = 0;
+
+        var tree = MountTree(new ScopeA
+        {
+            Value = 1,
+            Child = new Probe
+            {
+                OnBuild = ctx =>
+                {
+                    buildCount++;
+                    ctx.DependOnInheritedWidgetOfExactType<ScopeA>();
+                    scopeElement = ctx.GetElementForInheritedWidgetOfExactType<ScopeA>();
+                }
+            }
+        });
+
+        Assert.NotNull(scopeElement);
+        Assert.Single(scopeElement!.Dependents);
+        Assert.Equal(1, buildCount);
+
+        // Probeを別型のWidgetに差し替えてdeactivateさせる（ScopeA自体は同型なのでin-place更新）
+        ReattachRoot(tree, new ScopeA { Value = 1, Child = new SizedBox() });
+
+        Assert.Empty(scopeElement.Dependents);
+
+        // Scopeの値を変えて通知を発火させても、破棄済みのProbeは再ビルドされない
+        ReattachRoot(tree, new ScopeA { Value = 2, Child = new SizedBox() });
+
+        Assert.Equal(1, buildCount);
+    }
+
+    [Fact]
+    public void SurvivingDependent_StaysInDependents_AfterScopeUpdate()
+    {
+        InheritedElement? scopeElement = null;
+        var buildCount = 0;
+
+        Probe CreateProbe() => new()
+        {
+            OnBuild = ctx =>
+            {
+                buildCount++;
+                ctx.DependOnInheritedWidgetOfExactType<ScopeA>();
+                scopeElement = ctx.GetElementForInheritedWidgetOfExactType<ScopeA>();
+            }
+        };
+
+        var tree = MountTree(new ScopeA { Value = 1, Child = CreateProbe() });
+
+        Assert.Equal(1, buildCount);
+
+        // 同型のProbeを保ったままScopeの値だけ変える → Probeはin-place更新で生存
+        ReattachRoot(tree, new ScopeA { Value = 2, Child = CreateProbe() });
+
+        Assert.NotNull(scopeElement);
+        Assert.Single(scopeElement!.Dependents);
+        Assert.True(buildCount >= 2);
     }
 
     [Fact]
