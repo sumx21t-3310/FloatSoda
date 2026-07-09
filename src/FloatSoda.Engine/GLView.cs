@@ -7,15 +7,17 @@ namespace FloatSoda.Engine;
 public class GLView : IDisposable
 {
     public GRContext GrContext { get; }
-    public SKSurface Surface { get; }
-    public int TextureHandle { get; }
-    public SKSizeI Size { get; set; } = new(1000, 1000);
+    public SKSurface Surface { get; private set; }
+    public int TextureHandle { get; private set; }
+    public SKSizeI Size { get; private set; }
 
     private readonly unsafe Window* _window;
     private bool _disposed;
 
-    public GLView()
+    public GLView(SKSizeI? initialSize = null)
     {
+        Size = initialSize ?? new SKSizeI(1000, 1000);
+
         unsafe
         {
             GLFW.WindowHint(WindowHintBool.Visible, false);
@@ -31,29 +33,72 @@ public class GLView : IDisposable
         GrContext = GRContext.CreateGl(GRGlInterface.Create()) ??
                     throw new InvalidOperationException("GRGContextの作成に失敗しました");
 
+        (TextureHandle, Surface) = CreateTextureAndSurface(Size);
+    }
 
-        TextureHandle = GL.GenTexture();
+    private (int textureHandle, SKSurface surface) CreateTextureAndSurface(SKSizeI size)
+    {
+        var textureHandle = GL.GenTexture();
 
-        GL.BindTexture(TextureTarget.Texture2D, TextureHandle);
+        GL.BindTexture(TextureTarget.Texture2D, textureHandle);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
         GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, Size.Width, Size.Height, 0,
+        GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, size.Width, size.Height, 0,
             PixelFormat.Rgba,
             PixelType.UnsignedByte, IntPtr.Zero);
 
-        var backendTexture = new GRBackendTexture(Size.Width, Size.Height, false, new GRGlTextureInfo
+        using var backendTexture = new GRBackendTexture(size.Width, size.Height, false, new GRGlTextureInfo
         {
-            Id = (uint)TextureHandle,
+            Id = (uint)textureHandle,
             Target = (uint)TextureTarget.Texture2D,
             Format = (uint)InternalFormat.Rgba8
         });
 
-        Surface = SKSurface.Create(GrContext, backendTexture, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888) ??
-                  throw new InvalidOperationException("SKSurfaceの作成に失敗しました。");
+        var surface = SKSurface.Create(GrContext, backendTexture, GRSurfaceOrigin.BottomLeft, SKColorType.Rgba8888) ??
+                      throw new InvalidOperationException("SKSurfaceの作成に失敗しました。");
+
+        return (textureHandle, surface);
     }
+
+    /// <summary>
+    /// 描画先のサイズを変更します。既存のテクスチャとSurfaceは破棄され、再作成されます。
+    /// </summary>
+    public void Resize(int width, int height)
+    {
+        if (width <= 0 || height <= 0)
+            throw new ArgumentOutOfRangeException(nameof(width), "幅・高さは正の値である必要があります。");
+
+        if (Size.Width == width && Size.Height == height)
+            return; // サイズが変わらないなら何もしない
+
+        unsafe
+        {
+            GLFW.MakeContextCurrent(_window);
+        }
+        GrContext.ResetContext();
+
+        // 古いリソースを破棄
+        Surface.Dispose();
+        if (TextureHandle != 0)
+        {
+            GL.DeleteTexture(TextureHandle);
+        }
+
+        Size = new SKSizeI(width, height);
+        (var newTextureHandle, var newSurface) = CreateTextureAndSurface(Size);
+
+        TextureHandle = newTextureHandle;
+        Surface = newSurface;
+    }
+
+    public void Resize(SKSizeI size) => Resize(size.Width, size.Height);
 
     public void Clear()
     {
+        unsafe
+        {
+            GLFW.MakeContextCurrent(_window);
+        }
         GrContext.ResetContext();
 
         Surface.Canvas.Clear(SKColors.Transparent);
@@ -65,7 +110,6 @@ public class GLView : IDisposable
         GrContext.Flush();
         GL.Flush();
     }
-
 
     public void Dispose()
     {
