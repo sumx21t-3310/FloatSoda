@@ -60,7 +60,8 @@ Widget root = new Center
     }
 };
 
-app.CreateDashboardOverlay("HelloWorld", root, 1000, 1000);
+// オーバーレイのサイズは root ウィジェットのレイアウト結果に自動追従します。
+app.CreateWindow(new DashboardWindow { WindowKey = "HelloWorld", Child = root });
 
 app.Run();
 ```
@@ -96,7 +97,8 @@ var root = new RenderPositionedBox
     }
 };
 
-app.CreateDashboardOverlay("HelloWorld", root, 1000, 1000);
+// CreateWindow の Child は Widget を要求するため、RenderObject を直接ルートにする場合は
+// RenderObjectWidget でラップして渡します。
 app.Run();
 ```
 </details>
@@ -105,23 +107,25 @@ app.Run();
 
 ## オーバーレイ種別の選び方
 
-`FloatSodaApp` には 3 種類のオーバーレイ作成メソッドがあります。
+`app.CreateWindow(...)` に渡すウィンドウ定義 `WindowWidget` の種類でオーバーレイ種別を選びます。
+`Size` を指定しない場合、オーバーレイのサイズは `Child` ウィジェットのレイアウト結果に追従します
+（`Size` を指定するとそのサイズで固定されます）。
 
-| メソッド | オーバーレイ種別 | 位置の管理 |
+| ウィンドウ定義 | オーバーレイ種別 | 位置の管理 |
 |---|---|---|
-| `CreateDashboardOverlay(name, root, w, h)` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） |
-| `CreateWorldSpaceOverlay(name, root, w, h, position)` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 position`） |
-| `CreateTrackingOverlay(name, root, w, h, device)` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） |
+| `DashboardWindow { WindowKey, Child, Size? }` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） |
+| `WorldSpaceWindow { WindowKey, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`） |
+| `DeviceTrackedWindow { WindowKey, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） |
 
 ```csharp
 // ダッシュボード
-app.CreateDashboardOverlay("MyDashboard", root, 1000, 1000);
+app.CreateWindow(new DashboardWindow { WindowKey = "MyDashboard", Child = root });
 
 // ワールド座標 (x=0, y=1, z=-1 メートル)
-app.CreateWorldSpaceOverlay("MyWorld", root, 1000, 1000, new Vector3(0, 1, -1));
+app.CreateWindow(new WorldSpaceWindow { WindowKey = "MyWorld", Child = root, Position = new Vector3(0, 1, -1) });
 
 // 左コントローラーに追従
-app.CreateTrackingOverlay("MyHand", root, 1000, 1000, TrackedDevice.LeftController);
+app.CreateWindow(new DeviceTrackedWindow { WindowKey = "MyHand", Child = root, Target = TrackedDevice.LeftController });
 ```
 
 ---

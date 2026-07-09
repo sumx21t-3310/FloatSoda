@@ -168,5 +168,5 @@ OpenVR.Overlay.SetOverlayTransformAbsolute(handle, origin, ref hmd);
 
 ## 関連ページ
 
-- [GettingStarted](GettingStarted.md) — オーバーレイ作成の高レベル API(`CreateDashboardOverlay` など)
+- [GettingStarted](GettingStarted.md) — オーバーレイ作成の高レベル API(`CreateWindow` と `DashboardWindow` など)
 - [Architecture](Architecture.md) — オーバーレイテクスチャへのレンダリング経路
