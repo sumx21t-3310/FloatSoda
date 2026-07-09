@@ -190,6 +190,9 @@ public class FloatSodaApp : IDisposable
 
             _dispatcher.Register(EVREventType.VREvent_ProcessQuit, (in _) => _cts.Cancel());
 
+            // 起動時にコントローラーが未接続だったDeviceTrackedWindowへ、接続/ロール確定を機に再適用する。
+            _dispatcher.Register(EVREventType.VREvent_TrackedDeviceActivated, (in _) => ReapplyPendingDeviceTrackedTransforms());
+            _dispatcher.Register(EVREventType.VREvent_TrackedDeviceRoleChanged, (in _) => ReapplyPendingDeviceTrackedTransforms());
 
             _renderThreadRunner.Start(_cts.Token);
         }
@@ -206,6 +209,14 @@ public class FloatSodaApp : IDisposable
     }
 
     private void PollEvents() => _dispatcher?.PollEvents();
+
+    private void ReapplyPendingDeviceTrackedTransforms()
+    {
+        foreach (var (_, binding) in _bindings)
+        {
+            binding.ReapplyDeviceTrackedTransform();
+        }
+    }
 
 
     private void DrawFrame()
