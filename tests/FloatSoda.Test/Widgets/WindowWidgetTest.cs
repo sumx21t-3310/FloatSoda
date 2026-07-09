@@ -47,13 +47,13 @@ public class WindowWidgetTest
 
         MountTree(new DashboardWindow
         {
-            WindowKey = "TestWindow",
+            Title = "TestWindow",
             Child = new Probe { OnBuild = ctx => found = WindowWidget.Of(ctx) }
         });
 
         // ScopeType により具象型（DashboardWindow）でも基底型 WindowWidget で lookup できる
         Assert.IsType<DashboardWindow>(found);
-        Assert.Equal("TestWindow", found!.WindowKey);
+        Assert.Equal("TestWindow", found!.Title);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class WindowWidgetTest
     {
         var (pipeline, renderView) = MountTree(new DashboardWindow
         {
-            WindowKey = "TestWindow",
+            Title = "TestWindow",
             Child = new SizedBox { Width = 320, Height = 240 }
         });
 
@@ -76,7 +76,7 @@ public class WindowWidgetTest
     {
         var (pipeline, renderView) = MountTree(new DashboardWindow
         {
-            WindowKey = "TestWindow",
+            Title = "TestWindow",
             Size = new SKSize(800, 600),
             Child = new SizedBox { Width = 320, Height = 240 }
         });

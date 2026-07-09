@@ -10,19 +10,19 @@ using var app = builder.Build();
 // Size 未指定のウィンドウは Child のレイアウト結果にサイズが追従する。
 app.CreateWindow(new DashboardWindow
 {
-    WindowKey = "FloatSodaDashboard",
+    Title = "FloatSodaDashboard",
     Child = new StackWidget()
 });
 
 app.CreateWindow(new DashboardWindow
 {
-    WindowKey = "WatchDashBoard",
+    Title = "WatchDashBoard",
     Child = new WatchWidget()
 });
 
 app.CreateWindow(new DeviceTrackedWindow
 {
-    WindowKey = "Left Hand",
+    Title = "Left Hand",
     Child = new WatchWidget(),
     Target = TrackedDevice.LeftController
 });

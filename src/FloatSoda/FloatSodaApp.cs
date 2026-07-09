@@ -101,12 +101,12 @@ public class FloatSodaApp : IDisposable
     {
         _pendingTasks.Enqueue(() =>
         {
-            var windowName = window.WindowKey;
+            var title = window.Title;
             var widgetBinding = new WidgetBinding();
-            _bindings.TryAdd(windowName, widgetBinding);
-            widgetBinding.EnsureInitialized(windowName, _renderThreadRunner, _ => window.CreateOverlay(AppName));
+            _bindings.TryAdd(title, widgetBinding);
+            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => window.CreateOverlay());
             widgetBinding.AttachRootWidget(window);
-            _logger?.LogInformation("{WindowName}を作成しました", windowName);
+            _logger?.LogInformation("{Title}を作成しました", title);
         });
     }
 

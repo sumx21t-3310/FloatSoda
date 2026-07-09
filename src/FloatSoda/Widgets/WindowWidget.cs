@@ -1,4 +1,5 @@
 using System.Numerics;
+using FloatSoda.Core;
 using FloatSoda.Elements;
 using FloatSoda.OVR.Overlay;
 using SkiaSharp;
@@ -6,16 +7,17 @@ using SkiaSharp;
 namespace FloatSoda.Widgets;
 
 /// <summary>
-/// ウィンドウ設定（種別・キー・ルート制約）を担うルートウィジェット。
+/// ウィンドウ設定（種別・タイトル・ルート制約）を担うルートウィジェット。
 /// <see cref="IOverlay"/> の生成責務と、ウィンドウサイズの決定方法（<see cref="Size"/>）を宣言します。
 /// <see cref="FloatSodaApp.CreateWindow"/> に渡して使用します。
 /// </summary>
 public abstract record WindowWidget : InheritedWidget
 {
     /// <summary>
-    /// オーバーレイを識別するウィンドウキー。<see cref="OverlayIdentity"/> のキー生成にも使用されます。
+    /// ウィンドウに表示されるタイトル。SteamVR 上の表示名（ダッシュボードタブ名など）になります。
+    /// オーバーレイキーは「エントリアセンブリ名 + タイトルのスネークケース」から自動生成されます。
     /// </summary>
-    public required string WindowKey { get; init; }
+    public required string Title { get; init; }
 
     /// <summary>
     /// ウィンドウの固定サイズ。null の場合は <see cref="Child"/> のレイアウト結果サイズに
@@ -42,10 +44,9 @@ public abstract record WindowWidget : InheritedWidget
     /// <summary>
     /// このウィンドウ定義に対応する <see cref="IOverlay"/> を生成します。レンダースレッド上で呼ばれます。
     /// </summary>
-    /// <param name="appName">アプリ名。オーバーレイキーの接頭辞に使用されます。</param>
-    internal abstract IOverlay CreateOverlay(string appName);
+    internal abstract IOverlay CreateOverlay();
 
-    private protected string BuildKey(string appName) => $"{appName.ToLower()}.{WindowKey.ToLower()}";
+    private protected string Key => WindowKeyGenerator.GenerateKey(Title);
 }
 
 /// <summary>
@@ -53,8 +54,8 @@ public abstract record WindowWidget : InheritedWidget
 /// </summary>
 public record DashboardWindow : WindowWidget
 {
-    internal override IOverlay CreateOverlay(string appName)
-        => new DashboardOverlay(new DashboardOverlayIdentity(BuildKey(appName), WindowKey));
+    internal override IOverlay CreateOverlay()
+        => new DashboardOverlay(new DashboardOverlayIdentity(Key, Title));
 }
 
 /// <summary>
@@ -68,9 +69,9 @@ public record WorldSpaceWindow : WindowWidget
     /// <summary>オーバーレイの回転。既定は無回転。</summary>
     public Quaternion Rotation { get; init; } = Quaternion.Identity;
 
-    internal override IOverlay CreateOverlay(string appName)
+    internal override IOverlay CreateOverlay()
     {
-        var overlay = new WorldSpaceOverlay(new OverlayIdentity(BuildKey(appName), WindowKey));
+        var overlay = new WorldSpaceOverlay(new OverlayIdentity(Key, Title));
         overlay.Transform.Position = Position;
         overlay.Transform.Rotation = Rotation;
         overlay.Visibility.Show();
@@ -92,9 +93,9 @@ public record DeviceTrackedWindow : WindowWidget
     /// <summary>オーバーレイの回転。既定は無回転。</summary>
     public Quaternion Rotation { get; init; } = Quaternion.Identity;
 
-    internal override IOverlay CreateOverlay(string appName)
+    internal override IOverlay CreateOverlay()
     {
-        var overlay = new DeviceTrackedOverlay(new OverlayIdentity(BuildKey(appName), WindowKey));
+        var overlay = new DeviceTrackedOverlay(new OverlayIdentity(Key, Title));
         overlay.Transform.Target = Target;
         overlay.Transform.Position = Offset;
         overlay.Transform.Rotation = Rotation;

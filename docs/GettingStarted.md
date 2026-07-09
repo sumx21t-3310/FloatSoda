@@ -61,7 +61,7 @@ Widget root = new Center
 };
 
 // オーバーレイのサイズは root ウィジェットのレイアウト結果に自動追従します。
-app.CreateWindow(new DashboardWindow { WindowKey = "HelloWorld", Child = root });
+app.CreateWindow(new DashboardWindow { Title = "HelloWorld", Child = root });
 
 app.Run();
 ```
@@ -113,19 +113,23 @@ app.Run();
 
 | ウィンドウ定義 | オーバーレイ種別 | 位置の管理 |
 |---|---|---|
-| `DashboardWindow { WindowKey, Child, Size? }` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） |
-| `WorldSpaceWindow { WindowKey, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`） |
-| `DeviceTrackedWindow { WindowKey, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） |
+| `DashboardWindow { Title, Child, Size? }` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） |
+| `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`） |
+| `DeviceTrackedWindow { Title, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） |
+
+`Title` は SteamVR 上の表示名（ダッシュボードタブ名など）です。OpenVR のオーバーレイキーは
+「エントリアセンブリ名 + `Title` のスネークケース」から自動生成されます
+（例: アセンブリ `MyOverlayApp` + `Title = "My Dashboard"` → `my_overlay_app.my_dashboard`）。
 
 ```csharp
 // ダッシュボード
-app.CreateWindow(new DashboardWindow { WindowKey = "MyDashboard", Child = root });
+app.CreateWindow(new DashboardWindow { Title = "MyDashboard", Child = root });
 
 // ワールド座標 (x=0, y=1, z=-1 メートル)
-app.CreateWindow(new WorldSpaceWindow { WindowKey = "MyWorld", Child = root, Position = new Vector3(0, 1, -1) });
+app.CreateWindow(new WorldSpaceWindow { Title = "MyWorld", Child = root, Position = new Vector3(0, 1, -1) });
 
 // 左コントローラーに追従
-app.CreateWindow(new DeviceTrackedWindow { WindowKey = "MyHand", Child = root, Target = TrackedDevice.LeftController });
+app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Target = TrackedDevice.LeftController });
 ```
 
 ---
