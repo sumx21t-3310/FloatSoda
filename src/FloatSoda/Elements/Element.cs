@@ -36,7 +36,41 @@ public abstract class Element : IBuildContext, IComparable<Element>
         protected set => field = value;
     }
 
+    public Dictionary<Type, InheritedElement>? InheritedWidgets { get; set; }
+
+    protected HashSet<InheritedElement> Dependencies { get; } = [];
+
     public BuildOwner? Owner { get; set; }
+
+    private InheritedWidget DependOnInheritedElement(InheritedElement ancestor)
+    {
+        Dependencies.Add(ancestor);
+        ancestor.UpdateDependencies(this);
+        return ancestor.Widget as InheritedWidget;
+    }
+
+    public T? DependOnInheritedWidgetOfExactType<T>() where T : InheritedWidget
+    {
+        if (InheritedWidgets?.TryGetValue(typeof(T), out var ancestor) ?? false)
+        {
+            return DependOnInheritedElement(ancestor) as T;
+        }
+
+        return null;
+    }
+
+    public virtual InheritedElement? GetElementForInheritedWidgetOfExactType<T>() where T : InheritedWidget
+    {
+        if (InheritedWidgets?.TryGetValue(typeof(T), out var inheritedElement) ?? false)
+        {
+            return inheritedElement;
+        }
+
+        return null;
+    }
+
+    protected virtual void UpdateInheritance() => InheritedWidgets = Parent?.InheritedWidgets;
+
     public bool InDirtyList { get; set; }
     public bool Dirty { get; set; }
 
@@ -51,7 +85,10 @@ public abstract class Element : IBuildContext, IComparable<Element>
         {
             Owner = Parent.Owner;
         }
+
+        UpdateInheritance();
     }
+
 
     protected Element? UpdateChild(Element? child, Widget? newWidget)
     {

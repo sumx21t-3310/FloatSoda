@@ -1,9 +1,45 @@
-﻿namespace FloatSoda.Elements;
+﻿using FloatSoda.Widgets;
 
-public class InheritedElement : Element
+namespace FloatSoda.Elements;
+
+public class InheritedElement : ComponentElement
 {
-    public override void PerformRebuild()
+    private HashSet<Element> Dependents { get; } = [];
+    public override Widget Build() => (Widget as InheritedWidget)!.Child;
+
+    protected override void UpdateInheritance()
     {
-        throw new NotImplementedException();
+        var incomingWidgets = Parent?.InheritedWidgets;
+
+        InheritedWidgets = incomingWidgets != null
+            ? new Dictionary<Type, InheritedElement>(incomingWidgets)
+            : [];
+
+        // 祖先マップの有無にかかわらず自分自身を登録する（同型はネストした側で上書き＝最近傍が優先）
+        InheritedWidgets[Widget!.GetType()] = this;
+    }
+
+    public void UpdateDependencies(Element dependent) => Dependents.Add(dependent);
+
+    public override void Update(Widget newWidget)
+    {
+        var oldWidget = Widget as InheritedWidget;
+        base.Update(newWidget);
+
+        if ((Widget as InheritedWidget).UpdateShouldNotify(oldWidget))
+        {
+            NotifyClients();
+        }
+
+        Dirty = true;
+        Rebuild();
+    }
+
+    private void NotifyClients()
+    {
+        foreach (var dependent in Dependents)
+        {
+            dependent.DidChangeDependencies();
+        }
     }
 }
