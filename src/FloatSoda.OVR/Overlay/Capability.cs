@@ -121,14 +121,30 @@ public sealed class WorldOverlayTransform(ulong overlayHandle) : OverlayTransfor
 public sealed class DeviceTrackedOverlayTransform(ulong overlayHandle) : OverlayTransform
 {
     public TrackedDevice Target { get; set; } = TrackedDevice.HMD;
-    
+
+    /// <summary>
+    /// <see cref="Target"/> が未接続のため直近の <see cref="Apply"/> を適用できなかったかどうか。
+    /// デバイス接続イベントで再度 <see cref="Apply"/> を呼び出す判断に使う。
+    /// </summary>
+    public bool PendingReapply { get; private set; }
+
     public override void Apply()
     {
+        var deviceIndex = TrackedDeviceResolver.ResolveIndex(Target);
+        if (deviceIndex == OpenVR.k_unTrackedDeviceIndexInvalid)
+        {
+            // Target未接続。例外にはせず、接続イベント（VREvent_TrackedDeviceActivated /
+            // VREvent_TrackedDeviceRoleChanged）を受けた再適用に委ねる。
+            PendingReapply = true;
+            return;
+        }
+
         var matrix = GetMatrix().ToHmdMatrix34_t();
         OpenVR.Overlay
-            .SetOverlayTransformTrackedDeviceRelative(overlayHandle, TrackedDeviceResolver.ResolveIndex(Target),
-                ref matrix)
+            .SetOverlayTransformTrackedDeviceRelative(overlayHandle, deviceIndex, ref matrix)
             .ThrowIfError();
+
+        PendingReapply = false;
     }
 }
 

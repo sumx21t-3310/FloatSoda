@@ -66,6 +66,20 @@ public class WidgetBinding
 
     public void EnsureVisualUpdate() => NeedsVisualUpdate = true;
 
+    /// <summary>
+    /// このウィンドウが <see cref="DeviceTrackedOverlayTransform"/> を持つ場合、Transform を再適用します。
+    /// デバイス接続/ロール変更イベント（VREvent_TrackedDeviceActivated / VREvent_TrackedDeviceRoleChanged）を
+    /// 受けて FloatSodaApp から呼ばれます。未接続だった場合の初回適用に加え、
+    /// 再接続で device index が変わったケースの再バインドも兼ねます（未接続なら Apply 側で安全にスキップされます）。
+    /// </summary>
+    public void ReapplyDeviceTrackedTransform()
+    {
+        if (Window is not OverlayWindow overlayWindow) return;
+        if (overlayWindow.Overlay is not IMovableOverlay { Transform: DeviceTrackedOverlayTransform transform }) return;
+
+        RenderThreadRunner?.PostTask(transform.Apply);
+    }
+
     public void AttachRootWidget(Widget rootWidget)
     {
         var isBootStrapFrame = RenderViewElement == null;
