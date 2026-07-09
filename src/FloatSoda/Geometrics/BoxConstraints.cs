@@ -10,6 +10,12 @@ public readonly record struct BoxConstraints(
     double MinHeight = 0,
     double MaxHeight = PositiveInfinity)
 {
+    /// <summary>
+    /// 下限0・上限無限の完全に緩い制約。子はコンテンツサイズに収縮（shrink-wrap）します。
+    /// （<c>default(BoxConstraints)</c> は全て0になるため、無限上限が必要な場合はこれを使うこと）
+    /// </summary>
+    public static BoxConstraints Unbounded => new(0, PositiveInfinity, 0, PositiveInfinity);
+
     public static BoxConstraints Tight(SKSize size) => Tight(size.Width, size.Height);
 
     public static BoxConstraints Tight(double width, double height) => new(width, width, height, height);

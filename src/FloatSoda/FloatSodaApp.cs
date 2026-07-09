@@ -7,7 +7,6 @@ using FloatSoda.OVR.Overlay;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SkiaSharp;
 
 namespace FloatSoda;
 
@@ -92,15 +91,21 @@ public class FloatSodaApp : IDisposable
         _logger?.LogInformation("ホットリロード: 全Widgetツリーを再ビルドします");
     }
 
-    public void CreateOverlayWindow(string windowName, Widget root, int width, int height,
-        Func<string, IOverlay> overlayFactory)
+    /// <summary>
+    /// ウィンドウ定義 <see cref="WindowWidget"/> からオーバーレイウィンドウを作成します。
+    /// <see cref="WindowWidget"/> はウィジェットツリーのルートとしてマウントされ、
+    /// <see cref="WindowWidget.Size"/> が null の場合、オーバーレイのサイズは
+    /// <see cref="InheritedWidget.Child"/> のレイアウト結果に追従します。
+    /// </summary>
+    public void CreateWindow(WindowWidget window)
     {
         _pendingTasks.Enqueue(() =>
         {
+            var windowName = window.WindowKey;
             var widgetBinding = new WidgetBinding();
             _bindings.TryAdd(windowName, widgetBinding);
-            widgetBinding.EnsureInitialized(windowName, new SKSize(width, height), _renderThreadRunner, overlayFactory);
-            widgetBinding.AttachRootWidget(root);
+            widgetBinding.EnsureInitialized(windowName, _renderThreadRunner, _ => window.CreateOverlay(AppName));
+            widgetBinding.AttachRootWidget(window);
             _logger?.LogInformation("{WindowName}を作成しました", windowName);
         });
     }

@@ -16,7 +16,7 @@ public class InheritedElement : ComponentElement
             : [];
 
         // 祖先マップの有無にかかわらず自分自身を登録する（同型はネストした側で上書き＝最近傍が優先）
-        InheritedWidgets[Widget!.GetType()] = this;
+        InheritedWidgets[((InheritedWidget)Widget!).ScopeType] = this;
     }
 
     public void UpdateDependencies(Element dependent) => Dependents.Add(dependent);

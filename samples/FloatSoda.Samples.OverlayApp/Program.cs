@@ -1,19 +1,30 @@
 ﻿using FloatSoda;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Samples.OverlayApp;
-using SkiaSharp;
+using FloatSoda.Widgets;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
 
 using var app = builder.Build();
 
-var size = new SKSizeI(1000, 1000);
+// Size 未指定のウィンドウは Child のレイアウト結果にサイズが追従する。
+app.CreateWindow(new DashboardWindow
+{
+    WindowKey = "FloatSodaDashboard",
+    Child = new StackWidget()
+});
 
+app.CreateWindow(new DashboardWindow
+{
+    WindowKey = "WatchDashBoard",
+    Child = new WatchWidget()
+});
 
-app.CreateDashboardOverlay("FloatSodaDashboard", new StackWidget { Width = size.Width, Height = size.Height },
-    size.Width, size.Width);
-
-app.CreateDashboardOverlay("WatchDashBoard", new WatchWidget(), size.Width, size.Height);
-app.CreateTrackingOverlay("Left Hand", new WatchWidget(), size.Width, size.Height, TrackedDevice.LeftController);
+app.CreateWindow(new DeviceTrackedWindow
+{
+    WindowKey = "Left Hand",
+    Child = new WatchWidget(),
+    Target = TrackedDevice.LeftController
+});
 
 app.Run();
