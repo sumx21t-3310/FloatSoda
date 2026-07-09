@@ -82,8 +82,11 @@ public record DashboardWindow : OverlayWindow
 /// </summary>
 public record WorldSpaceWindow : OverlayWindow
 {
-    /// <summary>ワールド空間上の配置座標。</summary>
-    public required Vector3 Position { get; init; }
+    /// <summary>
+    /// ワールド空間（Standing 原点 = プレイエリア床中央、前方 = -Z）上の配置座標。
+    /// 既定はプレイエリア中央から前方 1m・高さ 1m。
+    /// </summary>
+    public Vector3 Position { get; init; } = new(0f, 1f, -1f);
 
     /// <summary>オーバーレイの回転。既定は無回転。</summary>
     public Quaternion Rotation { get; init; } = Quaternion.Identity;

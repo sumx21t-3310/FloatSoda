@@ -114,7 +114,7 @@ app.Run();
 | ウィンドウ定義 | オーバーレイ種別 | 位置の管理 |
 |---|---|---|
 | `DashboardWindow { Title, Child, Size? }` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） |
-| `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`） |
+| `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`、既定は前方1m・高さ1m） |
 | `DeviceTrackedWindow { Title, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） |
 
 `Title` は SteamVR 上の表示名（ダッシュボードタブ名など）です。OpenVR のオーバーレイキーは
@@ -125,8 +125,8 @@ app.Run();
 // ダッシュボード
 app.CreateWindow(new DashboardWindow { Title = "MyDashboard", Child = root });
 
-// ワールド座標 (x=0, y=1, z=-1 メートル)
-app.CreateWindow(new WorldSpaceWindow { Title = "MyWorld", Child = root, Position = new Vector3(0, 1, -1) });
+// ワールド座標固定。Position 省略時はプレイエリア中央から前方1m・高さ1m (0, 1, -1)
+app.CreateWindow(new WorldSpaceWindow { Title = "MyWorld", Child = root });
 
 // 左コントローラーに追従
 app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Target = TrackedDevice.LeftController });
