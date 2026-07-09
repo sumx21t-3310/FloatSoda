@@ -31,5 +31,7 @@ public class OverlayWindow(IOverlay overlay, Renderer renderer) : IWindow
         Overlay.Texture.FromTexture_t(texture);
     }
 
+    public void Resize(int width, int height) => renderer.Resize(width, height);
+
     public void Dispose() => Overlay.Dispose();
 }

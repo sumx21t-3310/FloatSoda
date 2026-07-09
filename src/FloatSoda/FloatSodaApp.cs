@@ -7,7 +7,7 @@ using FloatSoda.OVR.Overlay;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SkiaSharp;
+using OverlayWindow = FloatSoda.Widgets.OverlayWindow;
 
 namespace FloatSoda;
 
@@ -92,16 +92,28 @@ public class FloatSodaApp : IDisposable
         _logger?.LogInformation("ホットリロード: 全Widgetツリーを再ビルドします");
     }
 
-    public void CreateOverlayWindow(string windowName, Widget root, int width, int height,
-        Func<string, IOverlay> overlayFactory)
+    /// <summary>
+    /// ウィンドウ定義 <see cref="WindowWidget"/> からオーバーレイウィンドウを作成します。
+    /// <see cref="WindowWidget"/> はウィジェットツリーのルートとしてマウントされ、
+    /// <see cref="WindowWidget.Size"/> が null の場合、オーバーレイのサイズは
+    /// <see cref="InheritedWidget.Child"/> のレイアウト結果に追従します。
+    /// </summary>
+    public void CreateWindow(WindowWidget window)
     {
+        // 現状はOpenVRオーバーレイのみ対応。デスクトップウィンドウ等は今後の派生で追加する。
+        if (window is not OverlayWindow overlayWindow)
+        {
+            throw new NotSupportedException($"{window.GetType().Name} は未対応のウィンドウ種別です。");
+        }
+
         _pendingTasks.Enqueue(() =>
         {
+            var title = window.Title;
             var widgetBinding = new WidgetBinding();
-            _bindings.TryAdd(windowName, widgetBinding);
-            widgetBinding.EnsureInitialized(windowName, new SKSize(width, height), _renderThreadRunner, overlayFactory);
-            widgetBinding.AttachRootWidget(root);
-            _logger?.LogInformation("{WindowName}を作成しました", windowName);
+            _bindings.TryAdd(title, widgetBinding);
+            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => overlayWindow.CreateOverlay());
+            widgetBinding.AttachRootWidget(window);
+            _logger?.LogInformation("{Title}を作成しました", title);
         });
     }
 

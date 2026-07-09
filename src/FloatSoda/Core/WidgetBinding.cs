@@ -5,6 +5,7 @@ using FloatSoda.OVR.Overlay;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using SkiaSharp;
+using OverlayWindow = FloatSoda.Engine.OverlayWindow;
 
 namespace FloatSoda.Core;
 
@@ -27,8 +28,11 @@ public class WidgetBinding
 
     public SKSizeI Size => Pipeline?.RenderView.Size.ToSizeI() ?? SKSizeI.Empty;
 
+    /// <summary>直近でレンダースレッドへ通知したオーバーレイサイズ。変化検知に使用する。</summary>
+    private SKSizeI _lastPostedSize = SKSizeI.Empty;
 
-    public void EnsureInitialized(string windowName, SKSize size, RenderThreadRunner renderThreadRunner,
+
+    public void EnsureInitialized(string windowName, RenderThreadRunner renderThreadRunner,
         Func<string, IOverlay> overlayFactory)
     {
         if (Initialized) return;
@@ -42,10 +46,7 @@ public class WidgetBinding
         {
             var renderer = new Renderer
             {
-                GLView = new GLView
-                {
-                    Size = Size
-                }
+                GLView = new GLView(Size)
             };
 
             var overlay = overlayFactory(WindowName);
@@ -57,7 +58,7 @@ public class WidgetBinding
         Pipeline = new RenderPipeline
         {
             OnNeedVisualUpdate = EnsureVisualUpdate,
-            RenderView = new RenderView(size.Width, size.Height)
+            RenderView = new RenderView()
         };
 
         Pipeline.RenderView.PrepareInitialFrame();
@@ -99,10 +100,30 @@ public class WidgetBinding
         NeedsVisualUpdate = false;
 
         Pipeline?.FlushLayout();
+
+        // レイアウト結果サイズ = オーバーレイサイズ。変化していればレンダースレッドで GLView をリサイズする。
+        // 初回生成時だけでなく、MarkNeedsLayout 起点の再レイアウト（テキスト変更やホットリロード）でも
+        // FlushLayout 後にここで検知されるため、同じ経路でサイズ追従できる。
+        PostResizeIfSizeChanged();
+
         Pipeline?.FlushPaint();
 
         if (Pipeline?.RenderView.Layer?.Clone() is not ContainerLayer layer) return;
 
         RenderThreadRunner?.PostRender(Window, layer);
+    }
+
+    private void PostResizeIfSizeChanged()
+    {
+        var newSize = Pipeline?.RenderView.Size.ToSizeI() ?? SKSizeI.Empty;
+
+        if (newSize == _lastPostedSize || newSize is not { Width: > 0, Height: > 0 }) return;
+
+        _lastPostedSize = newSize;
+
+        var window = Window;
+        if (window == null) return;
+
+        RenderThreadRunner?.PostTask(() => window.Resize(newSize.Width, newSize.Height));
     }
 }

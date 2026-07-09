@@ -9,8 +9,8 @@ namespace FloatSoda.Samples.OverlayApp;
 
 public record StackWidget : StatelessWidget
 {
-    public required double Width { get; init; }
-    public required double Height { get; init; }
+    public double Width { get; init; } = 1000;
+    public double Height { get; init; } = 1000;
 
     public override Widget Build(IBuildContext context)
 

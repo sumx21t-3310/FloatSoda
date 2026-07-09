@@ -24,7 +24,7 @@ public class RenderView : RenderObject, IHasSingleChildRenderObject
         set => Child = (RenderBox?)value;
     }
 
-    public RenderView(float width, float height)
+    public RenderView(float width = 1000, float height = 1000)
     {
         Size = new SKSize(width, height);
         _child = new SingleChildContainer<RenderBox>(this);
@@ -32,7 +32,39 @@ public class RenderView : RenderObject, IHasSingleChildRenderObject
 
     public override bool IsRepaintBoundary => true;
 
-    public override void PerformLayout() => Child?.Layout(BoxConstraints.Tight(Size));
+    /// <summary>
+    /// ウィンドウの固定サイズ。null の場合は子のレイアウト結果サイズに追従します。
+    /// </summary>
+    public SKSize? FixedSize
+    {
+        get;
+        set
+        {
+            if (field == value) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    }
+
+    /// <summary>
+    /// <see cref="FixedSize"/> があれば Tight 制約でレイアウトし、なければ Loosen（無限上限）制約を
+    /// 渡して子ウィジェットのレイアウト結果サイズを <see cref="Size"/>（＝オーバーレイサイズ）に採用します。
+    /// </summary>
+    public override void PerformLayout()
+    {
+        if (Child == null)
+        {
+            Size = FixedSize ?? SKSize.Empty;
+            return;
+        }
+
+        var constraints = FixedSize is { } fixedSize
+            ? BoxConstraints.Tight(fixedSize)
+            : BoxConstraints.Unbounded;
+
+        Child.Layout(constraints, parentUseSize: true);
+        Size = FixedSize ?? Child.Size;
+    }
 
 
     public override void Paint(PaintingContext context, Offset offset)

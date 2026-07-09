@@ -57,14 +57,14 @@ Widget root = new Align
     }
 };
 
-// ダッシュボードオーバーレイ
-app.CreateDashboardOverlay("MyDashboard", root, 1000, 1000);
+// ダッシュボードオーバーレイ（サイズは root のレイアウト結果に自動追従）
+app.CreateWindow(new DashboardWindow { Title = "MyDashboard", Child = root });
 
-// ワールド座標固定（メートル単位）
-// app.CreateWorldSpaceOverlay("MyWorld", root, 1000, 1000, new Vector3(0, 1, -1));
+// ワールド座標固定（メートル単位。Position 省略時は前方1m・高さ1m）
+// app.CreateWindow(new WorldSpaceWindow { Title = "MyWorld", Child = root });
 
 // デバイス追従
-// app.CreateTrackingOverlay("MyHand", root, 1000, 1000, TrackedDevice.LeftController);
+// app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Target = TrackedDevice.LeftController });
 
 app.Run();
 ```

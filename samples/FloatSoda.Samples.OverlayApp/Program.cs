@@ -1,19 +1,37 @@
 ﻿using FloatSoda;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Samples.OverlayApp;
-using SkiaSharp;
+using FloatSoda.Widgets;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
 
 using var app = builder.Build();
 
-var size = new SKSizeI(1000, 1000);
+// Size 未指定のウィンドウは Child のレイアウト結果にサイズが追従する。
+app.CreateWindow(new DashboardWindow
+{
+    Title = "FloatSodaDashboard",
+    Child = new StackWidget()
+});
 
+app.CreateWindow(new DashboardWindow
+{
+    Title = "WatchDashBoard",
+    Child = new WatchWidget()
+});
 
-app.CreateDashboardOverlay("FloatSodaDashboard", new StackWidget { Width = size.Width, Height = size.Height },
-    size.Width, size.Width);
+app.CreateWindow(new DeviceTrackedWindow
+{
+    Title = "Left Hand",
+    Child = new WatchWidget(),
+    Target = TrackedDevice.LeftController
+});
 
-app.CreateDashboardOverlay("WatchDashBoard", new WatchWidget(), size.Width, size.Height);
-app.CreateTrackingOverlay("Left Hand", new WatchWidget(), size.Width, size.Height, TrackedDevice.LeftController);
+// Position 省略時はプレイエリア中央から前方1m・高さ1mに表示される。
+app.CreateWindow(new WorldSpaceWindow
+{
+    Title = "WorldSpace Watch",
+    Child = new WatchWidget()
+});
 
 app.Run();
