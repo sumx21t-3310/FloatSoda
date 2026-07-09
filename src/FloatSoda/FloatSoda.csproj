@@ -11,6 +11,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <InternalsVisibleTo Include="FloatSoda.Test" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="Polly" Version="8.6.6" />
       <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.119.4" />
       <PackageReference Include="Topten.RichTextKit" Version="0.4.167" />
