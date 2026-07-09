@@ -74,7 +74,29 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
         }
     }
 
-    public abstract void PostTask(Action action);
+    private readonly ConcurrentQueue<Action> _pendingTasks = new();
+
+    public virtual void PostTask(Action action) => _pendingTasks.Enqueue(action);
+
+    /// <summary>
+    /// キューに積まれたタスクを実行する。1タスクが例外を投げても他のタスクとスレッド自体は継続する。
+    /// ここで拾わないと最上位の<see cref="RunLoop"/>のcatchまで抜けて<see cref="OnStop"/>が走り、
+    /// レンダースレッドが停止して以降すべての描画が止まる。
+    /// </summary>
+    protected void DrainPendingTasks()
+    {
+        while (_pendingTasks.TryDequeue(out var task))
+        {
+            try
+            {
+                task();
+            }
+            catch (Exception ex)
+            {
+                Logger?.LogError(ex, "{ThreadName} でタスクの実行に失敗しました", ThreadName);
+            }
+        }
+    }
 
     private void RunLoop(CancellationToken ct)
     {
@@ -129,9 +151,6 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
 public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
     : ThreadRunner(threadName, limiter, logger)
 {
-    private readonly ConcurrentQueue<Action> _pendingTasks = new();
-
-
     public void PostRender(IWindow window, ILayer layer)
     {
         PostTask(() =>
@@ -143,19 +162,7 @@ public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogge
         });
     }
 
-    public override void PostTask(Action action)
-    {
-        _pendingTasks.Enqueue(action);
-    }
-
-
-    protected override void PreUpdate()
-    {
-        while (_pendingTasks.TryDequeue(out var task))
-        {
-            task();
-        }
-    }
+    protected override void PreUpdate() => DrainPendingTasks();
 
     protected override void OnStart(CancellationToken ct)
     {
