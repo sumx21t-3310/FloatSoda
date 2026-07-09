@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Verify tag matches Directory.Build.props version
+        shell: pwsh
+        run: |
+          $tagVersion = '${{ github.ref_name }}'.TrimStart('v')
+          [xml]$props = Get-Content Directory.Build.props
+          $propsVersion = $props.Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if ($tagVersion -ne $propsVersion) {
+            Write-Error "Tag version ($tagVersion) does not match Directory.Build.props version ($propsVersion)."
+            exit 1
+          }
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Test (FloatSoda.Common.Test)
+        run: dotnet test tests/FloatSoda.Common.Test --configuration Release --no-build
+
+      - name: Test (FloatSoda.Test)
+        run: dotnet test tests/FloatSoda.Test --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack --configuration Release --no-build --output artifacts
+
+      - name: Push to NuGet
+        run: dotnet nuget push "artifacts/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate

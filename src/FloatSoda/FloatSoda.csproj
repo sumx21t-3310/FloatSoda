@@ -4,6 +4,8 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>FloatSoda</PackageId>
+        <Description>A SteamVR overlay UI framework with a Flutter-like declarative API. Provides the widget/element system, RenderObject tree, and render pipeline, rendering via SkiaSharp, OpenGL, and OpenVR.</Description>
     </PropertyGroup>
 
     <ItemGroup>

@@ -1,0 +1,22 @@
+<Project>
+
+    <PropertyGroup>
+        <Version>0.0.1</Version>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Authors>Sumx21t</Authors>
+        <Copyright>Copyright (c) 2026 Sumx21t</Copyright>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/sumx21t-3310/FloatSoda</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/sumx21t-3310/FloatSoda</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>steamvr;openvr;overlay;vr;ui;skiasharp;declarative-ui</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />
+    </ItemGroup>
+
+</Project>

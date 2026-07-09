@@ -5,6 +5,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PackageId>FloatSoda.Engine</PackageId>
+        <Description>Platform layer for FloatSoda: GLFW/OpenGL rendering via SkiaSharp, the render thread runner, overlay windows, and frame limiting.</Description>
     </PropertyGroup>
 
     <ItemGroup>

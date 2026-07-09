@@ -4,6 +4,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>FloatSoda.Hooks</PackageId>
+    <Description>React Hooks-style state management for FloatSoda widgets, built on R3 reactive properties. Experimental.</Description>
   </PropertyGroup>
 
   <ItemGroup>
