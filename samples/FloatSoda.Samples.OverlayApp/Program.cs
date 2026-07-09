@@ -27,4 +27,11 @@ app.CreateWindow(new DeviceTrackedWindow
     Target = TrackedDevice.LeftController
 });
 
+// Position 省略時はプレイエリア中央から前方1m・高さ1mに表示される。
+app.CreateWindow(new WorldSpaceWindow
+{
+    Title = "WorldSpace Watch",
+    Child = new WatchWidget()
+});
+
 app.Run();
