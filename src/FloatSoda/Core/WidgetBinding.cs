@@ -5,6 +5,7 @@ using FloatSoda.OVR.Overlay;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using SkiaSharp;
+using OverlayWindow = FloatSoda.Engine.OverlayWindow;
 
 namespace FloatSoda.Core;
 

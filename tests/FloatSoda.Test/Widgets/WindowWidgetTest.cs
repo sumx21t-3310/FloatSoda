@@ -57,6 +57,21 @@ public class WindowWidgetTest
     }
 
     [Fact]
+    public void OverlayWindowOf_FindsConcreteOverlayWindow()
+    {
+        OverlayWindow? found = null;
+
+        MountTree(new DashboardWindow
+        {
+            Title = "TestWindow",
+            Child = new Probe { OnBuild = ctx => found = OverlayWindow.Of(ctx) }
+        });
+
+        // オーバーレイ系の中間基底 OverlayWindow でも lookup できる（Swap 拡張の前提）
+        Assert.IsType<DashboardWindow>(found);
+    }
+
+    [Fact]
     public void SizeUnset_RenderViewShrinkWrapsToChild()
     {
         var (pipeline, renderView) = MountTree(new DashboardWindow

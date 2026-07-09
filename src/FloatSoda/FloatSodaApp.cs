@@ -7,6 +7,7 @@ using FloatSoda.OVR.Overlay;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using OverlayWindow = FloatSoda.Widgets.OverlayWindow;
 
 namespace FloatSoda;
 
@@ -99,12 +100,18 @@ public class FloatSodaApp : IDisposable
     /// </summary>
     public void CreateWindow(WindowWidget window)
     {
+        // 現状はOpenVRオーバーレイのみ対応。デスクトップウィンドウ等は今後の派生で追加する。
+        if (window is not OverlayWindow overlayWindow)
+        {
+            throw new NotSupportedException($"{window.GetType().Name} は未対応のウィンドウ種別です。");
+        }
+
         _pendingTasks.Enqueue(() =>
         {
             var title = window.Title;
             var widgetBinding = new WidgetBinding();
             _bindings.TryAdd(title, widgetBinding);
-            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => window.CreateOverlay());
+            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => overlayWindow.CreateOverlay());
             widgetBinding.AttachRootWidget(window);
             _logger?.LogInformation("{Title}を作成しました", title);
         });
