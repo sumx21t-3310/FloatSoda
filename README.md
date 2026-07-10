@@ -1,4 +1,4 @@
-# FloatSoda: SteamVR Overlay UI Framework (v0.0.1)
+# FloatSoda: SteamVR Overlay UI Framework (v0.0.2)
 
 **FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。SkiaSharp → OpenGL → OpenVR という経路でレンダリングし、複数のオーバーレイを統一的に管理できます。
 
@@ -157,7 +157,7 @@ sequenceDiagram
 
 ---
 
-## 開発ステータス (v0.0.1 Alpha)
+## 開発ステータス (v0.0.2 Alpha)
 
 本プロジェクトは現在 **概念実証（PoC）段階** です。API は予告なく変更されます。
 

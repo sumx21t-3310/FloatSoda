@@ -7,7 +7,7 @@
 
 ## [Unreleased]
 
-## [0.0.1] - 2026-07-10
+## [0.0.2] - 2026-07-10
 
 ### Added
 
@@ -17,6 +17,7 @@
 - SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR オーバーレイテクスチャのレンダリング経路
 - 複数オーバーレイの統一管理（ダッシュボード・ワールド座標固定・デバイス追従）
 - メインスレッドとレンダースレッドのレイヤークローンによる分離
+- NuGetパッケージのメタデータ整備・リリース自動化(Directory.Build.props / CHANGELOG / Trusted Publishingによるリリースワークフロー)
 
-[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.0.1...main
-[0.0.1]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.0.1
+[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.0.2...main
+[0.0.2]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.0.2
