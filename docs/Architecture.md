@@ -30,7 +30,7 @@ graph TD
 
 ## ツリー構造
 
-FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が完全実装済みです。ウィジェット/エレメントツリーは `StatelessWidget` / `StatelessElement` と `BuildOwner` による差分ビルドが実装済みで、`StatefulWidget` / `StatefulElement` は WIP です(詳細は [WidgetSystem](WidgetSystem.md) と [BuildPipeline](BuildPipeline.md))。
+FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が完全実装済みです。ウィジェット/エレメントツリーは `StatelessWidget` / `StatefulWidget` / `InheritedWidget` と `BuildOwner` による差分ビルド(`Key` 対応の子リスト差分を含む)が実装済みです。一部の便利ウィジェットはスタブのままです(詳細は [WidgetSystem](WidgetSystem.md) と [BuildPipeline](BuildPipeline.md))。
 
 ```mermaid
 graph LR
@@ -61,7 +61,7 @@ graph LR
 各ツリーの役割:
 
 - **Widget** — 宣言的な UI の設計図。`abstract record` で不変。
-- **Element** — Widget と RenderObject を橋渡しするミュータブルなノード。`MarkNeedsBuild()` で dirty になり、`BuildOwner` が次フレームの `BuildScope()` でまとめて再ビルドする。`StatelessElement` は実装済み。`StatefulElement` は WIP。
+- **Element** — Widget と RenderObject を橋渡しするミュータブルなノード。`MarkNeedsBuild()` で dirty になり、`BuildOwner` が次フレームの `BuildScope()` でまとめて再ビルドする。`StatelessElement` / `StatefulElement` / `InheritedElement` はいずれも実装済み。
 - **BuildOwner** — dirty な Element のリストを保持し、`Depth` 順(親が先)に再ビルドを実行するスケジューラ。`WidgetBinding` がウィンドウごとに 1 つ保持する。
 - **RenderObject** — レイアウト計算(`PerformLayout`)と描画コマンド記録(`Paint`)を担う。`MarkNeedsLayout` / `MarkNeedsPaint` の dirty フラグにより、変更があった部分だけを再レイアウト・再ペイントする。
 - **Layer** — `Paint` フェーズが生成する合成操作のツリー。クローンしてレンダースレッドに渡す。

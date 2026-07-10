@@ -47,7 +47,7 @@ Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widge
 
 ## Architecture: Three Trees
 
-FloatSoda mirrors Flutter's three-tree model. The RenderObject and Layer trees are fully implemented; the Widget/Element tree has incremental (dirty-list) rebuilds working for `StatelessWidget`:
+FloatSoda mirrors Flutter's three-tree model. The RenderObject and Layer trees are fully implemented; the Widget/Element tree has incremental (dirty-list) rebuilds working for `StatelessWidget`, `StatefulWidget`, and `InheritedWidget`, including keyed multi-child list diffing:
 
 ### 1. RenderObject Tree (`src/FloatSoda/RenderObjects/`)
 
@@ -73,19 +73,20 @@ Produced by the RenderObject tree's paint phase. Represents composited draw oper
 
 The layer tree is **cloned** (`ILayer.Clone()`) before being handed to the render thread to avoid data races.
 
-### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Partially implemented
+### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Core implemented
 
-Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatelessElement` are fully wired, including incremental rebuilds via `BuildOwner`. `StatefulWidget` / `StatefulElement` and `InheritedWidget` / `InheritedElement` are skeletons (`NotImplementedException`); `MultiChildRenderObjectElement.PerformRebuild()` (children diffing) is also not implemented yet:
-- `Widget` — immutable `abstract record`; declares `CreateElement()`. `Widget.CanUpdate` is currently full record equality (not Flutter's type+key check); `Key` types exist but aren't wired in
+Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatefulWidget` / `InheritedWidget` and their elements are all wired, including incremental rebuilds via `BuildOwner` and keyed two-ended list diffing in `MultiChildRenderObjectElement`. Remaining gaps: many convenience widgets (`Padding`, `Container`, `ListView`, `GridView`, `Opacity`, `Button`, `Icon`, `GestureDetector`, `Listener`) are still `NotImplementedException` stubs, and gesture/hit-testing is not implemented:
+- `Widget` — immutable `abstract record`; declares `CreateElement()` and holds an optional `Key`. `Widget.CanUpdate` is Flutter-style (same runtime type + equal `Key`); a fast-path record-equality check in `Element.UpdateChild` short-circuits identical widgets before that
 - `RenderObjectWidget<T>` — widget that owns a `RenderObject`; declares `CreateRenderObject()` / `UpdateRenderObject(T)`
 - `StatelessWidget` — `Build()` is called by `StatelessElement`; usable today
-- `StatefulWidget<T>` — state lifecycle scaffolded but `StatefulElement.Build()` not yet implemented
+- `StatefulWidget<T>` / `State<T>` — state lifecycle wired via `StatefulElement`; `State.SetState()` mutates state and calls `Element.MarkNeedsBuild()` to schedule a rebuild
+- `InheritedWidget` / `InheritedElement` — context propagation with dependent tracking; descendants registered via `DependOnInheritedWidget` are notified on change
 - `Element` — mutable tree node; `Mount()` / `UpdateChild()` / `InflateWidget()` / `MarkNeedsBuild()` / `Rebuild()`
 - `BuildOwner` — per-window rebuild scheduler; holds the dirty-element list, `BuildScope()` rebuilds dirty elements in `Depth` order (parents first)
-- `RenderObjectElement` — element that attaches its `RenderObject` into the render tree
+- `RenderObjectElement` — element that attaches its `RenderObject` into the render tree; `UpdateChildren()` implements the keyed two-ended list-diff for multi-child widgets
 - `RenderObjectToWidgetAdapter` — bridges the widget tree root to a `RenderView`; `AttachToRenderTree(owner, element)` mounts on first call and schedules a rebuild (via `NewWidget` + `MarkNeedsBuild`) on re-attach
 - `WidgetBinding` — per-window coordinator; owns the `BuildOwner`; `DrawFrame()` runs `BuildOwner.BuildScope()` then flushes layout/paint only when `NeedsVisualUpdate` is set
-- `src/FloatSoda.Hooks` — R3-based `HookWidget` / `HookElement` (`UseState` via `ReactiveProperty`), partially implemented, not yet integrated with the build loop
+- `src/FloatSoda.Hooks` — R3-based `HookWidget` / `HookElement` (`UseState` via `ReactiveProperty`), partially implemented, not yet integrated with the build loop; the `HookExtension` helpers (`UseState`/`UseEffect`/`UseMemo`/etc.) still throw `NotImplementedException`
 
 ## Frame Pipeline
 

@@ -72,10 +72,11 @@ graph LR
 | `StatelessWidget` / `StatelessElement` | ✓ 実装済み |
 | `BuildOwner` による差分ビルド(dirty list / BuildScope) | ✓ 実装済み |
 | `SingleChildRenderObjectWidget` 系の更新(`UpdateRenderObject`) | ✓ 実装済み(一部ウィジェットは未対応) |
-| `MultiChildRenderObjectElement` の再ビルド(子リストの差分) | ✗ 未実装 |
-| `StatefulWidget` / `StatefulElement` | ✗ スケルトンのみ |
-| `InheritedWidget` / `InheritedElement` | ✗ スケルトンのみ |
-| `Key` によるElement再利用 | ✗ 型定義のみ(Widget に未接続) |
+| `MultiChildRenderObjectElement` の再ビルド(子リストの差分) | ✓ 実装済み(`Key` 対応の両端差分) |
+| `StatefulWidget` / `StatefulElement`(`SetState` 再ビルド) | ✓ 実装済み |
+| `InheritedWidget` / `InheritedElement`(依存追跡・通知) | ✓ 実装済み |
+| `Key` による Element 再利用(`Widget.CanUpdate` = 型 + Key) | ✓ 実装済み |
+| 一部の便利ウィジェット(`Padding` / `Container` / `ListView` / `Button` など) | ✗ スタブ(`NotImplementedException`) |
 | Hooks(`FloatSoda.Hooks` / R3 ベースの `UseState`) | △ WIP(フレームワーク未統合) |
 | ジェスチャ・ヒットテスト | ✗ 未実装 |
 

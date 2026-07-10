@@ -3,9 +3,9 @@
 # ウィジェット/エレメントシステム
 
 > **実装状況:**
-> - **実装済み:** `StatelessWidget` / `StatelessElement` は完全に動作します。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能です。`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **WIP:** `StatefulWidget` / `StatefulElement` はスケルトン実装のみです。`StatefulElement.Build()` は `NotImplementedException` を投げます。`InheritedWidget` / `InheritedElement` も同様にスケルトンのみです。
+> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
 > - **スタブ:** `Padding`, `Container`, `ListView`, `GridView`, `SingleChildScrollView`, `Opacity`, `Button`, `Icon`, `GestureDetector`, `Listener` は `NotImplementedException` を投げます。
+> - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
 ## 三ツリーの役割
 
@@ -31,11 +31,11 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 |---|---|---|
 | `Widget` | すべてのウィジェットの基底。`CreateElement()` を宣言 | — |
 | `StatelessWidget` | `Build(IBuildContext)` で子ツリーを返す純粋関数コンポーネント | `StatelessElement` ✓ |
-| `StatefulWidget<T>` | `CreateState()` で `State<T>` を分離(WIP) | `StatefulElement` ✗ |
-| `InheritedWidget` | ツリー下方へのコンテキスト伝播(WIP) | `InheritedElement` ✗ |
+| `StatefulWidget<T>` | `CreateState()` で `State<T>` を分離 | `StatefulElement` ✓ |
+| `InheritedWidget` | ツリー下方へのコンテキスト伝播 | `InheritedElement` ✓ |
 | `RenderObjectWidget<T>` | `CreateRenderObject()` / `UpdateRenderObject(T)` で RenderObject を所有 | `RenderObjectElement<T>` ✓ |
 | `SingleChildRenderObjectWidget<T>` | 単一の `Child` を持つ RenderObjectWidget | `SingleChildRenderObjectElement<T>` ✓ |
-| `MultiChildRenderObjectWidget<T>` | `Children`(`List<Widget>`)を持つ RenderObjectWidget | `MultiChildRenderObjectElement<T>` △(初回構築のみ) |
+| `MultiChildRenderObjectWidget<T>` | `Children`(`List<Widget>`)を持つ RenderObjectWidget | `MultiChildRenderObjectElement<T>` ✓(`Key` 対応の子リスト差分) |
 | `RenderObjectToWidgetAdapter` | Widget ツリーのルートを `RenderView` に接続 | `RenderObjectToWidgetElement<RenderView>` ✓ |
 
 ---
@@ -65,9 +65,7 @@ public record MyWidget : StatelessWidget
 
 ## StatefulWidget / State
 
-> **WIP:** `StatefulElement` の `Build()` / `MarkNeedsBuild()` は未実装です。`State.SetState()` を呼ぶと `NotImplementedException` になります。
-
-`StatefulWidget<T>` は Widget から `State<T>` を分離するパターンです。API は以下の形で確定していますが、フレームワーク駆動が未実装です。
+`StatefulWidget<T>` は Widget から `State<T>` を分離するパターンです。`State.SetState(Action)` は状態を書き換えたうえで `Element.MarkNeedsBuild()` を呼び、次フレームの `BuildScope()` で再ビルドされます。
 
 ```csharp
 public record WatchWidget : StatefulWidget<WatchWidget>
@@ -98,9 +96,7 @@ public record WatchState : State<WatchWidget>
 
 ## InheritedWidget
 
-> **WIP:** `InheritedElement.PerformRebuild()` が未実装で、依存側への通知経路もまだありません。
-
-ツリーの下方にコンテキスト(テーマなど)を伝播させるためのウィジェットです。`UpdateShouldNotify(InheritedWidget oldWidget)` で「依存している子孫を再ビルドすべきか」を判定する設計です。
+ツリーの下方にコンテキスト(テーマなど)を伝播させるためのウィジェットです。`InheritedElement` が依存する子孫を追跡し、`UpdateShouldNotify(InheritedWidget oldWidget)` が `true` を返したときに依存側を再ビルド対象にします。
 
 ---
 
@@ -136,7 +132,7 @@ public override Widget Build(IBuildContext context)
 | `Align` | ✓ | 子を指定の `Alignment` で配置 | `Alignment`, `WidthFactor`, `HeightFactor`, `Child` |
 | `Column` | ✓ | 垂直方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Row` | ✓ | 水平方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
-| `Flex` | △ | 方向指定のフレックスレイアウト。初回構築は動作、再ビルド(`UpdateRenderObject` と子リスト差分)は未実装 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
+| `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
 | `Padding` | ✗ スタブ | 子に余白を追加(`RenderSiftedBox.PerformLayout` 未実装) | `Spacing` (`EdgeInsets`), `Child` |
@@ -165,7 +161,7 @@ public override Widget Build(IBuildContext context)
 | `Text` | ✓ | プレーンテキスト表示(`RichText` に委譲) | `Data` (string) |
 | `Image` (Components) | ✗ スタブ | 高レベルな画像ウィジェット(予定) | — |
 | `Icon` | ✗ スタブ | アイコン | `Color`, `Size` |
-| `Button` | ✗ スタブ | タップイベント付きボタン(`StatefulWidget` 依存) | — |
+| `Button` | ✗ スタブ | タップイベント付きボタン(ジェスチャ未実装のため) | — |
 
 ### Gesture
 
@@ -178,9 +174,7 @@ public override Widget Build(IBuildContext context)
 
 ## Key
 
-> **未接続:** `IKey` / `ValueKey<T>` / `UniqueKey` の型は定義済みですが、`Widget` に `Key` プロパティがなく、差分判定(`Widget.CanUpdate`)にも組み込まれていません。
-
-Flutter と同様に「ウィジェットが同型のまま位置や内容が変わったときに Element を再利用するためのヒント」として導入予定です。現在の `Widget.CanUpdate` は record の完全一致比較であるため、プロパティが変わった Widget は Element ごと作り直されます(詳細は [BuildPipeline](BuildPipeline.md))。
+`IKey` / `ValueKey<T>` / `UniqueKey` が定義され、`Widget.Key` プロパティと差分判定に組み込まれています。`Widget.CanUpdate(old, new)` は「同じ実行時型かつ `Key` が等しい」なら既存 Element を再利用します(Flutter と同じ型 + Key 判定)。`Element.UpdateChild` は先に record 等値の高速パスで同一 Widget をスキップし、その後 `CanUpdate` で更新可否を判断します。`MultiChildRenderObjectElement` の子リスト差分でも `Key` を使って要素の同一性を追跡します(詳細は [BuildPipeline](BuildPipeline.md))。
 
 ---
 

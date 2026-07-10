@@ -23,7 +23,7 @@ dotnet run --project samples/FloatSoda.Samples.OverlayApp
 
 SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動終了します。
 
-> サンプルには `StatefulWidget` を使った時計ウィジェット(`WatchWidget.cs`)も含まれていますが、`StatefulElement` が未実装のため現在はコメントアウトされています。
+> サンプルには `StatefulWidget` を使った時計ウィジェット(`WatchWidget.cs`)が含まれており、`SetState()` による毎秒の再ビルドで時刻が更新されます。
 
 ---
 
@@ -73,7 +73,7 @@ dotnet run
 
 `app.Run()` は SteamVR が終了するまでブロックします。
 
-> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能です。`Padding`, `Button`, `StatefulWidget` 系は WIP（`NotImplementedException`）です。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
+> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。`Padding`, `Container`, `ListView`, `Button` などは未実装スタブ（`NotImplementedException`）です。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
 
 <details>
 <summary>RenderObject レベルの直接操作（低レベル API）</summary>

@@ -4,7 +4,7 @@
 
 このページは Widget ツリーの差分ビルドの仕組み — `BuildOwner` / dirty list / `BuildScope` / `Element.UpdateChild` — を解説します。RenderObject 側の差分レイアウト・差分ペイントは [RenderObjects](RenderObjects.md) を参照してください。
 
-> **実装状況:** `BuildOwner` と `StatelessElement` / `SingleChildRenderObjectElement` / `RenderObjectToWidgetElement` の再ビルドは動作します。`MultiChildRenderObjectElement.PerformRebuild()`(子リストの差分更新)、`StatefulElement`、`InheritedElement` は未実装です。
+> **実装状況:** `BuildOwner` と `StatelessElement` / `StatefulElement` / `InheritedElement` / `SingleChildRenderObjectElement` / `MultiChildRenderObjectElement`(`Key` 対応の子リスト差分)/ `RenderObjectToWidgetElement` の再ビルドが動作します。`Key`(`ValueKey<T>` / `UniqueKey`)は `Widget.CanUpdate` に組み込み済みです。
 
 ## 全体の流れ
 
@@ -95,7 +95,7 @@ public override void PerformRebuild()
 | `Widget.CanUpdate(old, new)` | `child.Update(newWidget)` で既存 Element を更新 |
 | それ以外 | 子を破棄して `InflateWidget` で作り直し |
 
-> **現状の注意:** `Widget.CanUpdate` は現在 `oldWidget == newWidget`(record の等値比較)です。Flutter のような「型と Key が同じなら更新」ではないため、プロパティが 1 つでも違う Widget は Element ごと作り直されます。`Key`(`ValueKey<T>` / `UniqueKey`)は型定義のみで、まだ差分判定に組み込まれていません。
+> **`CanUpdate` の判定:** `Widget.CanUpdate(old, new)` は Flutter と同じく「同じ実行時型かつ `Key` が等しい」なら `true` を返し、既存 Element を再利用します。その手前にある `child.Widget == newWidget`(record の等値比較)は完全一致を素通しする高速パスで、ここで一致すれば `Update` すら呼びません。プロパティだけが変わった同型・同 Key の Widget は Element を再利用してプロパティ差分だけが適用されます。`Key`(`ValueKey<T>` / `UniqueKey`)は `Widget.Key` として差分判定に組み込み済みです。
 
 ### RenderObjectElement
 
@@ -173,11 +173,9 @@ public void DrawFrame()
 
 | 対象 | 現状 |
 |---|---|
-| `MultiChildRenderObjectElement.PerformRebuild()` | `NotImplementedException`。`Flex`(Row/Column)などの子リストは初回 `Mount` でのみ構築され、再ビルドできません |
-| `StatefulElement` | `Build()` / `MarkNeedsBuild()` が `NotImplementedException`。`State.SetState()` は定義済みですが機能しません |
-| `InheritedElement` | `PerformRebuild()` が `NotImplementedException`。`InheritedWidget.UpdateShouldNotify()` の通知経路も未実装 |
-| `Key` | `IKey` / `ValueKey<T>` / `UniqueKey` の型定義のみ。`Widget` にプロパティがなく、`CanUpdate` にも未接続 |
-| `FloatSoda.Hooks` | `HookWidget` / `HookElement`(R3 の `ReactiveProperty` による `UseState`)が部分実装。フレームワークのビルドループとは未統合 |
+| 一部の便利ウィジェット | `Padding` / `Container` / `ListView` / `GridView` / `SingleChildScrollView` / `Opacity` / `Button` / `Icon` / `GestureDetector` / `Listener` は `NotImplementedException` のスタブ |
+| ジェスチャ・ヒットテスト | 宣言的な入力(タップ・ドラッグ)は未実装 |
+| `FloatSoda.Hooks` | `HookWidget` / `HookElement`(R3 の `ReactiveProperty` による `UseState`)が部分実装。フレームワークのビルドループとは未統合で、`HookExtension` の各ヘルパーは `NotImplementedException` |
 
 ---
 
