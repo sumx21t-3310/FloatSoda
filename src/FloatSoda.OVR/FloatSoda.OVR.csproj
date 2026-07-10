@@ -4,6 +4,8 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <PackageId>FloatSoda.OVR</PackageId>
+        <Description>OpenVR integration for FloatSoda: overlay wrappers (dashboard, world-space, device-tracked), VR event dispatching, and OpenVR exception types.</Description>
     </PropertyGroup>
 
 
