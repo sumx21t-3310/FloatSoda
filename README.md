@@ -6,7 +6,7 @@
 
 ## 特徴
 
-- **Flutter-like な開発体験**: `StatelessWidget` による宣言的な UI 構築が可能です（`StatefulWidget` は WIP）
+- **Flutter-like な開発体験**: `StatelessWidget` / `StatefulWidget` による宣言的な UI 構築と `SetState()` による再ビルド
 - **差分更新**: `BuildOwner` による Widget の差分ビルドと、dirty フラグによる RenderObject の差分レイアウト・差分ペイント
 - **RenderObject ツリー**: Flutter の RenderObject に相当するレイアウト・描画ツリーを実装
 - **複数オーバーレイ対応**: ダッシュボード・ワールド座標固定・デバイス追従を同時に管理
@@ -111,32 +111,42 @@ sequenceDiagram
 
 ---
 
-## 実装済みの RenderObject
+## 実装済みの Widget
 
 **レイアウト系**
 
 | クラス | 説明 |
 |---|---|
-| `RenderView` | ルートノード。オーバーレイのサイズを定義 |
-| `RenderPositionedBox` | 子を `Alignment` で配置（デフォルト: 中央） |
-| `RenderFlex` | Row / Column 相当。`Axis`, `MainAxisAlignment`, `CrossAxisAlignment` を指定可 |
-| `RenderConstrainedBox` | 子に `BoxConstraints` を付与してサイズを強制 |
+| `Row` / `Column` / `Flex` | 子を水平・垂直に並べる。`MainAxisAlignment` / `CrossAxisAlignment` を指定可 |
+| `Align` / `Center` | 子を `Alignment` で配置 |
+| `SizedBox` | `Width` / `Height` で固定サイズを与える |
+| `ConstrainedBox` | 子に `BoxConstraints` を付与してサイズを制約 |
 
 **描画系**
 
 | クラス | 説明 |
 |---|---|
-| `RenderColoredBox` | 矩形を指定色で塗りつぶす |
-| `RenderImage` | `FileImageProvider` でロードした画像を描画 |
+| `ColoredBox` | 矩形を指定色で塗りつぶす |
+| `Image` | `FileImageProvider` でロードした画像を描画 |
+| `Text` / `RichText` | テキストを描画（`Text` は `RichText` の簡易ラッパー） |
+| `ClipRect` / `ClipRoundRect` / `ClipOval` | 矩形・角丸矩形・楕円でクリップ |
+| `ClipCustomPath` | 任意の `SKPath` でクリップ（`CustomClipper<SKPath>` を渡す） |
 
-**クリップ系**
+**ウィンドウ系**
 
 | クラス | 説明 |
 |---|---|
-| `RenderClipRect` | 矩形でクリップ |
-| `RenderClipRoundRect` | 角丸矩形でクリップ（`BorderRadius` 指定可） |
-| `RenderClipPath` | 任意の `SKPath` でクリップ（`CustomClipper<SKPath>` を渡す） |
-| `RenderClipOval` | 楕円でクリップ |
+| `DashboardWindow` | SteamVR ダッシュボードに表示するオーバーレイ |
+| `WorldSpaceWindow` | ワールド座標に固定するオーバーレイ（メートル単位） |
+| `DeviceTrackedWindow` | HMD・コントローラー等のデバイスに追従するオーバーレイ |
+
+**自作 Widget の基底クラス**
+
+- `StatelessWidget` — `Build()` をオーバーライドして UI を宣言
+- `StatefulWidget<T>` + `State<T>` — `SetState()` で状態変更と再ビルド
+- `InheritedWidget` — ツリー下方向へのコンテキスト伝播
+
+> `Container` / `Padding` / `Opacity` / `ListView` / `GridView` / `Button` / `GestureDetector` などは API 定義のみの未実装スタブです。
 
 ---
 
@@ -159,15 +169,15 @@ sequenceDiagram
 
 ## 開発ステータス (v0.0.2 Alpha)
 
-本プロジェクトは現在 **概念実証（PoC）段階** です。API は予告なく変更されます。
+本プロジェクトは現在 **Alpha 段階** です。簡単なアプリケーションは動作しますが、API は予告なく変更されます。
 
 - [x] RenderObject ツリー（レイアウト・描画・クリップ・画像・差分更新）
 - [x] レイヤーツリー（ContainerLayer / PictureLayer / ClipLayer / OpacityLayer）
 - [x] 複数オーバーレイ（ダッシュボード / ワールド座標 / デバイス追従）
-- [x] Widget → RenderObject への inflate パイプライン（StatelessWidget）
-- [x] BuildOwner による Widget 差分ビルド
-- [ ] StatefulWidget / InheritedWidget / Key（スケルトンのみ）
-- [ ] MultiChildRenderObjectElement の再ビルド（子リストの差分更新）
+- [x] Widget → RenderObject への inflate パイプライン（StatelessWidget / StatefulWidget）
+- [x] BuildOwner による Widget 差分ビルド（子リストの差分更新を含む）
+- [x] InheritedWidget によるコンテキスト伝播
+- [ ] Key による要素の同一性判定
 - [ ] SteamVR のイベント処理と宣言的な入力（ヒットテスト）
 - [ ] アニメーションシステムの統合
 - [ ] マニフェストファイルの自動生成（検討中）
