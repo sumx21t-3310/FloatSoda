@@ -1,23 +1,30 @@
-﻿namespace FloatSoda.OVR.Exceptions;
+using FloatSoda.OVR.Exceptions.Resources;
 
+namespace FloatSoda.OVR.Exceptions;
+
+/// <summary>
+/// Thrown when an OpenVR settings operation (<see cref="EVRSettingsError"/>) fails.
+/// </summary>
 public class VRSettingsException(string message, EVRSettingsError errorCode)
     : OpenVRSystemException<EVRSettingsError>(message, errorCode)
 {
+    /// <summary>Creates an exception with a message derived from <paramref name="errorCode"/>.</summary>
     public VRSettingsException(EVRSettingsError errorCode) : this(GetMessage(errorCode), errorCode)
     {
     }
 
     private static string GetMessage(EVRSettingsError error) => error switch
     {
-        EVRSettingsError.None => "設定エラーは発生していません。",
-        EVRSettingsError.IPCFailed => "設定システムとのIPC通信に失敗しました。",
-        EVRSettingsError.WriteFailed => "設定の書き込みに失敗しました。",
-        EVRSettingsError.ReadFailed => "設定の読み込みに失敗しました。",
-        EVRSettingsError.JsonParseFailed => "設定ファイルのJSON解析に失敗しました。",
-        EVRSettingsError.UnsetSettingHasNoDefault => "設定値が未設定であり、既定値も存在しません。",
+        EVRSettingsError.None => ExceptionMessages.VRSettingsException_None,
+        EVRSettingsError.IPCFailed => ExceptionMessages.VRSettingsException_IPCFailed,
+        EVRSettingsError.WriteFailed => ExceptionMessages.VRSettingsException_WriteFailed,
+        EVRSettingsError.ReadFailed => ExceptionMessages.VRSettingsException_ReadFailed,
+        EVRSettingsError.JsonParseFailed => ExceptionMessages.VRSettingsException_JsonParseFailed,
+        EVRSettingsError.UnsetSettingHasNoDefault => ExceptionMessages.VRSettingsException_UnsetSettingHasNoDefault,
         _ => throw new ArgumentOutOfRangeException(nameof(error), error, null)
     };
 
+    /// <summary>Throws a <see cref="VRSettingsException"/> if <paramref name="error"/> indicates a failure.</summary>
     public static void ThrowIfError(EVRSettingsError error)
     {
         if (error == EVRSettingsError.None) return;

@@ -1,0 +1,1009 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="VRInitializeException_Unknown" xml:space="preserve">
+    <value>未知の初期化エラーが発生しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_InstallationNotFound" xml:space="preserve">
+    <value>OpenVRのインストールが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_InstallationCorrupt" xml:space="preserve">
+    <value>OpenVRのインストールが壊れています。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRClientDLLNotFound" xml:space="preserve">
+    <value>vrclient.dllが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_FileNotFound" xml:space="preserve">
+    <value>必要な構成ファイルが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_FactoryNotFound" xml:space="preserve">
+    <value>ファクトリインターフェースの取得に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_InterfaceNotFound" xml:space="preserve">
+    <value>要求されたインターフェースが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_InvalidInterface" xml:space="preserve">
+    <value>インターフェースが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Init_UserConfigDirectoryInvalid" xml:space="preserve">
+    <value>ユーザー設定ディレクトリが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Init_HmdNotFound" xml:space="preserve">
+    <value>HMDが見つからないか、接続されていません。</value>
+  </data>
+  <data name="VRInitializeException_Init_NotInitialized" xml:space="preserve">
+    <value>OpenVRが初期化されていません。</value>
+  </data>
+  <data name="VRInitializeException_Init_PathRegistryNotFound" xml:space="preserve">
+    <value>パスレジストリが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_NoConfigPath" xml:space="preserve">
+    <value>構成パスが設定されていません。</value>
+  </data>
+  <data name="VRInitializeException_Init_NoLogPath" xml:space="preserve">
+    <value>ログパスが設定されていません。</value>
+  </data>
+  <data name="VRInitializeException_Init_PathRegistryNotWritable" xml:space="preserve">
+    <value>パスレジストリに書き込めません。</value>
+  </data>
+  <data name="VRInitializeException_Init_AppInfoInitFailed" xml:space="preserve">
+    <value>アプリケーション情報の初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_Retry" xml:space="preserve">
+    <value>再試行が必要です。</value>
+  </data>
+  <data name="VRInitializeException_Init_InitCanceledByUser" xml:space="preserve">
+    <value>ユーザーによって初期化がキャンセルされました。</value>
+  </data>
+  <data name="VRInitializeException_Init_AnotherAppLaunching" xml:space="preserve">
+    <value>別のアプリケーションが起動中です。</value>
+  </data>
+  <data name="VRInitializeException_Init_SettingsInitFailed" xml:space="preserve">
+    <value>設定の初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_ShuttingDown" xml:space="preserve">
+    <value>システムが終了処理中です。</value>
+  </data>
+  <data name="VRInitializeException_Init_TooManyObjects" xml:space="preserve">
+    <value>オブジェクトが多すぎます。</value>
+  </data>
+  <data name="VRInitializeException_Init_NoServerForBackgroundApp" xml:space="preserve">
+    <value>バックグラウンドアプリ用のサーバーがありません。</value>
+  </data>
+  <data name="VRInitializeException_Init_NotSupportedWithCompositor" xml:space="preserve">
+    <value>コンポジター使用時はサポートされません。</value>
+  </data>
+  <data name="VRInitializeException_Init_NotAvailableToUtilityApps" xml:space="preserve">
+    <value>ユーティリティアプリでは利用できません。</value>
+  </data>
+  <data name="VRInitializeException_Init_Internal" xml:space="preserve">
+    <value>内部エラーが発生しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_HmdDriverIdIsNone" xml:space="preserve">
+    <value>HMDドライバIDがNoneです。</value>
+  </data>
+  <data name="VRInitializeException_Init_HmdNotFoundPresenceFailed" xml:space="preserve">
+    <value>HMDの存在確認に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRMonitorNotFound" xml:space="preserve">
+    <value>VRモニターが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRMonitorStartupFailed" xml:space="preserve">
+    <value>VRモニターの起動に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_LowPowerWatchdogNotSupported" xml:space="preserve">
+    <value>低電力ウォッチドッグはサポートされていません。</value>
+  </data>
+  <data name="VRInitializeException_Init_InvalidApplicationType" xml:space="preserve">
+    <value>アプリケーションタイプが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Init_NotAvailableToWatchdogApps" xml:space="preserve">
+    <value>ウォッチドッグアプリでは利用できません。</value>
+  </data>
+  <data name="VRInitializeException_Init_WatchdogDisabledInSettings" xml:space="preserve">
+    <value>設定でウォッチドッグが無効になっています。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRDashboardNotFound" xml:space="preserve">
+    <value>VRダッシュボードが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRDashboardStartupFailed" xml:space="preserve">
+    <value>VRダッシュボードの起動に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRHomeNotFound" xml:space="preserve">
+    <value>VR Homeが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRHomeStartupFailed" xml:space="preserve">
+    <value>VR Homeの起動に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_RebootingBusy" xml:space="preserve">
+    <value>再起動処理中のためビジーです。</value>
+  </data>
+  <data name="VRInitializeException_Init_FirmwareUpdateBusy" xml:space="preserve">
+    <value>ファームウェア更新中のためビジーです。</value>
+  </data>
+  <data name="VRInitializeException_Init_FirmwareRecoveryBusy" xml:space="preserve">
+    <value>ファームウェア復旧中のためビジーです。</value>
+  </data>
+  <data name="VRInitializeException_Init_USBServiceBusy" xml:space="preserve">
+    <value>USBサービスがビジーです。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRWebHelperStartupFailed" xml:space="preserve">
+    <value>VR Web Helperの起動に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_TrackerManagerInitFailed" xml:space="preserve">
+    <value>トラッカーマネージャーの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_AlreadyRunning" xml:space="preserve">
+    <value>既に実行中です。</value>
+  </data>
+  <data name="VRInitializeException_Init_FailedForVrMonitor" xml:space="preserve">
+    <value>VRモニター用プロセスの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_PropertyManagerInitFailed" xml:space="preserve">
+    <value>プロパティマネージャーの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_WebServerFailed" xml:space="preserve">
+    <value>Webサーバーの起動に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_IllegalTypeTransition" xml:space="preserve">
+    <value>不正なタイプ遷移です。</value>
+  </data>
+  <data name="VRInitializeException_Init_MismatchedRuntimes" xml:space="preserve">
+    <value>ランタイムのバージョンが一致しません。</value>
+  </data>
+  <data name="VRInitializeException_Init_InvalidProcessId" xml:space="preserve">
+    <value>プロセスIDが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Init_VRServiceStartupFailed" xml:space="preserve">
+    <value>VRサービスの起動に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Init_PrismNeedsNewDrivers" xml:space="preserve">
+    <value>Prismドライバの更新が必要です。</value>
+  </data>
+  <data name="VRInitializeException_Init_PrismStartupTimedOut" xml:space="preserve">
+    <value>Prismの起動がタイムアウトしました。</value>
+  </data>
+  <data name="VRInitializeException_Init_CouldNotStartPrism" xml:space="preserve">
+    <value>Prismを起動できませんでした。</value>
+  </data>
+  <data name="VRInitializeException_Init_PrismExitedUnexpectedly" xml:space="preserve">
+    <value>Prismが予期せず終了しました。</value>
+  </data>
+  <data name="VRInitializeException_Steam_SteamInstallationNotFound" xml:space="preserve">
+    <value>Steamのインストールが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Driver_Failed" xml:space="preserve">
+    <value>ドライバのエラーです。</value>
+  </data>
+  <data name="VRInitializeException_Driver_Unknown" xml:space="preserve">
+    <value>未知のドライバエラーです。</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdUnknown" xml:space="preserve">
+    <value>未知のHMDドライバです。</value>
+  </data>
+  <data name="VRInitializeException_Driver_NotLoaded" xml:space="preserve">
+    <value>ドライバがロードされていません。</value>
+  </data>
+  <data name="VRInitializeException_Driver_RuntimeOutOfDate" xml:space="preserve">
+    <value>ドライバのランタイムが古すぎます。</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdInUse" xml:space="preserve">
+    <value>HMDが別のプロセスで使用中です。</value>
+  </data>
+  <data name="VRInitializeException_Driver_NotCalibrated" xml:space="preserve">
+    <value>ドライバが校正されていません。</value>
+  </data>
+  <data name="VRInitializeException_Driver_CalibrationInvalid" xml:space="preserve">
+    <value>ドライバの校正データが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDisplayNotFound" xml:space="preserve">
+    <value>HMDのディスプレイが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_Driver_TrackedDeviceInterfaceUnknown" xml:space="preserve">
+    <value>トラッキングデバイスインターフェースが不明です。</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDriverIdOutOfBounds" xml:space="preserve">
+    <value>HMDドライバIDが範囲外です。</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDisplayMirrored" xml:space="preserve">
+    <value>HMDディスプレイがミラーリング設定になっています。</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDisplayNotFoundLaptop" xml:space="preserve">
+    <value>ラップトップ用HMDディスプレイが見つかりません。</value>
+  </data>
+  <data name="VRInitializeException_IPC_ServerInitFailed" xml:space="preserve">
+    <value>IPCサーバーの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_ConnectFailed" xml:space="preserve">
+    <value>IPC接続に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_SharedStateInitFailed" xml:space="preserve">
+    <value>共有ステートの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_CompositorInitFailed" xml:space="preserve">
+    <value>コンポジターの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_MutexInitFailed" xml:space="preserve">
+    <value>Mutexの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_Failed" xml:space="preserve">
+    <value>IPC接続エラーが発生しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_CompositorConnectFailed" xml:space="preserve">
+    <value>コンポジターへの接続に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_CompositorInvalidConnectResponse" xml:space="preserve">
+    <value>コンポジターからの接続レスポンスが無効です。</value>
+  </data>
+  <data name="VRInitializeException_IPC_ConnectFailedAfterMultipleAttempts" xml:space="preserve">
+    <value>複数回の試行後、IPC接続に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_ConnectFailedAfterTargetExited" xml:space="preserve">
+    <value>ターゲット終了後、IPC接続に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_IPC_NamespaceUnavailable" xml:space="preserve">
+    <value>IPCネームスペースを利用できません。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_Failed" xml:space="preserve">
+    <value>コンポジターが失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_D3D11HardwareRequired" xml:space="preserve">
+    <value>Direct3D11ハードウェアが必要です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FirmwareRequiresUpdate" xml:space="preserve">
+    <value>コンポジター用にファームウェアの更新が必要です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_OverlayInitFailed" xml:space="preserve">
+    <value>コンポジターオーバーレイの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_ScreenshotsInitFailed" xml:space="preserve">
+    <value>コンポジタースクリーンショットの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_UnableToCreateDevice" xml:space="preserve">
+    <value>グラフィックスデバイスを作成できませんでした。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SharedStateIsNull" xml:space="preserve">
+    <value>共有ステートがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_NotificationManagerIsNull" xml:space="preserve">
+    <value>通知マネージャーがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_ResourceManagerClientIsNull" xml:space="preserve">
+    <value>リソースマネージャークライアントがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_MessageOverlaySharedStateInitFailure" xml:space="preserve">
+    <value>メッセージオーバーレイ共有ステートの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_PropertiesInterfaceIsNull" xml:space="preserve">
+    <value>プロパティインターフェースがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFullscreenWindowFailed" xml:space="preserve">
+    <value>全画面ウィンドウの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SettingsInterfaceIsNull" xml:space="preserve">
+    <value>設定インターフェースがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToShowWindow" xml:space="preserve">
+    <value>ウィンドウの表示に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DistortInterfaceIsNull" xml:space="preserve">
+    <value>歪み補正インターフェースがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DisplayFrequencyFailure" xml:space="preserve">
+    <value>ディスプレイ周波数の取得に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_RendererInitializationFailed" xml:space="preserve">
+    <value>レンダラーの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DXGIFactoryInterfaceIsNull" xml:space="preserve">
+    <value>DXGIファクトリインターフェースがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DXGIFactoryCreateFailed" xml:space="preserve">
+    <value>DXGIファクトリの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DXGIFactoryQueryFailed" xml:space="preserve">
+    <value>DXGIファクトリのクエリに失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidAdapterDesktop" xml:space="preserve">
+    <value>デスクトップアダプターが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidHmdAttachment" xml:space="preserve">
+    <value>HMDの接続が無効です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidOutputDesktop" xml:space="preserve">
+    <value>出力デスクトップが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidDeviceProvided" xml:space="preserve">
+    <value>提供されたデバイスが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_D3D11RendererInitializationFailed" xml:space="preserve">
+    <value>D3D11レンダラーの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToFindDisplayMode" xml:space="preserve">
+    <value>ディスプレイモードが見つかりませんでした。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateSwapChain" xml:space="preserve">
+    <value>スワップチェーンの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToGetBackBuffer" xml:space="preserve">
+    <value>バックバッファの取得に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateRenderTarget" xml:space="preserve">
+    <value>レンダーターゲットの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateDXGI2SwapChain" xml:space="preserve">
+    <value>DXGI2スワップチェーンの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedtoGetDXGI2BackBuffer" xml:space="preserve">
+    <value>DXGI2バックバッファの取得に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateDXGI2RenderTarget" xml:space="preserve">
+    <value>DXGI2レンダーターゲットの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToGetDXGIDeviceInterface" xml:space="preserve">
+    <value>DXGIデバイスインターフェースの取得に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SelectDisplayMode" xml:space="preserve">
+    <value>ディスプレイモードの選択に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateNvAPIRenderTargets" xml:space="preserve">
+    <value>NvAPIレンダーターゲットの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_NvAPISetDisplayMode" xml:space="preserve">
+    <value>NvAPIディスプレイモード設定に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateDirectModeDisplay" xml:space="preserve">
+    <value>ダイレクトモードディスプレイの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidHmdPropertyContainer" xml:space="preserve">
+    <value>HMDプロパティコンテナが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_UpdateDisplayFrequency" xml:space="preserve">
+    <value>ディスプレイ周波数の更新に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateRasterizerState" xml:space="preserve">
+    <value>ラスタライザステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateWireframeRasterizerState" xml:space="preserve">
+    <value>ワイヤーフレームラスタライザステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateSamplerState" xml:space="preserve">
+    <value>サンプラーステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateClampToBorderSamplerState" xml:space="preserve">
+    <value>ClampToBorderサンプラーステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateAnisoSamplerState" xml:space="preserve">
+    <value>異方性サンプラーステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlaySamplerState" xml:space="preserve">
+    <value>オーバーレイサンプラーステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreatePanoramaSamplerState" xml:space="preserve">
+    <value>パノラマサンプラーステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFontSamplerState" xml:space="preserve">
+    <value>フォントサンプラーステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateNoBlendState" xml:space="preserve">
+    <value>NoBlendステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendState" xml:space="preserve">
+    <value>Blendステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateAlphaBlendState" xml:space="preserve">
+    <value>AlphaBlendステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendStateMaskR" xml:space="preserve">
+    <value>BlendStateMaskRの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendStateMaskG" xml:space="preserve">
+    <value>BlendStateMaskGの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendStateMaskB" xml:space="preserve">
+    <value>BlendStateMaskBの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDepthStencilState" xml:space="preserve">
+    <value>深度ステンシルステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDepthStencilStateNoWrite" xml:space="preserve">
+    <value>NoWrite深度ステンシルステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDepthStencilStateNoDepth" xml:space="preserve">
+    <value>NoDepth深度ステンシルステートの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFlushTexture" xml:space="preserve">
+    <value>Flushテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDistortionSurfaces" xml:space="preserve">
+    <value>歪み補正サーフェスの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateConstantBuffer" xml:space="preserve">
+    <value>定数バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateHmdPoseConstantBuffer" xml:space="preserve">
+    <value>HMDポーズ定数バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateHmdPoseStagingConstantBuffer" xml:space="preserve">
+    <value>HMDポーズステージングバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateSharedFrameInfoConstantBuffer" xml:space="preserve">
+    <value>フレーム情報共有バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayConstantBuffer" xml:space="preserve">
+    <value>オーバーレイ定数バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateSceneTextureIndexConstantBuffer" xml:space="preserve">
+    <value>シーンテクスチャインデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateReadableSceneTextureIndexConstantBuffer" xml:space="preserve">
+    <value>読み取り可能シーンテクスチャインデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLayerGraphicsTextureIndexConstantBuffer" xml:space="preserve">
+    <value>レイヤーグラフィックスインデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLayerComputeTextureIndexConstantBuffer" xml:space="preserve">
+    <value>レイヤー演算インデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer" xml:space="preserve">
+    <value>レイヤー演算シーンインデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateComputeHmdPoseConstantBuffer" xml:space="preserve">
+    <value>演算用HMDポーズバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateGeomConstantBuffer" xml:space="preserve">
+    <value>幾何定数バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreatePanelMaskConstantBuffer" xml:space="preserve">
+    <value>パネルマスクバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreatePixelSimUBO" xml:space="preserve">
+    <value>PixelSimUBOの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateMSAARenderTextures" xml:space="preserve">
+    <value>MSAAレンダーテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateResolveRenderTextures" xml:space="preserve">
+    <value>Resolveレンダーテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateComputeResolveRenderTextures" xml:space="preserve">
+    <value>演算用Resolveレンダーテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDriverDirectModeResolveTextures" xml:space="preserve">
+    <value>ドライバダイレクトResolveテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_OpenDriverDirectModeResolveTextures" xml:space="preserve">
+    <value>ドライバダイレクトResolveテクスチャを開けませんでした。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFallbackSyncTexture" xml:space="preserve">
+    <value>フォールバック同期テクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_ShareFallbackSyncTexture" xml:space="preserve">
+    <value>フォールバック同期テクスチャの共有に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayIndexBuffer" xml:space="preserve">
+    <value>オーバーレイインデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayVertexBuffer" xml:space="preserve">
+    <value>オーバーレイ頂点バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateTextVertexBuffer" xml:space="preserve">
+    <value>テキスト頂点バッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateTextIndexBuffer" xml:space="preserve">
+    <value>テキストインデックスバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateMirrorTextures" xml:space="preserve">
+    <value>ミラーテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLastFrameRenderTexture" xml:space="preserve">
+    <value>直前フレームレンダリングテクスチャの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateMirrorOverlay" xml:space="preserve">
+    <value>ミラーオーバーレイの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateVirtualDisplayBackbuffer" xml:space="preserve">
+    <value>仮想ディスプレイバックバッファの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DisplayModeNotSupported" xml:space="preserve">
+    <value>ディスプレイモードがサポートされていません。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayInvalidCall" xml:space="preserve">
+    <value>オーバーレイ作成呼び出しが無効です。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayAlreadyInitialized" xml:space="preserve">
+    <value>オーバーレイは既に初期化されています。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateMailbox" xml:space="preserve">
+    <value>メールボックスの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_WindowInterfaceIsNull" xml:space="preserve">
+    <value>ウィンドウインターフェースがnullです。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SystemLayerCreateInstance" xml:space="preserve">
+    <value>システムレイヤーインスタンスの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SystemLayerCreateSession" xml:space="preserve">
+    <value>システムレイヤーセッションの作成に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_UnableToConnectToOculusRuntime" xml:space="preserve">
+    <value>Oculusランタイムに接続できません。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_WindowsNotInDevMode" xml:space="preserve">
+    <value>Windowsが開発者モードではありません。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_CantOpenDevice" xml:space="preserve">
+    <value>HMDデバイスを開けませんでした。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToRequestConfigStart" xml:space="preserve">
+    <value>HMD構成開始の要求に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_NoStoredConfig" xml:space="preserve">
+    <value>HMD内に保存された構成がありません。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_ConfigTooBig" xml:space="preserve">
+    <value>HMD構成データが大きすぎます。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_ConfigTooSmall" xml:space="preserve">
+    <value>HMD構成データが小さすぎます。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToInitZLib" xml:space="preserve">
+    <value>zlibの初期化に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_CantReadFirmwareVersion" xml:space="preserve">
+    <value>ファームウェアバージョンの読み取りに失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToSendUserDataStart" xml:space="preserve">
+    <value>ユーザーデータ送信開始に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToGetUserDataStart" xml:space="preserve">
+    <value>ユーザーデータ取得開始に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToGetUserDataNext" xml:space="preserve">
+    <value>ユーザーデータ次フレーム取得に失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UserDataAddressRange" xml:space="preserve">
+    <value>ユーザーデータのアドレス範囲エラーです。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UserDataError" xml:space="preserve">
+    <value>ユーザーデータエラーが発生しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_ConfigFailedSanityCheck" xml:space="preserve">
+    <value>HMD構成データの整合性チェックに失敗しました。</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_OculusRuntimeBadInstall" xml:space="preserve">
+    <value>Oculusランタイムのインストールが不完全です。</value>
+  </data>
+  <data name="VRInitializeException_UnexpectedError" xml:space="preserve">
+    <value>予期しない初期化エラーが発生しました: {0}</value>
+  </data>
+  <data name="VRApplicationException_AppKeyAlreadyExists" xml:space="preserve">
+    <value>指定されたアプリケーションキーは既に存在します。</value>
+  </data>
+  <data name="VRApplicationException_NoManifest" xml:space="preserve">
+    <value>アプリケーションマニフェストが見つかりません。</value>
+  </data>
+  <data name="VRApplicationException_NoApplication" xml:space="preserve">
+    <value>指定されたアプリケーションが見つかりません。</value>
+  </data>
+  <data name="VRApplicationException_InvalidIndex" xml:space="preserve">
+    <value>インデックスが無効です。</value>
+  </data>
+  <data name="VRApplicationException_UnknownApplication" xml:space="preserve">
+    <value>未知のアプリケーションです。</value>
+  </data>
+  <data name="VRApplicationException_IPCFailed" xml:space="preserve">
+    <value>プロセス間通信(IPC)に失敗しました。</value>
+  </data>
+  <data name="VRApplicationException_ApplicationAlreadyRunning" xml:space="preserve">
+    <value>アプリケーションは既に実行中です。</value>
+  </data>
+  <data name="VRApplicationException_InvalidManifest" xml:space="preserve">
+    <value>マニフェストファイルが不正です。</value>
+  </data>
+  <data name="VRApplicationException_InvalidApplication" xml:space="preserve">
+    <value>アプリケーションの設定が無効です。</value>
+  </data>
+  <data name="VRApplicationException_LaunchFailed" xml:space="preserve">
+    <value>アプリケーションの起動に失敗しました。</value>
+  </data>
+  <data name="VRApplicationException_ApplicationAlreadyStarting" xml:space="preserve">
+    <value>アプリケーションは既に起動処理中です。</value>
+  </data>
+  <data name="VRApplicationException_LaunchInProgress" xml:space="preserve">
+    <value>別の起動処理が進行中です。</value>
+  </data>
+  <data name="VRApplicationException_OldApplicationQuitting" xml:space="preserve">
+    <value>以前のアプリケーションが終了処理中のため、起動できません。</value>
+  </data>
+  <data name="VRApplicationException_TransitionAborted" xml:space="preserve">
+    <value>アプリケーションの遷移が中断されました。</value>
+  </data>
+  <data name="VRApplicationException_IsTemplate" xml:space="preserve">
+    <value>指定されたアプリはテンプレートであり、直接起動できません。</value>
+  </data>
+  <data name="VRApplicationException_SteamVRIsExiting" xml:space="preserve">
+    <value>SteamVRが終了処理中のため、要求を完了できません。</value>
+  </data>
+  <data name="VRApplicationException_BufferTooSmall" xml:space="preserve">
+    <value>バッファサイズが不足しています。</value>
+  </data>
+  <data name="VRApplicationException_PropertyNotSet" xml:space="preserve">
+    <value>プロパティが設定されていません。</value>
+  </data>
+  <data name="VRApplicationException_UnknownProperty" xml:space="preserve">
+    <value>未知のプロパティが要求されました。</value>
+  </data>
+  <data name="VRApplicationException_InvalidParameter" xml:space="preserve">
+    <value>パラメータが無効です。</value>
+  </data>
+  <data name="VRApplicationException_NotImplemented" xml:space="preserve">
+    <value>要求された機能は実装されていません。</value>
+  </data>
+  <data name="VRApplicationException_UnexpectedError" xml:space="preserve">
+    <value>予期しないアプリケーションエラーが発生しました: {0}</value>
+  </data>
+  <data name="VROverlayException_UnknownOverlay" xml:space="preserve">
+    <value>指定されたオーバーレイが見つかりません。</value>
+  </data>
+  <data name="VROverlayException_InvalidHandle" xml:space="preserve">
+    <value>オーバーレイハンドルが無効です。</value>
+  </data>
+  <data name="VROverlayException_PermissionDenied" xml:space="preserve">
+    <value>このオーバーレイ操作を実行する権限がありません。</value>
+  </data>
+  <data name="VROverlayException_OverlayLimitExceeded" xml:space="preserve">
+    <value>VRオーバーレイの最大数(128個等)に達しました。</value>
+  </data>
+  <data name="VROverlayException_WrongVisibilityType" xml:space="preserve">
+    <value>この操作には対応していない表示タイプです。</value>
+  </data>
+  <data name="VROverlayException_KeyTooLong" xml:space="preserve">
+    <value>オーバーレイのキーが長すぎます。</value>
+  </data>
+  <data name="VROverlayException_NameTooLong" xml:space="preserve">
+    <value>オーバーレイの名前が長すぎます。</value>
+  </data>
+  <data name="VROverlayException_KeyInUse" xml:space="preserve">
+    <value>このキー(文字列ID)は既に別のオーバーレイで使用されています。</value>
+  </data>
+  <data name="VROverlayException_WrongTransformType" xml:space="preserve">
+    <value>このオーバーレイでは、要求された座標変換タイプ(Absolute/TrackedDevice等)はサポートされていません。</value>
+  </data>
+  <data name="VROverlayException_InvalidTrackedDevice" xml:space="preserve">
+    <value>指定されたトラックデバイスのインデックスが無効、または接続されていません。</value>
+  </data>
+  <data name="VROverlayException_InvalidParameter" xml:space="preserve">
+    <value>引数(パラメータ)が不正です。</value>
+  </data>
+  <data name="VROverlayException_ThumbnailCantBeDestroyed" xml:space="preserve">
+    <value>サムネイル・オーバーレイを単体で破棄することはできません。</value>
+  </data>
+  <data name="VROverlayException_ArrayTooSmall" xml:space="preserve">
+    <value>提供されたバッファサイズが不足しています。</value>
+  </data>
+  <data name="VROverlayException_RequestFailed" xml:space="preserve">
+    <value>OpenVRリクエストが失敗しました。</value>
+  </data>
+  <data name="VROverlayException_InvalidTexture" xml:space="preserve">
+    <value>テクスチャハンドルまたはポインタが無効です。</value>
+  </data>
+  <data name="VROverlayException_UnableToLoadFile" xml:space="preserve">
+    <value>ファイル(PNG/マニフェスト等)を読み込めませんでした。パスを確認してください。</value>
+  </data>
+  <data name="VROverlayException_KeyboardAlreadyInUse" xml:space="preserve">
+    <value>VRシステムキーボードは既に他のプロセスで使用されています。</value>
+  </data>
+  <data name="VROverlayException_NoNeighbor" xml:space="preserve">
+    <value>隣接オーバーレイが見つかりません。</value>
+  </data>
+  <data name="VROverlayException_TooManyMaskPrimitives" xml:space="preserve">
+    <value>マスクプリミティブの制限数を超えました。</value>
+  </data>
+  <data name="VROverlayException_BadMaskPrimitive" xml:space="preserve">
+    <value>マスクプリミティブの形式が不正です。</value>
+  </data>
+  <data name="VROverlayException_TextureAlreadyLocked" xml:space="preserve">
+    <value>テクスチャは既にロックされています。</value>
+  </data>
+  <data name="VROverlayException_TextureLockCapacityReached" xml:space="preserve">
+    <value>テクスチャロックのキャパシティに達しました。</value>
+  </data>
+  <data name="VROverlayException_TextureNotLocked" xml:space="preserve">
+    <value>操作前にテクスチャをロックする必要があります。</value>
+  </data>
+  <data name="VROverlayException_UnexpectedError" xml:space="preserve">
+    <value>予期しないエラーが発生しました: {0}</value>
+  </data>
+  <data name="VRCompositorException_RequestFailed" xml:space="preserve">
+    <value>コンポジターへの要求に失敗しました。</value>
+  </data>
+  <data name="VRCompositorException_IncompatibleVersion" xml:space="preserve">
+    <value>アプリケーションのコンポジター バージョンがランタイムと互換性がありません。</value>
+  </data>
+  <data name="VRCompositorException_DoNotHaveFocus" xml:space="preserve">
+    <value>アプリケーションが現在フォーカスを持っていません。</value>
+  </data>
+  <data name="VRCompositorException_InvalidTexture" xml:space="preserve">
+    <value>送信されたテクスチャが無効です。</value>
+  </data>
+  <data name="VRCompositorException_IsNotSceneApplication" xml:space="preserve">
+    <value>アプリケーションがシーンアプリケーションとして登録されていません。</value>
+  </data>
+  <data name="VRCompositorException_TextureIsOnWrongDevice" xml:space="preserve">
+    <value>テクスチャが別のグラフィックスデバイス上で作成されています。</value>
+  </data>
+  <data name="VRCompositorException_TextureUsesUnsupportedFormat" xml:space="preserve">
+    <value>テクスチャ形式がコンポジターでサポートされていません。</value>
+  </data>
+  <data name="VRCompositorException_SharedTexturesNotSupported" xml:space="preserve">
+    <value>共有テクスチャはこのシステムでサポートされていません。</value>
+  </data>
+  <data name="VRCompositorException_IndexOutOfRange" xml:space="preserve">
+    <value>テクスチャ インデックスが範囲外です。</value>
+  </data>
+  <data name="VRCompositorException_AlreadySubmitted" xml:space="preserve">
+    <value>この目に対するフレームは既に送信されています。</value>
+  </data>
+  <data name="VRCompositorException_InvalidBounds" xml:space="preserve">
+    <value>送信されたテクスチャ境界が無効です。</value>
+  </data>
+  <data name="VRCompositorException_AlreadySet" xml:space="preserve">
+    <value>コンポジター プロパティは既に設定されています。</value>
+  </data>
+  <data name="VRInputException_NameNotFound" xml:space="preserve">
+    <value>指定された入力アクションまたはパスが見つかりません。</value>
+  </data>
+  <data name="VRInputException_WrongType" xml:space="preserve">
+    <value>要求された入力タイプが期待された型と一致しません。</value>
+  </data>
+  <data name="VRInputException_InvalidHandle" xml:space="preserve">
+    <value>無効な入力ハンドルが指定されました。</value>
+  </data>
+  <data name="VRInputException_InvalidParam" xml:space="preserve">
+    <value>無効なパラメータが指定されました。</value>
+  </data>
+  <data name="VRInputException_NoSteam" xml:space="preserve">
+    <value>Steam または SteamVR が利用できません。</value>
+  </data>
+  <data name="VRInputException_MaxCapacityReached" xml:space="preserve">
+    <value>内部リソースの最大数に達しました。</value>
+  </data>
+  <data name="VRInputException_IPCError" xml:space="preserve">
+    <value>SteamVR との IPC 通信中にエラーが発生しました。</value>
+  </data>
+  <data name="VRInputException_NoActiveActionSet" xml:space="preserve">
+    <value>有効なアクションセットが設定されていません。</value>
+  </data>
+  <data name="VRInputException_InvalidDevice" xml:space="preserve">
+    <value>無効なデバイスが指定されました。</value>
+  </data>
+  <data name="VRInputException_InvalidSkeleton" xml:space="preserve">
+    <value>スケルトンデータが無効です。</value>
+  </data>
+  <data name="VRInputException_InvalidBoneCount" xml:space="preserve">
+    <value>ボーン数が正しくありません。</value>
+  </data>
+  <data name="VRInputException_InvalidCompressedData" xml:space="preserve">
+    <value>圧縮データが無効です。</value>
+  </data>
+  <data name="VRInputException_NoData" xml:space="preserve">
+    <value>利用可能な入力データが存在しません。</value>
+  </data>
+  <data name="VRInputException_BufferTooSmall" xml:space="preserve">
+    <value>指定されたバッファサイズが不足しています。</value>
+  </data>
+  <data name="VRInputException_MismatchedActionManifest" xml:space="preserve">
+    <value>現在読み込まれている Action Manifest が一致しません。</value>
+  </data>
+  <data name="VRInputException_MissingSkeletonData" xml:space="preserve">
+    <value>必要なスケルトンデータが不足しています。</value>
+  </data>
+  <data name="VRInputException_InvalidBoneIndex" xml:space="preserve">
+    <value>無効なボーンインデックスが指定されました。</value>
+  </data>
+  <data name="VRInputException_InvalidPriority" xml:space="preserve">
+    <value>無効な優先度が指定されました。</value>
+  </data>
+  <data name="VRInputException_PermissionDenied" xml:space="preserve">
+    <value>要求された操作へのアクセスが拒否されました。</value>
+  </data>
+  <data name="VRInputException_InvalidRenderModel" xml:space="preserve">
+    <value>無効なレンダーモデルが指定されました。</value>
+  </data>
+  <data name="VRInputException_UnexpectedError" xml:space="preserve">
+    <value>予期しない入力エラーが発生しました: {0}</value>
+  </data>
+  <data name="VRNotificationException_InvalidNotificationId" xml:space="preserve">
+    <value>無効な通知IDです。通知が存在しないか、すでに削除されています。</value>
+  </data>
+  <data name="VRNotificationException_NotificationQueueFull" xml:space="preserve">
+    <value>通知キューがいっぱいです。これ以上通知を追加できません。</value>
+  </data>
+  <data name="VRNotificationException_InvalidOverlayHandle" xml:space="preserve">
+    <value>無効なオーバーレイハンドルです。</value>
+  </data>
+  <data name="VRNotificationException_SystemWithUserValueAlreadyExists" xml:space="preserve">
+    <value>同じ UserValue を持つ通知がすでに存在しています。</value>
+  </data>
+  <data name="VRRenderModelException_Loading" xml:space="preserve">
+    <value>レンダーモデルは現在読み込み中です。</value>
+  </data>
+  <data name="VRRenderModelException_NotSupported" xml:space="preserve">
+    <value>この環境ではレンダーモデル機能がサポートされていません。</value>
+  </data>
+  <data name="VRRenderModelException_InvalidArg" xml:space="preserve">
+    <value>無効な引数が指定されました。</value>
+  </data>
+  <data name="VRRenderModelException_InvalidModel" xml:space="preserve">
+    <value>レンダーモデルが無効、または破損しています。</value>
+  </data>
+  <data name="VRRenderModelException_NoShapes" xml:space="preserve">
+    <value>レンダーモデルに形状データが含まれていません。</value>
+  </data>
+  <data name="VRRenderModelException_MultipleShapes" xml:space="preserve">
+    <value>複数の形状データが検出されましたが、単一形状のみサポートされています。</value>
+  </data>
+  <data name="VRRenderModelException_TooManyVertices" xml:space="preserve">
+    <value>レンダーモデルの頂点数が多すぎます。</value>
+  </data>
+  <data name="VRRenderModelException_MultipleTextures" xml:space="preserve">
+    <value>複数のテクスチャが検出されましたが、単一テクスチャのみサポートされています。</value>
+  </data>
+  <data name="VRRenderModelException_BufferTooSmall" xml:space="preserve">
+    <value>バッファサイズが不足しています。</value>
+  </data>
+  <data name="VRRenderModelException_NotEnoughNormals" xml:space="preserve">
+    <value>法線データが不足しています。</value>
+  </data>
+  <data name="VRRenderModelException_NotEnoughTexCoords" xml:space="preserve">
+    <value>テクスチャ座標データが不足しています。</value>
+  </data>
+  <data name="VRRenderModelException_InvalidTexture" xml:space="preserve">
+    <value>テクスチャデータが無効、または破損しています。</value>
+  </data>
+  <data name="VRRenderModelException_UnexpectedError" xml:space="preserve">
+    <value>不明なレンダーモデルエラーが発生しました。 ({0})</value>
+  </data>
+  <data name="VRScreenshotException_None" xml:space="preserve">
+    <value>エラーは発生していません。</value>
+  </data>
+  <data name="VRScreenshotException_RequestFailed" xml:space="preserve">
+    <value>スクリーンショットのリクエストに失敗しました。</value>
+  </data>
+  <data name="VRScreenshotException_IncompatibleVersion" xml:space="preserve">
+    <value>スクリーンショットAPIのバージョンに互換性がありません。</value>
+  </data>
+  <data name="VRScreenshotException_NotFound" xml:space="preserve">
+    <value>指定されたスクリーンショットが見つかりませんでした。</value>
+  </data>
+  <data name="VRScreenshotException_BufferTooSmall" xml:space="preserve">
+    <value>渡されたバッファサイズが不足しています。</value>
+  </data>
+  <data name="VRScreenshotException_ScreenshotAlreadyInProgress" xml:space="preserve">
+    <value>別のスクリーンショット処理が既に進行中です。</value>
+  </data>
+  <data name="VRSettingsException_None" xml:space="preserve">
+    <value>設定エラーは発生していません。</value>
+  </data>
+  <data name="VRSettingsException_IPCFailed" xml:space="preserve">
+    <value>設定システムとのIPC通信に失敗しました。</value>
+  </data>
+  <data name="VRSettingsException_WriteFailed" xml:space="preserve">
+    <value>設定の書き込みに失敗しました。</value>
+  </data>
+  <data name="VRSettingsException_ReadFailed" xml:space="preserve">
+    <value>設定の読み込みに失敗しました。</value>
+  </data>
+  <data name="VRSettingsException_JsonParseFailed" xml:space="preserve">
+    <value>設定ファイルのJSON解析に失敗しました。</value>
+  </data>
+  <data name="VRSettingsException_UnsetSettingHasNoDefault" xml:space="preserve">
+    <value>設定値が未設定であり、既定値も存在しません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_Success" xml:space="preserve">
+    <value>トラッキングプロパティ操作は正常に完了しました。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_WrongDataType" xml:space="preserve">
+    <value>要求されたプロパティのデータ型が正しくありません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_WrongDeviceClass" xml:space="preserve">
+    <value>このデバイスクラスでは利用できないプロパティです。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_BufferTooSmall" xml:space="preserve">
+    <value>プロパティを格納するバッファサイズが不足しています。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_UnknownProperty" xml:space="preserve">
+    <value>指定されたプロパティは存在しません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_InvalidDevice" xml:space="preserve">
+    <value>指定されたデバイスは無効です。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_CouldNotContactServer" xml:space="preserve">
+    <value>OpenVR サーバーへ接続できませんでした。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_ValueNotProvidedByDevice" xml:space="preserve">
+    <value>デバイスからこのプロパティ値は提供されていません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_StringExceedsMaximumLength" xml:space="preserve">
+    <value>文字列が許可されている最大長を超えています。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_NotYetAvailable" xml:space="preserve">
+    <value>プロパティ値はまだ利用可能ではありません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_PermissionDenied" xml:space="preserve">
+    <value>プロパティへのアクセス権限がありません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_InvalidOperation" xml:space="preserve">
+    <value>無効なプロパティ操作が実行されました。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_CannotWriteToWildcards" xml:space="preserve">
+    <value>ワイルドカードプロパティへ書き込むことはできません。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_IPCReadFailure" xml:space="preserve">
+    <value>IPC 読み取り中にエラーが発生しました。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_OutOfMemory" xml:space="preserve">
+    <value>メモリ不足によりプロパティ操作に失敗しました。</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_InvalidContainer" xml:space="preserve">
+    <value>指定されたプロパティコンテナは無効です。</value>
+  </data>
+</root>

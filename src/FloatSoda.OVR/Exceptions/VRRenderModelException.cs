@@ -1,5 +1,10 @@
-﻿namespace FloatSoda.OVR.Exceptions;
+using FloatSoda.OVR.Exceptions.Resources;
 
+namespace FloatSoda.OVR.Exceptions;
+
+/// <summary>
+/// Thrown when an OpenVR render model operation (<see cref="EVRRenderModelError"/>) fails.
+/// </summary>
 public class VRRenderModelException(string message, EVRRenderModelError errorCode)
     : OpenVRSystemException<EVRRenderModelError>(message, errorCode)
 {
@@ -10,21 +15,22 @@ public class VRRenderModelException(string message, EVRRenderModelError errorCod
 
     private static string GetMessage(EVRRenderModelError error) => error switch
     {
-        EVRRenderModelError.Loading => "レンダーモデルは現在読み込み中です。",
-        EVRRenderModelError.NotSupported => "この環境ではレンダーモデル機能がサポートされていません。",
-        EVRRenderModelError.InvalidArg => "無効な引数が指定されました。",
-        EVRRenderModelError.InvalidModel => "レンダーモデルが無効、または破損しています。",
-        EVRRenderModelError.NoShapes => "レンダーモデルに形状データが含まれていません。",
-        EVRRenderModelError.MultipleShapes => "複数の形状データが検出されましたが、単一形状のみサポートされています。",
-        EVRRenderModelError.TooManyVertices => "レンダーモデルの頂点数が多すぎます。",
-        EVRRenderModelError.MultipleTextures => "複数のテクスチャが検出されましたが、単一テクスチャのみサポートされています。",
-        EVRRenderModelError.BufferTooSmall => "バッファサイズが不足しています。",
-        EVRRenderModelError.NotEnoughNormals => "法線データが不足しています。",
-        EVRRenderModelError.NotEnoughTexCoords => "テクスチャ座標データが不足しています。",
-        EVRRenderModelError.InvalidTexture => "テクスチャデータが無効、または破損しています。",
-        _ => $"不明なレンダーモデルエラーが発生しました。 ({error})"
+        EVRRenderModelError.Loading => ExceptionMessages.VRRenderModelException_Loading,
+        EVRRenderModelError.NotSupported => ExceptionMessages.VRRenderModelException_NotSupported,
+        EVRRenderModelError.InvalidArg => ExceptionMessages.VRRenderModelException_InvalidArg,
+        EVRRenderModelError.InvalidModel => ExceptionMessages.VRRenderModelException_InvalidModel,
+        EVRRenderModelError.NoShapes => ExceptionMessages.VRRenderModelException_NoShapes,
+        EVRRenderModelError.MultipleShapes => ExceptionMessages.VRRenderModelException_MultipleShapes,
+        EVRRenderModelError.TooManyVertices => ExceptionMessages.VRRenderModelException_TooManyVertices,
+        EVRRenderModelError.MultipleTextures => ExceptionMessages.VRRenderModelException_MultipleTextures,
+        EVRRenderModelError.BufferTooSmall => ExceptionMessages.VRRenderModelException_BufferTooSmall,
+        EVRRenderModelError.NotEnoughNormals => ExceptionMessages.VRRenderModelException_NotEnoughNormals,
+        EVRRenderModelError.NotEnoughTexCoords => ExceptionMessages.VRRenderModelException_NotEnoughTexCoords,
+        EVRRenderModelError.InvalidTexture => ExceptionMessages.VRRenderModelException_InvalidTexture,
+        _ => string.Format(ExceptionMessages.VRRenderModelException_UnexpectedError, error)
     };
 
+    /// <summary>Throws a <see cref="VRRenderModelException"/> if <paramref name="error"/> indicates a failure.</summary>
     public static void ThrowIfError(EVRRenderModelError error)
     {
         if (error == EVRRenderModelError.None) return;
