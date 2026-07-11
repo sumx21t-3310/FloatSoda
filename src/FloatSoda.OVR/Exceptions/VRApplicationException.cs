@@ -1,8 +1,14 @@
+using FloatSoda.OVR.Exceptions.Resources;
+
 namespace FloatSoda.OVR.Exceptions;
 
+/// <summary>
+/// Thrown when an OpenVR application management operation (<see cref="EVRApplicationError"/>) fails.
+/// </summary>
 public class VRApplicationException(string message, EVRApplicationError errorCode)
     : OpenVRSystemException<EVRApplicationError>(message, errorCode)
 {
+    /// <summary>Creates an exception with a message derived from <paramref name="errorCode"/>.</summary>
     public VRApplicationException(EVRApplicationError errorCode) : this(GetMessage(errorCode), errorCode)
     {
     }
@@ -12,33 +18,34 @@ public class VRApplicationException(string message, EVRApplicationError errorCod
     {
         return error switch
         {
-            EVRApplicationError.AppKeyAlreadyExists => "指定されたアプリケーションキーは既に存在します。",
-            EVRApplicationError.NoManifest => "アプリケーションマニフェストが見つかりません。",
-            EVRApplicationError.NoApplication => "指定されたアプリケーションが見つかりません。",
-            EVRApplicationError.InvalidIndex => "インデックスが無効です。",
-            EVRApplicationError.UnknownApplication => "未知のアプリケーションです。",
-            EVRApplicationError.IPCFailed => "プロセス間通信(IPC)に失敗しました。",
-            EVRApplicationError.ApplicationAlreadyRunning => "アプリケーションは既に実行中です。",
-            EVRApplicationError.InvalidManifest => "マニフェストファイルが不正です。",
-            EVRApplicationError.InvalidApplication => "アプリケーションの設定が無効です。",
-            EVRApplicationError.LaunchFailed => "アプリケーションの起動に失敗しました。",
-            EVRApplicationError.ApplicationAlreadyStarting => "アプリケーションは既に起動処理中です。",
-            EVRApplicationError.LaunchInProgress => "別の起動処理が進行中です。",
-            EVRApplicationError.OldApplicationQuitting => "以前のアプリケーションが終了処理中のため、起動できません。",
+            EVRApplicationError.AppKeyAlreadyExists => ExceptionMessages.VRApplicationException_AppKeyAlreadyExists,
+            EVRApplicationError.NoManifest => ExceptionMessages.VRApplicationException_NoManifest,
+            EVRApplicationError.NoApplication => ExceptionMessages.VRApplicationException_NoApplication,
+            EVRApplicationError.InvalidIndex => ExceptionMessages.VRApplicationException_InvalidIndex,
+            EVRApplicationError.UnknownApplication => ExceptionMessages.VRApplicationException_UnknownApplication,
+            EVRApplicationError.IPCFailed => ExceptionMessages.VRApplicationException_IPCFailed,
+            EVRApplicationError.ApplicationAlreadyRunning => ExceptionMessages.VRApplicationException_ApplicationAlreadyRunning,
+            EVRApplicationError.InvalidManifest => ExceptionMessages.VRApplicationException_InvalidManifest,
+            EVRApplicationError.InvalidApplication => ExceptionMessages.VRApplicationException_InvalidApplication,
+            EVRApplicationError.LaunchFailed => ExceptionMessages.VRApplicationException_LaunchFailed,
+            EVRApplicationError.ApplicationAlreadyStarting => ExceptionMessages.VRApplicationException_ApplicationAlreadyStarting,
+            EVRApplicationError.LaunchInProgress => ExceptionMessages.VRApplicationException_LaunchInProgress,
+            EVRApplicationError.OldApplicationQuitting => ExceptionMessages.VRApplicationException_OldApplicationQuitting,
 
-            EVRApplicationError.TransitionAborted => "アプリケーションの遷移が中断されました。",
-            EVRApplicationError.IsTemplate => "指定されたアプリはテンプレートであり、直接起動できません。",
-            EVRApplicationError.SteamVRIsExiting => "SteamVRが終了処理中のため、要求を完了できません。",
-            EVRApplicationError.BufferTooSmall => "バッファサイズが不足しています。",
-            EVRApplicationError.PropertyNotSet => "プロパティが設定されていません。",
-            EVRApplicationError.UnknownProperty => "未知のプロパティが要求されました。",
-            EVRApplicationError.InvalidParameter => "パラメータが無効です。",
-            EVRApplicationError.NotImplemented => "要求された機能は実装されていません。",
+            EVRApplicationError.TransitionAborted => ExceptionMessages.VRApplicationException_TransitionAborted,
+            EVRApplicationError.IsTemplate => ExceptionMessages.VRApplicationException_IsTemplate,
+            EVRApplicationError.SteamVRIsExiting => ExceptionMessages.VRApplicationException_SteamVRIsExiting,
+            EVRApplicationError.BufferTooSmall => ExceptionMessages.VRApplicationException_BufferTooSmall,
+            EVRApplicationError.PropertyNotSet => ExceptionMessages.VRApplicationException_PropertyNotSet,
+            EVRApplicationError.UnknownProperty => ExceptionMessages.VRApplicationException_UnknownProperty,
+            EVRApplicationError.InvalidParameter => ExceptionMessages.VRApplicationException_InvalidParameter,
+            EVRApplicationError.NotImplemented => ExceptionMessages.VRApplicationException_NotImplemented,
 
-            _ => $"予期しないアプリケーションエラーが発生しました: {error}"
+            _ => string.Format(ExceptionMessages.VRApplicationException_UnexpectedError, error)
         };
     }
 
+    /// <summary>Throws a <see cref="VRApplicationException"/> if <paramref name="error"/> indicates a failure.</summary>
     public static void ThrowIfError(EVRApplicationError error)
     {
         if (error == EVRApplicationError.None) return;

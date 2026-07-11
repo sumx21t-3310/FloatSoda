@@ -1,0 +1,1009 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="VRInitializeException_Unknown" xml:space="preserve">
+    <value>An unknown initialization error occurred.</value>
+  </data>
+  <data name="VRInitializeException_Init_InstallationNotFound" xml:space="preserve">
+    <value>The OpenVR installation was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_InstallationCorrupt" xml:space="preserve">
+    <value>The OpenVR installation is corrupted.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRClientDLLNotFound" xml:space="preserve">
+    <value>vrclient.dll was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_FileNotFound" xml:space="preserve">
+    <value>A required configuration file was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_FactoryNotFound" xml:space="preserve">
+    <value>Failed to obtain the factory interface.</value>
+  </data>
+  <data name="VRInitializeException_Init_InterfaceNotFound" xml:space="preserve">
+    <value>The requested interface was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_InvalidInterface" xml:space="preserve">
+    <value>The interface is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Init_UserConfigDirectoryInvalid" xml:space="preserve">
+    <value>The user config directory is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Init_HmdNotFound" xml:space="preserve">
+    <value>The HMD was not found or is not connected.</value>
+  </data>
+  <data name="VRInitializeException_Init_NotInitialized" xml:space="preserve">
+    <value>OpenVR has not been initialized.</value>
+  </data>
+  <data name="VRInitializeException_Init_PathRegistryNotFound" xml:space="preserve">
+    <value>The path registry was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_NoConfigPath" xml:space="preserve">
+    <value>No configuration path is set.</value>
+  </data>
+  <data name="VRInitializeException_Init_NoLogPath" xml:space="preserve">
+    <value>No log path is set.</value>
+  </data>
+  <data name="VRInitializeException_Init_PathRegistryNotWritable" xml:space="preserve">
+    <value>The path registry is not writable.</value>
+  </data>
+  <data name="VRInitializeException_Init_AppInfoInitFailed" xml:space="preserve">
+    <value>Failed to initialize application info.</value>
+  </data>
+  <data name="VRInitializeException_Init_Retry" xml:space="preserve">
+    <value>A retry is required.</value>
+  </data>
+  <data name="VRInitializeException_Init_InitCanceledByUser" xml:space="preserve">
+    <value>Initialization was canceled by the user.</value>
+  </data>
+  <data name="VRInitializeException_Init_AnotherAppLaunching" xml:space="preserve">
+    <value>Another application is currently launching.</value>
+  </data>
+  <data name="VRInitializeException_Init_SettingsInitFailed" xml:space="preserve">
+    <value>Failed to initialize settings.</value>
+  </data>
+  <data name="VRInitializeException_Init_ShuttingDown" xml:space="preserve">
+    <value>The system is shutting down.</value>
+  </data>
+  <data name="VRInitializeException_Init_TooManyObjects" xml:space="preserve">
+    <value>Too many objects.</value>
+  </data>
+  <data name="VRInitializeException_Init_NoServerForBackgroundApp" xml:space="preserve">
+    <value>There is no server for the background app.</value>
+  </data>
+  <data name="VRInitializeException_Init_NotSupportedWithCompositor" xml:space="preserve">
+    <value>Not supported when the compositor is in use.</value>
+  </data>
+  <data name="VRInitializeException_Init_NotAvailableToUtilityApps" xml:space="preserve">
+    <value>Not available to utility apps.</value>
+  </data>
+  <data name="VRInitializeException_Init_Internal" xml:space="preserve">
+    <value>An internal error occurred.</value>
+  </data>
+  <data name="VRInitializeException_Init_HmdDriverIdIsNone" xml:space="preserve">
+    <value>The HMD driver ID is None.</value>
+  </data>
+  <data name="VRInitializeException_Init_HmdNotFoundPresenceFailed" xml:space="preserve">
+    <value>Failed to detect HMD presence.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRMonitorNotFound" xml:space="preserve">
+    <value>The VR monitor was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRMonitorStartupFailed" xml:space="preserve">
+    <value>Failed to start the VR monitor.</value>
+  </data>
+  <data name="VRInitializeException_Init_LowPowerWatchdogNotSupported" xml:space="preserve">
+    <value>The low power watchdog is not supported.</value>
+  </data>
+  <data name="VRInitializeException_Init_InvalidApplicationType" xml:space="preserve">
+    <value>The application type is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Init_NotAvailableToWatchdogApps" xml:space="preserve">
+    <value>Not available to watchdog apps.</value>
+  </data>
+  <data name="VRInitializeException_Init_WatchdogDisabledInSettings" xml:space="preserve">
+    <value>The watchdog is disabled in settings.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRDashboardNotFound" xml:space="preserve">
+    <value>The VR dashboard was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRDashboardStartupFailed" xml:space="preserve">
+    <value>Failed to start the VR dashboard.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRHomeNotFound" xml:space="preserve">
+    <value>VR Home was not found.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRHomeStartupFailed" xml:space="preserve">
+    <value>Failed to start VR Home.</value>
+  </data>
+  <data name="VRInitializeException_Init_RebootingBusy" xml:space="preserve">
+    <value>Busy while rebooting.</value>
+  </data>
+  <data name="VRInitializeException_Init_FirmwareUpdateBusy" xml:space="preserve">
+    <value>Busy while updating firmware.</value>
+  </data>
+  <data name="VRInitializeException_Init_FirmwareRecoveryBusy" xml:space="preserve">
+    <value>Busy while recovering firmware.</value>
+  </data>
+  <data name="VRInitializeException_Init_USBServiceBusy" xml:space="preserve">
+    <value>The USB service is busy.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRWebHelperStartupFailed" xml:space="preserve">
+    <value>Failed to start the VR Web Helper.</value>
+  </data>
+  <data name="VRInitializeException_Init_TrackerManagerInitFailed" xml:space="preserve">
+    <value>Failed to initialize the tracker manager.</value>
+  </data>
+  <data name="VRInitializeException_Init_AlreadyRunning" xml:space="preserve">
+    <value>Already running.</value>
+  </data>
+  <data name="VRInitializeException_Init_FailedForVrMonitor" xml:space="preserve">
+    <value>Failed to initialize the process for the VR monitor.</value>
+  </data>
+  <data name="VRInitializeException_Init_PropertyManagerInitFailed" xml:space="preserve">
+    <value>Failed to initialize the property manager.</value>
+  </data>
+  <data name="VRInitializeException_Init_WebServerFailed" xml:space="preserve">
+    <value>Failed to start the web server.</value>
+  </data>
+  <data name="VRInitializeException_Init_IllegalTypeTransition" xml:space="preserve">
+    <value>Illegal type transition.</value>
+  </data>
+  <data name="VRInitializeException_Init_MismatchedRuntimes" xml:space="preserve">
+    <value>Runtime versions do not match.</value>
+  </data>
+  <data name="VRInitializeException_Init_InvalidProcessId" xml:space="preserve">
+    <value>The process ID is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Init_VRServiceStartupFailed" xml:space="preserve">
+    <value>Failed to start the VR service.</value>
+  </data>
+  <data name="VRInitializeException_Init_PrismNeedsNewDrivers" xml:space="preserve">
+    <value>The Prism driver needs to be updated.</value>
+  </data>
+  <data name="VRInitializeException_Init_PrismStartupTimedOut" xml:space="preserve">
+    <value>Prism startup timed out.</value>
+  </data>
+  <data name="VRInitializeException_Init_CouldNotStartPrism" xml:space="preserve">
+    <value>Could not start Prism.</value>
+  </data>
+  <data name="VRInitializeException_Init_PrismExitedUnexpectedly" xml:space="preserve">
+    <value>Prism exited unexpectedly.</value>
+  </data>
+  <data name="VRInitializeException_Steam_SteamInstallationNotFound" xml:space="preserve">
+    <value>The Steam installation was not found.</value>
+  </data>
+  <data name="VRInitializeException_Driver_Failed" xml:space="preserve">
+    <value>A driver error occurred.</value>
+  </data>
+  <data name="VRInitializeException_Driver_Unknown" xml:space="preserve">
+    <value>An unknown driver error occurred.</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdUnknown" xml:space="preserve">
+    <value>An unknown HMD driver.</value>
+  </data>
+  <data name="VRInitializeException_Driver_NotLoaded" xml:space="preserve">
+    <value>The driver is not loaded.</value>
+  </data>
+  <data name="VRInitializeException_Driver_RuntimeOutOfDate" xml:space="preserve">
+    <value>The driver runtime is out of date.</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdInUse" xml:space="preserve">
+    <value>The HMD is in use by another process.</value>
+  </data>
+  <data name="VRInitializeException_Driver_NotCalibrated" xml:space="preserve">
+    <value>The driver is not calibrated.</value>
+  </data>
+  <data name="VRInitializeException_Driver_CalibrationInvalid" xml:space="preserve">
+    <value>The driver calibration data is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDisplayNotFound" xml:space="preserve">
+    <value>The HMD display was not found.</value>
+  </data>
+  <data name="VRInitializeException_Driver_TrackedDeviceInterfaceUnknown" xml:space="preserve">
+    <value>The tracked device interface is unknown.</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDriverIdOutOfBounds" xml:space="preserve">
+    <value>The HMD driver ID is out of bounds.</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDisplayMirrored" xml:space="preserve">
+    <value>The HMD display is set to mirrored.</value>
+  </data>
+  <data name="VRInitializeException_Driver_HmdDisplayNotFoundLaptop" xml:space="preserve">
+    <value>The laptop HMD display was not found.</value>
+  </data>
+  <data name="VRInitializeException_IPC_ServerInitFailed" xml:space="preserve">
+    <value>Failed to initialize the IPC server.</value>
+  </data>
+  <data name="VRInitializeException_IPC_ConnectFailed" xml:space="preserve">
+    <value>Failed to connect via IPC.</value>
+  </data>
+  <data name="VRInitializeException_IPC_SharedStateInitFailed" xml:space="preserve">
+    <value>Failed to initialize shared state.</value>
+  </data>
+  <data name="VRInitializeException_IPC_CompositorInitFailed" xml:space="preserve">
+    <value>Failed to initialize the compositor.</value>
+  </data>
+  <data name="VRInitializeException_IPC_MutexInitFailed" xml:space="preserve">
+    <value>Failed to initialize the mutex.</value>
+  </data>
+  <data name="VRInitializeException_IPC_Failed" xml:space="preserve">
+    <value>An IPC connection error occurred.</value>
+  </data>
+  <data name="VRInitializeException_IPC_CompositorConnectFailed" xml:space="preserve">
+    <value>Failed to connect to the compositor.</value>
+  </data>
+  <data name="VRInitializeException_IPC_CompositorInvalidConnectResponse" xml:space="preserve">
+    <value>The connection response from the compositor is invalid.</value>
+  </data>
+  <data name="VRInitializeException_IPC_ConnectFailedAfterMultipleAttempts" xml:space="preserve">
+    <value>IPC connection failed after multiple attempts.</value>
+  </data>
+  <data name="VRInitializeException_IPC_ConnectFailedAfterTargetExited" xml:space="preserve">
+    <value>IPC connection failed after the target exited.</value>
+  </data>
+  <data name="VRInitializeException_IPC_NamespaceUnavailable" xml:space="preserve">
+    <value>The IPC namespace is unavailable.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_Failed" xml:space="preserve">
+    <value>The compositor failed.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_D3D11HardwareRequired" xml:space="preserve">
+    <value>Direct3D 11 hardware is required.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FirmwareRequiresUpdate" xml:space="preserve">
+    <value>A firmware update is required for the compositor.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_OverlayInitFailed" xml:space="preserve">
+    <value>Failed to initialize the compositor overlay.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_ScreenshotsInitFailed" xml:space="preserve">
+    <value>Failed to initialize compositor screenshots.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_UnableToCreateDevice" xml:space="preserve">
+    <value>Unable to create the graphics device.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SharedStateIsNull" xml:space="preserve">
+    <value>The shared state is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_NotificationManagerIsNull" xml:space="preserve">
+    <value>The notification manager is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_ResourceManagerClientIsNull" xml:space="preserve">
+    <value>The resource manager client is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_MessageOverlaySharedStateInitFailure" xml:space="preserve">
+    <value>Failed to initialize the message overlay shared state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_PropertiesInterfaceIsNull" xml:space="preserve">
+    <value>The properties interface is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFullscreenWindowFailed" xml:space="preserve">
+    <value>Failed to create the fullscreen window.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SettingsInterfaceIsNull" xml:space="preserve">
+    <value>The settings interface is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToShowWindow" xml:space="preserve">
+    <value>Failed to show the window.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DistortInterfaceIsNull" xml:space="preserve">
+    <value>The distortion interface is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DisplayFrequencyFailure" xml:space="preserve">
+    <value>Failed to get the display frequency.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_RendererInitializationFailed" xml:space="preserve">
+    <value>Failed to initialize the renderer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DXGIFactoryInterfaceIsNull" xml:space="preserve">
+    <value>The DXGI factory interface is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DXGIFactoryCreateFailed" xml:space="preserve">
+    <value>Failed to create the DXGI factory.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DXGIFactoryQueryFailed" xml:space="preserve">
+    <value>Failed to query the DXGI factory.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidAdapterDesktop" xml:space="preserve">
+    <value>The desktop adapter is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidHmdAttachment" xml:space="preserve">
+    <value>The HMD attachment is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidOutputDesktop" xml:space="preserve">
+    <value>The output desktop is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidDeviceProvided" xml:space="preserve">
+    <value>The provided device is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_D3D11RendererInitializationFailed" xml:space="preserve">
+    <value>Failed to initialize the D3D11 renderer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToFindDisplayMode" xml:space="preserve">
+    <value>Failed to find a display mode.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateSwapChain" xml:space="preserve">
+    <value>Failed to create the swap chain.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToGetBackBuffer" xml:space="preserve">
+    <value>Failed to get the back buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateRenderTarget" xml:space="preserve">
+    <value>Failed to create the render target.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateDXGI2SwapChain" xml:space="preserve">
+    <value>Failed to create the DXGI2 swap chain.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedtoGetDXGI2BackBuffer" xml:space="preserve">
+    <value>Failed to get the DXGI2 back buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateDXGI2RenderTarget" xml:space="preserve">
+    <value>Failed to create the DXGI2 render target.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToGetDXGIDeviceInterface" xml:space="preserve">
+    <value>Failed to get the DXGI device interface.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SelectDisplayMode" xml:space="preserve">
+    <value>Failed to select a display mode.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateNvAPIRenderTargets" xml:space="preserve">
+    <value>Failed to create NvAPI render targets.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_NvAPISetDisplayMode" xml:space="preserve">
+    <value>Failed to set the NvAPI display mode.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateDirectModeDisplay" xml:space="preserve">
+    <value>Failed to create the direct mode display.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_InvalidHmdPropertyContainer" xml:space="preserve">
+    <value>The HMD property container is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_UpdateDisplayFrequency" xml:space="preserve">
+    <value>Failed to update the display frequency.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateRasterizerState" xml:space="preserve">
+    <value>Failed to create the rasterizer state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateWireframeRasterizerState" xml:space="preserve">
+    <value>Failed to create the wireframe rasterizer state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateSamplerState" xml:space="preserve">
+    <value>Failed to create the sampler state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateClampToBorderSamplerState" xml:space="preserve">
+    <value>Failed to create the ClampToBorder sampler state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateAnisoSamplerState" xml:space="preserve">
+    <value>Failed to create the anisotropic sampler state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlaySamplerState" xml:space="preserve">
+    <value>Failed to create the overlay sampler state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreatePanoramaSamplerState" xml:space="preserve">
+    <value>Failed to create the panorama sampler state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFontSamplerState" xml:space="preserve">
+    <value>Failed to create the font sampler state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateNoBlendState" xml:space="preserve">
+    <value>Failed to create the NoBlend state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendState" xml:space="preserve">
+    <value>Failed to create the blend state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateAlphaBlendState" xml:space="preserve">
+    <value>Failed to create the AlphaBlend state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendStateMaskR" xml:space="preserve">
+    <value>Failed to create BlendStateMaskR.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendStateMaskG" xml:space="preserve">
+    <value>Failed to create BlendStateMaskG.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateBlendStateMaskB" xml:space="preserve">
+    <value>Failed to create BlendStateMaskB.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDepthStencilState" xml:space="preserve">
+    <value>Failed to create the depth stencil state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDepthStencilStateNoWrite" xml:space="preserve">
+    <value>Failed to create the NoWrite depth stencil state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDepthStencilStateNoDepth" xml:space="preserve">
+    <value>Failed to create the NoDepth depth stencil state.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFlushTexture" xml:space="preserve">
+    <value>Failed to create the flush texture.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDistortionSurfaces" xml:space="preserve">
+    <value>Failed to create the distortion surfaces.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateConstantBuffer" xml:space="preserve">
+    <value>Failed to create the constant buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateHmdPoseConstantBuffer" xml:space="preserve">
+    <value>Failed to create the HMD pose constant buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateHmdPoseStagingConstantBuffer" xml:space="preserve">
+    <value>Failed to create the HMD pose staging buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateSharedFrameInfoConstantBuffer" xml:space="preserve">
+    <value>Failed to create the shared frame info buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayConstantBuffer" xml:space="preserve">
+    <value>Failed to create the overlay constant buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateSceneTextureIndexConstantBuffer" xml:space="preserve">
+    <value>Failed to create the scene texture index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateReadableSceneTextureIndexConstantBuffer" xml:space="preserve">
+    <value>Failed to create the readable scene texture index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLayerGraphicsTextureIndexConstantBuffer" xml:space="preserve">
+    <value>Failed to create the layer graphics index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLayerComputeTextureIndexConstantBuffer" xml:space="preserve">
+    <value>Failed to create the layer compute index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer" xml:space="preserve">
+    <value>Failed to create the layer compute scene index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateComputeHmdPoseConstantBuffer" xml:space="preserve">
+    <value>Failed to create the compute HMD pose buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateGeomConstantBuffer" xml:space="preserve">
+    <value>Failed to create the geometry constant buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreatePanelMaskConstantBuffer" xml:space="preserve">
+    <value>Failed to create the panel mask buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreatePixelSimUBO" xml:space="preserve">
+    <value>Failed to create PixelSimUBO.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateMSAARenderTextures" xml:space="preserve">
+    <value>Failed to create MSAA render textures.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateResolveRenderTextures" xml:space="preserve">
+    <value>Failed to create resolve render textures.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateComputeResolveRenderTextures" xml:space="preserve">
+    <value>Failed to create compute resolve render textures.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateDriverDirectModeResolveTextures" xml:space="preserve">
+    <value>Failed to create driver direct mode resolve textures.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_OpenDriverDirectModeResolveTextures" xml:space="preserve">
+    <value>Failed to open driver direct mode resolve textures.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateFallbackSyncTexture" xml:space="preserve">
+    <value>Failed to create the fallback sync texture.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_ShareFallbackSyncTexture" xml:space="preserve">
+    <value>Failed to share the fallback sync texture.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayIndexBuffer" xml:space="preserve">
+    <value>Failed to create the overlay index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayVertexBuffer" xml:space="preserve">
+    <value>Failed to create the overlay vertex buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateTextVertexBuffer" xml:space="preserve">
+    <value>Failed to create the text vertex buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateTextIndexBuffer" xml:space="preserve">
+    <value>Failed to create the text index buffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateMirrorTextures" xml:space="preserve">
+    <value>Failed to create mirror textures.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateLastFrameRenderTexture" xml:space="preserve">
+    <value>Failed to create the last frame render texture.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateMirrorOverlay" xml:space="preserve">
+    <value>Failed to create the mirror overlay.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateVirtualDisplayBackbuffer" xml:space="preserve">
+    <value>Failed to create the virtual display backbuffer.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_DisplayModeNotSupported" xml:space="preserve">
+    <value>The display mode is not supported.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayInvalidCall" xml:space="preserve">
+    <value>The overlay creation call is invalid.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_CreateOverlayAlreadyInitialized" xml:space="preserve">
+    <value>The overlay is already initialized.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_FailedToCreateMailbox" xml:space="preserve">
+    <value>Failed to create the mailbox.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_WindowInterfaceIsNull" xml:space="preserve">
+    <value>The window interface is null.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SystemLayerCreateInstance" xml:space="preserve">
+    <value>Failed to create the system layer instance.</value>
+  </data>
+  <data name="VRInitializeException_Compositor_SystemLayerCreateSession" xml:space="preserve">
+    <value>Failed to create the system layer session.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_UnableToConnectToOculusRuntime" xml:space="preserve">
+    <value>Unable to connect to the Oculus runtime.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_WindowsNotInDevMode" xml:space="preserve">
+    <value>Windows is not in developer mode.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_CantOpenDevice" xml:space="preserve">
+    <value>Could not open the HMD device.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToRequestConfigStart" xml:space="preserve">
+    <value>Failed to request the start of HMD configuration.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_NoStoredConfig" xml:space="preserve">
+    <value>No configuration is stored on the HMD.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_ConfigTooBig" xml:space="preserve">
+    <value>The HMD configuration data is too large.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_ConfigTooSmall" xml:space="preserve">
+    <value>The HMD configuration data is too small.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToInitZLib" xml:space="preserve">
+    <value>Failed to initialize zlib.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_CantReadFirmwareVersion" xml:space="preserve">
+    <value>Failed to read the firmware version.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToSendUserDataStart" xml:space="preserve">
+    <value>Failed to start sending user data.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToGetUserDataStart" xml:space="preserve">
+    <value>Failed to start getting user data.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UnableToGetUserDataNext" xml:space="preserve">
+    <value>Failed to get the next frame of user data.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UserDataAddressRange" xml:space="preserve">
+    <value>A user data address range error occurred.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_UserDataError" xml:space="preserve">
+    <value>A user data error occurred.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_HmdFound_ConfigFailedSanityCheck" xml:space="preserve">
+    <value>The HMD configuration data failed a sanity check.</value>
+  </data>
+  <data name="VRInitializeException_VendorSpecific_OculusRuntimeBadInstall" xml:space="preserve">
+    <value>The Oculus runtime installation is incomplete.</value>
+  </data>
+  <data name="VRInitializeException_UnexpectedError" xml:space="preserve">
+    <value>An unexpected initialization error occurred: {0}</value>
+  </data>
+  <data name="VRApplicationException_AppKeyAlreadyExists" xml:space="preserve">
+    <value>The specified application key already exists.</value>
+  </data>
+  <data name="VRApplicationException_NoManifest" xml:space="preserve">
+    <value>The application manifest was not found.</value>
+  </data>
+  <data name="VRApplicationException_NoApplication" xml:space="preserve">
+    <value>The specified application was not found.</value>
+  </data>
+  <data name="VRApplicationException_InvalidIndex" xml:space="preserve">
+    <value>The index is invalid.</value>
+  </data>
+  <data name="VRApplicationException_UnknownApplication" xml:space="preserve">
+    <value>Unknown application.</value>
+  </data>
+  <data name="VRApplicationException_IPCFailed" xml:space="preserve">
+    <value>Inter-process communication (IPC) failed.</value>
+  </data>
+  <data name="VRApplicationException_ApplicationAlreadyRunning" xml:space="preserve">
+    <value>The application is already running.</value>
+  </data>
+  <data name="VRApplicationException_InvalidManifest" xml:space="preserve">
+    <value>The manifest file is invalid.</value>
+  </data>
+  <data name="VRApplicationException_InvalidApplication" xml:space="preserve">
+    <value>The application configuration is invalid.</value>
+  </data>
+  <data name="VRApplicationException_LaunchFailed" xml:space="preserve">
+    <value>Failed to launch the application.</value>
+  </data>
+  <data name="VRApplicationException_ApplicationAlreadyStarting" xml:space="preserve">
+    <value>The application is already starting.</value>
+  </data>
+  <data name="VRApplicationException_LaunchInProgress" xml:space="preserve">
+    <value>Another launch is already in progress.</value>
+  </data>
+  <data name="VRApplicationException_OldApplicationQuitting" xml:space="preserve">
+    <value>Cannot launch because the previous application is still quitting.</value>
+  </data>
+  <data name="VRApplicationException_TransitionAborted" xml:space="preserve">
+    <value>The application transition was aborted.</value>
+  </data>
+  <data name="VRApplicationException_IsTemplate" xml:space="preserve">
+    <value>The specified application is a template and cannot be launched directly.</value>
+  </data>
+  <data name="VRApplicationException_SteamVRIsExiting" xml:space="preserve">
+    <value>Cannot complete the request because SteamVR is exiting.</value>
+  </data>
+  <data name="VRApplicationException_BufferTooSmall" xml:space="preserve">
+    <value>The buffer size is insufficient.</value>
+  </data>
+  <data name="VRApplicationException_PropertyNotSet" xml:space="preserve">
+    <value>The property is not set.</value>
+  </data>
+  <data name="VRApplicationException_UnknownProperty" xml:space="preserve">
+    <value>An unknown property was requested.</value>
+  </data>
+  <data name="VRApplicationException_InvalidParameter" xml:space="preserve">
+    <value>The parameter is invalid.</value>
+  </data>
+  <data name="VRApplicationException_NotImplemented" xml:space="preserve">
+    <value>The requested feature is not implemented.</value>
+  </data>
+  <data name="VRApplicationException_UnexpectedError" xml:space="preserve">
+    <value>An unexpected application error occurred: {0}</value>
+  </data>
+  <data name="VROverlayException_UnknownOverlay" xml:space="preserve">
+    <value>The specified overlay was not found.</value>
+  </data>
+  <data name="VROverlayException_InvalidHandle" xml:space="preserve">
+    <value>The overlay handle is invalid.</value>
+  </data>
+  <data name="VROverlayException_PermissionDenied" xml:space="preserve">
+    <value>You do not have permission to perform this overlay operation.</value>
+  </data>
+  <data name="VROverlayException_OverlayLimitExceeded" xml:space="preserve">
+    <value>The maximum number of VR overlays (e.g. 128) has been reached.</value>
+  </data>
+  <data name="VROverlayException_WrongVisibilityType" xml:space="preserve">
+    <value>This visibility type is not supported for this operation.</value>
+  </data>
+  <data name="VROverlayException_KeyTooLong" xml:space="preserve">
+    <value>The overlay key is too long.</value>
+  </data>
+  <data name="VROverlayException_NameTooLong" xml:space="preserve">
+    <value>The overlay name is too long.</value>
+  </data>
+  <data name="VROverlayException_KeyInUse" xml:space="preserve">
+    <value>This key (string ID) is already used by another overlay.</value>
+  </data>
+  <data name="VROverlayException_WrongTransformType" xml:space="preserve">
+    <value>The requested transform type (Absolute/TrackedDevice, etc.) is not supported for this overlay.</value>
+  </data>
+  <data name="VROverlayException_InvalidTrackedDevice" xml:space="preserve">
+    <value>The specified tracked device index is invalid or not connected.</value>
+  </data>
+  <data name="VROverlayException_InvalidParameter" xml:space="preserve">
+    <value>The parameter is invalid.</value>
+  </data>
+  <data name="VROverlayException_ThumbnailCantBeDestroyed" xml:space="preserve">
+    <value>A thumbnail overlay cannot be destroyed on its own.</value>
+  </data>
+  <data name="VROverlayException_ArrayTooSmall" xml:space="preserve">
+    <value>The provided buffer size is insufficient.</value>
+  </data>
+  <data name="VROverlayException_RequestFailed" xml:space="preserve">
+    <value>The OpenVR request failed.</value>
+  </data>
+  <data name="VROverlayException_InvalidTexture" xml:space="preserve">
+    <value>The texture handle or pointer is invalid.</value>
+  </data>
+  <data name="VROverlayException_UnableToLoadFile" xml:space="preserve">
+    <value>Failed to load the file (PNG, manifest, etc.). Check the path.</value>
+  </data>
+  <data name="VROverlayException_KeyboardAlreadyInUse" xml:space="preserve">
+    <value>The VR system keyboard is already in use by another process.</value>
+  </data>
+  <data name="VROverlayException_NoNeighbor" xml:space="preserve">
+    <value>No neighboring overlay was found.</value>
+  </data>
+  <data name="VROverlayException_TooManyMaskPrimitives" xml:space="preserve">
+    <value>The mask primitive limit was exceeded.</value>
+  </data>
+  <data name="VROverlayException_BadMaskPrimitive" xml:space="preserve">
+    <value>The mask primitive format is invalid.</value>
+  </data>
+  <data name="VROverlayException_TextureAlreadyLocked" xml:space="preserve">
+    <value>The texture is already locked.</value>
+  </data>
+  <data name="VROverlayException_TextureLockCapacityReached" xml:space="preserve">
+    <value>The texture lock capacity has been reached.</value>
+  </data>
+  <data name="VROverlayException_TextureNotLocked" xml:space="preserve">
+    <value>The texture must be locked before this operation.</value>
+  </data>
+  <data name="VROverlayException_UnexpectedError" xml:space="preserve">
+    <value>An unexpected error occurred: {0}</value>
+  </data>
+  <data name="VRCompositorException_RequestFailed" xml:space="preserve">
+    <value>The request to the compositor failed.</value>
+  </data>
+  <data name="VRCompositorException_IncompatibleVersion" xml:space="preserve">
+    <value>The application's compositor version is incompatible with the runtime.</value>
+  </data>
+  <data name="VRCompositorException_DoNotHaveFocus" xml:space="preserve">
+    <value>The application does not currently have focus.</value>
+  </data>
+  <data name="VRCompositorException_InvalidTexture" xml:space="preserve">
+    <value>The submitted texture is invalid.</value>
+  </data>
+  <data name="VRCompositorException_IsNotSceneApplication" xml:space="preserve">
+    <value>The application is not registered as a scene application.</value>
+  </data>
+  <data name="VRCompositorException_TextureIsOnWrongDevice" xml:space="preserve">
+    <value>The texture was created on a different graphics device.</value>
+  </data>
+  <data name="VRCompositorException_TextureUsesUnsupportedFormat" xml:space="preserve">
+    <value>The texture format is not supported by the compositor.</value>
+  </data>
+  <data name="VRCompositorException_SharedTexturesNotSupported" xml:space="preserve">
+    <value>Shared textures are not supported on this system.</value>
+  </data>
+  <data name="VRCompositorException_IndexOutOfRange" xml:space="preserve">
+    <value>The texture index is out of range.</value>
+  </data>
+  <data name="VRCompositorException_AlreadySubmitted" xml:space="preserve">
+    <value>A frame for this eye has already been submitted.</value>
+  </data>
+  <data name="VRCompositorException_InvalidBounds" xml:space="preserve">
+    <value>The submitted texture bounds are invalid.</value>
+  </data>
+  <data name="VRCompositorException_AlreadySet" xml:space="preserve">
+    <value>The compositor property is already set.</value>
+  </data>
+  <data name="VRInputException_NameNotFound" xml:space="preserve">
+    <value>The specified input action or path was not found.</value>
+  </data>
+  <data name="VRInputException_WrongType" xml:space="preserve">
+    <value>The requested input type does not match the expected type.</value>
+  </data>
+  <data name="VRInputException_InvalidHandle" xml:space="preserve">
+    <value>An invalid input handle was specified.</value>
+  </data>
+  <data name="VRInputException_InvalidParam" xml:space="preserve">
+    <value>An invalid parameter was specified.</value>
+  </data>
+  <data name="VRInputException_NoSteam" xml:space="preserve">
+    <value>Steam or SteamVR is not available.</value>
+  </data>
+  <data name="VRInputException_MaxCapacityReached" xml:space="preserve">
+    <value>The maximum number of internal resources has been reached.</value>
+  </data>
+  <data name="VRInputException_IPCError" xml:space="preserve">
+    <value>An error occurred during IPC communication with SteamVR.</value>
+  </data>
+  <data name="VRInputException_NoActiveActionSet" xml:space="preserve">
+    <value>No active action set is configured.</value>
+  </data>
+  <data name="VRInputException_InvalidDevice" xml:space="preserve">
+    <value>An invalid device was specified.</value>
+  </data>
+  <data name="VRInputException_InvalidSkeleton" xml:space="preserve">
+    <value>The skeleton data is invalid.</value>
+  </data>
+  <data name="VRInputException_InvalidBoneCount" xml:space="preserve">
+    <value>The bone count is incorrect.</value>
+  </data>
+  <data name="VRInputException_InvalidCompressedData" xml:space="preserve">
+    <value>The compressed data is invalid.</value>
+  </data>
+  <data name="VRInputException_NoData" xml:space="preserve">
+    <value>No input data is available.</value>
+  </data>
+  <data name="VRInputException_BufferTooSmall" xml:space="preserve">
+    <value>The specified buffer size is insufficient.</value>
+  </data>
+  <data name="VRInputException_MismatchedActionManifest" xml:space="preserve">
+    <value>The currently loaded action manifest does not match.</value>
+  </data>
+  <data name="VRInputException_MissingSkeletonData" xml:space="preserve">
+    <value>Required skeleton data is missing.</value>
+  </data>
+  <data name="VRInputException_InvalidBoneIndex" xml:space="preserve">
+    <value>An invalid bone index was specified.</value>
+  </data>
+  <data name="VRInputException_InvalidPriority" xml:space="preserve">
+    <value>An invalid priority was specified.</value>
+  </data>
+  <data name="VRInputException_PermissionDenied" xml:space="preserve">
+    <value>Access to the requested operation was denied.</value>
+  </data>
+  <data name="VRInputException_InvalidRenderModel" xml:space="preserve">
+    <value>An invalid render model was specified.</value>
+  </data>
+  <data name="VRInputException_UnexpectedError" xml:space="preserve">
+    <value>An unexpected input error occurred: {0}</value>
+  </data>
+  <data name="VRNotificationException_InvalidNotificationId" xml:space="preserve">
+    <value>Invalid notification ID. The notification does not exist or has already been removed.</value>
+  </data>
+  <data name="VRNotificationException_NotificationQueueFull" xml:space="preserve">
+    <value>The notification queue is full. No more notifications can be added.</value>
+  </data>
+  <data name="VRNotificationException_InvalidOverlayHandle" xml:space="preserve">
+    <value>Invalid overlay handle.</value>
+  </data>
+  <data name="VRNotificationException_SystemWithUserValueAlreadyExists" xml:space="preserve">
+    <value>A notification with the same UserValue already exists.</value>
+  </data>
+  <data name="VRRenderModelException_Loading" xml:space="preserve">
+    <value>The render model is currently loading.</value>
+  </data>
+  <data name="VRRenderModelException_NotSupported" xml:space="preserve">
+    <value>The render model feature is not supported in this environment.</value>
+  </data>
+  <data name="VRRenderModelException_InvalidArg" xml:space="preserve">
+    <value>An invalid argument was specified.</value>
+  </data>
+  <data name="VRRenderModelException_InvalidModel" xml:space="preserve">
+    <value>The render model is invalid or corrupted.</value>
+  </data>
+  <data name="VRRenderModelException_NoShapes" xml:space="preserve">
+    <value>The render model does not contain any shape data.</value>
+  </data>
+  <data name="VRRenderModelException_MultipleShapes" xml:space="preserve">
+    <value>Multiple shapes were detected, but only a single shape is supported.</value>
+  </data>
+  <data name="VRRenderModelException_TooManyVertices" xml:space="preserve">
+    <value>The render model has too many vertices.</value>
+  </data>
+  <data name="VRRenderModelException_MultipleTextures" xml:space="preserve">
+    <value>Multiple textures were detected, but only a single texture is supported.</value>
+  </data>
+  <data name="VRRenderModelException_BufferTooSmall" xml:space="preserve">
+    <value>The buffer size is insufficient.</value>
+  </data>
+  <data name="VRRenderModelException_NotEnoughNormals" xml:space="preserve">
+    <value>There is not enough normal data.</value>
+  </data>
+  <data name="VRRenderModelException_NotEnoughTexCoords" xml:space="preserve">
+    <value>There is not enough texture coordinate data.</value>
+  </data>
+  <data name="VRRenderModelException_InvalidTexture" xml:space="preserve">
+    <value>The texture data is invalid or corrupted.</value>
+  </data>
+  <data name="VRRenderModelException_UnexpectedError" xml:space="preserve">
+    <value>An unknown render model error occurred. ({0})</value>
+  </data>
+  <data name="VRScreenshotException_None" xml:space="preserve">
+    <value>No error occurred.</value>
+  </data>
+  <data name="VRScreenshotException_RequestFailed" xml:space="preserve">
+    <value>The screenshot request failed.</value>
+  </data>
+  <data name="VRScreenshotException_IncompatibleVersion" xml:space="preserve">
+    <value>The screenshot API version is incompatible.</value>
+  </data>
+  <data name="VRScreenshotException_NotFound" xml:space="preserve">
+    <value>The specified screenshot was not found.</value>
+  </data>
+  <data name="VRScreenshotException_BufferTooSmall" xml:space="preserve">
+    <value>The provided buffer size is insufficient.</value>
+  </data>
+  <data name="VRScreenshotException_ScreenshotAlreadyInProgress" xml:space="preserve">
+    <value>Another screenshot operation is already in progress.</value>
+  </data>
+  <data name="VRSettingsException_None" xml:space="preserve">
+    <value>No settings error occurred.</value>
+  </data>
+  <data name="VRSettingsException_IPCFailed" xml:space="preserve">
+    <value>IPC communication with the settings system failed.</value>
+  </data>
+  <data name="VRSettingsException_WriteFailed" xml:space="preserve">
+    <value>Failed to write the setting.</value>
+  </data>
+  <data name="VRSettingsException_ReadFailed" xml:space="preserve">
+    <value>Failed to read the setting.</value>
+  </data>
+  <data name="VRSettingsException_JsonParseFailed" xml:space="preserve">
+    <value>Failed to parse the settings file as JSON.</value>
+  </data>
+  <data name="VRSettingsException_UnsetSettingHasNoDefault" xml:space="preserve">
+    <value>The setting is unset and has no default value.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_Success" xml:space="preserve">
+    <value>The tracked property operation completed successfully.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_WrongDataType" xml:space="preserve">
+    <value>The data type of the requested property is incorrect.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_WrongDeviceClass" xml:space="preserve">
+    <value>This property is not available for this device class.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_BufferTooSmall" xml:space="preserve">
+    <value>The buffer size for storing the property is insufficient.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_UnknownProperty" xml:space="preserve">
+    <value>The specified property does not exist.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_InvalidDevice" xml:space="preserve">
+    <value>The specified device is invalid.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_CouldNotContactServer" xml:space="preserve">
+    <value>Could not contact the OpenVR server.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_ValueNotProvidedByDevice" xml:space="preserve">
+    <value>This property value is not provided by the device.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_StringExceedsMaximumLength" xml:space="preserve">
+    <value>The string exceeds the maximum allowed length.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_NotYetAvailable" xml:space="preserve">
+    <value>The property value is not yet available.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_PermissionDenied" xml:space="preserve">
+    <value>Access to the property was denied.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_InvalidOperation" xml:space="preserve">
+    <value>An invalid property operation was performed.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_CannotWriteToWildcards" xml:space="preserve">
+    <value>Cannot write to a wildcard property.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_IPCReadFailure" xml:space="preserve">
+    <value>An error occurred while reading via IPC.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_OutOfMemory" xml:space="preserve">
+    <value>The property operation failed due to insufficient memory.</value>
+  </data>
+  <data name="TrackedPropertyException_TrackedProp_InvalidContainer" xml:space="preserve">
+    <value>The specified property container is invalid.</value>
+  </data>
+</root>

@@ -1,8 +1,14 @@
-﻿namespace FloatSoda.OVR.Exceptions;
+using FloatSoda.OVR.Exceptions.Resources;
 
+namespace FloatSoda.OVR.Exceptions;
+
+/// <summary>
+/// Thrown when an OpenVR notification operation (<see cref="EVRNotificationError"/>) fails.
+/// </summary>
 public class VRNotificationException(string message, EVRNotificationError errorCode)
     : OpenVRSystemException<EVRNotificationError>(message, errorCode)
 {
+    /// <summary>Creates an exception with a message derived from <paramref name="errorCode"/>.</summary>
     public VRNotificationException(EVRNotificationError errorCode)
         : this(GetMessage(errorCode), errorCode)
     {
@@ -10,13 +16,14 @@ public class VRNotificationException(string message, EVRNotificationError errorC
 
     private static string GetMessage(EVRNotificationError error) => error switch
     {
-        EVRNotificationError.InvalidNotificationId => "無効な通知IDです。通知が存在しないか、すでに削除されています。",
-        EVRNotificationError.NotificationQueueFull => "通知キューがいっぱいです。これ以上通知を追加できません。",
-        EVRNotificationError.InvalidOverlayHandle => "無効なオーバーレイハンドルです。",
-        EVRNotificationError.SystemWithUserValueAlreadyExists => "同じ UserValue を持つ通知がすでに存在しています。",
+        EVRNotificationError.InvalidNotificationId => ExceptionMessages.VRNotificationException_InvalidNotificationId,
+        EVRNotificationError.NotificationQueueFull => ExceptionMessages.VRNotificationException_NotificationQueueFull,
+        EVRNotificationError.InvalidOverlayHandle => ExceptionMessages.VRNotificationException_InvalidOverlayHandle,
+        EVRNotificationError.SystemWithUserValueAlreadyExists => ExceptionMessages.VRNotificationException_SystemWithUserValueAlreadyExists,
         _ => throw new ArgumentOutOfRangeException(nameof(error), error, null)
     };
 
+    /// <summary>Throws a <see cref="VRNotificationException"/> if <paramref name="error"/> indicates a failure.</summary>
     public static void ThrowIfError(EVRNotificationError error)
     {
         if (error == EVRNotificationError.OK) return;

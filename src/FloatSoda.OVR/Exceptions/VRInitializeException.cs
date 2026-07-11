@@ -1,8 +1,15 @@
+using FloatSoda.OVR.Exceptions.Resources;
+
 namespace FloatSoda.OVR.Exceptions;
 
+/// <summary>
+/// Thrown when OpenVR fails to initialize (<see cref="EVRInitError"/>). Subclasses categorize the failure
+/// by subsystem (<see cref="Driver"/>, <see cref="IPC"/>, <see cref="Compositor"/>, <see cref="VendorSpecific"/>).
+/// </summary>
 public class VRInitializeException(string message, EVRInitError errorCode)
     : OpenVRSystemException<EVRInitError>(message, errorCode)
 {
+    /// <summary>Throws a categorized <see cref="VRInitializeException"/> if <paramref name="error"/> indicates a failure.</summary>
     public static void ThrowIfError(EVRInitError error)
     {
         if (error == EVRInitError.None) return;
@@ -10,331 +17,335 @@ public class VRInitializeException(string message, EVRInitError errorCode)
         throw error switch
         {
             // --- 一般的な初期化エラー ---
-            EVRInitError.Unknown => new VRInitializeException("未知の初期化エラーが発生しました。", error),
-            EVRInitError.Init_InstallationNotFound => new VRInitializeException("OpenVRのインストールが見つかりません。", error),
-            EVRInitError.Init_InstallationCorrupt => new VRInitializeException("OpenVRのインストールが壊れています。", error),
-            EVRInitError.Init_VRClientDLLNotFound => new VRInitializeException("vrclient.dllが見つかりません。", error),
-            EVRInitError.Init_FileNotFound => new VRInitializeException("必要な構成ファイルが見つかりません。", error),
-            EVRInitError.Init_FactoryNotFound => new VRInitializeException("ファクトリインターフェースの取得に失敗しました。", error),
-            EVRInitError.Init_InterfaceNotFound => new VRInitializeException("要求されたインターフェースが見つかりません。", error),
-            EVRInitError.Init_InvalidInterface => new VRInitializeException("インターフェースが無効です。", error),
-            EVRInitError.Init_UserConfigDirectoryInvalid => new VRInitializeException("ユーザー設定ディレクトリが無効です。", error),
-            EVRInitError.Init_HmdNotFound => new VRInitializeException("HMDが見つからないか、接続されていません。", error),
-            EVRInitError.Init_NotInitialized => new VRInitializeException("OpenVRが初期化されていません。", error),
-            EVRInitError.Init_PathRegistryNotFound => new VRInitializeException("パスレジストリが見つかりません。", error),
-            EVRInitError.Init_NoConfigPath => new VRInitializeException("構成パスが設定されていません。", error),
-            EVRInitError.Init_NoLogPath => new VRInitializeException("ログパスが設定されていません。", error),
-            EVRInitError.Init_PathRegistryNotWritable => new VRInitializeException("パスレジストリに書き込めません。", error),
-            EVRInitError.Init_AppInfoInitFailed => new VRInitializeException("アプリケーション情報の初期化に失敗しました。", error),
-            EVRInitError.Init_Retry => new VRInitializeException("再試行が必要です。", error),
-            EVRInitError.Init_InitCanceledByUser => new VRInitializeException("ユーザーによって初期化がキャンセルされました。", error),
-            EVRInitError.Init_AnotherAppLaunching => new VRInitializeException("別のアプリケーションが起動中です。", error),
-            EVRInitError.Init_SettingsInitFailed => new VRInitializeException("設定の初期化に失敗しました。", error),
-            EVRInitError.Init_ShuttingDown => new VRInitializeException("システムが終了処理中です。", error),
-            EVRInitError.Init_TooManyObjects => new VRInitializeException("オブジェクトが多すぎます。", error),
-            EVRInitError.Init_NoServerForBackgroundApp => new VRInitializeException("バックグラウンドアプリ用のサーバーがありません。", error),
-            EVRInitError.Init_NotSupportedWithCompositor => new VRInitializeException("コンポジター使用時はサポートされません。", error),
-            EVRInitError.Init_NotAvailableToUtilityApps => new VRInitializeException("ユーティリティアプリでは利用できません。", error),
-            EVRInitError.Init_Internal => new VRInitializeException("内部エラーが発生しました。", error),
-            EVRInitError.Init_HmdDriverIdIsNone => new VRInitializeException("HMDドライバIDがNoneです。", error),
-            EVRInitError.Init_HmdNotFoundPresenceFailed => new VRInitializeException("HMDの存在確認に失敗しました。", error),
-            EVRInitError.Init_VRMonitorNotFound => new VRInitializeException("VRモニターが見つかりません。", error),
-            EVRInitError.Init_VRMonitorStartupFailed => new VRInitializeException("VRモニターの起動に失敗しました。", error),
-            EVRInitError.Init_LowPowerWatchdogNotSupported => new VRInitializeException("低電力ウォッチドッグはサポートされていません。",
+            EVRInitError.Unknown => new VRInitializeException(ExceptionMessages.VRInitializeException_Unknown, error),
+            EVRInitError.Init_InstallationNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InstallationNotFound, error),
+            EVRInitError.Init_InstallationCorrupt => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InstallationCorrupt, error),
+            EVRInitError.Init_VRClientDLLNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRClientDLLNotFound, error),
+            EVRInitError.Init_FileNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_FileNotFound, error),
+            EVRInitError.Init_FactoryNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_FactoryNotFound, error),
+            EVRInitError.Init_InterfaceNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InterfaceNotFound, error),
+            EVRInitError.Init_InvalidInterface => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InvalidInterface, error),
+            EVRInitError.Init_UserConfigDirectoryInvalid => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_UserConfigDirectoryInvalid, error),
+            EVRInitError.Init_HmdNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_HmdNotFound, error),
+            EVRInitError.Init_NotInitialized => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NotInitialized, error),
+            EVRInitError.Init_PathRegistryNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_PathRegistryNotFound, error),
+            EVRInitError.Init_NoConfigPath => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NoConfigPath, error),
+            EVRInitError.Init_NoLogPath => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NoLogPath, error),
+            EVRInitError.Init_PathRegistryNotWritable => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_PathRegistryNotWritable, error),
+            EVRInitError.Init_AppInfoInitFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_AppInfoInitFailed, error),
+            EVRInitError.Init_Retry => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_Retry, error),
+            EVRInitError.Init_InitCanceledByUser => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InitCanceledByUser, error),
+            EVRInitError.Init_AnotherAppLaunching => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_AnotherAppLaunching, error),
+            EVRInitError.Init_SettingsInitFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_SettingsInitFailed, error),
+            EVRInitError.Init_ShuttingDown => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_ShuttingDown, error),
+            EVRInitError.Init_TooManyObjects => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_TooManyObjects, error),
+            EVRInitError.Init_NoServerForBackgroundApp => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NoServerForBackgroundApp, error),
+            EVRInitError.Init_NotSupportedWithCompositor => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NotSupportedWithCompositor, error),
+            EVRInitError.Init_NotAvailableToUtilityApps => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NotAvailableToUtilityApps, error),
+            EVRInitError.Init_Internal => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_Internal, error),
+            EVRInitError.Init_HmdDriverIdIsNone => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_HmdDriverIdIsNone, error),
+            EVRInitError.Init_HmdNotFoundPresenceFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_HmdNotFoundPresenceFailed, error),
+            EVRInitError.Init_VRMonitorNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRMonitorNotFound, error),
+            EVRInitError.Init_VRMonitorStartupFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRMonitorStartupFailed, error),
+            EVRInitError.Init_LowPowerWatchdogNotSupported => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_LowPowerWatchdogNotSupported,
                 error),
-            EVRInitError.Init_InvalidApplicationType => new VRInitializeException("アプリケーションタイプが無効です。", error),
-            EVRInitError.Init_NotAvailableToWatchdogApps => new VRInitializeException("ウォッチドッグアプリでは利用できません。", error),
-            EVRInitError.Init_WatchdogDisabledInSettings => new VRInitializeException("設定でウォッチドッグが無効になっています。", error),
-            EVRInitError.Init_VRDashboardNotFound => new VRInitializeException("VRダッシュボードが見つかりません。", error),
-            EVRInitError.Init_VRDashboardStartupFailed => new VRInitializeException("VRダッシュボードの起動に失敗しました。", error),
-            EVRInitError.Init_VRHomeNotFound => new VRInitializeException("VR Homeが見つかりません。", error),
-            EVRInitError.Init_VRHomeStartupFailed => new VRInitializeException("VR Homeの起動に失敗しました。", error),
-            EVRInitError.Init_RebootingBusy => new VRInitializeException("再起動処理中のためビジーです。", error),
-            EVRInitError.Init_FirmwareUpdateBusy => new VRInitializeException("ファームウェア更新中のためビジーです。", error),
-            EVRInitError.Init_FirmwareRecoveryBusy => new VRInitializeException("ファームウェア復旧中のためビジーです。", error),
-            EVRInitError.Init_USBServiceBusy => new VRInitializeException("USBサービスがビジーです。", error),
-            EVRInitError.Init_VRWebHelperStartupFailed => new VRInitializeException("VR Web Helperの起動に失敗しました。", error),
-            EVRInitError.Init_TrackerManagerInitFailed => new VRInitializeException("トラッカーマネージャーの初期化に失敗しました。", error),
-            EVRInitError.Init_AlreadyRunning => new VRInitializeException("既に実行中です。", error),
-            EVRInitError.Init_FailedForVrMonitor => new VRInitializeException("VRモニター用プロセスの初期化に失敗しました。", error),
-            EVRInitError.Init_PropertyManagerInitFailed => new VRInitializeException("プロパティマネージャーの初期化に失敗しました。", error),
-            EVRInitError.Init_WebServerFailed => new VRInitializeException("Webサーバーの起動に失敗しました。", error),
-            EVRInitError.Init_IllegalTypeTransition => new VRInitializeException("不正なタイプ遷移です。", error),
-            EVRInitError.Init_MismatchedRuntimes => new VRInitializeException("ランタイムのバージョンが一致しません。", error),
-            EVRInitError.Init_InvalidProcessId => new VRInitializeException("プロセスIDが無効です。", error),
-            EVRInitError.Init_VRServiceStartupFailed => new VRInitializeException("VRサービスの起動に失敗しました。", error),
-            EVRInitError.Init_PrismNeedsNewDrivers => new VRInitializeException("Prismドライバの更新が必要です。", error),
-            EVRInitError.Init_PrismStartupTimedOut => new VRInitializeException("Prismの起動がタイムアウトしました。", error),
-            EVRInitError.Init_CouldNotStartPrism => new VRInitializeException("Prismを起動できませんでした。", error),
+            EVRInitError.Init_InvalidApplicationType => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InvalidApplicationType, error),
+            EVRInitError.Init_NotAvailableToWatchdogApps => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_NotAvailableToWatchdogApps, error),
+            EVRInitError.Init_WatchdogDisabledInSettings => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_WatchdogDisabledInSettings, error),
+            EVRInitError.Init_VRDashboardNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRDashboardNotFound, error),
+            EVRInitError.Init_VRDashboardStartupFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRDashboardStartupFailed, error),
+            EVRInitError.Init_VRHomeNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRHomeNotFound, error),
+            EVRInitError.Init_VRHomeStartupFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRHomeStartupFailed, error),
+            EVRInitError.Init_RebootingBusy => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_RebootingBusy, error),
+            EVRInitError.Init_FirmwareUpdateBusy => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_FirmwareUpdateBusy, error),
+            EVRInitError.Init_FirmwareRecoveryBusy => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_FirmwareRecoveryBusy, error),
+            EVRInitError.Init_USBServiceBusy => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_USBServiceBusy, error),
+            EVRInitError.Init_VRWebHelperStartupFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRWebHelperStartupFailed, error),
+            EVRInitError.Init_TrackerManagerInitFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_TrackerManagerInitFailed, error),
+            EVRInitError.Init_AlreadyRunning => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_AlreadyRunning, error),
+            EVRInitError.Init_FailedForVrMonitor => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_FailedForVrMonitor, error),
+            EVRInitError.Init_PropertyManagerInitFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_PropertyManagerInitFailed, error),
+            EVRInitError.Init_WebServerFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_WebServerFailed, error),
+            EVRInitError.Init_IllegalTypeTransition => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_IllegalTypeTransition, error),
+            EVRInitError.Init_MismatchedRuntimes => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_MismatchedRuntimes, error),
+            EVRInitError.Init_InvalidProcessId => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_InvalidProcessId, error),
+            EVRInitError.Init_VRServiceStartupFailed => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_VRServiceStartupFailed, error),
+            EVRInitError.Init_PrismNeedsNewDrivers => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_PrismNeedsNewDrivers, error),
+            EVRInitError.Init_PrismStartupTimedOut => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_PrismStartupTimedOut, error),
+            EVRInitError.Init_CouldNotStartPrism => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_CouldNotStartPrism, error),
             // EVRInitError.Init_CreateDriverDirectDeviceFailed => new VRInitializeException("ドライバダイレクトデバイスの作成に失敗しました。",
                 // error),
-            EVRInitError.Init_PrismExitedUnexpectedly => new VRInitializeException("Prismが予期せず終了しました。", error),
+            EVRInitError.Init_PrismExitedUnexpectedly => new VRInitializeException(ExceptionMessages.VRInitializeException_Init_PrismExitedUnexpectedly, error),
 
             // --- ドライバ関連 ---
-            EVRInitError.Driver_Failed => new Driver("ドライバのエラーです。", error),
-            EVRInitError.Driver_Unknown => new Driver("未知のドライバエラーです。", error),
-            EVRInitError.Driver_HmdUnknown => new Driver("未知のHMDドライバです。", error),
-            EVRInitError.Driver_NotLoaded => new Driver("ドライバがロードされていません。", error),
-            EVRInitError.Driver_RuntimeOutOfDate => new Driver("ドライバのランタイムが古すぎます。", error),
-            EVRInitError.Driver_HmdInUse => new Driver("HMDが別のプロセスで使用中です。", error),
-            EVRInitError.Driver_NotCalibrated => new Driver("ドライバが校正されていません。", error),
-            EVRInitError.Driver_CalibrationInvalid => new Driver("ドライバの校正データが無効です。", error),
-            EVRInitError.Driver_HmdDisplayNotFound => new Driver("HMDのディスプレイが見つかりません。", error),
+            EVRInitError.Driver_Failed => new Driver(ExceptionMessages.VRInitializeException_Driver_Failed, error),
+            EVRInitError.Driver_Unknown => new Driver(ExceptionMessages.VRInitializeException_Driver_Unknown, error),
+            EVRInitError.Driver_HmdUnknown => new Driver(ExceptionMessages.VRInitializeException_Driver_HmdUnknown, error),
+            EVRInitError.Driver_NotLoaded => new Driver(ExceptionMessages.VRInitializeException_Driver_NotLoaded, error),
+            EVRInitError.Driver_RuntimeOutOfDate => new Driver(ExceptionMessages.VRInitializeException_Driver_RuntimeOutOfDate, error),
+            EVRInitError.Driver_HmdInUse => new Driver(ExceptionMessages.VRInitializeException_Driver_HmdInUse, error),
+            EVRInitError.Driver_NotCalibrated => new Driver(ExceptionMessages.VRInitializeException_Driver_NotCalibrated, error),
+            EVRInitError.Driver_CalibrationInvalid => new Driver(ExceptionMessages.VRInitializeException_Driver_CalibrationInvalid, error),
+            EVRInitError.Driver_HmdDisplayNotFound => new Driver(ExceptionMessages.VRInitializeException_Driver_HmdDisplayNotFound, error),
             EVRInitError.Driver_TrackedDeviceInterfaceUnknown => new Driver(
-                "トラッキングデバイスインターフェースが不明です。", error),
-            EVRInitError.Driver_HmdDriverIdOutOfBounds => new Driver("HMDドライバIDが範囲外です。", error),
-            EVRInitError.Driver_HmdDisplayMirrored => new Driver("HMDディスプレイがミラーリング設定になっています。",
+                ExceptionMessages.VRInitializeException_Driver_TrackedDeviceInterfaceUnknown, error),
+            EVRInitError.Driver_HmdDriverIdOutOfBounds => new Driver(ExceptionMessages.VRInitializeException_Driver_HmdDriverIdOutOfBounds, error),
+            EVRInitError.Driver_HmdDisplayMirrored => new Driver(ExceptionMessages.VRInitializeException_Driver_HmdDisplayMirrored,
                 error),
-            EVRInitError.Driver_HmdDisplayNotFoundLaptop => new Driver("ラップトップ用HMDディスプレイが見つかりません。", error),
+            EVRInitError.Driver_HmdDisplayNotFoundLaptop => new Driver(ExceptionMessages.VRInitializeException_Driver_HmdDisplayNotFoundLaptop, error),
 
             // --- IPC (プロセス間通信) 関連 ---
-            EVRInitError.IPC_ServerInitFailed => new IPC("IPCサーバーの初期化に失敗しました。", error),
-            EVRInitError.IPC_ConnectFailed => new IPC("IPC接続に失敗しました。", error),
-            EVRInitError.IPC_SharedStateInitFailed => new IPC("共有ステートの初期化に失敗しました。", error),
-            EVRInitError.IPC_CompositorInitFailed => new IPC("コンポジターの初期化に失敗しました。", error),
-            EVRInitError.IPC_MutexInitFailed => new IPC("Mutexの初期化に失敗しました。", error),
-            EVRInitError.IPC_Failed => new IPC("IPC接続エラーが発生しました。", error),
-            EVRInitError.IPC_CompositorConnectFailed => new IPC("コンポジターへの接続に失敗しました。", error),
-            EVRInitError.IPC_CompositorInvalidConnectResponse => new IPC("コンポジターからの接続レスポンスが無効です。",
+            EVRInitError.IPC_ServerInitFailed => new IPC(ExceptionMessages.VRInitializeException_IPC_ServerInitFailed, error),
+            EVRInitError.IPC_ConnectFailed => new IPC(ExceptionMessages.VRInitializeException_IPC_ConnectFailed, error),
+            EVRInitError.IPC_SharedStateInitFailed => new IPC(ExceptionMessages.VRInitializeException_IPC_SharedStateInitFailed, error),
+            EVRInitError.IPC_CompositorInitFailed => new IPC(ExceptionMessages.VRInitializeException_IPC_CompositorInitFailed, error),
+            EVRInitError.IPC_MutexInitFailed => new IPC(ExceptionMessages.VRInitializeException_IPC_MutexInitFailed, error),
+            EVRInitError.IPC_Failed => new IPC(ExceptionMessages.VRInitializeException_IPC_Failed, error),
+            EVRInitError.IPC_CompositorConnectFailed => new IPC(ExceptionMessages.VRInitializeException_IPC_CompositorConnectFailed, error),
+            EVRInitError.IPC_CompositorInvalidConnectResponse => new IPC(ExceptionMessages.VRInitializeException_IPC_CompositorInvalidConnectResponse,
                 error),
-            EVRInitError.IPC_ConnectFailedAfterMultipleAttempts => new IPC("複数回の試行後、IPC接続に失敗しました。",
+            EVRInitError.IPC_ConnectFailedAfterMultipleAttempts => new IPC(ExceptionMessages.VRInitializeException_IPC_ConnectFailedAfterMultipleAttempts,
                 error),
-            EVRInitError.IPC_ConnectFailedAfterTargetExited => new IPC("ターゲット終了後、IPC接続に失敗しました。",
+            EVRInitError.IPC_ConnectFailedAfterTargetExited => new IPC(ExceptionMessages.VRInitializeException_IPC_ConnectFailedAfterTargetExited,
                 error),
-            EVRInitError.IPC_NamespaceUnavailable => new IPC("IPCネームスペースを利用できません。", error),
+            EVRInitError.IPC_NamespaceUnavailable => new IPC(ExceptionMessages.VRInitializeException_IPC_NamespaceUnavailable, error),
 
             // --- コンポジター関連 ---
-            EVRInitError.Compositor_Failed => new Compositor("コンポジターが失敗しました。", error),
+            EVRInitError.Compositor_Failed => new Compositor(ExceptionMessages.VRInitializeException_Compositor_Failed, error),
             EVRInitError.Compositor_D3D11HardwareRequired => new Compositor(
-                "Direct3D11ハードウェアが必要です。", error),
+                ExceptionMessages.VRInitializeException_Compositor_D3D11HardwareRequired, error),
             EVRInitError.Compositor_FirmwareRequiresUpdate => new Compositor(
-                "コンポジター用にファームウェアの更新が必要です。", error),
-            EVRInitError.Compositor_OverlayInitFailed => new Compositor("コンポジターオーバーレイの初期化に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_FirmwareRequiresUpdate, error),
+            EVRInitError.Compositor_OverlayInitFailed => new Compositor(ExceptionMessages.VRInitializeException_Compositor_OverlayInitFailed,
                 error),
             EVRInitError.Compositor_ScreenshotsInitFailed => new Compositor(
-                "コンポジタースクリーンショットの初期化に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_ScreenshotsInitFailed, error),
             EVRInitError.Compositor_UnableToCreateDevice => new Compositor(
-                "グラフィックスデバイスを作成できませんでした。", error),
-            EVRInitError.Compositor_SharedStateIsNull => new Compositor("共有ステートがnullです。", error),
-            EVRInitError.Compositor_NotificationManagerIsNull => new Compositor("通知マネージャーがnullです。",
+                ExceptionMessages.VRInitializeException_Compositor_UnableToCreateDevice, error),
+            EVRInitError.Compositor_SharedStateIsNull => new Compositor(ExceptionMessages.VRInitializeException_Compositor_SharedStateIsNull, error),
+            EVRInitError.Compositor_NotificationManagerIsNull => new Compositor(ExceptionMessages.VRInitializeException_Compositor_NotificationManagerIsNull,
                 error),
             EVRInitError.Compositor_ResourceManagerClientIsNull => new Compositor(
-                "リソースマネージャークライアントがnullです。", error),
+                ExceptionMessages.VRInitializeException_Compositor_ResourceManagerClientIsNull, error),
             EVRInitError.Compositor_MessageOverlaySharedStateInitFailure => new Compositor(
-                "メッセージオーバーレイ共有ステートの初期化に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_MessageOverlaySharedStateInitFailure, error),
             EVRInitError.Compositor_PropertiesInterfaceIsNull => new Compositor(
-                "プロパティインターフェースがnullです。", error),
+                ExceptionMessages.VRInitializeException_Compositor_PropertiesInterfaceIsNull, error),
             EVRInitError.Compositor_CreateFullscreenWindowFailed => new Compositor(
-                "全画面ウィンドウの作成に失敗しました。", error),
-            EVRInitError.Compositor_SettingsInterfaceIsNull => new Compositor("設定インターフェースがnullです。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateFullscreenWindowFailed, error),
+            EVRInitError.Compositor_SettingsInterfaceIsNull => new Compositor(ExceptionMessages.VRInitializeException_Compositor_SettingsInterfaceIsNull,
                 error),
             EVRInitError.Compositor_FailedToShowWindow =>
-                new Compositor("ウィンドウの表示に失敗しました。", error),
+                new Compositor(ExceptionMessages.VRInitializeException_Compositor_FailedToShowWindow, error),
             EVRInitError.Compositor_DistortInterfaceIsNull => new Compositor(
-                "歪み補正インターフェースがnullです。", error),
+                ExceptionMessages.VRInitializeException_Compositor_DistortInterfaceIsNull, error),
             EVRInitError.Compositor_DisplayFrequencyFailure => new Compositor(
-                "ディスプレイ周波数の取得に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_DisplayFrequencyFailure, error),
             EVRInitError.Compositor_RendererInitializationFailed => new Compositor(
-                "レンダラーの初期化に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_RendererInitializationFailed, error),
             EVRInitError.Compositor_DXGIFactoryInterfaceIsNull => new Compositor(
-                "DXGIファクトリインターフェースがnullです。", error),
+                ExceptionMessages.VRInitializeException_Compositor_DXGIFactoryInterfaceIsNull, error),
             EVRInitError.Compositor_DXGIFactoryCreateFailed => new Compositor(
-                "DXGIファクトリの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_DXGIFactoryCreateFailed, error),
             EVRInitError.Compositor_DXGIFactoryQueryFailed => new Compositor(
-                "DXGIファクトリのクエリに失敗しました。", error),
-            EVRInitError.Compositor_InvalidAdapterDesktop => new Compositor("デスクトップアダプターが無効です。",
+                ExceptionMessages.VRInitializeException_Compositor_DXGIFactoryQueryFailed, error),
+            EVRInitError.Compositor_InvalidAdapterDesktop => new Compositor(ExceptionMessages.VRInitializeException_Compositor_InvalidAdapterDesktop,
                 error),
-            EVRInitError.Compositor_InvalidHmdAttachment => new Compositor("HMDの接続が無効です。", error),
+            EVRInitError.Compositor_InvalidHmdAttachment => new Compositor(ExceptionMessages.VRInitializeException_Compositor_InvalidHmdAttachment, error),
             EVRInitError.Compositor_InvalidOutputDesktop =>
-                new Compositor("出力デスクトップが無効です。", error),
-            EVRInitError.Compositor_InvalidDeviceProvided => new Compositor("提供されたデバイスが無効です。",
+                new Compositor(ExceptionMessages.VRInitializeException_Compositor_InvalidOutputDesktop, error),
+            EVRInitError.Compositor_InvalidDeviceProvided => new Compositor(ExceptionMessages.VRInitializeException_Compositor_InvalidDeviceProvided,
                 error),
             EVRInitError.Compositor_D3D11RendererInitializationFailed => new Compositor(
-                "D3D11レンダラーの初期化に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_D3D11RendererInitializationFailed, error),
             EVRInitError.Compositor_FailedToFindDisplayMode => new Compositor(
-                "ディスプレイモードが見つかりませんでした。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToFindDisplayMode, error),
             EVRInitError.Compositor_FailedToCreateSwapChain => new Compositor(
-                "スワップチェーンの作成に失敗しました。", error),
-            EVRInitError.Compositor_FailedToGetBackBuffer => new Compositor("バックバッファの取得に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateSwapChain, error),
+            EVRInitError.Compositor_FailedToGetBackBuffer => new Compositor(ExceptionMessages.VRInitializeException_Compositor_FailedToGetBackBuffer,
                 error),
             EVRInitError.Compositor_FailedToCreateRenderTarget => new Compositor(
-                "レンダーターゲットの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateRenderTarget, error),
             EVRInitError.Compositor_FailedToCreateDXGI2SwapChain => new Compositor(
-                "DXGI2スワップチェーンの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateDXGI2SwapChain, error),
             EVRInitError.Compositor_FailedtoGetDXGI2BackBuffer => new Compositor(
-                "DXGI2バックバッファの取得に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedtoGetDXGI2BackBuffer, error),
             EVRInitError.Compositor_FailedToCreateDXGI2RenderTarget => new Compositor(
-                "DXGI2レンダーターゲットの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateDXGI2RenderTarget, error),
             EVRInitError.Compositor_FailedToGetDXGIDeviceInterface => new Compositor(
-                "DXGIデバイスインターフェースの取得に失敗しました。", error),
-            EVRInitError.Compositor_SelectDisplayMode => new Compositor("ディスプレイモードの選択に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_FailedToGetDXGIDeviceInterface, error),
+            EVRInitError.Compositor_SelectDisplayMode => new Compositor(ExceptionMessages.VRInitializeException_Compositor_SelectDisplayMode,
                 error),
             EVRInitError.Compositor_FailedToCreateNvAPIRenderTargets => new Compositor(
-                "NvAPIレンダーターゲットの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateNvAPIRenderTargets, error),
             EVRInitError.Compositor_NvAPISetDisplayMode => new Compositor(
-                "NvAPIディスプレイモード設定に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_NvAPISetDisplayMode, error),
             EVRInitError.Compositor_FailedToCreateDirectModeDisplay => new Compositor(
-                "ダイレクトモードディスプレイの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateDirectModeDisplay, error),
             EVRInitError.Compositor_InvalidHmdPropertyContainer => new Compositor(
-                "HMDプロパティコンテナが無効です。", error),
+                ExceptionMessages.VRInitializeException_Compositor_InvalidHmdPropertyContainer, error),
             EVRInitError.Compositor_UpdateDisplayFrequency => new Compositor(
-                "ディスプレイ周波数の更新に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_UpdateDisplayFrequency, error),
             EVRInitError.Compositor_CreateRasterizerState => new Compositor(
-                "ラスタライザステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateRasterizerState, error),
             EVRInitError.Compositor_CreateWireframeRasterizerState => new Compositor(
-                "ワイヤーフレームラスタライザステートの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreateSamplerState => new Compositor("サンプラーステートの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateWireframeRasterizerState, error),
+            EVRInitError.Compositor_CreateSamplerState => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateSamplerState,
                 error),
             EVRInitError.Compositor_CreateClampToBorderSamplerState => new Compositor(
-                "ClampToBorderサンプラーステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateClampToBorderSamplerState, error),
             EVRInitError.Compositor_CreateAnisoSamplerState => new Compositor(
-                "異方性サンプラーステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateAnisoSamplerState, error),
             EVRInitError.Compositor_CreateOverlaySamplerState => new Compositor(
-                "オーバーレイサンプラーステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateOverlaySamplerState, error),
             EVRInitError.Compositor_CreatePanoramaSamplerState => new Compositor(
-                "パノラマサンプラーステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreatePanoramaSamplerState, error),
             EVRInitError.Compositor_CreateFontSamplerState => new Compositor(
-                "フォントサンプラーステートの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreateNoBlendState => new Compositor("NoBlendステートの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateFontSamplerState, error),
+            EVRInitError.Compositor_CreateNoBlendState => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateNoBlendState,
                 error),
-            EVRInitError.Compositor_CreateBlendState => new Compositor("Blendステートの作成に失敗しました。",
+            EVRInitError.Compositor_CreateBlendState => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateBlendState,
                 error),
             EVRInitError.Compositor_CreateAlphaBlendState => new Compositor(
-                "AlphaBlendステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateAlphaBlendState, error),
             EVRInitError.Compositor_CreateBlendStateMaskR => new Compositor(
-                "BlendStateMaskRの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateBlendStateMaskR, error),
             EVRInitError.Compositor_CreateBlendStateMaskG => new Compositor(
-                "BlendStateMaskGの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateBlendStateMaskG, error),
             EVRInitError.Compositor_CreateBlendStateMaskB => new Compositor(
-                "BlendStateMaskBの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateBlendStateMaskB, error),
             EVRInitError.Compositor_CreateDepthStencilState => new Compositor(
-                "深度ステンシルステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateDepthStencilState, error),
             EVRInitError.Compositor_CreateDepthStencilStateNoWrite => new Compositor(
-                "NoWrite深度ステンシルステートの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateDepthStencilStateNoWrite, error),
             EVRInitError.Compositor_CreateDepthStencilStateNoDepth => new Compositor(
-                "NoDepth深度ステンシルステートの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreateFlushTexture => new Compositor("Flushテクスチャの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateDepthStencilStateNoDepth, error),
+            EVRInitError.Compositor_CreateFlushTexture => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateFlushTexture,
                 error),
             EVRInitError.Compositor_CreateDistortionSurfaces => new Compositor(
-                "歪み補正サーフェスの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreateConstantBuffer => new Compositor("定数バッファの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateDistortionSurfaces, error),
+            EVRInitError.Compositor_CreateConstantBuffer => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateConstantBuffer,
                 error),
             EVRInitError.Compositor_CreateHmdPoseConstantBuffer => new Compositor(
-                "HMDポーズ定数バッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateHmdPoseConstantBuffer, error),
             EVRInitError.Compositor_CreateHmdPoseStagingConstantBuffer => new Compositor(
-                "HMDポーズステージングバッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateHmdPoseStagingConstantBuffer, error),
             EVRInitError.Compositor_CreateSharedFrameInfoConstantBuffer => new Compositor(
-                "フレーム情報共有バッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateSharedFrameInfoConstantBuffer, error),
             EVRInitError.Compositor_CreateOverlayConstantBuffer => new Compositor(
-                "オーバーレイ定数バッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateOverlayConstantBuffer, error),
             EVRInitError.Compositor_CreateSceneTextureIndexConstantBuffer => new Compositor(
-                "シーンテクスチャインデックスバッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateSceneTextureIndexConstantBuffer, error),
             EVRInitError.Compositor_CreateReadableSceneTextureIndexConstantBuffer =>
-                new Compositor("読み取り可能シーンテクスチャインデックスバッファの作成に失敗しました。", error),
+                new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateReadableSceneTextureIndexConstantBuffer, error),
             EVRInitError.Compositor_CreateLayerGraphicsTextureIndexConstantBuffer =>
-                new Compositor("レイヤーグラフィックスインデックスバッファの作成に失敗しました。", error),
+                new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateLayerGraphicsTextureIndexConstantBuffer, error),
             EVRInitError.Compositor_CreateLayerComputeTextureIndexConstantBuffer => new Compositor(
-                "レイヤー演算インデックスバッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateLayerComputeTextureIndexConstantBuffer, error),
             EVRInitError.Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer =>
-                new Compositor("レイヤー演算シーンインデックスバッファの作成に失敗しました。", error),
+                new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateLayerComputeSceneTextureIndexConstantBuffer, error),
             EVRInitError.Compositor_CreateComputeHmdPoseConstantBuffer => new Compositor(
-                "演算用HMDポーズバッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateComputeHmdPoseConstantBuffer, error),
             EVRInitError.Compositor_CreateGeomConstantBuffer => new Compositor(
-                "幾何定数バッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateGeomConstantBuffer, error),
             EVRInitError.Compositor_CreatePanelMaskConstantBuffer => new Compositor(
-                "パネルマスクバッファの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreatePixelSimUBO => new Compositor("PixelSimUBOの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreatePanelMaskConstantBuffer, error),
+            EVRInitError.Compositor_CreatePixelSimUBO => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreatePixelSimUBO,
                 error),
             EVRInitError.Compositor_CreateMSAARenderTextures => new Compositor(
-                "MSAAレンダーテクスチャの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateMSAARenderTextures, error),
             EVRInitError.Compositor_CreateResolveRenderTextures => new Compositor(
-                "Resolveレンダーテクスチャの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateResolveRenderTextures, error),
             EVRInitError.Compositor_CreateComputeResolveRenderTextures => new Compositor(
-                "演算用Resolveレンダーテクスチャの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateComputeResolveRenderTextures, error),
             EVRInitError.Compositor_CreateDriverDirectModeResolveTextures => new Compositor(
-                "ドライバダイレクトResolveテクスチャの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateDriverDirectModeResolveTextures, error),
             EVRInitError.Compositor_OpenDriverDirectModeResolveTextures => new Compositor(
-                "ドライバダイレクトResolveテクスチャを開けませんでした。", error),
+                ExceptionMessages.VRInitializeException_Compositor_OpenDriverDirectModeResolveTextures, error),
             EVRInitError.Compositor_CreateFallbackSyncTexture => new Compositor(
-                "フォールバック同期テクスチャの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateFallbackSyncTexture, error),
             EVRInitError.Compositor_ShareFallbackSyncTexture => new Compositor(
-                "フォールバック同期テクスチャの共有に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_ShareFallbackSyncTexture, error),
             EVRInitError.Compositor_CreateOverlayIndexBuffer => new Compositor(
-                "オーバーレイインデックスバッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateOverlayIndexBuffer, error),
             EVRInitError.Compositor_CreateOverlayVertexBuffer => new Compositor(
-                "オーバーレイ頂点バッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateOverlayVertexBuffer, error),
             EVRInitError.Compositor_CreateTextVertexBuffer => new Compositor(
-                "テキスト頂点バッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateTextVertexBuffer, error),
             EVRInitError.Compositor_CreateTextIndexBuffer => new Compositor(
-                "テキストインデックスバッファの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreateMirrorTextures => new Compositor("ミラーテクスチャの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateTextIndexBuffer, error),
+            EVRInitError.Compositor_CreateMirrorTextures => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateMirrorTextures,
                 error),
             EVRInitError.Compositor_CreateLastFrameRenderTexture => new Compositor(
-                "直前フレームレンダリングテクスチャの作成に失敗しました。", error),
-            EVRInitError.Compositor_CreateMirrorOverlay => new Compositor("ミラーオーバーレイの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateLastFrameRenderTexture, error),
+            EVRInitError.Compositor_CreateMirrorOverlay => new Compositor(ExceptionMessages.VRInitializeException_Compositor_CreateMirrorOverlay,
                 error),
             EVRInitError.Compositor_FailedToCreateVirtualDisplayBackbuffer => new Compositor(
-                "仮想ディスプレイバックバッファの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_FailedToCreateVirtualDisplayBackbuffer, error),
             EVRInitError.Compositor_DisplayModeNotSupported => new Compositor(
-                "ディスプレイモードがサポートされていません。", error),
+                ExceptionMessages.VRInitializeException_Compositor_DisplayModeNotSupported, error),
             EVRInitError.Compositor_CreateOverlayInvalidCall => new Compositor(
-                "オーバーレイ作成呼び出しが無効です。", error),
+                ExceptionMessages.VRInitializeException_Compositor_CreateOverlayInvalidCall, error),
             EVRInitError.Compositor_CreateOverlayAlreadyInitialized => new Compositor(
-                "オーバーレイは既に初期化されています。", error),
-            EVRInitError.Compositor_FailedToCreateMailbox => new Compositor("メールボックスの作成に失敗しました。",
+                ExceptionMessages.VRInitializeException_Compositor_CreateOverlayAlreadyInitialized, error),
+            EVRInitError.Compositor_FailedToCreateMailbox => new Compositor(ExceptionMessages.VRInitializeException_Compositor_FailedToCreateMailbox,
                 error),
             EVRInitError.Compositor_WindowInterfaceIsNull => new Compositor(
-                "ウィンドウインターフェースがnullです。", error),
+                ExceptionMessages.VRInitializeException_Compositor_WindowInterfaceIsNull, error),
             EVRInitError.Compositor_SystemLayerCreateInstance => new Compositor(
-                "システムレイヤーインスタンスの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_SystemLayerCreateInstance, error),
             EVRInitError.Compositor_SystemLayerCreateSession => new Compositor(
-                "システムレイヤーセッションの作成に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_Compositor_SystemLayerCreateSession, error),
 
             // --- ベンダー固有エラー (Oculus/Meta等) ---
             EVRInitError.VendorSpecific_UnableToConnectToOculusRuntime => new VendorSpecific(
-                "Oculusランタイムに接続できません。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_UnableToConnectToOculusRuntime, error),
             EVRInitError.VendorSpecific_WindowsNotInDevMode => new VendorSpecific(
-                "Windowsが開発者モードではありません。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_WindowsNotInDevMode, error),
             EVRInitError.VendorSpecific_HmdFound_CantOpenDevice => new VendorSpecific(
-                "HMDデバイスを開けませんでした。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_CantOpenDevice, error),
             EVRInitError.VendorSpecific_HmdFound_UnableToRequestConfigStart => new VendorSpecific(
-                "HMD構成開始の要求に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UnableToRequestConfigStart, error),
             EVRInitError.VendorSpecific_HmdFound_NoStoredConfig => new VendorSpecific(
-                "HMD内に保存された構成がありません。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_NoStoredConfig, error),
             EVRInitError.VendorSpecific_HmdFound_ConfigTooBig => new VendorSpecific(
-                "HMD構成データが大きすぎます。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_ConfigTooBig, error),
             EVRInitError.VendorSpecific_HmdFound_ConfigTooSmall => new VendorSpecific(
-                "HMD構成データが小さすぎます。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_ConfigTooSmall, error),
             EVRInitError.VendorSpecific_HmdFound_UnableToInitZLib => new VendorSpecific(
-                "zlibの初期化に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UnableToInitZLib, error),
             EVRInitError.VendorSpecific_HmdFound_CantReadFirmwareVersion => new VendorSpecific(
-                "ファームウェアバージョンの読み取りに失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_CantReadFirmwareVersion, error),
             EVRInitError.VendorSpecific_HmdFound_UnableToSendUserDataStart => new VendorSpecific(
-                "ユーザーデータ送信開始に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UnableToSendUserDataStart, error),
             EVRInitError.VendorSpecific_HmdFound_UnableToGetUserDataStart => new VendorSpecific(
-                "ユーザーデータ取得開始に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UnableToGetUserDataStart, error),
             EVRInitError.VendorSpecific_HmdFound_UnableToGetUserDataNext => new VendorSpecific(
-                "ユーザーデータ次フレーム取得に失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UnableToGetUserDataNext, error),
             EVRInitError.VendorSpecific_HmdFound_UserDataAddressRange => new VendorSpecific(
-                "ユーザーデータのアドレス範囲エラーです。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UserDataAddressRange, error),
             EVRInitError.VendorSpecific_HmdFound_UserDataError => new VendorSpecific(
-                "ユーザーデータエラーが発生しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_UserDataError, error),
             EVRInitError.VendorSpecific_HmdFound_ConfigFailedSanityCheck => new VendorSpecific(
-                "HMD構成データの整合性チェックに失敗しました。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_HmdFound_ConfigFailedSanityCheck, error),
             EVRInitError.VendorSpecific_OculusRuntimeBadInstall => new VendorSpecific(
-                "Oculusランタイムのインストールが不完全です。", error),
+                ExceptionMessages.VRInitializeException_VendorSpecific_OculusRuntimeBadInstall, error),
 
             // --- その他 ---
-            EVRInitError.Steam_SteamInstallationNotFound => new VRInitializeException("Steamのインストールが見つかりません。", error),
-            _ => throw new VRInitializeException($"予期しない初期化エラーが発生しました: {error}", error)
+            EVRInitError.Steam_SteamInstallationNotFound => new VRInitializeException(ExceptionMessages.VRInitializeException_Steam_SteamInstallationNotFound, error),
+            _ => throw new VRInitializeException(string.Format(ExceptionMessages.VRInitializeException_UnexpectedError, error), error)
         };
     }
 
+    /// <summary>Initialization failure originating from a device driver.</summary>
     public sealed class Driver(string message, EVRInitError errorCode) : VRInitializeException(message, errorCode);
 
+    /// <summary>Initialization failure in inter-process communication with the OpenVR runtime.</summary>
     public sealed class IPC(string message, EVRInitError errorCode) : VRInitializeException(message, errorCode);
 
+    /// <summary>Initialization failure originating from the compositor.</summary>
     public sealed class Compositor(string message, EVRInitError errorCode) : VRInitializeException(message, errorCode);
 
+    /// <summary>Initialization failure specific to a hardware vendor.</summary>
     public sealed class VendorSpecific(string message, EVRInitError errorCode) : VRInitializeException(message, errorCode);
 }
