@@ -94,6 +94,19 @@ public class LayerTest
     }
 
     [Fact]
+    public void OpacityLayer_Clone_PreservesAlpha()
+    {
+        // レンダースレッドへはClone済みのLayerツリーが渡るため、Alphaの複製漏れは実描画に直結する(回帰テスト)
+        var opacity = new OpacityLayer { Alpha = 128 };
+        opacity.Children.Add(MakePicture(SKColors.Red, SKRect.Create(0, 0, 100, 100)));
+
+        var cloned = (OpacityLayer)opacity.Clone();
+
+        Assert.Equal(128, cloned.Alpha);
+        Assert.Single(cloned.Children);
+    }
+
+    [Fact]
     public void TransformLayer_TranslatesChildren()
     {
         var transform = new TransformLayer { Transform = SKMatrix.CreateTranslation(50, 50) };

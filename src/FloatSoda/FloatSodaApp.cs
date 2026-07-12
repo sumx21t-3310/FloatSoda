@@ -25,6 +25,7 @@ public class FloatSodaAppBuilder
         });
 
         builder.Services.AddScoped<IFrameLimiter, FrameLimiter>();
+        builder.Services.AddSingleton(TimeProvider.System);
         builder.AppName = appName;
 
         return builder;
@@ -38,7 +39,8 @@ public class FloatSodaAppBuilder
         var provider = Services.BuildServiceProvider();
         var limiter = provider.GetRequiredService<IFrameLimiter>();
         var loggerFactory = provider.GetService<ILoggerFactory>();
-        return new FloatSodaApp(limiter, AppName, loggerFactory);
+        var timeProvider = provider.GetService<TimeProvider>() ?? TimeProvider.System;
+        return new FloatSodaApp(limiter, AppName, loggerFactory, timeProvider);
     }
 }
 
@@ -55,14 +57,24 @@ public class FloatSodaApp : IDisposable
 
     private readonly CancellationTokenSource _cts = new();
     private readonly IFrameLimiter _limiter;
+
+    /// <summary>フレームタイムスタンプの供給元。テストではFakeTimeProvider等に差し替え可能。</summary>
+    private readonly TimeProvider _timeProvider;
+
+    /// <summary>経過時間のゼロ点(アプリ生成時)。壁時計ではなく単調タイムスタンプを使う。</summary>
+    private readonly long _startTimestamp;
+
     private bool _disposed;
     private readonly ConcurrentQueue<Action> _pendingTasks = new();
 
     private static readonly ConcurrentDictionary<FloatSodaApp, byte> ActiveApps = new();
 
-    internal FloatSodaApp(IFrameLimiter limiter, string appName, ILoggerFactory? loggerFactory = null)
+    internal FloatSodaApp(IFrameLimiter limiter, string appName, ILoggerFactory? loggerFactory = null,
+        TimeProvider? timeProvider = null)
     {
         _limiter = limiter;
+        _timeProvider = timeProvider ?? TimeProvider.System;
+        _startTimestamp = _timeProvider.GetTimestamp();
         AppName = appName;
         _renderThreadRunner =
             new RenderThreadRunner("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
@@ -111,7 +123,8 @@ public class FloatSodaApp : IDisposable
             var title = window.Title;
             var widgetBinding = new WidgetBinding();
             _bindings.TryAdd(title, widgetBinding);
-            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => overlayWindow.CreateOverlay());
+            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => overlayWindow.CreateOverlay(),
+                overlayWindow.Dpm);
             widgetBinding.AttachRootWidget(window);
             _logger?.LogInformation("{Title}を作成しました", title);
         });
@@ -221,9 +234,12 @@ public class FloatSodaApp : IDisposable
 
     private void DrawFrame()
     {
+        // 1フレーム1回だけサンプリングし、全ウィンドウに同一のタイムスタンプを配る
+        var elapsed = _timeProvider.GetElapsedTime(_startTimestamp);
+
         foreach (var (_, binding) in _bindings)
         {
-            binding.DrawFrame();
+            binding.BeginFrame(elapsed);
         }
     }
 

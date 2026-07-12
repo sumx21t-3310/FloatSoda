@@ -4,6 +4,9 @@
         <Project Path="src/FloatSoda.Engine/FloatSoda.Engine.csproj" />
         <Project Path="src/FloatSoda.Hooks/FloatSoda.Hooks.csproj" />
         <Project Path="src/FloatSoda.OVR/FloatSoda.OVR.csproj" />
+        <Project Path="src/FloatSoda.UI.Cream/FloatSoda.UI.Cream.csproj" />
+        <Project Path="src/FloatSoda.UI.FizzyPop/FloatSoda.UI.FizzyPop.csproj" />
+        <Project Path="src/FloatSoda.UI/FloatSoda.UI.csproj" />
         <Project Path="src/FloatSoda/FloatSoda.csproj" />
     </Folder>
     <Folder Name="/samples/">

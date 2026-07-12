@@ -1,4 +1,5 @@
 using System.Numerics;
+using FloatSoda.Common.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Elements;
 using FloatSoda.OVR.Overlay;
@@ -58,6 +59,15 @@ public abstract record OverlayWindow : WindowWidget
         throw new InvalidOperationException("OverlayWindowが祖先に見つかりません。");
 
     /// <summary>
+    /// テクスチャの物理密度（dots per meter）。オーバーレイの物理幅は
+    /// レイアウト結果のピクセル幅 ÷ Dpm として自動算出されます。
+    /// 既定は 4000 dpm（1px = 0.25mm。例: 幅 1000px のウィジェットは実寸 25cm）。
+    /// ダッシュボードオーバーレイのサイズは SteamVR が管理するため、
+    /// <see cref="DashboardWindow"/> では表示サイズに影響しない場合があります。
+    /// </summary>
+    public Dpm Dpm { get; init; } = Dpm.Default;
+
+    /// <summary>
     /// このウィンドウ定義に対応する <see cref="IOverlay"/> を生成します。レンダースレッド上で呼ばれます。
     /// </summary>
     internal abstract IOverlay CreateOverlay();
@@ -76,6 +86,7 @@ public record DashboardWindow : OverlayWindow
     internal override IOverlay CreateOverlay()
         => new DashboardOverlay(new DashboardOverlayIdentity(Key, Title));
 }
+
 
 /// <summary>
 /// ワールド空間の指定座標に固定されるウィンドウ。

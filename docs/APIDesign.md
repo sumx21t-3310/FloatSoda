@@ -102,7 +102,7 @@ var tile = new Row
 
 ### 2.4 スタイルの分離
 
-視覚的な属性はコンポーネント本体ではなく、専用の `*Style` クラスに分離します。
+視覚的な属性はコンポーネント本体ではなく、専用の `*Style` クラスに分離します。`*Style` レコードや `Button` などのスタイル付きコンポーネントはデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)に属します(→ [UILayering](UILayering.md))。
 
 ```csharp
 new Button
@@ -167,6 +167,47 @@ if (Child != null) context.PaintChild(Child, offset);
 - 等値演算子をオーバーロードする `record` / `record struct`（セクション8・9）が多い本フレームワークでは、特にこの差が問題になりやすい。
 
 > **補足:** 値型（`record struct` 等）の比較や、null 以外の値との比較は従来どおり `==` / `!=` を使います。本ルールは **参照の null 判定** に限定した規約です。
+
+---
+
+## 3.6 リスナーパターンを実装せず `event` を使う
+
+マルチキャストデリゲート（`event`）で表現できる通知は、Flutter流のリスナーパターン（`AddListener` / `RemoveListener` メソッドやリスナー用インターフェース）を独自実装せず、C# の `event` で公開します。
+
+```csharp
+// ✅ 推奨: event による通知
+public class AnimationController
+{
+    public event Action? Changed;
+    public event Action<AnimationStatus>? StatusChanged;
+}
+
+// ❌ 避ける: リスナーパターンの独自実装
+public interface IAnimationListener { void OnChanged(); }
+
+public class AnimationController
+{
+    public void AddListener(IAnimationListener listener) { /* ... */ }
+    public void RemoveListener(IAnimationListener listener) { /* ... */ }
+}
+```
+
+**理由:**
+- Dart の `addListener` / `removeListener` は言語にイベント機構がないための実装であり、C# ではマルチキャストデリゲートが同じ機能を言語レベルで提供する。リスナーリストの管理・通知中の購読解除の安全性（invocation list のスナップショット）も自前実装なしで手に入る。
+- `+=` / `-=` による購読・解除は C# 開発者にとって最も予測可能な API になる。
+- 購読側にインターフェース実装を強制せず、ラムダやメソッド参照をそのまま渡せる。
+
+**適用範囲の整理:**
+
+| 対象 | 使うもの |
+|---|---|
+| Widget のコールバック（単一ハンドラを `init` で受ける） | `On` プレフィックスの `Action?` プロパティ（セクション3） |
+| 長寿命のミュータブルなオブジェクト（Controller 等）からの通知（購読者が複数・動的に増減） | `event` |
+
+**補足:**
+- 通知元の共通抽象が必要な場合も、リスナー側ではなく通知元側のインターフェースに `event` を宣言する（例: `interface IListenable { event Action? Changed; }`）。
+- ラッパー型が親の通知をそのまま中継する場合は、カスタムイベントアクセサ（`add` / `remove`）で親の `event` に委譲すると購読の付け替えや解除漏れを防げる。
+- `Dispose()` ではイベントフィールドに `null` を代入して購読を破棄する。
 
 ---
 

@@ -8,14 +8,3 @@ public enum KeyEventPhase
     Up,
     Repeat
 }
-
-public readonly record struct PointerEvent();
-
-
-public enum PointerEventPhase
-{
-    Down,
-    Up,
-    Move,
-    Cancel
-}
