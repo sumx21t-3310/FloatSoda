@@ -10,10 +10,10 @@
 
 
   <ItemGroup>
-    <EmbeddedResource Include="openvr_api.dll">
-      <PackageCopyToOutput>true</PackageCopyToOutput>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <None Include="openvr_api.dll"
+          Pack="true"
+          PackagePath="runtimes/win-x64/native/"
+          CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
