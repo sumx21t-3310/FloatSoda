@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>FloatSoda.UI.FizzyPop</PackageId>
+        <Description>FizzyPop design system for FloatSoda: translucent, glassmorphism-inspired visuals. Maps FloatSoda.UI headless behavior widgets to styled visuals.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FloatSoda.UI\FloatSoda.UI.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -17,10 +17,10 @@ public sealed class ControllerPointerSystem(OverlayIntersection intersection)
 
     /// <summary>
     /// 指定コントローラーのレイをオーバーレイに向けて交差判定を行い、
-    /// ヒットした場合は UV 座標とフェーズを持つ <see cref="PointerEvent"/> を返します。
+    /// ヒットした場合は UV 座標とフェーズを持つ <see cref="PointerData"/> を返します。
     /// ヒットしない場合は <see langword="null"/> を返します。
     /// </summary>
-    public PointerEvent? Poll(TrackedDevice device, ETrackingUniverseOrigin trackingOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding)
+    public PointerData? Poll(TrackedDevice device, ETrackingUniverseOrigin trackingOrigin = ETrackingUniverseOrigin.TrackingUniverseStanding)
     {
         var deviceIndex = device.ResolveIndex();
         if (deviceIndex == OpenVR.k_unTrackedDeviceIndexInvalid)
@@ -55,15 +55,15 @@ public sealed class ControllerPointerSystem(OverlayIntersection intersection)
         OpenVR.System.GetControllerState(deviceIndex, ref state, ControllerStateSize);
         var isPressed = (state.ulButtonPressed & TriggerMask) != 0;
 
-        var phase = (isPressed, _wasPressed) switch
+        var change = (isPressed, _wasPressed) switch
         {
-            (true, false) => PointerEventPhase.Down,
-            (false, true) => PointerEventPhase.Up,
-            _ => PointerEventPhase.Hover,
+            (true, false) => PointerChange.Down,
+            (false, true) => PointerChange.Up,
+            _ => PointerChange.Hover,
         };
         _wasPressed = isPressed;
 
-        return new PointerEvent(hit.Value.UV.X, hit.Value.UV.Y, phase);
+        return new PointerData(hit.Value.UV.X, hit.Value.UV.Y, change);
     }
 
 

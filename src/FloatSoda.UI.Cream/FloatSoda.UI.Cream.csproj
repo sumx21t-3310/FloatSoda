@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <PackageId>FloatSoda.UI.Cream</PackageId>
+        <Description>Cream design system for FloatSoda: retro, creamy color palettes and flat design. Maps FloatSoda.UI headless behavior widgets to styled visuals.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\FloatSoda.UI\FloatSoda.UI.csproj" />
+    </ItemGroup>
+
+</Project>

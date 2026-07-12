@@ -23,7 +23,7 @@ public class OpacityLayer : ContainerLayer
 
     public override ILayer Clone()
     {
-        var cloned = new OpacityLayer();
+        var cloned = new OpacityLayer { Alpha = Alpha };
 
         foreach (var child in Children)
         {

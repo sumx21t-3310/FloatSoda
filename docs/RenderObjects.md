@@ -120,6 +120,7 @@ context.PushClipRect(childOffset, clipRect, Clip.Antialias, (ctx, off) =>
 | `RenderClipRoundRect` | 角丸矩形でクリップ | `BorderRadius`, `ClipBehavior` |
 | `RenderClipOval` | 楕円でクリップ | `ClipBehavior` |
 | `RenderClipPath` | カスタム `SKPath` でクリップ | `Clipper` (`CustomClipper<SKPath>`), `ClipBehavior` |
+| `RenderAnimatedOpacity` | `IAnimation<double>` を購読し、値変化フレームのみ再ペイントして不透明度を適用(→ [Animation](Animation.md)) | `Opacity` (`IAnimation<double>`) |
 
 ### Content
 

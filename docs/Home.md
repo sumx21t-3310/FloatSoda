@@ -13,6 +13,8 @@
 | [GettingStarted](GettingStarted.md) | 環境構築・サンプル実行・最初のアプリ作成 | 利用者 |
 | [Architecture](Architecture.md) | アセンブリ構成・ツリー構造・スレッドモデル | 利用者 / コントリビュータ |
 | [WidgetSystem](WidgetSystem.md) | Widget / Element システムと組み込みウィジェット一覧 | 利用者 |
+| [UILayering](UILayering.md) | UI層の3層パッケージ構成(ヘッドレス / デザインシステム) | 利用者 / コントリビュータ |
+| [Animation](Animation.md) | AnimationController・Ticker・Curves によるアニメーション | 利用者 / コントリビュータ |
 | [BuildPipeline](BuildPipeline.md) | BuildOwner による差分ビルドとフレームパイプラインの詳細 | コントリビュータ |
 | [RenderObjects](RenderObjects.md) | RenderObject ツリーのリファレンス(レイアウト・描画) | コントリビュータ |
 | [OVRIntegration](OVRIntegration.md) | OpenVR ラッパー・オーバーレイ種別・イベント処理 | 利用者 / コントリビュータ |
@@ -76,7 +78,9 @@ graph LR
 | `StatefulWidget` / `StatefulElement`(`SetState` 再ビルド) | ✓ 実装済み |
 | `InheritedWidget` / `InheritedElement`(依存追跡・通知) | ✓ 実装済み |
 | `Key` による Element 再利用(`Widget.CanUpdate` = 型 + Key) | ✓ 実装済み |
-| 一部の便利ウィジェット(`Padding` / `Container` / `ListView` / `Button` など) | ✗ スタブ(`NotImplementedException`) |
+| アニメーション(`AnimationController` / `Ticker` / `Curve`・`Curves` / `FadeTransition`) | ✓ 実装済み |
+| 一部の便利ウィジェット(`Padding` / `Container` / `ListView` など) | ✗ スタブ(`NotImplementedException`) |
+| UI3層構成(`FloatSoda.UI` ヘッドレス / `Cream` / `FizzyPop`) | △ スケルトン(`ButtonBase` / `Button`、ジェスチャ配線待ち) |
 | Hooks(`FloatSoda.Hooks` / R3 ベースの `UseState`) | △ WIP(フレームワーク未統合) |
 | ジェスチャ・ヒットテスト | ✗ 未実装 |
 
@@ -90,6 +94,9 @@ graph LR
 | `src/FloatSoda.Engine` | GLFW/OpenGL・レンダースレッド・フレームリミッタ |
 | `src/FloatSoda.OVR` | OpenVR ラッパー・オーバーレイ型・イベントディスパッチャ |
 | `src/FloatSoda` | フレームワーク本体(Widget / Element / RenderObject / パイプライン) |
+| `src/FloatSoda.UI` | ヘッドレスUI層(振る舞いのみ、見た目なし)→ [UILayering](UILayering.md) |
+| `src/FloatSoda.UI.Cream` | デザインシステム①(レトロ・クリーミー・フラット) |
+| `src/FloatSoda.UI.FizzyPop` | デザインシステム②(透明感・グラスモーフィズム) |
 | `src/FloatSoda.Hooks` | R3 ベースのフックAPI(WIP) |
 | `samples/` | サンプルアプリ(SteamVR 必須) |
 | `tests/` | xunit テスト |

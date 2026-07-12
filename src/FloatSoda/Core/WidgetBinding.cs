@@ -1,4 +1,5 @@
-﻿using FloatSoda.Common.Layer;
+﻿using FloatSoda.Common.Geometries;
+using FloatSoda.Common.Layer;
 using FloatSoda.Elements;
 using FloatSoda.Engine;
 using FloatSoda.OVR.Overlay;
@@ -9,11 +10,11 @@ using OverlayWindow = FloatSoda.Engine.OverlayWindow;
 
 namespace FloatSoda.Core;
 
-public class WidgetBinding
+public class WidgetBinding : IFrameScheduler
 {
     public WidgetBinding()
     {
-        BuildOwner = new BuildOwner(EnsureVisualUpdate);
+        BuildOwner = new BuildOwner(EnsureVisualUpdate) { FrameScheduler = this };
     }
 
     private RenderPipeline? Pipeline { get; set; }
@@ -31,9 +32,14 @@ public class WidgetBinding
     /// <summary>直近でレンダースレッドへ通知したオーバーレイサイズ。変化検知に使用する。</summary>
     private SKSizeI _lastPostedSize = SKSizeI.Empty;
 
+    public int NextFrameCallbackId { get; private set; } = 0;
+
+    private Dictionary<int, Action<TimeSpan>> _transientCallbacks = [];
+
+    private bool _hasScheduledFrame;
 
     public void EnsureInitialized(string windowName, RenderThreadRunner renderThreadRunner,
-        Func<string, IOverlay> overlayFactory)
+        Func<string, IOverlay> overlayFactory, Dpm dpm)
     {
         if (Initialized) return;
         Initialized = true;
@@ -51,7 +57,7 @@ public class WidgetBinding
 
             var overlay = overlayFactory(WindowName);
 
-            Window = new OverlayWindow(overlay, renderer);
+            Window = new OverlayWindow(overlay, renderer, dpm);
         });
 
 
@@ -139,5 +145,40 @@ public class WidgetBinding
         if (window == null) return;
 
         RenderThreadRunner?.PostTask(() => window.Resize(newSize.Width, newSize.Height));
+    }
+
+    public void BeginFrame(TimeSpan elapsedTime)
+    {
+        if (!Initialized) return;
+        _hasScheduledFrame = false;
+        var callbacks = _transientCallbacks.Values.ToList();
+        _transientCallbacks.Clear();
+
+        foreach (var callback in callbacks)
+        {
+            callback(elapsedTime);
+        }
+
+        DrawFrame();
+    }
+
+    public int ScheduleFrameCallback(Action<TimeSpan> callback)
+    {
+        ScheduleFrame();
+        NextFrameCallbackId++;
+
+        _transientCallbacks[NextFrameCallbackId] = callback;
+
+
+        return NextFrameCallbackId;
+    }
+
+    public void CancelFrameCallback(int id) => _transientCallbacks.Remove(id);
+
+    public void ScheduleFrame()
+    {
+        if (_hasScheduledFrame) return;
+
+        _hasScheduledFrame = true;
     }
 }

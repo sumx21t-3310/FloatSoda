@@ -4,7 +4,7 @@
 
 > **実装状況:**
 > - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **スタブ:** `Padding`, `Container`, `ListView`, `GridView`, `SingleChildScrollView`, `Opacity`, `Button`, `Icon`, `GestureDetector`, `Listener` は `NotImplementedException` を投げます。
+> - **スタブ:** `Padding`, `Container`, `ListView`, `GridView`, `SingleChildScrollView`, `Opacity`, `GestureDetector`, `Listener` は `NotImplementedException` を投げます。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
 ## 三ツリーの役割
@@ -107,7 +107,7 @@ public record WatchState : State<WatchWidget>
 `HookWidget.Build()` 内で `UseState(initialValue)` を呼ぶと `ReactiveProperty<T>` が返り、値の変更が再ビルドをトリガーする、という React フック風の API を目指しています。
 
 ```csharp
-// 構想中の API(未動作)
+// 構想中の API(未動作。Button は FloatSoda.UI.Cream などのデザインシステム層のもの)
 public override Widget Build(IBuildContext context)
 {
     var count = UseState(0);
@@ -153,15 +153,20 @@ public override Widget Build(IBuildContext context)
 | `ClipCustomPath` | ✓ | カスタムパスクリップ | `Clipper`, `ClipBehavior`, `Child` |
 | `Opacity` | ✗ スタブ | 透明度を適用 | `Child` |
 
+### Animation
+
+| ウィジェット | 実装状況 | 説明 | 主なプロパティ |
+|---|---|---|---|
+| `FadeTransition` | ✓ | `IAnimation<double>` で子の不透明度を駆動(リビルド不要、ペイントのみ)→ [Animation](Animation.md) | `Opacity` (`IAnimation<double>`), `Child` |
+
 ### Components
 
 | ウィジェット | 実装状況 | 説明 | 主なプロパティ |
 |---|---|---|---|
 | `RichText` | ✓ | スタイル付きテキスト(Topten.RichTextKit) | `Text` (`TextSpan`) |
 | `Text` | ✓ | プレーンテキスト表示(`RichText` に委譲) | `Data` (string) |
-| `Image` (Components) | ✗ スタブ | 高レベルな画像ウィジェット(予定) | — |
-| `Icon` | ✗ スタブ | アイコン | `Color`, `Size` |
-| `Button` | ✗ スタブ | タップイベント付きボタン(ジェスチャ未実装のため) | — |
+
+`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` にあります。詳細は [UILayering](UILayering.md) を参照してください。
 
 ### Gesture
 
@@ -183,4 +188,5 @@ public override Widget Build(IBuildContext context)
 - [BuildPipeline](BuildPipeline.md) — BuildOwner / dirty list / UpdateChild の詳細
 - [RenderObjects](RenderObjects.md) — Widget が生成する RenderObject のリファレンス
 - [GettingStarted](GettingStarted.md) — Widget を使った最初のアプリ
+- [UILayering](UILayering.md) — ヘッドレスUI層とデザインシステム層の構成
 - [APIDesign](APIDesign.md) — ウィジェット API の設計規約

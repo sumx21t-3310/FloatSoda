@@ -1,7 +1,15 @@
-﻿namespace FloatSoda.Elements;
+﻿using FloatSoda.Core;
+
+namespace FloatSoda.Elements;
 
 public class BuildOwner(Action onBuildScheduled)
 {
+    /// <summary>
+    /// このツリーが属するウィンドウのフレームスケジューラ(通常はWidgetBinding)。
+    /// TickerがElement.Owner経由で自ウィンドウのフレームコールバックへ到達するために使います。
+    /// </summary>
+    public IFrameScheduler? FrameScheduler { get; init; }
+
     private readonly List<Element> _dirtyElements = [];
     private bool? _dirtyElementsNeedsRestoring;
     private bool _scheduledFlushDirtyElements;

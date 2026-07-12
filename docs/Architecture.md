@@ -12,11 +12,17 @@ graph TD
     Engine["FloatSoda.Engine\nOpenGL・レンダースレッド"]
     OVR["FloatSoda.OVR\nOpenVR ラッパー"]
     Core["FloatSoda\nウィジェット・RenderObject・パイプライン"]
+    UI["FloatSoda.UI\nヘッドレスUI(振る舞いのみ)"]
+    Cream["FloatSoda.UI.Cream\nデザインシステム①"]
+    FizzyPop["FloatSoda.UI.FizzyPop\nデザインシステム②"]
 
     Common --> Engine
     Common --> Core
     OVR --> Core
     Engine --> Core
+    Core --> UI
+    UI --> Cream
+    UI --> FizzyPop
 ```
 
 | アセンブリ | 役割 |
@@ -25,6 +31,9 @@ graph TD
 | `FloatSoda.Engine` | `GLView`（OpenGL サーフェス）、`Renderer`（レイヤーツリー → OpenGL FBO）、`RenderThreadRunner`（レンダースレッド管理）、`FrameLimiter` |
 | `FloatSoda.OVR` | OpenVR 初期化（`Application`）、オーバーレイ型（`DashboardOverlay` / `WorldSpaceOverlay` / `DeviceTrackedOverlay`）、イベントディスパッチャ、例外体系 |
 | `FloatSoda` | ウィジェット/エレメントツリー、RenderObject ツリー、`RenderPipeline`、`FloatSodaApp` / `FloatSodaAppBuilder` |
+| `FloatSoda.UI` | ヘッドレスUI層。振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder に委譲(→ [UILayering](UILayering.md)) |
+| `FloatSoda.UI.Cream` | デザインシステム①: レトロでクリーミーな色使いのフラットデザイン(`Button`, `ButtonStyle`, `CreamTheme`) |
+| `FloatSoda.UI.FizzyPop` | デザインシステム②: 透明感・グラスモーフィズム(`Button`, `ButtonStyle`, `FizzyPopTheme`) |
 
 ---
 

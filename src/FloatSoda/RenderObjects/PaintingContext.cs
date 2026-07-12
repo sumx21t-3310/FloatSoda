@@ -58,6 +58,21 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         childContext.StopRecordingIfNeeded();
     }
 
+    public OpacityLayer PushOpacity(
+        Offset offset,
+        byte alpha,
+        Action<PaintingContext, Offset> painter,
+        OpacityLayer? oldLayer = null)
+    {
+        var layer = oldLayer ?? new OpacityLayer();
+
+        layer.Alpha = alpha;
+
+        PushLayer(layer, painter, offset);
+
+        return layer;
+    }
+
     public ClipPathLayer PushClipPath(
         Offset offset,
         SKRect bounds,
@@ -147,7 +162,7 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         }
 
         if (child.Layer is not TransformLayer childTransformLayer) return;
-        
+
         childTransformLayer.Transform = SKMatrix.CreateTranslation((float)offset.X, (float)offset.Y);
         containerLayer.Children.Add(childTransformLayer);
     }
