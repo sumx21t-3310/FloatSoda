@@ -1,4 +1,13 @@
-# FloatSoda: SteamVR Overlay UI Framework (v0.0.2)
+# FloatSoda: SteamVR Overlay UI Framework
+
+[![NuGet](https://img.shields.io/nuget/v/FloatSoda.svg)](https://www.nuget.org/packages/FloatSoda/)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/FloatSoda.svg)](https://www.nuget.org/packages/FloatSoda/)
+[![CI](https://github.com/sumx21t-3310/FloatSoda/actions/workflows/ci.yml/badge.svg)](https://github.com/sumx21t-3310/FloatSoda/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/github/license/sumx21t-3310/FloatSoda)](LICENSE)
+
+**FloatSoda** is a UI framework for building SteamVR overlays with a **Flutter-like declarative API** in C# / .NET. It renders via SkiaSharp → OpenGL → OpenVR, and manages multiple overlays (dashboard, world-space, and device-tracked) in a unified way. Currently in alpha — APIs may change without notice.
+
+> 📖 The documentation below is in Japanese. See the [Wiki](https://github.com/sumx21t-3310/FloatSoda/wiki) for details, or check the [minimal example](#最小構成のコード) — the code speaks for itself.
 
 **FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。SkiaSharp → OpenGL → OpenVR という経路でレンダリングし、複数のオーバーレイを統一的に管理できます。
 
