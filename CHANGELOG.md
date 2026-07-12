@@ -21,3 +21,7 @@
 
 [Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.0.2...main
 [0.0.2]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.0.2
+
+
+## [0.0.3] - 2026-07-13
+- openvr_api.dllが正しく配置されるようにFloatSoda.OVR.csprojを変更
