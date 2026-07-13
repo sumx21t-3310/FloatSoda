@@ -115,8 +115,12 @@ public class OVRApplication : IDisposable
     /// <see cref="OpenVR.Init"/> only bootstraps the OpenVR API; it does not associate the
     /// calling process with a manifest's <c>app_key</c>. Call this once during startup — SteamVR
     /// needs the process/AppKey association for <see cref="AutoLaunch"/> and scene-transition
-    /// behavior to work correctly.
+    /// behavior to work correctly. Requires <see cref="Info"/>'s key to already be registered
+    /// with SteamVR (see <see cref="OVRApplications.AddManifest"/> and <see cref="Installed"/>);
+    /// otherwise this throws <see cref="Exceptions.VRApplicationException"/> with
+    /// <see cref="EVRApplicationError.UnknownApplication"/>.
     /// </remarks>
+    /// <exception cref="Exceptions.VRApplicationException">The application key is not registered with SteamVR, or another OpenVR application error occurred.</exception>
     public void Identify() =>
         OpenVR.Applications.IdentifyApplication((uint)Environment.ProcessId, Info.Key).ThrowIfError();
 
