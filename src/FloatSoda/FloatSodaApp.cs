@@ -197,6 +197,18 @@ public class FloatSodaApp : IDisposable
         try
         {
             _openVR = new OVRApplication(_appInfo);
+
+            try
+            {
+                _openVR.Identify();
+            }
+            catch (VRApplicationException e)
+            {
+                // マニフェスト未登録のAppKeyでも起動できるように、識別失敗は致命的エラーにしない
+                // (AutoLaunch/シーン遷移などマニフェスト連携機能のみが動作しなくなる)。
+                _logger?.LogWarning("SteamVRへのアプリケーション識別に失敗しました: {Message}", e.Message);
+            }
+
             _dispatcher = new VRSystemEventDispatcher();
 
             _dispatcher.Register(EVREventType.VREvent_Quit, (in _) =>
