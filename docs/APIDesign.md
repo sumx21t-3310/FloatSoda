@@ -119,6 +119,41 @@ new Button
 }
 ```
 
+### 2.5 ファイル構成 — 兄弟ウィジェットは同じファイルに置く
+
+密接に関連するウィジェット群（**兄弟ウィジェット**）は、1型1ファイルに分割せず同一ファイルにまとめます。
+
+```csharp
+// Flex.cs — Flex とその薄い特殊化をまとめて定義
+public sealed record Flex : MultiChildRenderObjectWidget<RenderFlex> { /* ... */ }
+
+public abstract record FlexWrapper(Axis Direction) : StatelessWidget { /* ... */ }
+
+public sealed record Column() : FlexWrapper(Axis.Vertical);
+
+public sealed record Row() : FlexWrapper(Axis.Horizontal);
+```
+
+**兄弟と見なす基準（いずれかを満たす場合）:**
+
+1. 同一ファイル内の共通基底の薄い特殊化である（`Column` / `Row` → `FlexWrapper`）
+2. 単独では意味をなさず、必ず対で使う（`Stack` + `Positioned` のような関係）
+3. 同じ実装詳細（private ヘルパーや共通の RenderObject）を共有する
+
+**兄弟と見なさない:** 単に同じカテゴリ・同じフォルダに属するというだけの関係。`Padding` と `SizedBox` はどちらも Layout 配下ですが、独立したファイルに分けます。
+
+**ファイル名の規則:**
+
+| 状況 | ファイル名 | 例 |
+|---|---|---|
+| 基底・代表となるウィジェットがある | 代表のウィジェット名 | `Flex.cs`, `Text.cs`, `Align.cs` |
+| 対等なグループで代表が決めがたい | グループの概念名 | `Clip.cs`（`ClipOval` / `ClipRect` / `ClipRoundRect` / `ClipCustomPath`） |
+
+**理由:**
+
+- `Column` / `Row` のような数行のレコードを個別ファイルに分けるより、基底と並べて読めるほうが設計意図（薄いラッパーであること）が伝わる。Flutter の `basic.dart` が関連ウィジェットをまとめているのと同じ発想。
+- C# の一般慣習「1型1ファイル」（StyleCop SA1402）からは意図的に逸脱する。本フレームワークのウィジェットは小さな `record` が多く、機械的な分割はファイル数だけを増やして見通しを悪化させるため。
+
 ---
 
 ## 3. プロパティ命名規則
@@ -283,6 +318,7 @@ public Color? TextColor { get; init; }
 | 単位値 | `One` / `Unit` | `Size.One` |
 | 既存値からの変換・導出 | `From*(...)` | `Rect.FromPoints(a, b)` |
 | よく使うプリセット | 意味のある名詞 | `ThemeContext.Dark()`, `ThemeContext.Light()` |
+| 単位付きリテラル | 単位名の拡張プロパティ | `45.Deg`, `2000.Dpm`（→ 7.5） |
 
 ### 7.2 ジオメトリ型のファクトリ例
 
@@ -348,6 +384,66 @@ public record ThemeContext
 - 別の表現形式（座標2点→矩形など）から変換する必要がある
 - `with` 式と組み合わせて「ベースに少し手を加える」用途が想定される
 
+### 7.5 単位系値オブジェクトの拡張ファクトリ
+
+角度・密度・物理長など**単位を持つ値オブジェクト**には、`FromXxx` 静的ファクトリ（セクション7.1）に加えて、数値リテラルから直接生成できる**拡張プロパティ**を提供します。C# 14 の `extension` ブロックで定義し、引数なし・`()` なしで単位付きリテラルのように読める書き味を実現します。
+
+```csharp
+// ✅ 推奨: 拡張プロパティによる単位付きリテラル
+new RotatedBox { Angle = 45.Deg, Child = icon }
+
+// 従来の静的ファクトリも引き続き有効（こちらが正準）
+new RotatedBox { Angle = Angle.FromDegrees(45), Child = icon }
+```
+
+**定義例:**
+
+```csharp
+namespace FloatSoda.Common.Geometries.Units;
+
+public static class AngleUnits
+{
+    extension(double value)
+    {
+        /// <summary>度数から <see cref="Angle"/> を生成します。</summary>
+        public Angle Deg => Angle.FromDegrees(value);
+
+        /// <summary>ラジアンから <see cref="Angle"/> を生成します。</summary>
+        public Angle Rad => Angle.FromRadians(value);
+    }
+
+    extension(int value)
+    {
+        /// <summary>度数から <see cref="Angle"/> を生成します。</summary>
+        public Angle Deg => Angle.FromDegrees(value);
+
+        /// <summary>ラジアンから <see cref="Angle"/> を生成します。</summary>
+        public Angle Rad => Angle.FromRadians(value);
+    }
+}
+```
+
+**規約:**
+
+| 項目 | 規約 |
+|---|---|
+| 形式 | 拡張**プロパティ**（`()` なし）。引数なし・副作用なしの純粋変換のみ |
+| 命名 | `From` プレフィックスなしの単位名（`Deg`, `Rad`, `Dpm`, `Meters`） |
+| レシーバー型 | `double` と `int` の2つ（公開APIが `double` 基準〔セクション8.5〕のため `float` レシーバーは提供しない） |
+| 名前空間 | 専用名前空間（`FloatSoda.Common.Geometries.Units` 等）に隔離し、オプトインにする |
+| 位置づけ | `FromXxx` 静的ファクトリが正準。拡張プロパティはその糖衣であり、必ず正準ファクトリへ委譲する |
+
+**理由:**
+
+- オブジェクト初期化子ベースのマークアップ（セクション1）の中で、`Angle.FromDegrees(45)` より `45.Deg` のほうが視覚的ノイズが少なく、単位付きリテラルとして自然に読める。
+- 従来の拡張メソッドと異なり、C# 14 の `extension` ブロックは**プロパティ**を定義できるため、`45.Deg()` の `()` すら不要になる。値を返すだけの純粋変換であり、プロパティのセマンティクスにも合致する。
+- 数値型への拡張は、名前空間をインポートしたすべてのコードで数値リテラルの補完候補に現れる。専用名前空間への隔離により、単位リテラルを使いたいファイルだけがオプトインでき、IntelliSense 汚染を防げる。
+
+**注意点:**
+
+- 拡張ブロックのレシーバー解決には数値の暗黙変換（`int` → `double` 等）が**効かない**。`double` にだけ定義すると `45.Deg`（int リテラル）がコンパイルエラーになるため、レシーバー型は必ず規約どおり `double` と `int` の両方に定義すること。
+- 単位の解釈が自明でない変換（例: `Dpm.FromMillimetersPerPixel` のような逆数系）は拡張プロパティにせず、正準の `FromXxx` のみとする。拡張プロパティは「数値がそのまま単位値になる」変換に限定する。
+
 ---
 
 ## 8. ジオメトリオブジェクトには `record struct` を使う
@@ -377,6 +473,56 @@ var wider = insets with { Left = 32, Right = 32 };
 | 等値比較 | 値ベース（自動） | 参照ベース | 手動実装が必要 |
 | `with` 式 | ✅ | ✅ | ❌ |
 | 分解 (`Deconstruct`) | ✅ | 手動 | 手動 |
+
+---
+
+## 8.5 実数は `double` を基本とし、Skia型を公開APIに出さない
+
+### 実数型の方針
+
+公開APIに現れる実数（座標・サイズ・角度・比率など）は **`double`** を使用します。`float` はプラットフォーム境界（SkiaSharp / OpenVR / OpenGL への受け渡し）でのみ使用し、境界での変換はフレームワーク内部が担います。
+
+```csharp
+// ✅ 推奨: 公開APIは double
+public readonly record struct Angle(double Radians);
+public readonly record struct Size(double Width, double Height);
+
+// ❌ 避ける: 公開APIに float を露出
+public readonly record struct Angle(float Radians);
+```
+
+**理由:**
+
+- C# の浮動小数リテラルはデフォルトで `double` であるため、`Rotation = 45.5.Deg` のように接尾辞 `f` なしで書ける。`float` 基準のAPIはマークアップ全体に `f` のノイズを強いる（セクション7.5の単位リテラルと相乗）。
+- レイアウト計算や角度→行列変換のような合成計算は `double` で保持するほうが誤差が蓄積しにくい。
+- Flutterも公開API（`dart:ui` / framework層）はすべて `double` であり、エンジン境界で `float` へ変換している。
+
+**性能に関する補足:** 値オブジェクトのサイズは倍になるが、UIのプロパティ用途では実害はない。SIMD化されたホットパスなど `float` が正当化される箇所は、公開APIではなく内部実装に限定する。
+
+### Skia型を公開APIに出さない
+
+`SKCanvas` / `SKPicture` / `SKSize` / `SKColor` などの SkiaSharp 型は、公開API（Widget のプロパティ、RenderObject の公開メンバー、ジオメトリ型、デザインシステムの Style レコード）に露出させません。描画の語彙はフレームワーク自前の型（`Size`, `Color`, `Paint` 等）で定義し、Skia型への変換は `FloatSoda.Engine` 側の境界で行います。
+
+```csharp
+// ✅ 推奨: 自前の語彙型
+public record ButtonStyle
+{
+    public Color BackgroundColor { get; init; } = Colors.White;
+}
+
+// ❌ 避ける: Skia型の直接露出
+public record ButtonStyle
+{
+    public SKColor BackgroundColor { get; init; } = SKColors.White;
+}
+```
+
+**理由:**
+
+- レンダリングバックエンドを実装詳細に保つため。Flutter が framework 層と `dart:ui` の境界を維持していたからこそ Skia → Impeller の差し替えが可能だった。同じ境界を引くことで、将来のバックエンド変更を公開APIの破壊なしに行える。
+- 利用者に SkiaSharp への直接依存を強制しない。
+
+> **移行中の注記:** 既存コードにはこの規約に違反する箇所が残っている（`RenderBox.Size` の `SKSize`、`Angle` / `Dpm` / `Alignment` の `float` など）。段階的な解消は [Issue #131](https://github.com/sumx21t-3310/FloatSoda/issues/131) のロードマップに従う。新規APIはこの規約に従うこと。
 
 ---
 
