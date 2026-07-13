@@ -622,6 +622,80 @@ public string Label { get; init; } = string.Empty;
 
 ---
 
+## 11. ネイティブAPIラップの方針
+
+`FloatSoda.OVR` などでネイティブAPI（OpenVR等）をラップする際の規約です。
+
+### 11.1 enum の名前を返すだけの API は高レベルラッパーに追加しない
+
+OpenVR には `GetApplicationsErrorNameFromEnum` / `GetOverlayErrorNameFromEnum` / `GetSceneApplicationStateNameFromEnum` / `GetEventTypeNameFromEnum` など、enum 値を人間可読な名前文字列へ変換するだけの `*NameFromEnum` 系 API が各インターフェースに存在します。**列挙子名を返すだけで、説明文・ローカライズ・プロトコル上の意味を追加で持たないもの**は、`FloatSoda.OVR` の高レベルラッパーに同等メソッドを追加しません。
+
+```csharp
+// ✅ 推奨: 既知の値をログへ出す通常用途は C# の文字列補間で十分
+EVRApplicationError err = ...;
+logger.Log($"OpenVR error: {err} ({(int)err})");   // "AppKeyAlreadyExists (100)"
+
+// ❌ 避ける: ネイティブ関数を経由した文字列化を高レベルラッパーとして公開する
+public string GetErrorName(EVRApplicationError err)
+    => Marshal.PtrToStringAnsi(OpenVR.Applications.GetApplicationsErrorNameFromEnum(err));
+```
+
+**理由:**
+
+- 既知の enum 値をログへ表示する通常用途には `enum.ToString()`（および文字列補間）で十分であり、`FloatSoda.OVR` の高レベル API として別の文字列化メソッドを追加する価値が小さい。
+- FloatSoda.OVR のエラーモデルは `ThrowIfError()` による例外化であり、エラーは例外と型付きの `ErrorCode` で扱い、メッセージは診断情報として提供する。文字列化 API を高レベルラッパーとして公開すると「エラーは文字列で扱う」という誤ったシグナルになる。
+- 高レベルラッパーの公開 API に存在するものは「使うべきもの」と解釈される（特にコード生成 AI）。不要な API を増やさないことが誤用防止になる。
+
+**注意点:**
+
+- C# の `enum.ToString()` とネイティブ側 `*NameFromEnum` の返却文字列が完全一致することは**保証しません**（例: ネイティブ側は `VRApplicationError_AppKeyAlreadyExists`、C# バインディングは `AppKeyAlreadyExists` のように表現が既に異なる）。また未定義の将来値に対して `enum.ToString()` は数値文字列（例: `"117"`）を返しますが、ランタイム側の `*NameFromEnum` はその値の名前を認識できる場合があります。診断上どうしてもネイティブ側の名前が必要な場合は、低レベルバインディング（`OpenVR.Applications.GetApplicationsErrorNameFromEnum` 等）を直接呼び出してください。
+- この規約は `FloatSoda.OVR` の**高レベルラッパー**に適用するものであり、`openvr_api.cs` に生成される低レベルバインディングから `*NameFromEnum` を削除する意味ではありません。
+- 単なる列挙子名ではなく、説明文・対処方法・ローカライズ済み表示文を返す API（例: `VR_GetVRInitErrorAsEnglishDescription` のような記述系 API）はこの規約の対象外です。個別に検討してください。
+
+### 11.2 ライフサイクルを持つ型は単数形、ステートレスなユーティリティは複数形
+
+ネイティブ API のラッパー型を命名する際、**そのインスタンスが `Init`/`Dispose` のようなライフサイクルを持つか**で単数形・複数形を使い分けます。
+
+```csharp
+// ✅ ライフサイクルを持つ: 単数形 (OVRApplication)
+// - コンストラクタで OpenVR.Init()、Dispose() で OpenVR.Shutdown()
+// - Info.Key（自分自身のアプリ識別子）を暗黙に使う自己参照系の操作を持つ
+public class OVRApplication : IDisposable
+{
+    public OVRAppInfo Info { get; init; }
+
+    public bool AutoLaunch
+    {
+        get => OpenVR.Applications.GetApplicationAutoLaunch(Info.Key);
+        set => OpenVR.Applications.SetApplicationAutoLaunch(Info.Key, value);
+    }
+}
+
+// ✅ ステートレスなユーティリティ: 複数形 (OVRApplications)
+// - ライフサイクルを持たない static クラス
+// - 「自分」ではなく SteamVR のアプリ登録全体を対象にした操作を持ち、対象は毎回引数で明示する
+public static class OVRApplications
+{
+    public static void Launch(string appKey) =>
+        OpenVR.Applications.LaunchApplication(appKey).ThrowIfError();
+}
+```
+
+**判断基準:**
+
+| 型の性質 | 命名 | 例 |
+|---|---|---|
+| `Init`/`Dispose` のようなライフサイクルを持ち、自分自身の識別子（`Info.Key` 等）を暗黙に使う操作を持つ | 単数形 | `OVRApplication` |
+| ライフサイクルを持たない `static` クラスで、操作対象を毎回引数で明示する | 複数形 | `OVRApplications` |
+
+**理由:**
+
+- OpenVR 自身の命名（`IVRSystem` = 単数、`IVRApplications` = 複数）と対応させることで、ラップ元の API との対応関係が名前から読み取れる。
+- `OVRApplication.Launch(appKey)` のように単数形インスタンスから他アプリを起動する形にすると、「自分」と「他アプリ」の操作が同じ型に混在し、`this` を参照しない操作なのか自己参照系の操作なのかが型名だけでは区別できない。複数形の独立した静的クラスに分離することで、その曖昧さを型レベルで解消する。
+- 将来 `IVROverlay` など他のネイティブインターフェースをラップする際にも、同じ基準（ライフサイクル所有の有無）で単数形/複数形を機械的に判断できる。
+
+---
+
 ## 関連ページ
 
 - [WidgetSystem](WidgetSystem.md) — この規約で実装された組み込みウィジェット

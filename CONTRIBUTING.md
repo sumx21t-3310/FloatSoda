@@ -61,9 +61,10 @@ API設計の詳細な規約は **[docs/APIDesign.md](docs/APIDesign.md)** を参
 - コンストラクタ引数は使わず、`init` プロパティのみで構成する(オブジェクト初期化子ファースト)
 - 単一の子は `Child`、複数の子は `Children`(`IList<Widget>`)
 - ジオメトリ型は `readonly record struct`、Context/Theme等は `record`
-- `public` プロパティには XML ドキュメントコメントを付与する
+- `public` プロパティには XML ドキュメントコメントを付与する(**日本語**で書く。理由と英語化の方針は [docs/Localization.md](docs/Localization.md) を参照)
 - イベントハンドラは `Action?` / `Action<T>?` / `Func<Task>?` で `On` プレフィックスを付ける
 - スタイル属性はコンポーネント本体ではなく別の `*Style` record に分離する
+- ユーザーに露出する例外・診断メッセージは resx でローカライズする(ニュートラル = 日本語、`en` サテライト。手順は [docs/Localization.md](docs/Localization.md))
 
 ---
 
@@ -82,7 +83,7 @@ API設計の詳細な規約は **[docs/APIDesign.md](docs/APIDesign.md)** を参
 
 FloatSoda は RenderObject ツリー / Layer ツリー / Widget-Element ツリーの三層構造を持ちます。コードを読み始める前に **[docs/Home.md](docs/Home.md)** から目を通すことを推奨します。
 
-特に Widget/Element 層は `StatelessWidget` のみ実装済みで、`StatefulWidget` / `InheritedWidget` / `MultiChildRenderObjectElement.PerformRebuild()`(子リストの差分更新)は未実装(`NotImplementedException`)です。これらの領域に貢献する場合は、事前に設計方針を Issue 等ですり合わせることを推奨します。
+Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element、`BuildOwner` による差分ビルド、`MultiChildRenderObjectElement` のキー付き二端リスト差分まで実装済みです。一方で、多くの便利ウィジェット(`Padding`, `Container`, `ListView`, `GridView`, `Opacity`, `GestureDetector`, `Listener` 等)は未実装(`NotImplementedException`)のスタブで、ジェスチャ・ヒットテストも未実装です。これらの領域に貢献する場合は、事前に設計方針を Issue 等ですり合わせることを推奨します。
 
 ---
 

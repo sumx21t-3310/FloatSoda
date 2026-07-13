@@ -2,7 +2,8 @@
 using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
 
-var app = new Application(ApplicationType.Overlay);
+
+var app = new OVRApplication(new OVRAppInfo(new("com.sumx21t.floatsoda.overlay_primitive")));
 
 var eventDispatcher = new VRSystemEventDispatcher();
 bool isRunning = true;
@@ -10,7 +11,7 @@ bool isRunning = true;
 eventDispatcher.Register(EVREventType.VREvent_Quit, (in _) => isRunning = false);
 
 
-var overlayName = "float_soda_openvr_overlay_sample";
+var overlayName = $"{app.Info.Key}.overlay_sample";
 var overlayKey = $"{overlayName}.{Guid.NewGuid()}";
 var identity = new OverlayIdentity(overlayKey, overlayName);
 var overlay = new DeviceTrackedOverlay(identity);

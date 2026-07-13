@@ -54,7 +54,7 @@ Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widge
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
 | `tests/FloatSoda.Common.Test` | xunit tests for the Layer tree |
-| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, APIDesign). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, APIDesign, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
 
 ### UI Layering Rules (see `docs/UILayering.md`)
 
