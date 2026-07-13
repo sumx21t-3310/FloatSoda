@@ -10,6 +10,14 @@ The repository owner develops hands-on and tracks the implementation themselves.
 
 FloatSoda is a SteamVR Overlay UI framework for .NET 10 / C# 14 that brings Flutter-like declarative UI to VR overlays. It renders via SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR overlay texture.
 
+## Target Users
+
+FloatSoda targets three personas. Use them as the yardstick for API design, docs tone, and error messages:
+
+1. **VRChatters who vibe-code personal tools** — they barely write code themselves; an LLM does. The real "reader" of `docs/` and the API surface is the LLM, so optimize for "an LLM cannot misuse this API." Concrete wants: a FaceEmo expression switcher (OSC), a VRChat photo album, a friend-online toast notifier.
+2. **Booth creators selling overlays** — Unity-native programmers capable of building a game world, but they only know uGUI and have never seen declarative UI. Explain concepts by mapping from Unity/Udon vocabulary. They can handle exe distribution given a guide.
+3. **Engineers who avoid uGUI** — their core pain is that uGUI is not text-based (scenes/prefabs don't diff, review, or LLM-generate). The headline value: **the entire UI lives in C# code — no scenes, no prefabs**. Never introduce state that can't be expressed in code (e.g. external asset/config files) without weighing this trade-off.
+
 ## Build & Run Commands
 
 ```bash
@@ -40,10 +48,17 @@ Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widge
 | `src/FloatSoda.Engine` | Platform layer: GLFW/OpenGL (`GLView`), `Renderer`, `OverlayWindow`, `RenderThreadRunner`, `FrameLimiter` |
 | `src/FloatSoda.OVR` | OpenVR wrappers, overlay types (`DashboardOverlay`, `WorldSpaceOverlay`, `DeviceTrackedOverlay`), `VREventDispatcher`, and exception types |
 | `src/FloatSoda` | Framework core: RenderObject tree, Widget/Element system, `RenderPipeline`, `FloatSodaApp` |
+| `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets (`ButtonBase`, `InteractionState`), no visuals — see `docs/UILayering.md` |
+| `src/FloatSoda.UI.Cream` | Design system #1: retro creamy colors, flat design (`Button`, `ButtonStyle`, `CreamTheme`) |
+| `src/FloatSoda.UI.FizzyPop` | Design system #2: translucency / glassmorphism (`Button`, `ButtonStyle`, `FizzyPopTheme`) |
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
 | `tests/FloatSoda.Common.Test` | xunit tests for the Layer tree |
-| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, GettingStarted, Architecture, WidgetSystem, BuildPipeline, RenderObjects, OVRIntegration, APIDesign). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, GettingStarted, Architecture, WidgetSystem, UILayering, BuildPipeline, RenderObjects, OVRIntegration, APIDesign). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
+
+### UI Layering Rules (see `docs/UILayering.md`)
+
+The UI is split into three layers: `FloatSoda` (core + primitive widgets; anything touching Skia/render-tree types), `FloatSoda.UI` (headless behavior: interaction state machines, typed builder slots), and two parallel design systems `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` (state→visual mapping only). Two rules: (1) behavior/state machines always go in `FloatSoda.UI`, never in a design system; (2) `FloatSoda.UI` widgets must work without any design-system `InheritedWidget` (themes' `Of()` returns null and components fall back to defaults). Litmus test: each design system must be buildable without copying code from the other. Design systems never reference each other.
 
 ## Architecture: Three Trees
 
@@ -75,7 +90,7 @@ The layer tree is **cloned** (`ILayer.Clone()`) before being handed to the rende
 
 ### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Core implemented
 
-Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatefulWidget` / `InheritedWidget` and their elements are all wired, including incremental rebuilds via `BuildOwner` and keyed two-ended list diffing in `MultiChildRenderObjectElement`. Remaining gaps: many convenience widgets (`Padding`, `Container`, `ListView`, `GridView`, `Opacity`, `Button`, `Icon`, `GestureDetector`, `Listener`) are still `NotImplementedException` stubs, and gesture/hit-testing is not implemented:
+Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatefulWidget` / `InheritedWidget` and their elements are all wired, including incremental rebuilds via `BuildOwner` and keyed two-ended list diffing in `MultiChildRenderObjectElement`. Remaining gaps: many convenience widgets (`Padding`, `Container`, `ListView`, `GridView`, `Opacity`, `GestureDetector`, `Listener`) are still `NotImplementedException` stubs, and gesture/hit-testing is not implemented (`Button`/`Icon` now live in the design-system layer; see UI Layering Rules above):
 - `Widget` — immutable `abstract record`; declares `CreateElement()` and holds an optional `Key`. `Widget.CanUpdate` is Flutter-style (same runtime type + equal `Key`); a fast-path record-equality check in `Element.UpdateChild` short-circuits identical widgets before that
 - `RenderObjectWidget<T>` — widget that owns a `RenderObject`; declares `CreateRenderObject()` / `UpdateRenderObject(T)`
 - `StatelessWidget` — `Build()` is called by `StatelessElement`; usable today
