@@ -300,15 +300,15 @@ public record Text : Widget
 - 必須プロパティは `required` キーワードで明示する
 
 ```csharp
-public record Image : Widget
+public record AspectRatio : Widget
 {
-    public required string Src { get; init; }   // 必須
-    public string? Alt { get; init; }           // 省略可
-    public double? Width { get; init; }         // null = 自動
-    public double? Height { get; init; }        // null = 自動
-    public BoxFit Fit { get; init; } = BoxFit.Contain;  // デフォルトあり
+    public required double Ratio { get; init; }  // 必須（幅 ÷ 高さ。妥当なデフォルトが存在しない）
+    public Widget? Child { get; init; }          // null = 子なし
+    public Alignment Alignment { get; init; } = Alignment.Center;  // デフォルトあり
 }
 ```
+
+> **末端ウィジェットの必須値は `required` にしない:** 上の `AspectRatio` はウィジェット（`Child`）を取る合成ウィジェットなので、初期化子＋`required` で必須値を表現します。一方 `Text` / `Icon` / `Image` のような**末端ウィジェット**は、必須値をコンストラクタで受けるため `required` を使いません（→ [セクション2.1 の例外](#例外-末端ウィジェットの単一値コンストラクタ)）。両者で必須値の受け方が異なる点に注意してください。
 
 ---
 
