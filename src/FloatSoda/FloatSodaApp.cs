@@ -197,6 +197,7 @@ public class FloatSodaApp : IDisposable
         try
         {
             _openVR = new OVRApplication(_appInfo);
+            _openVR.Identify();
             _dispatcher = new VRSystemEventDispatcher();
 
             _dispatcher.Register(EVREventType.VREvent_Quit, (in _) =>
