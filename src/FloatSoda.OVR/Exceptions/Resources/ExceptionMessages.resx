@@ -682,6 +682,9 @@
   <data name="VRApplicationException_SteamVRIsExiting" xml:space="preserve">
     <value>SteamVRが終了処理中のため、要求を完了できません。</value>
   </data>
+  <data name="VRApplicationException_WaitingForChaperone" xml:space="preserve">
+    <value>Chaperoneの準備待ちのため、要求を完了できません。</value>
+  </data>
   <data name="VRApplicationException_BufferTooSmall" xml:space="preserve">
     <value>バッファサイズが不足しています。</value>
   </data>

@@ -220,6 +220,7 @@ internal static class ExceptionMessages
     public static string VRApplicationException_TransitionAborted => Get("VRApplicationException_TransitionAborted");
     public static string VRApplicationException_IsTemplate => Get("VRApplicationException_IsTemplate");
     public static string VRApplicationException_SteamVRIsExiting => Get("VRApplicationException_SteamVRIsExiting");
+    public static string VRApplicationException_WaitingForChaperone => Get("VRApplicationException_WaitingForChaperone");
     public static string VRApplicationException_BufferTooSmall => Get("VRApplicationException_BufferTooSmall");
     public static string VRApplicationException_PropertyNotSet => Get("VRApplicationException_PropertyNotSet");
     public static string VRApplicationException_UnknownProperty => Get("VRApplicationException_UnknownProperty");

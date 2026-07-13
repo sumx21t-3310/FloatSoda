@@ -4,3 +4,7 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 *.DotSettings.user
+
+# Shared agent memory (Basic Memory MCP) — local, not published
+.agent-memory/
+.mcp.json

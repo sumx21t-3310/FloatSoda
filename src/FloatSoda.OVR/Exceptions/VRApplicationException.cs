@@ -35,6 +35,7 @@ public class VRApplicationException(string message, EVRApplicationError errorCod
             EVRApplicationError.TransitionAborted => ExceptionMessages.VRApplicationException_TransitionAborted,
             EVRApplicationError.IsTemplate => ExceptionMessages.VRApplicationException_IsTemplate,
             EVRApplicationError.SteamVRIsExiting => ExceptionMessages.VRApplicationException_SteamVRIsExiting,
+            EVRApplicationError.WaitingForChaperone => ExceptionMessages.VRApplicationException_WaitingForChaperone,
             EVRApplicationError.BufferTooSmall => ExceptionMessages.VRApplicationException_BufferTooSmall,
             EVRApplicationError.PropertyNotSet => ExceptionMessages.VRApplicationException_PropertyNotSet,
             EVRApplicationError.UnknownProperty => ExceptionMessages.VRApplicationException_UnknownProperty,

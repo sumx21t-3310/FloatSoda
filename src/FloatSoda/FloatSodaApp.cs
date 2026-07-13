@@ -24,15 +24,15 @@ public class FloatSodaAppBuilder
             return factory.CreateLogger("FloatSoda");
         });
 
+        builder.Services.AddSingleton(new OVRAppInfo(new AppKey(appName)));
+
         builder.Services.AddScoped<IFrameLimiter, FrameLimiter>();
         builder.Services.AddSingleton(TimeProvider.System);
-        builder.AppName = appName;
 
         return builder;
     }
 
     public IServiceCollection Services { get; } = new ServiceCollection();
-    public string AppName { get; set; } = "FloatSoda";
 
     public FloatSodaApp Build()
     {
@@ -40,23 +40,26 @@ public class FloatSodaAppBuilder
         var limiter = provider.GetRequiredService<IFrameLimiter>();
         var loggerFactory = provider.GetService<ILoggerFactory>();
         var timeProvider = provider.GetService<TimeProvider>() ?? TimeProvider.System;
-        return new FloatSodaApp(limiter, AppName, loggerFactory, timeProvider);
+        var appInfo = provider.GetService<OVRAppInfo>() ?? throw new InvalidOperationException();
+
+        return new FloatSodaApp(limiter, appInfo, loggerFactory, timeProvider);
     }
 }
 
 public class FloatSodaApp : IDisposable
 {
-    public string AppName { get; init; }
     private readonly RenderThreadRunner _renderThreadRunner;
 
     private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<string, WidgetBinding> _bindings = [];
 
-    private Application? _openVR;
+    private OVRApplication? _openVR;
     private VRSystemEventDispatcher? _dispatcher;
 
     private readonly CancellationTokenSource _cts = new();
     private readonly IFrameLimiter _limiter;
+
+    private readonly OVRAppInfo _appInfo;
 
     /// <summary>フレームタイムスタンプの供給元。テストではFakeTimeProvider等に差し替え可能。</summary>
     private readonly TimeProvider _timeProvider;
@@ -69,13 +72,14 @@ public class FloatSodaApp : IDisposable
 
     private static readonly ConcurrentDictionary<FloatSodaApp, byte> ActiveApps = new();
 
-    internal FloatSodaApp(IFrameLimiter limiter, string appName, ILoggerFactory? loggerFactory = null,
+    internal FloatSodaApp(IFrameLimiter limiter,
+        OVRAppInfo appInfo, ILoggerFactory? loggerFactory = null,
         TimeProvider? timeProvider = null)
     {
         _limiter = limiter;
+        _appInfo = appInfo;
         _timeProvider = timeProvider ?? TimeProvider.System;
         _startTimestamp = _timeProvider.GetTimestamp();
-        AppName = appName;
         _renderThreadRunner =
             new RenderThreadRunner("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
         _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
@@ -192,7 +196,7 @@ public class FloatSodaApp : IDisposable
     {
         try
         {
-            _openVR = new Application(ApplicationType.Overlay);
+            _openVR = new OVRApplication(_appInfo);
             _dispatcher = new VRSystemEventDispatcher();
 
             _dispatcher.Register(EVREventType.VREvent_Quit, (in _) =>
@@ -204,8 +208,11 @@ public class FloatSodaApp : IDisposable
             _dispatcher.Register(EVREventType.VREvent_ProcessQuit, (in _) => _cts.Cancel());
 
             // 起動時にコントローラーが未接続だったDeviceTrackedWindowへ、接続/ロール確定を機に再適用する。
-            _dispatcher.Register(EVREventType.VREvent_TrackedDeviceActivated, (in _) => ReapplyPendingDeviceTrackedTransforms());
-            _dispatcher.Register(EVREventType.VREvent_TrackedDeviceRoleChanged, (in _) => ReapplyPendingDeviceTrackedTransforms());
+            _dispatcher.Register(EVREventType.VREvent_TrackedDeviceActivated,
+                (in _) => ReapplyPendingDeviceTrackedTransforms());
+            
+            _dispatcher.Register(EVREventType.VREvent_TrackedDeviceRoleChanged,
+                (in _) => ReapplyPendingDeviceTrackedTransforms());
 
             _renderThreadRunner.Start(_cts.Token);
         }

@@ -682,6 +682,9 @@
   <data name="VRApplicationException_SteamVRIsExiting" xml:space="preserve">
     <value>Cannot complete the request because SteamVR is exiting.</value>
   </data>
+  <data name="VRApplicationException_WaitingForChaperone" xml:space="preserve">
+    <value>Cannot complete the request because SteamVR is waiting for Chaperone to be ready.</value>
+  </data>
   <data name="VRApplicationException_BufferTooSmall" xml:space="preserve">
     <value>The buffer size is insufficient.</value>
   </data>

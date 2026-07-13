@@ -2,6 +2,7 @@
 
 namespace FloatSoda.OVR.Math
 {
+    /// <summary>Converts matrices between <see cref="Matrix4x4"/> and OpenVR representations.</summary>
     public static class MatrixExtension
     {
         /// <summary>
@@ -21,6 +22,8 @@ namespace FloatSoda.OVR.Math
         /// M21 M22 M23 M42 <br/>
         /// M31 M32 M33 M43
         /// </summary>
+        /// <param name="matrix">The matrix to convert.</param>
+        /// <returns>The equivalent OpenVR matrix.</returns>
         public static HmdMatrix34_t ToHmdMatrix34_t(this Matrix4x4 matrix)
         {
             return new HmdMatrix34_t
@@ -56,6 +59,8 @@ namespace FloatSoda.OVR.Math
         /// m8 m9 m10 0 <br/>
         /// m3 m7 m11 1
         /// </summary>
+        /// <param name="matrix">The OpenVR matrix to convert.</param>
+        /// <returns>The equivalent numerics matrix.</returns>
         public static Matrix4x4 ToMatrix4x4(this HmdMatrix34_t matrix)
         {
             return new Matrix4x4(
