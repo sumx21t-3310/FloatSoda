@@ -10,6 +10,14 @@ The repository owner develops hands-on and tracks the implementation themselves.
 
 FloatSoda is a SteamVR Overlay UI framework for .NET 10 / C# 14 that brings Flutter-like declarative UI to VR overlays. It renders via SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR overlay texture.
 
+## Target Users
+
+FloatSoda targets three personas. Use them as the yardstick for API design, docs tone, and error messages:
+
+1. **VRChatters who vibe-code personal tools** — they barely write code themselves; an LLM does. The real "reader" of `docs/` and the API surface is the LLM, so optimize for "an LLM cannot misuse this API." Concrete wants: a FaceEmo expression switcher (OSC), a VRChat photo album, a friend-online toast notifier.
+2. **Booth creators selling overlays** — Unity-native programmers capable of building a game world, but they only know uGUI and have never seen declarative UI. Explain concepts by mapping from Unity/Udon vocabulary. They can handle exe distribution given a guide.
+3. **Engineers who avoid uGUI** — their core pain is that uGUI is not text-based (scenes/prefabs don't diff, review, or LLM-generate). The headline value: **the entire UI lives in C# code — no scenes, no prefabs**. Never introduce state that can't be expressed in code (e.g. external asset/config files) without weighing this trade-off.
+
 ## Build & Run Commands
 
 ```bash
@@ -46,7 +54,7 @@ Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widge
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
 | `tests/FloatSoda.Common.Test` | xunit tests for the Layer tree |
-| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, GettingStarted, Architecture, WidgetSystem, UILayering, BuildPipeline, RenderObjects, OVRIntegration, APIDesign). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, APIDesign). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
 
 ### UI Layering Rules (see `docs/UILayering.md`)
 
