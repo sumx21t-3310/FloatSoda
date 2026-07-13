@@ -55,6 +55,38 @@ var card = new Card("タイトル", new Text("本文"), 4);
 - 引数の順序を覚える必要がない
 - 将来的なプロパティ追加時に後方互換性を保ちやすい
 
+#### 例外: 末端ウィジェットの単一値コンストラクタ
+
+**末端ウィジェット**に限り、主たる値1つを取るコンストラクタを容認します。末端ウィジェットとは、次の**両方**を満たすものです。
+
+1. **ウィジェットを引数（`Child` / `Children`）に取らない** — 合成ではなく、それ自体が葉になる
+2. **データそのものが表示対象** — 文字列・グリフ・画像・数値など「表示される値」を持つ（レイアウト指示の値は該当しない）
+
+```csharp
+// ✅ 容認: Text / Icon はデータそのものが表示対象で、子を取らない
+new Text("Hello, World!")
+new Icon("home")
+
+// 初期化子形式も常に併存する（スタイル等を足すときはこちら）
+new Text { Content = "Hello, World!", FontSize = 24 }
+```
+
+**該当する例:** `Text(string)`、`Icon(string)`、`Image`（画像プロバイダ1つ）、`ProgressBar(double)` など。
+**該当しない例:** `Padding` / `Container`（ウィジェットを取る）、`Spacer`（`size` はレイアウト指示でデータではない）。
+
+**付帯ルール:**
+
+- コンストラクタ引数は**主たる値1つのみ**。スタイルやオプションは従来どおり `init` プロパティで受ける
+- オブジェクト初期化子形式を**必ず併存**させる（コンストラクタは糖衣であって、初期化子を置き換えない）
+- コンストラクタを持つ末端ウィジェットは、その引数以外に `required` メンバーを**持たない**。C# ではコンストラクタで必須値を埋めるのに `[SetsRequiredMembers]` が必要だが、これは同時に**他の `required` メンバーの検査も無効化**してしまうため（→ [セクション5](#5-デフォルト値の方針)）
+- ソースが曖昧なもの（`Image` のパスかプロバイダか等）は、コンストラクタを増やさず静的ファクトリ（`Image.FromFile(path)` など、[セクション7](#7-ファクトリメソッドの方針)）で受ける
+
+**理由:**
+
+- `Text` の本体は文字列そのもの、`Icon` はグリフそのものであり、位置引数の意味が曖昧になりようがない。初期化子ファースト規約が守ろうとしている「引数の意味の自明性」を壊さない。
+- 末端ウィジェットは `Children` の深部に大量に現れるため、`new Text("OK")` と書けることの視覚的ノイズ削減効果が最も大きい。
+- Flutter が末端ウィジェットを `Text('hello')` / `Icon(Icons.add)` の形で提供しているため、Flutter を参照する利用者・コード生成AIが自然に書く形をそのまま正解にできる。
+
 ### 2.2 子要素の表現
 
 単一の子を持つコンポーネントは `Child` プロパティ、複数の子を持つ場合は `Children` プロパティ（`IList<Widget>` 型）を使用します。
@@ -268,15 +300,15 @@ public record Text : Widget
 - 必須プロパティは `required` キーワードで明示する
 
 ```csharp
-public record Image : Widget
+public record AspectRatio : Widget
 {
-    public required string Src { get; init; }   // 必須
-    public string? Alt { get; init; }           // 省略可
-    public double? Width { get; init; }         // null = 自動
-    public double? Height { get; init; }        // null = 自動
-    public BoxFit Fit { get; init; } = BoxFit.Contain;  // デフォルトあり
+    public required double Ratio { get; init; }  // 必須（幅 ÷ 高さ。妥当なデフォルトが存在しない）
+    public Widget? Child { get; init; }          // null = 子なし
+    public Alignment Alignment { get; init; } = Alignment.Center;  // デフォルトあり
 }
 ```
+
+> **末端ウィジェットの必須値は `required` にしない:** 上の `AspectRatio` はウィジェット（`Child`）を取る合成ウィジェットなので、初期化子＋`required` で必須値を表現します。一方 `Text` / `Icon` / `Image` のような**末端ウィジェット**は、必須値をコンストラクタで受けるため `required` を使いません（→ [セクション2.1 の例外](#例外-末端ウィジェットの単一値コンストラクタ)）。両者で必須値の受け方が異なる点に注意してください。
 
 ---
 
