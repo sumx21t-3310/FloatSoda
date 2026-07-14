@@ -50,7 +50,7 @@ public abstract class RenderObject
 
         if (RelayoutBoundary != null && relayoutBoundary != RelayoutBoundary)
         {
-            VisitChildren(_ => CleanChildRelayoutBoundary());
+            VisitChildren(child => child.CleanChildRelayoutBoundary());
         }
 
         RelayoutBoundary = relayoutBoundary;
@@ -77,7 +77,7 @@ public abstract class RenderObject
         {
             RelayoutBoundary = null;
             NeedsLayout = true;
-            VisitChildren(_ => CleanChildRelayoutBoundary());
+            VisitChildren(child => child.CleanChildRelayoutBoundary());
         }
     }
 
