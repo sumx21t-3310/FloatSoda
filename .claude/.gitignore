@@ -1,0 +1,3 @@
+# Transient / machine-local Claude Code state — never commit these.
+worktrees/
+settings.local.json
