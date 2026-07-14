@@ -139,17 +139,14 @@ app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Targe
 `FloatSodaAppBuilder` でフレームレートを制御できます。
 
 ```csharp
-// 固定 FPS（デフォルトは IFrameLimiter 実装に依存）
+// 固定 FPS
 var builder = FloatSodaAppBuilder.CreateDefault();
 builder.WithTargetFrameRate(90);
-
-// OpenVR Compositor のタイミングに同期（推奨: WaitGetPoses ベース）
-builder.WithOpenVRFrameLimiter();
 
 using var app = builder.Build();
 ```
 
-VR アプリでは `WithOpenVRFrameLimiter()` を使うと Compositor のリフレッシュレートに同期できます。`WithTargetFrameRate()` を指定しない場合のデフォルトは 30fps です。
+`WithTargetFrameRate()` を指定しない場合のデフォルトは 30fps です。オーバーレイアプリはシーンアプリではないため、`WaitGetPoses` によるフレーム同期は利用できません。
 
 ---
 

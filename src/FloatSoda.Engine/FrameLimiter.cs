@@ -1,38 +1,10 @@
 ﻿using System.Diagnostics;
-using FloatSoda.OVR;
-using Microsoft.Extensions.Logging;
 
 namespace FloatSoda.Engine;
 
 public interface IFrameLimiter
 {
     void Wait();
-}
-
-public class OpenVRFrameLimiter(ILogger<OpenVRFrameLimiter> logger) : IFrameLimiter
-{
-    private readonly TrackedDevicePose_t[] _renderPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-    private readonly TrackedDevicePose_t[] _gamePoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-
-    public ReadOnlySpan<TrackedDevicePose_t> RenderPoses => _renderPoses;
-
-    public ReadOnlySpan<TrackedDevicePose_t> GamePoses => _gamePoses;
-
-    public void Wait()
-    {
-        var error = OpenVR.Compositor.WaitGetPoses(_renderPoses, _gamePoses);
-
-        switch (error)
-        {
-            case EVRCompositorError.None: return;
-            case EVRCompositorError.DoNotHaveFocus:
-                Console.WriteLine($"[OpenVR] Compositor warning: {error}");
-                logger.LogWarning("[OpenVR] Compositor warning: {error}", error);
-                break;
-            default:
-                throw new InvalidOperationException($"[OpenVR] WaitGetPoses failed: {error}");
-        }
-    }
 }
 
 public class FrameLimiter(int targetFrameRate = 30) : IFrameLimiter
