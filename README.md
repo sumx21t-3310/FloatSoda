@@ -176,7 +176,7 @@ sequenceDiagram
 
 ---
 
-## 開発ステータス (v0.0.2 Alpha)
+## 開発ステータス (v0.1.0 Alpha)
 
 本プロジェクトは現在 **Alpha 段階** です。簡単なアプリケーションは動作しますが、API は予告なく変更されます。
 
@@ -184,9 +184,8 @@ sequenceDiagram
 - [x] レイヤーツリー（ContainerLayer / PictureLayer / ClipLayer / OpacityLayer）
 - [x] 複数オーバーレイ（ダッシュボード / ワールド座標 / デバイス追従）
 - [x] Widget → RenderObject への inflate パイプライン（StatelessWidget / StatefulWidget）
-- [x] BuildOwner による Widget 差分ビルド（子リストの差分更新を含む）
+- [x] BuildOwner による Widget 差分ビルド（Key による子リストの差分更新を含む）
 - [x] InheritedWidget によるコンテキスト伝播
-- [ ] Key による要素の同一性判定
+- [x] アニメーションシステム（AnimationController / Ticker / FadeTransition）
 - [ ] SteamVR のイベント処理と宣言的な入力（ヒットテスト）
-- [ ] アニメーションシステムの統合
 - [ ] マニフェストファイルの自動生成（検討中）
