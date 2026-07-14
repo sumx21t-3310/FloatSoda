@@ -4,6 +4,8 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <!-- ヒットテスト実装(v0.2.0)まで機能しないため、NuGet公開はデザインシステム完成(v0.6.0)まで停止 -->
+        <IsPackable>false</IsPackable>
         <PackageId>FloatSoda.UI</PackageId>
         <Description>Headless UI layer for FloatSoda. Provides behavior-only widgets (interaction state machines and typed builder slots) with no visual opinion, designed to be skinned by design-system packages such as FloatSoda.UI.Cream and FloatSoda.UI.FizzyPop.</Description>
     </PropertyGroup>
