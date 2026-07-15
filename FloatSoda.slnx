@@ -1,9 +1,11 @@
 <Solution>
     <Folder Name="/src/">
-        <Project Path="src/FloatSoda.Common/FloatSoda.Common.csproj" />
+        <Project Path="src/FloatSoda.Abstractions/FloatSoda.Abstractions.csproj" />
         <Project Path="src/FloatSoda.Engine/FloatSoda.Engine.csproj" />
         <Project Path="src/FloatSoda.Hooks/FloatSoda.Hooks.csproj" />
         <Project Path="src/FloatSoda.OVR/FloatSoda.OVR.csproj" />
+        <Project Path="src/FloatSoda.Rendering/FloatSoda.Rendering.csproj" />
+        <Project Path="src/FloatSoda.Testing/FloatSoda.Testing.csproj" />
         <Project Path="src/FloatSoda.UI.Cream/FloatSoda.UI.Cream.csproj" />
         <Project Path="src/FloatSoda.UI.FizzyPop/FloatSoda.UI.FizzyPop.csproj" />
         <Project Path="src/FloatSoda.UI/FloatSoda.UI.csproj" />
@@ -15,8 +17,7 @@
         <Project Path="samples/FloatSoda.Samples.PrimitiveOverlay/FloatSoda.Samples.PrimitiveOverlay.csproj" />
     </Folder>
     <Folder Name="/tests/">
-        <Project Path="tests/FloatSoda.Common.Test/FloatSoda.Common.Test.csproj" />
+        <Project Path="tests/FloatSoda.Rendering.Test/FloatSoda.Rendering.Test.csproj" />
         <Project Path="tests/FloatSoda.Test/FloatSoda.Test.csproj" />
     </Folder>
 </Solution>
- 

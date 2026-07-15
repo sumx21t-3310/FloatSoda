@@ -149,9 +149,8 @@ public void DrawFrame()
     if (!NeedsVisualUpdate || Window == null) return;   // 変更がなければ何もしない
     NeedsVisualUpdate = false;
 
-    Pipeline?.RenderView.PrepareInitialFrame();
-
     Pipeline?.FlushLayout();              // 2. 差分レイアウト
+    PostResizeIfSizeChanged();            // レイアウト結果にオーバーレイサイズを追従
     Pipeline?.FlushPaint();               // 3. 差分ペイント
 
     if (Pipeline?.RenderView.Layer?.Clone() is not ContainerLayer layer) return;
@@ -173,7 +172,8 @@ public void DrawFrame()
 
 | 対象 | 現状 |
 |---|---|
-| 一部の便利ウィジェット | `Padding` / `Container` / `ListView` / `GridView` / `SingleChildScrollView` / `Opacity` / `Button` / `Icon` / `GestureDetector` / `Listener` は `NotImplementedException` のスタブ |
+| 一部の便利ウィジェット | `Padding` / `Container` / `ListView` / `GridView` / `SingleChildScrollView` / `Opacity` と旧 `Components.Icon` / `Components.Image` は未実装のため `internal`。入力系の `GestureDetector` / `Listener` は公開スタブ |
+| デザインシステムの `Button` | `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` にスケルトン実装済み。ジェスチャ・ヒットテストとの配線待ち |
 | ジェスチャ・ヒットテスト | 宣言的な入力(タップ・ドラッグ)は未実装 |
 | `FloatSoda.Hooks` | `HookWidget` / `HookElement`(R3 の `ReactiveProperty` による `UseState`)が部分実装。フレームワークのビルドループとは未統合で、`HookExtension` の各ヘルパーは `NotImplementedException` |
 

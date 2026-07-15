@@ -1,5 +1,5 @@
-﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Common.Layer;
+﻿using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Rendering.Layers;
 using FloatSoda.Geometrics;
 using SkiaSharp;
 
@@ -42,7 +42,7 @@ public abstract class RenderCustomClip<T> : RenderProxyBox
             field = value;
             MarkNeedsPaint();
         }
-    } = Common.Layer.Clip.Antialias;
+    } = FloatSoda.Rendering.Layers.Clip.Antialias;
 
     protected T Clip => Clipper != null ? Clipper.GetClip(Size) : DefaultClip;
 

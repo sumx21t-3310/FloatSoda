@@ -8,18 +8,25 @@ FloatSoda は Flutter のアーキテクチャを参考に設計された VR オ
 
 ```mermaid
 graph TD
-    Common["FloatSoda.Common\nジオメトリ型・レイヤーツリー"]
+    Abstractions["FloatSoda.Abstractions\n共有契約・プリミティブ"]
+    Rendering["FloatSoda.Rendering\nLayerツリー・Skia描画"]
     Engine["FloatSoda.Engine\nOpenGL・レンダースレッド"]
     OVR["FloatSoda.OVR\nOpenVR ラッパー"]
     Core["FloatSoda\nウィジェット・RenderObject・パイプライン"]
+    Testing["FloatSoda.Testing\nヘッドレス画像レンダリング"]
     UI["FloatSoda.UI\nヘッドレスUI(振る舞いのみ)"]
     Cream["FloatSoda.UI.Cream\nデザインシステム①"]
     FizzyPop["FloatSoda.UI.FizzyPop\nデザインシステム②"]
 
-    Common --> Engine
-    Common --> Core
+    Rendering --> Abstractions
+    Rendering --> Engine
+    Rendering --> Core
+    Abstractions --> Engine
+    Abstractions --> Core
     OVR --> Core
     Engine --> Core
+    Core --> Testing
+    Rendering --> Testing
     Core --> UI
     UI --> Cream
     UI --> FizzyPop
@@ -27,10 +34,12 @@ graph TD
 
 | アセンブリ | 役割 |
 |---|---|
-| `FloatSoda.Common` | `Offset`, `Alignment`, `BoxConstraints` などのジオメトリ型。`ILayer` / `ContainerLayer` / `PictureLayer` などのレイヤーツリーインターフェース |
-| `FloatSoda.Engine` | `GLView`（OpenGL サーフェス）、`Renderer`（レイヤーツリー → OpenGL FBO）、`RenderThreadRunner`（レンダースレッド管理）、`FrameLimiter` |
+| `FloatSoda.Abstractions` | Engine境界契約、`Offset`などの共有値型、入力イベント、フレームペーシング |
+| `FloatSoda.Rendering` | `ILayer`と具象Layer群、共通Layer描画、Bitmap描画 |
+| `FloatSoda.Engine` | `IEngineWindow`などの具体実装、`GLView`、`Renderer`、`RenderThreadRunner`、`FramePacer` |
 | `FloatSoda.OVR` | OpenVR 初期化（`Application`）、オーバーレイ型（`DashboardOverlay` / `WorldSpaceOverlay` / `DeviceTrackedOverlay`）、イベントディスパッチャ、例外体系 |
 | `FloatSoda` | ウィジェット/エレメントツリー、RenderObject ツリー、`RenderPipeline`、`FloatSodaApp` / `FloatSodaAppBuilder` |
+| `FloatSoda.Testing` | Widget・RenderObjectツリーをBitmapへ描画するヘッドレステスト支援 |
 | `FloatSoda.UI` | ヘッドレスUI層。振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder に委譲(→ [UILayering](UILayering.md)) |
 | `FloatSoda.UI.Cream` | デザインシステム①: レトロでクリーミーな色使いのフラットデザイン(`Button`, `ButtonStyle`, `CreamTheme`) |
 | `FloatSoda.UI.FizzyPop` | デザインシステム②: 透明感・グラスモーフィズム(`Button`, `ButtonStyle`, `FizzyPopTheme`) |
@@ -118,7 +127,7 @@ sequenceDiagram
             WB-->>RT: PostRender(window, capturedLayer)
         end
 
-        Main->>Main: FrameLimiter.Wait()
+        Main->>Main: FramePacer.WaitForNextFrame()
     end
 
     loop レンダースレッド (RenderThreadRunner)

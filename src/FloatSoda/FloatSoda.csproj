@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\FloatSoda.Abstractions\FloatSoda.Abstractions.csproj" />
       <ProjectReference Include="..\FloatSoda.Engine\FloatSoda.Engine.csproj" />
+      <ProjectReference Include="..\FloatSoda.Rendering\FloatSoda.Rendering.csproj" />
     </ItemGroup>
 
     <ItemGroup>

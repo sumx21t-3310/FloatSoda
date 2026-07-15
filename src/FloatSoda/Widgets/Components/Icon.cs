@@ -3,7 +3,7 @@ using SkiaSharp;
 
 namespace FloatSoda.Widgets.Components;
 
-public record Icon : Widget
+internal record Icon : Widget
 {
     public SKColor Color { get; init; }
     public double Size { get; init; }

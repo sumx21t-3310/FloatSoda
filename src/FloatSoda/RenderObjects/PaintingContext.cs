@@ -1,5 +1,5 @@
-﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Common.Layer;
+﻿using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Rendering.Layers;
 using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;

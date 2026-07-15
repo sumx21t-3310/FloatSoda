@@ -32,28 +32,30 @@ dotnet test
 
 # Run a specific test project
 dotnet test tests/FloatSoda.Test
-dotnet test tests/FloatSoda.Common.Test
+dotnet test tests/FloatSoda.Rendering.Test
 
 # Run a specific test by name
 dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.TopLeft"
 ```
 
-Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widgets. `FloatSoda.Common.Test` tests the Layer tree.
+Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widgets. `FloatSoda.Rendering.Test` tests the Layer tree.
 
 ## Project Structure
 
 | Project | Role |
 |---|---|
-| `src/FloatSoda.Common` | Shared geometry types (`Offset`, `GeometryExtension`) and the Layer tree (`ILayer`, `ContainerLayer`, `PictureLayer`, clip layers) |
-| `src/FloatSoda.Engine` | Platform layer: GLFW/OpenGL (`GLView`), `Renderer`, `OverlayWindow`, `RenderThreadRunner`, `FrameLimiter` |
+| `src/FloatSoda.Abstractions` | Shared engine contracts, geometry types, input events, and frame pacing |
+| `src/FloatSoda.Rendering` | Skia layer tree, shared Layer renderer, and bitmap rendering |
+| `src/FloatSoda.Engine` | Platform layer: GLFW/OpenGL (`GLView`), `Renderer`, `OverlayWindow`, `RenderThreadRunner`, `FramePacer` |
 | `src/FloatSoda.OVR` | OpenVR wrappers, overlay types (`DashboardOverlay`, `WorldSpaceOverlay`, `DeviceTrackedOverlay`), `VREventDispatcher`, and exception types |
 | `src/FloatSoda` | Framework core: RenderObject tree, Widget/Element system, `RenderPipeline`, `FloatSodaApp` |
+| `src/FloatSoda.Testing` | Headless Widget and RenderObject bitmap renderers for tests and tooling |
 | `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets (`ButtonBase`, `InteractionState`), no visuals — see `docs/UILayering.md` |
 | `src/FloatSoda.UI.Cream` | Design system #1: retro creamy colors, flat design (`Button`, `ButtonStyle`, `CreamTheme`) |
 | `src/FloatSoda.UI.FizzyPop` | Design system #2: translucency / glassmorphism (`Button`, `ButtonStyle`, `FizzyPopTheme`) |
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
-| `tests/FloatSoda.Common.Test` | xunit tests for the Layer tree |
+| `tests/FloatSoda.Rendering.Test` | xunit tests for the Layer tree |
 | `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, APIDesign, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
 
 ### UI Layering Rules (see `docs/UILayering.md`)
@@ -79,7 +81,7 @@ Key classes:
 - `SingleChildContainer<T>` / `MultiChildrenCollection<T>` — composition helpers for child holding (adopt/drop on assignment, attach/detach/visit forwarding)
 - `RenderImage` — renders an `SKImage` loaded via `FileImageProvider`
 
-### 2. Layer Tree (`src/FloatSoda.Common/Layer/`)
+### 2. Layer Tree (`src/FloatSoda.Rendering/Layers/`)
 
 Produced by the RenderObject tree's paint phase. Represents composited draw operations sent to the render thread:
 - `ContainerLayer` — node with child layers
@@ -118,7 +120,7 @@ FloatSodaApp.Run() [main thread, STA]
                  └─ Renderer.Render(layer)
                       └─ GLView.Clear() → layer.Layout(ctx) → layer.Paint(ctx) → GLView.Flush()
                  └─ OpenVR SetRenderTexture(GL texture handle)
-  └─ FrameLimiter.Wait()
+  └─ FramePacer.WaitForNextFrame()
 ```
 
 The render thread runs in `RenderThreadRunner` (a `ThreadRunner` subclass) and owns the GLFW/GL context. Work is posted via `ConcurrentQueue<Action>` (`_pendingTasks`). Window creation is also deferred through this queue so all GL calls stay on the same thread.

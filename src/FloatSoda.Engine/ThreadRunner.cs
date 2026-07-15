@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using FloatSoda.Common.Layer;
+using FloatSoda.Abstractions.Engine;
+using FloatSoda.Abstractions.Scheduling;
+using FloatSoda.Rendering.Layers;
 using Microsoft.Extensions.Logging;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -16,8 +18,7 @@ public interface IThreadRunner
     bool IsRunning { get; }
 }
 
-public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
-    : IThreadRunner
+public abstract class ThreadRunner(string threadName, IFramePacer pacer, ILogger? logger = null) : IThreadRunner
 {
     private Thread? _thread;
 
@@ -111,7 +112,7 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
                 Update();
                 PostUpdate();
 
-                limiter.Wait();
+                pacer.WaitForNextFrame(ct);
             }
         }
         catch (OperationCanceledException)
@@ -148,17 +149,16 @@ public abstract class ThreadRunner(string threadName, IFrameLimiter limiter, ILo
     }
 }
 
-public class RenderThreadRunner(string threadName, IFrameLimiter limiter, ILogger? logger = null)
-    : ThreadRunner(threadName, limiter, logger)
+public class RenderThreadRunner(string threadName, IFramePacer pacer, ILogger? logger = null)
+    : ThreadRunner(threadName, pacer, logger)
 {
-    public void PostRender(IWindow window, ILayer layer)
+    public void PostRender(IEngineWindow window, ILayer layer)
     {
         PostTask(() =>
         {
             if (!IsRunning) return;
 
-            window.Root = layer;
-            window.Update();
+            window.Present(layer);
         });
     }
 

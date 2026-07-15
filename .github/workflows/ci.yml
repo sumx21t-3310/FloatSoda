@@ -19,8 +19,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release
 
-      - name: Test (FloatSoda.Common.Test)
-        run: dotnet test tests/FloatSoda.Common.Test --configuration Release --no-build
+      - name: Test (FloatSoda.Rendering.Test)
+        run: dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 
       - name: Test (FloatSoda.Test)
         run: dotnet test tests/FloatSoda.Test --configuration Release --no-build

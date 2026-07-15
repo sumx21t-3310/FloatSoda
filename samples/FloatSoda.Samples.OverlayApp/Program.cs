@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using FloatSoda;
-using FloatSoda.Common.Geometries;
+using FloatSoda.Abstractions.Geometries;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Samples.OverlayApp;
 using FloatSoda.Widgets;

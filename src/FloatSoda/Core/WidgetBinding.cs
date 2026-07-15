@@ -1,5 +1,6 @@
-﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Common.Layer;
+﻿using FloatSoda.Abstractions.Engine;
+using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Rendering.Layers;
 using FloatSoda.Elements;
 using FloatSoda.Engine;
 using FloatSoda.OVR.Overlay;
@@ -21,7 +22,7 @@ public class WidgetBinding : IFrameScheduler
     private BuildOwner BuildOwner { get; set; }
     public Element? RenderViewElement { get; private set; }
     private RenderThreadRunner? RenderThreadRunner { get; set; }
-    private IWindow? Window { get; set; }
+    private IEngineWindow? Window { get; set; }
     public bool Initialized { get; private set; }
     public bool NeedsVisualUpdate { get; private set; }
 
@@ -144,7 +145,7 @@ public class WidgetBinding : IFrameScheduler
         var window = Window;
         if (window == null) return;
 
-        RenderThreadRunner?.PostTask(() => window.Resize(newSize.Width, newSize.Height));
+        RenderThreadRunner?.PostTask(() => window.Resize(newSize));
     }
 
     public void BeginFrame(TimeSpan elapsedTime)

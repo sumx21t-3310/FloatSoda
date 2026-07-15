@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Widgets.Layout;
 
-public record ListView : Widget
+internal record ListView : Widget
 {
     public List<Widget> Children { get; init; } = [];
     

@@ -83,7 +83,7 @@ graph LR
 | `InheritedWidget` / `InheritedElement`(依存追跡・通知) | ✓ 実装済み |
 | `Key` による Element 再利用(`Widget.CanUpdate` = 型 + Key) | ✓ 実装済み |
 | アニメーション(`AnimationController` / `Ticker` / `Curve`・`Curves` / `FadeTransition`) | ✓ 実装済み |
-| 一部の便利ウィジェット(`Padding` / `Container` / `ListView` など) | ✗ スタブ(`NotImplementedException`) |
+| 一部の便利ウィジェット(`Padding` / `Container` / `ListView` など) | ✗ 未実装のため `internal` |
 | UI3層構成(`FloatSoda.UI` ヘッドレス / `Cream` / `FizzyPop`) | △ スケルトン(`ButtonBase` / `Button`、ジェスチャ配線待ち) |
 | Hooks(`FloatSoda.Hooks` / R3 ベースの `UseState`) | △ WIP(フレームワーク未統合) |
 | ジェスチャ・ヒットテスト | ✗ 未実装 |
@@ -94,10 +94,12 @@ graph LR
 
 | プロジェクト | 役割 |
 |---|---|
-| `src/FloatSoda.Common` | ジオメトリ型(`Offset` など)とレイヤーツリー |
+| `src/FloatSoda.Abstractions` | Engine境界契約、共有値型、入力イベント、フレームペーシング |
+| `src/FloatSoda.Rendering` | Layerツリー、共通Layer描画、Bitmap描画 |
 | `src/FloatSoda.Engine` | GLFW/OpenGL・レンダースレッド・フレームリミッタ |
 | `src/FloatSoda.OVR` | OpenVR ラッパー・オーバーレイ型・イベントディスパッチャ |
 | `src/FloatSoda` | フレームワーク本体(Widget / Element / RenderObject / パイプライン) |
+| `src/FloatSoda.Testing` | Widget・RenderObjectのヘッドレスBitmap描画 |
 | `src/FloatSoda.UI` | ヘッドレスUI層(振る舞いのみ、見た目なし)→ [UILayering](UILayering.md) |
 | `src/FloatSoda.UI.Cream` | デザインシステム①(レトロ・クリーミー・フラット) |
 | `src/FloatSoda.UI.FizzyPop` | デザインシステム②(透明感・グラスモーフィズム) |

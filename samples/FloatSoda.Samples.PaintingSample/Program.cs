@@ -1,5 +1,6 @@
-﻿using FloatSoda.Common.Layer;
+﻿using FloatSoda.Rendering.Layers;
 using FloatSoda.Rendering;
+using FloatSoda.Testing;
 using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Layout;
@@ -9,7 +10,9 @@ using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
 
-var imageRenderer = new ImageRenderer();
+var layerRenderer = new LayerBitmapRenderer();
+var renderObjectRenderer = new RenderObjectBitmapRenderer();
+var widgetRenderer = new WidgetBitmapRenderer();
 
 var imageSize = new SKSizeI(1000, 1000);
 
@@ -17,14 +20,14 @@ var layerTree = CreateLayerTree(imageSize.Width, imageSize.Height);
 
 var savePath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
-imageRenderer.RenderLayerTree(layerTree, imageSize).Save(Path.Combine(savePath, "layer_tree_output.png"));
+layerRenderer.Render(layerTree, imageSize).Save(Path.Combine(savePath, "layer_tree_output.png"));
 
 var renderTree = CreateRenderObject(imageSize.Width, imageSize.Width);
 
-imageRenderer.RenderObjectTree(renderTree, imageSize).Save(Path.Combine(savePath, "render_tree_output.png"));
+renderObjectRenderer.Render(renderTree, imageSize).Save(Path.Combine(savePath, "render_tree_output.png"));
 
 var widgetTree = CreateWidgetTree(imageSize.Width, imageSize.Height);
-imageRenderer.RenderWidgetTree(widgetTree, imageSize).Save(Path.Combine(savePath, "widget_tree_output.png"));
+widgetRenderer.Render(widgetTree, imageSize).Save(Path.Combine(savePath, "widget_tree_output.png"));
 
 return;
 

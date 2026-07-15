@@ -4,7 +4,7 @@
 
 > **実装状況:**
 > - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **スタブ:** `Padding`, `Container`, `ListView`, `GridView`, `SingleChildScrollView`, `Opacity`, `GestureDetector`, `Listener` は `NotImplementedException` を投げます。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
+> - **未実装:** `Padding`, `Container`, `ListView`, `GridView`, `SingleChildScrollView`, `Opacity` は `internal` で、公開 API から除外されています。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
 ## 三ツリーの役割
@@ -135,11 +135,11 @@ public override Widget Build(IBuildContext context)
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
-| `Padding` | ✗ スタブ | 子に余白を追加(`RenderSiftedBox.PerformLayout` 未実装) | `Spacing` (`EdgeInsets`), `Child` |
-| `Container` | ✗ スタブ | パディング・色・サイズなどを一括指定 | — |
-| `ListView` | ✗ スタブ | スクロール可能なリスト | `Children` |
-| `GridView` | ✗ スタブ | グリッドレイアウト | — |
-| `SingleChildScrollView` | ✗ スタブ | 単一子をスクロール | `Child` |
+| `Padding` | ✗ `internal` スタブ | 子に余白を追加(`RenderSiftedBox.PerformLayout` 未実装) | `Spacing` (`EdgeInsets`), `Child` |
+| `Container` | ✗ `internal` スタブ | パディング・色・サイズなどを一括指定 | — |
+| `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
+| `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
+| `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
 
 ### Painting
 
@@ -151,7 +151,7 @@ public override Widget Build(IBuildContext context)
 | `ClipRoundRect` | ✓ | 角丸矩形クリップ | `BorderRadius`, `Clipper`, `ClipBehavior`, `Child` |
 | `ClipOval` | ✓ | 楕円クリップ | `CustomClipper`, `ClipBehavior`, `Child` |
 | `ClipCustomPath` | ✓ | カスタムパスクリップ | `Clipper`, `ClipBehavior`, `Child` |
-| `Opacity` | ✗ スタブ | 透明度を適用 | `Child` |
+| `Opacity` | ✗ `internal` スタブ | 透明度を適用 | `Child` |
 
 ### Animation
 

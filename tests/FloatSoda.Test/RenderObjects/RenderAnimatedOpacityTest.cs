@@ -1,7 +1,7 @@
 using FloatSoda.Animation;
 using FloatSoda.Core;
 using FloatSoda.Geometrics;
-using FloatSoda.Rendering;
+using FloatSoda.Testing;
 using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Animation;
 using FloatSoda.RenderObjects.Layout;
@@ -146,7 +146,7 @@ public class RenderAnimatedOpacityTest
             }
         };
 
-        using var bitmap = new ImageRenderer().RenderObjectTree(tree, Size);
+        using var bitmap = new RenderObjectBitmapRenderer().Render(tree, Size);
 
         var pixel = bitmap.GetPixel(50, 50);
         Assert.Equal(255, pixel.Red);
@@ -169,7 +169,7 @@ public class RenderAnimatedOpacityTest
             }
         };
 
-        using var bitmap = new ImageRenderer().RenderObjectTree(tree, Size);
+        using var bitmap = new RenderObjectBitmapRenderer().Render(tree, Size);
 
         Assert.Equal(0, bitmap.GetPixel(50, 50).Alpha);
     }

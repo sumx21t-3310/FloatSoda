@@ -1,26 +1,18 @@
-﻿using FloatSoda.Common.Geometries;
-using FloatSoda.Common.Layer;
+﻿using FloatSoda.Abstractions.Engine;
+using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Rendering.Layers;
 using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
 
 namespace FloatSoda.Engine;
 
-public class OverlayWindow(IOverlay overlay, Renderer renderer, Dpm dpm) : IWindow
+public class OverlayWindow(IOverlay overlay, Renderer renderer, Dpm dpm) : IEngineWindow
 {
     public IOverlay Overlay { get; } = overlay;
 
-    public string Key => Overlay.Identity.Key;
-
-    public ILayer? Root { get; set; }
-
-    public void Update()
+    public void Present(ILayer layer)
     {
-        if (Root == null)
-        {
-            return;
-        }
-
-        renderer.Render(Root);
+        renderer.Render(layer);
 
         var texture = new Texture_t
         {
@@ -36,10 +28,10 @@ public class OverlayWindow(IOverlay overlay, Renderer renderer, Dpm dpm) : IWind
     /// 描画先テクスチャをリサイズし、ピクセル幅と物理密度（dots per meter）から
     /// オーバーレイの物理幅（WidthInMeters = width / dpm）を更新します。
     /// </summary>
-    public void Resize(int width, int height)
+    public void Resize(SkiaSharp.SKSizeI size)
     {
-        renderer.Resize(width, height);
-        Overlay.WidthInMeters.Value = dpm.ToMeters(width);
+        renderer.Resize(size.Width, size.Height);
+        Overlay.WidthInMeters.Value = dpm.ToMeters(size.Width);
     }
 
     public void Dispose() => Overlay.Dispose();

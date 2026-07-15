@@ -1,3 +1,4 @@
+using FloatSoda.Abstractions.Scheduling;
 using FloatSoda.Engine;
 using Microsoft.Extensions.Logging;
 
@@ -5,9 +6,9 @@ namespace FloatSoda.Test.Engine;
 
 public class ThreadRunnerTest
 {
-    private sealed class NoopFrameLimiter : IFrameLimiter
+    private sealed class NoopFramePacer : IFramePacer
     {
-        public void Wait() { }
+        public void WaitForNextFrame(CancellationToken cancellationToken = default) { }
     }
 
     /// <summary>ログに記録されたエラー件数を数えるだけのロガー。</summary>
@@ -27,7 +28,7 @@ public class ThreadRunnerTest
 
     /// <summary>GLFW を起動せずに <see cref="ThreadRunner.DrainPendingTasks"/> だけを検証するための最小サブクラス。</summary>
     private sealed class TestThreadRunner(ILogger? logger)
-        : ThreadRunner("Test", new NoopFrameLimiter(), logger)
+        : ThreadRunner("Test", new NoopFramePacer(), logger)
     {
         protected override void Update() { }
 

@@ -1,6 +1,7 @@
 ﻿using FloatSoda.OVR;
 using FloatSoda.OVR.Exceptions;
 using System.Collections.Concurrent;
+using FloatSoda.Abstractions.Scheduling;
 using FloatSoda.Core;
 using FloatSoda.Engine;
 using FloatSoda.OVR.Overlay;
@@ -26,7 +27,7 @@ public class FloatSodaAppBuilder
 
         builder.Services.AddSingleton(new OVRAppInfo(new AppKey(appName)));
 
-        builder.Services.AddScoped<IFrameLimiter, FrameLimiter>();
+        builder.Services.AddTransient<IFramePacer, FramePacer>();
         builder.Services.AddSingleton(TimeProvider.System);
 
         return builder;
@@ -37,12 +38,13 @@ public class FloatSodaAppBuilder
     public FloatSodaApp Build()
     {
         var provider = Services.BuildServiceProvider();
-        var limiter = provider.GetRequiredService<IFrameLimiter>();
+        var mainFramePacer = provider.GetRequiredService<IFramePacer>();
+        var renderFramePacer = provider.GetRequiredService<IFramePacer>();
         var loggerFactory = provider.GetService<ILoggerFactory>();
         var timeProvider = provider.GetService<TimeProvider>() ?? TimeProvider.System;
         var appInfo = provider.GetService<OVRAppInfo>() ?? throw new InvalidOperationException();
 
-        return new FloatSodaApp(limiter, appInfo, loggerFactory, timeProvider);
+        return new FloatSodaApp(mainFramePacer, renderFramePacer, appInfo, loggerFactory, timeProvider);
     }
 }
 
@@ -57,7 +59,7 @@ public class FloatSodaApp : IDisposable
     private VRSystemEventDispatcher? _dispatcher;
 
     private readonly CancellationTokenSource _cts = new();
-    private readonly IFrameLimiter _limiter;
+    private readonly IFramePacer _mainFramePacer;
 
     private readonly OVRAppInfo _appInfo;
 
@@ -72,16 +74,18 @@ public class FloatSodaApp : IDisposable
 
     private static readonly ConcurrentDictionary<FloatSodaApp, byte> ActiveApps = new();
 
-    internal FloatSodaApp(IFrameLimiter limiter,
+    internal FloatSodaApp(IFramePacer mainFramePacer,
+        IFramePacer renderFramePacer,
         OVRAppInfo appInfo, ILoggerFactory? loggerFactory = null,
         TimeProvider? timeProvider = null)
     {
-        _limiter = limiter;
+        _mainFramePacer = mainFramePacer;
         _appInfo = appInfo;
         _timeProvider = timeProvider ?? TimeProvider.System;
         _startTimestamp = _timeProvider.GetTimestamp();
         _renderThreadRunner =
-            new RenderThreadRunner("RenderThread", limiter, loggerFactory?.CreateLogger<RenderThreadRunner>());
+            new RenderThreadRunner("RenderThread", renderFramePacer,
+                loggerFactory?.CreateLogger<RenderThreadRunner>());
         _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
         ActiveApps.TryAdd(this, 0);
     }
@@ -188,7 +192,7 @@ public class FloatSodaApp : IDisposable
                 break;
             }
 
-            _limiter.Wait();
+            _mainFramePacer.WaitForNextFrame(_cts.Token);
         }
     }
 
