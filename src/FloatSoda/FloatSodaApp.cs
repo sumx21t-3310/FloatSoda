@@ -6,47 +6,10 @@ using FloatSoda.Core;
 using FloatSoda.Engine;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Widgets;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using OverlayWindow = FloatSoda.Widgets.OverlayWindow;
 
 namespace FloatSoda;
-
-public class FloatSodaAppBuilder
-{
-    public static FloatSodaAppBuilder CreateDefault(string appName = "FloatSoda")
-    {
-        var builder = new FloatSodaAppBuilder();
-        builder.Services.AddLogging(logging => { logging.AddConsole(); });
-
-        builder.Services.AddSingleton<ILogger>(provider =>
-        {
-            var factory = provider.GetRequiredService<ILoggerFactory>();
-            return factory.CreateLogger("FloatSoda");
-        });
-
-        builder.Services.AddSingleton(new OVRAppInfo(new AppKey(appName)));
-
-        builder.Services.AddTransient<IFramePacer, FramePacer>();
-        builder.Services.AddSingleton(TimeProvider.System);
-
-        return builder;
-    }
-
-    public IServiceCollection Services { get; } = new ServiceCollection();
-
-    public FloatSodaApp Build()
-    {
-        var provider = Services.BuildServiceProvider();
-        var mainFramePacer = provider.GetRequiredService<IFramePacer>();
-        var renderFramePacer = provider.GetRequiredService<IFramePacer>();
-        var loggerFactory = provider.GetService<ILoggerFactory>();
-        var timeProvider = provider.GetService<TimeProvider>() ?? TimeProvider.System;
-        var appInfo = provider.GetService<OVRAppInfo>() ?? throw new InvalidOperationException();
-
-        return new FloatSodaApp(mainFramePacer, renderFramePacer, appInfo, loggerFactory, timeProvider);
-    }
-}
 
 public class FloatSodaApp : IDisposable
 {
@@ -141,16 +104,35 @@ public class FloatSodaApp : IDisposable
 
     [STAThread]
     public void Run()
+        => Run(CancellationToken.None, static () => { });
+
+    internal void Run(CancellationToken cancellationToken, Action started)
     {
+        using var cancellationRegistration = cancellationToken.Register(RequestStop);
+
         try
         {
+            cancellationToken.ThrowIfCancellationRequested();
             Initialize();
+            started();
 
             MainLoop();
         }
         finally
         {
             Dispose();
+        }
+    }
+
+    internal void RequestStop()
+    {
+        try
+        {
+            _cts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // すでに終了処理が完了している場合、追加の停止要求は何もしない。
         }
     }
 

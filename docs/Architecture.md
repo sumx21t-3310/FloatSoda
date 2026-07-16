@@ -38,7 +38,7 @@ graph TD
 | `FloatSoda.Rendering` | `ILayer`と具象Layer群、共通Layer描画、Bitmap描画 |
 | `FloatSoda.Engine` | `IEngineWindow`などの具体実装、`GLView`、`Renderer`、`RenderThreadRunner`、`FramePacer` |
 | `FloatSoda.OVR` | OpenVR 初期化（`Application`）、オーバーレイ型（`DashboardOverlay` / `WorldSpaceOverlay` / `DeviceTrackedOverlay`）、イベントディスパッチャ、例外体系 |
-| `FloatSoda` | ウィジェット/エレメントツリー、RenderObject ツリー、`RenderPipeline`、`FloatSodaApp` / `FloatSodaAppBuilder` |
+| `FloatSoda` | ウィジェット/エレメントツリー、RenderObject ツリー、`RenderPipeline`、`FloatSodaApp`、Generic Host統合 |
 | `FloatSoda.Testing` | Widget・RenderObjectツリーをBitmapへ描画するヘッドレステスト支援 |
 | `FloatSoda.UI` | ヘッドレスUI層。振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder に委譲(→ [UILayering](UILayering.md)) |
 | `FloatSoda.UI.Cream` | デザインシステム①: レトロでクリーミーな色使いのフラットデザイン(`Button`, `ButtonStyle`, `CreamTheme`) |
@@ -90,7 +90,8 @@ graph LR
 
 ```mermaid
 sequenceDiagram
-    participant Main as メインスレッド
+    participant Host as Generic Host
+    participant Main as FloatSodaメインスレッド (STA)
     participant WB as WidgetBinding
     participant BO as BuildOwner
     participant Pipeline as RenderPipeline
@@ -103,9 +104,11 @@ sequenceDiagram
     participant GL as GLView (GLFW/OpenGL)
     participant VR as OpenVR Compositor
 
+    Host->>Main: FloatSodaHostedService.StartAsync()
+
     loop メインループ (FloatSodaApp.MainLoop)
         Main->>Main: VREventDispatcher.PollEvents()
-        Note over Main: VREvent_Quit → CancellationToken をキャンセル
+        Note over Main,Host: VREvent_Quit → Host全体へ停止通知
 
         Main->>WB: DrawFrame() [ウィンドウごと]
         WB->>BO: BuildScope()

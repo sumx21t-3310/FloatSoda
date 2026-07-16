@@ -1,13 +1,22 @@
 ﻿using System.Numerics;
 using FloatSoda;
 using FloatSoda.Abstractions.Geometries;
+using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Samples.OverlayApp;
 using FloatSoda.Widgets;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-var builder = FloatSodaAppBuilder.CreateDefault();
+var builder = Host.CreateApplicationBuilder(args);
 
-using var app = builder.Build();
+builder.Services.AddFloatSoda(new FloatSodaOptions
+{
+    AppKey = new AppKey("FloatSoda.Samples.OverlayApp")
+});
+
+using var host = builder.Build();
+var app = host.Services.GetRequiredService<FloatSodaApp>();
 
 // Size 未指定のウィンドウは Child のレイアウト結果にサイズが追従する。
 app.CreateWindow(new DashboardWindow
@@ -60,4 +69,4 @@ app.CreateWindow(new WorldSpaceWindow
     Child = new WatchWidget()
 });
 
-app.Run();
+await host.RunAsync();
