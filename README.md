@@ -48,10 +48,15 @@ using FloatSoda;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SkiaSharp;
 
-var builder = FloatSodaAppBuilder.CreateDefault();
-using var app = builder.Build();
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddFloatSoda();
+
+using var host = builder.Build();
+var app = host.Services.GetRequiredService<FloatSodaApp>();
 
 Widget root = new Align
 {
@@ -75,7 +80,7 @@ app.CreateWindow(new DashboardWindow { Title = "MyDashboard", Child = root });
 // デバイス追従
 // app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Target = TrackedDevice.LeftController });
 
-app.Run();
+await host.RunAsync();
 ```
 
 ---

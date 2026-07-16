@@ -7,6 +7,7 @@ using FloatSoda.Widgets.Animation;
 using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
+using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using Topten.RichTextKit;
 
