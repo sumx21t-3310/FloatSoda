@@ -30,7 +30,7 @@ dotnet run --project samples/FloatSoda.Samples.OverlayApp
 
 ```bash
 dotnet build --configuration Release
-dotnet test tests/FloatSoda.Common.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 dotnet test tests/FloatSoda.Test --configuration Release --no-build
 ```
 
@@ -43,7 +43,7 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 テストは xunit を使用しています。
 
 - `tests/FloatSoda.Test` — ジオメトリ型、RenderObject、Widget のテスト
-- `tests/FloatSoda.Common.Test` — Layer ツリーのテスト
+- `tests/FloatSoda.Rendering.Test` — Layer ツリーのテスト
 
 追加する機能に応じて、対応するテストプロジェクトにテストを追加してください。
 

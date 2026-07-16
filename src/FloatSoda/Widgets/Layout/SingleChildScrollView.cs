@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Widgets.Layout;
 
-public record SingleChildScrollView : Widget
+internal record SingleChildScrollView : Widget
 {
     public Widget? Child { get; init; } = null;
     

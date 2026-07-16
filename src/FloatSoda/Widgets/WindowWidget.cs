@@ -1,5 +1,5 @@
 using System.Numerics;
-using FloatSoda.Common.Geometries;
+using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Elements;
 using FloatSoda.OVR.Overlay;

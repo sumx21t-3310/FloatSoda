@@ -1,3 +1,4 @@
+using FloatSoda.Abstractions.Scheduling;
 using FloatSoda.Engine;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -10,7 +11,7 @@ public static class FloatSodaAppExtensions
     /// </summary>
     public static FloatSodaAppBuilder WithTargetFrameRate(this FloatSodaAppBuilder builder, int fps)
     {
-        builder.Services.AddScoped<IFrameLimiter>(_ => new FrameLimiter(fps));
+        builder.Services.AddTransient<IFramePacer>(_ => new FramePacer(fps));
         return builder;
     }
 }

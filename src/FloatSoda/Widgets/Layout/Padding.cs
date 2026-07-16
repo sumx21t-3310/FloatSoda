@@ -1,11 +1,11 @@
-﻿using FloatSoda.Common.Geometries;
+﻿using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects;
 
 namespace FloatSoda.Widgets.Layout;
 
-public record Padding : SingleChildRenderObjectWidget<RenderSiftedBox>
+internal record Padding : SingleChildRenderObjectWidget<RenderSiftedBox>
 {
     public EdgeInsets Spacing { get; init; } = EdgeInsets.Zero;
 

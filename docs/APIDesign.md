@@ -18,12 +18,15 @@ var ui = new Column
 {
     Children =
     [
-        new Text { Content = "Hello, World!", FontSize = 24 },
-        new Button
+        new Text("Hello, World!"),
+        new FloatSoda.UI.Cream.Button
         {
-            Label = "Click me",
-            OnClick = HandleClick,
-            Style = new ButtonStyle { IsPrimary = true }
+            Child = new Text("Click me"),
+            OnPressed = HandleClick,
+            Style = new FloatSoda.UI.Cream.ButtonStyle
+            {
+                BackgroundColor = SKColors.CornflowerBlue
+            }
         }
     ]
 };
@@ -42,7 +45,7 @@ var ui = new Column
 var card = new Card
 {
     Title = "タイトル",
-    Body = new Text { Content = "本文" },
+    Body = new Text("本文"),
     Elevation = 4
 };
 
@@ -63,23 +66,18 @@ var card = new Card("タイトル", new Text("本文"), 4);
 2. **データそのものが表示対象** — 文字列・グリフ・画像・数値など「表示される値」を持つ（レイアウト指示の値は該当しない）
 
 ```csharp
-// ✅ 容認: Text / Icon はデータそのものが表示対象で、子を取らない
+// ✅ 容認: Text はデータそのものが表示対象で、子を取らない
 new Text("Hello, World!")
-new Icon("home")
-
-// 初期化子形式も常に併存する（スタイル等を足すときはこちら）
-new Text { Content = "Hello, World!", FontSize = 24 }
 ```
 
-**該当する例:** `Text(string)`、`Icon(string)`、`Image`（画像プロバイダ1つ）、`ProgressBar(double)` など。
+**現在の該当例:** `Text(string)`。将来 `Icon` や `ProgressBar` などの末端ウィジェットを追加するときも、この基準を適用します。
 **該当しない例:** `Padding` / `Container`（ウィジェットを取る）、`Spacer`（`size` はレイアウト指示でデータではない）。
 
 **付帯ルール:**
 
 - コンストラクタ引数は**主たる値1つのみ**。スタイルやオプションは従来どおり `init` プロパティで受ける
-- オブジェクト初期化子形式を**必ず併存**させる（コンストラクタは糖衣であって、初期化子を置き換えない）
-- コンストラクタを持つ末端ウィジェットは、その引数以外に `required` メンバーを**持たない**。C# ではコンストラクタで必須値を埋めるのに `[SetsRequiredMembers]` が必要だが、これは同時に**他の `required` メンバーの検査も無効化**してしまうため（→ [セクション5](#5-デフォルト値の方針)）
-- ソースが曖昧なもの（`Image` のパスかプロバイダか等）は、コンストラクタを増やさず静的ファクトリ（`Image.FromFile(path)` など、[セクション7](#7-ファクトリメソッドの方針)）で受ける
+- コンストラクタを持つ末端ウィジェットは、その引数以外に `required` メンバーを**持たない**。追加のスタイルやオプションが必要なら `init` プロパティで受ける
+- ソースが曖昧なもの（`Image` のパスかプロバイダか等）はコンストラクタを増やさず、型付きのプロバイダで受ける（現行 API は `new Image { ImageProvider = new FileImageProvider(path) }`）。将来ショートカットを追加する場合は、[セクション7](#7-ファクトリメソッドの方針)に従って静的ファクトリにする
 
 **理由:**
 
@@ -92,11 +90,12 @@ new Text { Content = "Hello, World!", FontSize = 24 }
 単一の子を持つコンポーネントは `Child` プロパティ、複数の子を持つ場合は `Children` プロパティ（`IList<Widget>` 型）を使用します。
 
 ```csharp
-// 単一の子
-new Padding
+// 単一の子（SizedBox）
+new SizedBox
 {
-    Insets = EdgeInsets.All(16),
-    Child = new Text { Content = "パディングされたテキスト" }
+    Width = 240,
+    Height = 80,
+    Child = new Text("固定サイズ内のテキスト")
 }
 
 // 複数の子
@@ -105,8 +104,8 @@ new Row
     MainAxisAlignment = MainAxisAlignment.SpaceBetween,
     Children =
     [
-        new Icon { Name = "home" },
-        new Text { Content = "ホーム" }
+        new Text("ホーム"),
+        new Text("設定")
     ]
 }
 ```
@@ -117,9 +116,9 @@ new Row
 
 ```csharp
 // ✅ 推奨: 変数に切り出してフラット化
-var avatar = new CircleAvatar { ImageUrl = user.AvatarUrl, Size = 40 };
-var nameLabel = new Text { Content = user.Name, FontWeight = FontWeight.Bold };
-var emailLabel = new Text { Content = user.Email, Color = Colors.Gray };
+var avatarPlaceholder = new SizedBox { Width = 40, Height = 40 };
+var nameLabel = new Text(user.Name);
+var emailLabel = new Text(user.Email);
 
 var userInfo = new Column
 {
@@ -128,7 +127,7 @@ var userInfo = new Column
 
 var tile = new Row
 {
-    Children = [avatar, new SizedBox { Width = 12 }, userInfo]
+    Children = [avatarPlaceholder, new SizedBox { Width = 12 }, userInfo]
 };
 ```
 
@@ -137,16 +136,15 @@ var tile = new Row
 視覚的な属性はコンポーネント本体ではなく、専用の `*Style` クラスに分離します。`*Style` レコードや `Button` などのスタイル付きコンポーネントはデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)に属します(→ [UILayering](UILayering.md))。
 
 ```csharp
-new Button
+new FloatSoda.UI.Cream.Button
 {
-    Label = "送信",
-    OnClick = OnSubmit,
-    Style = new ButtonStyle
+    Child = new Text("送信"),
+    OnPressed = OnSubmit,
+    Style = new FloatSoda.UI.Cream.ButtonStyle
     {
-        BackgroundColor = Colors.Blue,
-        TextColor = Colors.White,
-        BorderRadius = 8,
-        Padding = EdgeInsets.Symmetric(horizontal: 16, vertical: 8)
+        BackgroundColor = SKColors.CornflowerBlue,
+        PressedBackgroundColor = SKColors.RoyalBlue,
+        DisabledBackgroundColor = SKColors.LightGray
     }
 }
 ```
@@ -194,7 +192,7 @@ public sealed record Row() : FlexWrapper(Axis.Horizontal);
 |---|---|---|
 | コンテンツ系 | 意味のある名詞 | `Content`, `Label`, `Title`, `ImageUrl` |
 | 子要素 | `Child` / `Children` | `Child`, `Children` |
-| イベントハンドラ | `On` + 動詞 (PascalCase) | `OnClick`, `OnChanged`, `OnSubmit` |
+| イベントハンドラ | `On` + 動詞 (PascalCase) | `OnPressed`, `OnChanged`, `OnSubmit` |
 | ブール型フラグ | `Is` / `Has` / `Can` プレフィックス | `IsEnabled`, `HasBorder`, `IsVisible` |
 | スタイル | `Style` サフィックス | `TextStyle`, `ButtonStyle` |
 | レイアウト | Flutterに準拠した名前 | `MainAxisAlignment`, `CrossAxisAlignment` |
@@ -203,7 +201,7 @@ public sealed record Row() : FlexWrapper(Axis.Horizontal);
 
 ```csharp
 // 引数なし
-public Action? OnClick { get; init; }
+public Action? OnPressed { get; init; }
 
 // 値を渡す場合
 public Action<string>? OnChanged { get; init; }
@@ -431,7 +429,7 @@ new RotatedBox { Angle = Angle.FromDegrees(45), Child = icon }
 **定義例:**
 
 ```csharp
-namespace FloatSoda.Common.Geometries.Units;
+namespace FloatSoda.Abstractions.Geometries.Units;
 
 public static class AngleUnits
 {
@@ -462,7 +460,7 @@ public static class AngleUnits
 | 形式 | 拡張**プロパティ**（`()` なし）。引数なし・副作用なしの純粋変換のみ |
 | 命名 | `From` プレフィックスなしの単位名（`Deg`, `Rad`, `Dpm`, `Meters`） |
 | レシーバー型 | `double` と `int` の2つ（公開APIが `double` 基準〔セクション8.5〕のため `float` レシーバーは提供しない） |
-| 名前空間 | 専用名前空間（`FloatSoda.Common.Geometries.Units` 等）に隔離し、オプトインにする |
+| 名前空間 | 専用名前空間（`FloatSoda.Abstractions.Geometries.Units` 等）に隔離し、オプトインにする |
 | 位置づけ | `FromXxx` 静的ファクトリが正準。拡張プロパティはその糖衣であり、必ず正準ファクトリへ委譲する |
 
 **理由:**
@@ -611,13 +609,13 @@ var darkSection = parentTheme with
 すべての public プロパティには XML ドキュメントコメントを記載します。
 
 ```csharp
-/// <summary>ボタンに表示するラベルテキスト。</summary>
+/// <summary>ボタンの中身。</summary>
 /// <example>
 /// <code>
-/// new Button { Label = "送信", OnClick = OnSubmit }
+/// new Button { Child = new Text("送信"), OnPressed = OnSubmit }
 /// </code>
 /// </example>
-public string Label { get; init; } = string.Empty;
+public required Widget Child { get; init; }
 ```
 
 ---

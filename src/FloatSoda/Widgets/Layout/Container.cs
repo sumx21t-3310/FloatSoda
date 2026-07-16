@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Widgets.Layout;
 
-public record Container : Widget
+internal record Container : Widget
 {
     public override Element CreateElement()
     {

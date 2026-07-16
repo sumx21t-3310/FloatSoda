@@ -1,4 +1,4 @@
-using FloatSoda.Common.Geometries;
+using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Engine;
 
@@ -13,7 +13,7 @@ public class WidgetBindingTest
     private static WidgetBinding CreateInitializedBinding()
     {
         var binding = new WidgetBinding();
-        var runner = new RenderThreadRunner("TestRenderThread", new FrameLimiter());
+        var runner = new RenderThreadRunner("TestRenderThread", new FramePacer());
 
         binding.EnsureInitialized("test_window", runner,
             _ => throw new InvalidOperationException("オーバーレイ生成はテストでは呼ばれない想定"),

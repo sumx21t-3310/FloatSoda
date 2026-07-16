@@ -19,7 +19,7 @@
 dotnet run --project samples/FloatSoda.Samples.OverlayApp
 ```
 
-起動すると SteamVR ダッシュボードに `FloatSodaDashboard` タブが追加され、中央に 100×100 のカラーボックスが表示されます(`samples/FloatSoda.Samples.OverlayApp/Program.cs`)。
+起動すると SteamVR ダッシュボードに、レイアウト、時計、アニメーション、カウンターのデモ用タブが追加されます。左コントローラー追従とワールド座標固定の時計オーバーレイも生成されます(`samples/FloatSoda.Samples.OverlayApp/Program.cs`)。
 
 SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動終了します。
 
@@ -73,7 +73,7 @@ dotnet run
 
 `app.Run()` は SteamVR が終了するまでブロックします。
 
-> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。`Padding`, `Container`, `ListView`, `Button` などは未実装スタブ（`NotImplementedException`）です。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
+> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。未実装の `Padding`, `Container`, `ListView` などは公開 API から除外されています。`Button` は `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` にスケルトン実装がありますが、ジェスチャ・ヒットテスト未実装のため押下操作はまだ動作しません。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
 
 <details>
 <summary>RenderObject レベルの直接操作（低レベル API）</summary>
@@ -83,6 +83,7 @@ using FloatSoda;
 using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
+using FloatSoda.Widgets;
 using SkiaSharp;
 
 var builder = FloatSodaAppBuilder.CreateDefault();
@@ -97,9 +98,18 @@ var root = new RenderPositionedBox
     }
 };
 
-// CreateWindow の Child は Widget を要求するため、RenderObject を直接ルートにする場合は
-// RenderObjectWidget でラップして渡します。
+// CreateWindow の Child は Widget を要求するため、RenderObjectWidget でラップします。
+Widget widgetRoot = new RawRootWidget { Root = root };
+app.CreateWindow(new DashboardWindow { Title = "LowLevel", Child = widgetRoot });
 app.Run();
+
+// 既存の RenderObject を Widget ツリーのルートへ接続する最小ラッパー。
+public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositionedBox>
+{
+    public required RenderPositionedBox Root { get; init; }
+
+    public override RenderPositionedBox CreateRenderObject() => Root;
+}
 ```
 </details>
 

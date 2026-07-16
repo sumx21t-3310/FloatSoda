@@ -1,4 +1,5 @@
-﻿using FloatSoda.Common.Layer;
+﻿using FloatSoda.Rendering;
+using FloatSoda.Rendering.Layers;
 
 namespace FloatSoda.Engine;
 
@@ -13,8 +14,7 @@ public class Renderer : IDisposable
 
         GLView.Clear();
 
-        root.Layout(renderContext);
-        root.Paint(renderContext);
+        LayerRenderer.Render(root, renderContext);
 
         GLView.Flush();
     }

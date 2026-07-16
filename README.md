@@ -102,7 +102,7 @@ sequenceDiagram
         Note over RO: Skia ドローコールを記録<br/>→ PictureLayer に格納
         Main->>Layer: Clone() — スレッドセーフコピー
         Main-->>RT: PostTask(layer)
-        Main->>Main: FrameLimiter.Wait()
+        Main->>Main: FramePacer.WaitForNextFrame()
     end
 
     loop レンダースレッド

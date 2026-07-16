@@ -2,7 +2,7 @@
 
 namespace FloatSoda.Widgets.Layout;
 
-public record GridView : Widget
+internal record GridView : Widget
 {
     public override Element CreateElement()
     {

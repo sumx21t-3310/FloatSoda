@@ -1,5 +1,5 @@
 using FloatSoda.Geometrics;
-using FloatSoda.Rendering;
+using FloatSoda.Testing;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
 using SkiaSharp;
@@ -8,7 +8,7 @@ namespace FloatSoda.Test.RenderObjects;
 
 public class RenderColoredBoxTest
 {
-    private static readonly ImageRenderer Renderer = new();
+    private static readonly RenderObjectBitmapRenderer Renderer = new();
     private static readonly SKSizeI Size = new(100, 100);
 
     [Fact]
@@ -20,7 +20,7 @@ public class RenderColoredBoxTest
             Child = new RenderColoredBox { Color = SKColors.Red }
         };
 
-        using var bitmap = Renderer.RenderObjectTree(renderBox, Size);
+        using var bitmap = Renderer.Render(renderBox, Size);
 
         Assert.Equal(SKColors.Red, bitmap.GetPixel(50, 50));
     }

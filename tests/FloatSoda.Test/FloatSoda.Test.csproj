@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FloatSoda\FloatSoda.csproj" />
+    <ProjectReference Include="..\..\src\FloatSoda.Testing\FloatSoda.Testing.csproj" />
   </ItemGroup>
 
 </Project>

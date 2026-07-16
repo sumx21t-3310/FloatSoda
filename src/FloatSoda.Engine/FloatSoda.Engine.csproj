@@ -18,8 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FloatSoda.Common\FloatSoda.Common.csproj" />
+      <ProjectReference Include="..\FloatSoda.Abstractions\FloatSoda.Abstractions.csproj" />
       <ProjectReference Include="..\FloatSoda.OVR\FloatSoda.OVR.csproj" />
+      <ProjectReference Include="..\FloatSoda.Rendering\FloatSoda.Rendering.csproj" />
     </ItemGroup>
 
 </Project>

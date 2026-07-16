@@ -1,4 +1,4 @@
-﻿using FloatSoda.Common.Geometries;
+﻿using FloatSoda.Abstractions.Geometries;
 
 namespace FloatSoda.Geometrics;
 
