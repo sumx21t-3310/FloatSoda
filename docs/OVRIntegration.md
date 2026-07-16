@@ -15,7 +15,7 @@ using var app = new OVRApplication(
 // app.Info.Type → ApplicationType.Overlay
 ```
 
-`FloatSodaApp.Run()` を呼ぶと、`FloatSodaAppBuilder.CreateDefault(appName)` が登録した `OVRAppInfo` から内部で `OVRApplication` を生成するため、通常は直接インスタンス化する必要はありません。
+`builder.Services.AddFloatSoda()` は `FloatSodaOptions.AppKey` から `OVRAppInfo` を登録します。`host.RunAsync()` でFloatSodaのHostedServiceが開始されると、内部で `OVRApplication` を生成するため、通常は直接インスタンス化する必要はありません。
 
 ### ApplicationType
 
@@ -130,7 +130,7 @@ dispatcher.Register(EVREventType.VREvent_Quit, (in VREvent_t _) =>
 dispatcher.PollEvents();
 ```
 
-`FloatSodaApp.Run()` は `VREvent_Quit` / `VREvent_ProcessQuit` を自動登録しています。
+FloatSodaのHostedServiceは `VREvent_Quit` / `VREvent_ProcessQuit` を自動登録し、受信時にGeneric Host全体へ停止を通知します。
 
 ---
 

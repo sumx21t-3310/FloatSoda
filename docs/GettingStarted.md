@@ -46,10 +46,15 @@ using FloatSoda;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SkiaSharp;
 
-var builder = FloatSodaAppBuilder.CreateDefault();
-using var app = builder.Build();
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddFloatSoda();
+
+using var host = builder.Build();
+var app = host.Services.GetRequiredService<FloatSodaApp>();
 
 Widget root = new Center
 {
@@ -63,7 +68,7 @@ Widget root = new Center
 // オーバーレイのサイズは root ウィジェットのレイアウト結果に自動追従します。
 app.CreateWindow(new DashboardWindow { Title = "HelloWorld", Child = root });
 
-app.Run();
+await host.RunAsync();
 ```
 
 ```bash
@@ -71,7 +76,7 @@ app.Run();
 dotnet run
 ```
 
-`app.Run()` は SteamVR が終了するまでブロックします。
+Window の作成は Host 側で行います。`host.RunAsync()` は SteamVR が終了するまで待機し、SteamVR の終了イベント、Ctrl+C、または Host の停止要求を受けると正常終了します。
 
 > **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。未実装の `Padding`, `Container`, `ListView` などは公開 API から除外されています。`Button` は `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` にスケルトン実装がありますが、ジェスチャ・ヒットテスト未実装のため押下操作はまだ動作しません。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
 
@@ -84,10 +89,15 @@ using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Widgets;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SkiaSharp;
 
-var builder = FloatSodaAppBuilder.CreateDefault();
-using var app = builder.Build();
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddFloatSoda();
+
+using var host = builder.Build();
+var app = host.Services.GetRequiredService<FloatSodaApp>();
 
 var root = new RenderPositionedBox
 {
@@ -101,7 +111,7 @@ var root = new RenderPositionedBox
 // CreateWindow の Child は Widget を要求するため、RenderObjectWidget でラップします。
 Widget widgetRoot = new RawRootWidget { Root = root };
 app.CreateWindow(new DashboardWindow { Title = "LowLevel", Child = widgetRoot });
-app.Run();
+await host.RunAsync();
 
 // 既存の RenderObject を Widget ツリーのルートへ接続する最小ラッパー。
 public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositionedBox>
@@ -146,17 +156,18 @@ app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Targe
 
 ## フレームレート設定
 
-`FloatSodaAppBuilder` でフレームレートを制御できます。
+`FloatSodaOptions` でフレームレートを制御できます。
 
 ```csharp
 // 固定 FPS
-var builder = FloatSodaAppBuilder.CreateDefault();
-builder.WithTargetFrameRate(90);
-
-using var app = builder.Build();
+var builder = Host.CreateApplicationBuilder(args);
+builder.Services.AddFloatSoda(new FloatSodaOptions
+{
+    TargetFrameRate = 90
+});
 ```
 
-`WithTargetFrameRate()` を指定しない場合のデフォルトは 30fps です。オーバーレイアプリはシーンアプリではないため、`WaitGetPoses` によるフレーム同期は利用できません。
+`TargetFrameRate` を指定しない場合のデフォルトは 60fps です。オーバーレイアプリはシーンアプリではないため、`WaitGetPoses` によるフレーム同期は利用できません。
 
 ---
 
