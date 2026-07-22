@@ -10,6 +10,6 @@ public interface IGestureBinding
     /// <summary>このウィンドウのジェスチャアリーナ。</summary>
     GestureArenaManager GestureArena { get; }
 
-    /// <summary>このウィンドウのポインタルータ。</summary>
+    /// <summary>このウィンドウのポインタールータ。</summary>
     PointerRouter PointerRouter { get; }
 }

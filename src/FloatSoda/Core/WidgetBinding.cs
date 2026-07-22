@@ -258,6 +258,14 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         hitTestResult.Add(new HitTestEntry(this));
     }
     
+    /// <summary>
+    /// ヒットパスを通過したポインターイベントを認識器へ配送し、フェーズに応じてアリーナを進行します。
+    /// </summary>
+    /// <param name="pointerEvent">認識器へ配送するポインターイベント。</param>
+    /// <param name="entry">このバインディングに対応するヒットテストエントリ。</param>
+    /// <remarks>
+    /// Downフェーズでは認識器の参加受付を締め切り、Upフェーズでは未確定アリーナの既定勝者を確定します。
+    /// </remarks>
     public void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry)
     {
         // ヒットパス末尾のこのエントリで、ジェスチャ認識器へのルーティングとアリーナ調停を行う
