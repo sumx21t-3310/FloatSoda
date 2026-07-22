@@ -19,6 +19,7 @@
 | [BuildPipeline](BuildPipeline.md) | BuildOwner による差分ビルドとフレームパイプラインの詳細 | コントリビュータ |
 | [RenderObjects](RenderObjects.md) | RenderObject ツリーのリファレンス(レイアウト・描画) | コントリビュータ |
 | [OVRIntegration](OVRIntegration.md) | OpenVR ラッパー・オーバーレイ種別・イベント処理 | 利用者 / コントリビュータ |
+| [Input](Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) | 利用者 |
 | [APIDesign](APIDesign.md) | API 設計規約(コンポーネント設計・命名・イミュータビリティ) | コントリビュータ |
 | [Localization](Localization.md) | ローカライゼーション方針(日本語デフォルト・resx・サテライトXML) | コントリビュータ |
 
@@ -73,8 +74,8 @@ graph LR
 | Phase | 内容 | 状況 |
 |---|---|---|
 | Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 🚧 進行中 |
-| Phase 2 | basic.dart 相当の表示系ウィジェット網羅 | 未着手 |
-| Phase 3 | スクロールと画像コンポーネント | 未着手 |
+| Phase 2 | basic.dart 相当の表示系ウィジェット網羅(画像・アイコン含む) | 未着手 |
+| Phase 3 | スクロールとアニメーションの充実(Tween / 暗黙的アニメーション / 物理シミュレーション) | 未着手 |
 | Phase 4 | Hooks・テキスト入力・API安定化 | 未着手 |
 | Phase 5 | Cream / FizzyPop デザインシステム完成 | 未着手 |
 | Phase 6 | DX 向上(Storybook・manifest 自動生成・ライフサイクル) | 未着手 |

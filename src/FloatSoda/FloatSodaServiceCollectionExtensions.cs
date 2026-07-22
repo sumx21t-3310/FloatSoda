@@ -53,7 +53,8 @@ public static class FloatSodaServiceCollectionExtensions
                 renderFramePacer,
                 appInfo,
                 loggerFactory,
-                timeProvider);
+                timeProvider,
+                options.InputActionMaps);
         });
 
         services.AddHostedService<FloatSodaHostedService>();

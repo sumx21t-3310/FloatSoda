@@ -1,0 +1,30 @@
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,json}]
+indent_size = 2
+
+[*.cs]
+# --- APIDesign.md 3.5: 参照の null 判定は is null / is not null ---
+# IDE0041 は ReferenceEquals(x, null) 形のみ対象。素の == null / != null は
+# Roslynator RCS1248 (null チェックの正規化) で検出する。
+dotnet_style_prefer_is_null_check_over_reference_equality_operator = true
+dotnet_diagnostic.IDE0041.severity = warning
+roslynator_null_check_style = pattern_matching
+dotnet_diagnostic.RCS1248.severity = warning
+
+# Roslynator は RCS1248 以外を目的に入れていないため、既定で有効な他ルールは無効化する
+roslynator_analyzers.enabled_by_default = false
+
+# --- APIDesign.md 10: public メンバーの XML ドキュメントコメント必須 ---
+# CS1591 は GenerateDocumentationFile が有効なプロジェクト (src/) でのみ発火する
+dotnet_diagnostic.CS1591.severity = warning
+
+# --- コードスタイル (EnforceCodeStyleInBuild でビルド時に検査される) ---
+csharp_style_namespace_declarations = file_scoped:warning
+dotnet_diagnostic.IDE0161.severity = warning

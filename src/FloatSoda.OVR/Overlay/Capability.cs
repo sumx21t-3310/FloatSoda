@@ -266,6 +266,15 @@ public sealed class OverlayInput(ulong overlayHandle)
         }
         set => OpenVR.Overlay.SetOverlayInputMethod(overlayHandle, value).ThrowIfError();
     }
+
+    /// <summary>Sets the coordinate range of mouse events delivered to the overlay (typically the texture size in pixels).</summary>
+    /// <param name="width">The maximum x coordinate.</param>
+    /// <param name="height">The maximum y coordinate.</param>
+    public void SetMouseScale(float width, float height)
+    {
+        var scale = new HmdVector2_t { v0 = width, v1 = height };
+        OpenVR.Overlay.SetOverlayMouseScale(overlayHandle, ref scale).ThrowIfError();
+    }
 }
 
 /// <summary>Describes where a ray intersected an overlay.</summary>

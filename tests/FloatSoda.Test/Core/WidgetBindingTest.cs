@@ -1,4 +1,3 @@
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Engine;
 
@@ -8,7 +7,7 @@ public class WidgetBindingTest
 {
     /// <summary>
     /// レンダースレッドを起動せずに初期化したWidgetBindingを作る。
-    /// PostTaskはキューに積むだけなのでオーバーレイ生成（GL/OpenVR）は走らない。
+    /// PostTaskはキューに積むだけなのでウィンドウ生成（GL/OpenVR）は走らない。
     /// </summary>
     private static WidgetBinding CreateInitializedBinding()
     {
@@ -16,8 +15,7 @@ public class WidgetBindingTest
         var runner = new RenderThreadRunner("TestRenderThread", new FramePacer());
 
         binding.EnsureInitialized("test_window", runner,
-            _ => throw new InvalidOperationException("オーバーレイ生成はテストでは呼ばれない想定"),
-            Dpm.Default);
+            _ => throw new InvalidOperationException("ウィンドウ生成はテストでは呼ばれない想定"));
 
         return binding;
     }

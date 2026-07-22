@@ -1,13 +1,15 @@
 ﻿using System.Diagnostics;
 using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Abstractions.Input;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.Core;
 using FloatSoda.Geometrics;
+using FloatSoda.Gesture;
 using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;
 
-public abstract class RenderObject
+public abstract class RenderObject : IHitTestTarget
 {
     public BoxConstraints Constraints { get; private set; }
     public IParentData? ParentData { get; set; }
@@ -189,4 +191,7 @@ public abstract class RenderObject
 
         MarkNeedsLayout();
     }
+
+    
+    public abstract void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry);
 }

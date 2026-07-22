@@ -16,7 +16,7 @@ public record WatchWidget : StatefulWidget<WatchWidget>
     public override State<WatchWidget> CreateState() => new WatchState();
 }
 
-public record WatchState : State<WatchWidget>
+public class WatchState : State<WatchWidget>
 {
     private Timer? _timer;
     private string _time = "00:00:00";

@@ -1,6 +1,7 @@
 ﻿using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Geometrics;
+using FloatSoda.Gesture;
 using static System.Double;
 
 namespace FloatSoda.RenderObjects.Layout;
@@ -111,4 +112,17 @@ public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject
     public override void VisitChildren(Action<RenderObject> visitor) => _child.VisitChildren(visitor);
 
     public override void RedepthChildren() => VisitChildren(RedepthChild);
+
+    public override bool HitTestChildren(HitTestResult result, Offset position)
+    {
+        if (Child is null) return false;
+
+        var childParentData = Child.ParentData as BoxParentData;
+
+        return result.AddWidthPaintOffset(
+            childParentData?.Offset,
+            position,
+            (testResult, transformed) => (Child as RenderBox)?.HitTest(testResult, transformed) ?? false
+        );
+    }
 }

@@ -1,7 +1,9 @@
 ﻿using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Abstractions.Input;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.Core;
 using FloatSoda.Geometrics;
+using FloatSoda.Gesture;
 using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;
@@ -104,5 +106,19 @@ public class RenderView : RenderObject, IHasSingleChildRenderObject
     {
         RelayoutBoundary = this;
         Owner?.NodesNeedingLayout.Add(this);
+    }
+
+    public bool HitTest(HitTestResult result, Offset position)
+    {
+        Child?.HitTest(result, position);
+
+        result.Add(new HitTestEntry(this));
+
+        return true;
+    }
+
+    public override void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry)
+    {
+        // Do nothing
     }
 }

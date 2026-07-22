@@ -72,6 +72,31 @@ public class WindowWidgetTest
     }
 
     [Fact]
+    public void DesktopWindowOf_FindsConcreteDesktopWindow()
+    {
+        DesktopWindow? found = null;
+
+        MountTree(new DesktopWindow
+        {
+            Title = "TestWindow",
+            Child = new Probe { OnBuild = ctx => found = DesktopWindow.Of(ctx) }
+        });
+
+        Assert.IsType<DesktopWindow>(found);
+        Assert.Equal("TestWindow", found!.Title);
+    }
+
+    [Fact]
+    public void OverlayWindowOf_ThrowsForDesktopWindow()
+    {
+        MountTree(new DesktopWindow
+        {
+            Title = "TestWindow",
+            Child = new Probe { OnBuild = ctx => Assert.Throws<InvalidOperationException>(() => OverlayWindow.Of(ctx)) }
+        });
+    }
+
+    [Fact]
     public void SizeUnset_RenderViewShrinkWrapsToChild()
     {
         var (pipeline, renderView) = MountTree(new DashboardWindow

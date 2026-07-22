@@ -8,3 +8,9 @@ riderModule.iml
 # Shared agent memory (Basic Memory MCP) — local, not published
 .agent-memory/
 .mcp.json
+
+# IDE state — local, not published
+.idea/
+
+# Local AI tool config — local, not published
+.codex/

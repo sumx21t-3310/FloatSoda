@@ -22,7 +22,7 @@ public record ButtonBase : StatefulWidget<ButtonBase>
     public override State<ButtonBase> CreateState() => new ButtonBaseState();
 }
 
-public record ButtonBaseState : State<ButtonBase>
+public class ButtonBaseState : State<ButtonBase>
 {
     public override Widget Build(IBuildContext context)
     {

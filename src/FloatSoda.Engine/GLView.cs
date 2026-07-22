@@ -11,19 +11,28 @@ public class GLView : IDisposable
     public int TextureHandle { get; private set; }
     public SKSizeI Size { get; private set; }
 
+    /// <summary>
+    /// このGLFWウィンドウがOS上に可視ウィンドウとして表示されるかどうか。
+    /// コンストラクタの <c>visible</c> 引数で確定し、以降は変更できません。
+    /// </summary>
+    public bool Visible { get; }
+
+    internal unsafe Window* WindowHandle => _window;
     private readonly unsafe Window* _window;
     private bool _disposed;
 
-    public GLView(SKSizeI? initialSize = null)
+    public GLView(SKSizeI? initialSize = null, bool visible = false, string title = "")
     {
         Size = initialSize ?? new SKSizeI(1000, 1000);
 
+        Visible = visible;
+
         unsafe
         {
-            GLFW.WindowHint(WindowHintBool.Visible, false);
+            GLFW.WindowHint(WindowHintBool.Visible, visible);
 
-            _window = GLFW.CreateWindow(Size.Width, Size.Height, "", null, null);
-            if (_window == null) throw new InvalidOperationException("GLFWウィンドウの作成に失敗しました。");
+            _window = GLFW.CreateWindow(Size.Width, Size.Height, title, null, null);
+            if (_window is null) throw new InvalidOperationException("GLFWウィンドウの作成に失敗しました。");
 
             GLFW.MakeContextCurrent(_window);
 
@@ -75,6 +84,7 @@ public class GLView : IDisposable
         {
             GLFW.MakeContextCurrent(_window);
         }
+
         GrContext.ResetContext();
 
         // 古いリソースを破棄
@@ -99,15 +109,25 @@ public class GLView : IDisposable
         {
             GLFW.MakeContextCurrent(_window);
         }
+
         GrContext.ResetContext();
 
         Surface.Canvas.Clear(SKColors.Transparent);
+    }
+
+    public void SwapBuffers()
+    {
+        unsafe
+        {
+            GLFW.SwapBuffers(_window);
+        }
     }
 
     public void Flush()
     {
         Surface.Flush();
         GrContext.Flush();
+
         GL.Flush();
     }
 

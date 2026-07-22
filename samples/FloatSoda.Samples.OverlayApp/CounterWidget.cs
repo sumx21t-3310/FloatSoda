@@ -3,6 +3,7 @@ using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Components;
+using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
@@ -19,34 +20,38 @@ public record CounterWidget : StatefulWidget<CounterWidget>
     public override State<CounterWidget> CreateState() => new CounterState();
 }
 
-public record CounterState : State<CounterWidget>
+public class CounterState : State<CounterWidget>
 {
     private int _count = 0;
 
-    private Widget BuildButton(string label)
+    private Widget BuildButton(string label, Action onPressed)
     {
-        // TODO: GestureDetectorが実装されたら、ボタンをクリック可能にする
-        return new ClipRoundRect
+        // TODO: GestureDetector(タップ認識)が実装されたら Listener から置き換える
+        return new Listener
         {
-            BorderRadius = BorderRadius.All(Radius.Circular(15)),
-            Child = new SizedBox
+            OnPointerUp = _ => SetState(onPressed),
+            Child = new ClipRoundRect
             {
-                Width = 120,
-                Height = 80,
-                Child = new ColoredBox
+                BorderRadius = BorderRadius.All(Radius.Circular(15)),
+                Child = new SizedBox
                 {
-                    Color = SKColors.CornflowerBlue,
-                    Child = new Center
+                    Width = 120,
+                    Height = 80,
+                    Child = new ColoredBox
                     {
-                        Child = new RichText
+                        Color = SKColors.CornflowerBlue,
+                        Child = new Center
                         {
-                            Text = new TextSpan(label)
+                            Child = new RichText
                             {
-                                Style = new Style
+                                Text = new TextSpan(label)
                                 {
-                                    TextColor = SKColors.WhiteSmoke,
-                                    FontSize = 50,
-                                    FontWeight = 700
+                                    Style = new Style
+                                    {
+                                        TextColor = SKColors.WhiteSmoke,
+                                        FontSize = 50,
+                                        FontWeight = 700
+                                    }
                                 }
                             }
                         }
@@ -139,35 +144,39 @@ public record CounterState : State<CounterWidget>
                                 CrossAxisAlignment = CrossAxisAlignment.Center,
                                 Children =
                                 {
-                                    BuildButton("-"),
+                                    BuildButton("-", () => _count--),
                                     new SizedBox { Width = 60 },
-                                    BuildButton("+"),
+                                    BuildButton("+", () => _count++),
                                 }
                             },
 
                             // リセットボタン
                             new SizedBox { Height = 40 },
-                            new ClipRoundRect
+                            new Listener
                             {
-                                BorderRadius = BorderRadius.All(Radius.Circular(15)),
-                                Child = new SizedBox
+                                OnPointerUp = _ => SetState(() => _count = 0),
+                                Child = new ClipRoundRect
                                 {
-                                    Width = 200,
-                                    Height = 70,
-                                    Child = new ColoredBox
+                                    BorderRadius = BorderRadius.All(Radius.Circular(15)),
+                                    Child = new SizedBox
                                     {
-                                        Color = SKColors.Tomato,
-                                        Child = new Center
+                                        Width = 200,
+                                        Height = 70,
+                                        Child = new ColoredBox
                                         {
-                                            Child = new RichText
+                                            Color = SKColors.Tomato,
+                                            Child = new Center
                                             {
-                                                Text = new TextSpan("Reset")
+                                                Child = new RichText
                                                 {
-                                                    Style = new Style
+                                                    Text = new TextSpan("Reset")
                                                     {
-                                                        TextColor = SKColors.White,
-                                                        FontSize = 40,
-                                                        FontWeight = 700
+                                                        Style = new Style
+                                                        {
+                                                            TextColor = SKColors.White,
+                                                            FontSize = 40,
+                                                            FontWeight = 700
+                                                        }
                                                     }
                                                 }
                                             }
