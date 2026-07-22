@@ -17,13 +17,20 @@ namespace FloatSoda.Samples.OverlayApp;
 /// </summary>
 public record CounterWidget : StatefulWidget<CounterWidget>
 {
+    /// <inheritdoc />
     public override State<CounterWidget> CreateState() => new CounterState();
 }
 
+/// <summary><see cref="CounterWidget"/>のカウント値を保持し、表示を構築します。</summary>
 public class CounterState : State<CounterWidget>
 {
+    /// <summary>画面に表示する現在のカウント値。</summary>
     private int _count = 0;
 
+    /// <summary>押下時に指定された処理を実行するカウンターボタンを構築します。</summary>
+    /// <param name="label">ボタンに表示する文字列。</param>
+    /// <param name="onPressed">ボタンがタップされたときに状態更新内で実行する処理。</param>
+    /// <returns>構築したボタンウィジェット。</returns>
     private Widget BuildButton(string label, Action onPressed)
     {
         return new GestureDetector
@@ -60,6 +67,7 @@ public class CounterState : State<CounterWidget>
         };
     }
 
+    /// <inheritdoc />
     public override Widget Build(IBuildContext context)
     {
         return new Align

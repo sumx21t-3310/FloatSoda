@@ -18,20 +18,27 @@ namespace FloatSoda.Samples.OverlayApp;
 /// </summary>
 public record DragBoxWidget : StatefulWidget<DragBoxWidget>
 {
+    /// <inheritdoc />
     public override State<DragBoxWidget> CreateState() => new DragBoxState();
 }
 
+/// <summary><see cref="DragBoxWidget"/>のドラッグ位置を保持し、表示を構築します。</summary>
 public class DragBoxState : State<DragBoxWidget>
 {
+    /// <summary>ドラッグ領域の一辺の長さ。単位は論理ピクセルです。</summary>
     private const float ContainerSize = 600f;
+
+    /// <summary>ドラッグ対象の一辺の長さ。単位は論理ピクセルです。</summary>
     private const float BoxSize = 140f;
 
-    // Align は子を remaining(= Container - Box) の範囲に -1..1 で配置する。
-    // よって delta(px) → alignment の変換係数は 2 / remaining。
+    /// <summary>ドラッグ領域からドラッグ対象を除いた移動可能距離。単位は論理ピクセルです。</summary>
+    /// <remarks>移動量を<see cref="Alignment"/>の-1から1の範囲へ変換するために使用します。</remarks>
     private const float Remaining = ContainerSize - BoxSize;
 
+    /// <summary>ドラッグ対象の現在の配置を保持します。</summary>
     private Alignment _alignment = Alignment.Center;
 
+    /// <inheritdoc />
     public override Widget Build(IBuildContext context)
     {
         return new Align

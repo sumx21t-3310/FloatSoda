@@ -47,6 +47,8 @@ public class StatefulElement<T> : ComponentElement where T : StatefulWidget<T>
     public State<T> State => _stateInternal!;
     private State<T>? _stateInternal = null;
     private bool _didChangeDependencies = false;
+
+    /// <summary><see cref="State{T}.Dispose"/>をすでに呼び出したかどうか。</summary>
     private bool _stateDisposed = false;
 
     public override void Mount(Element? parent)

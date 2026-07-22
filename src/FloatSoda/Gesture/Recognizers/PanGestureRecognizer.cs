@@ -5,24 +5,32 @@ namespace FloatSoda.Gesture;
 
 /// <summary>
 /// ドラッグ（パン）を認識する。Down 後にスロップを超えて動いた時点でアリーナへ勝利を宣言し、
-/// 以降の移動量を <see cref="OnPanUpdate"/> に delta で通知する。
+/// 以降の移動量を<see cref="OnPanUpdate"/>へ前回位置との差分で通知する。
 /// </summary>
 public sealed class PanGestureRecognizer : GestureRecognizer
 {
     /// <summary>ドラッグ開始（勝利確定）時。引数は開始位置。</summary>
     public Action<Offset>? OnPanStart { get; set; }
 
-    /// <summary>ドラッグ中の移動。引数は前回からの delta。</summary>
+    /// <summary>ドラッグ中に、前回位置からの移動量を通知します。</summary>
     public Action<Offset>? OnPanUpdate { get; set; }
 
     /// <summary>ドラッグ終了時。</summary>
     public Action? OnPanEnd { get; set; }
 
+    /// <summary>現在のポインター列で押下が始まった位置。</summary>
     private Offset _initialPosition;
+
+    /// <summary>直前に移動量を通知した位置。</summary>
     private Offset _lastPosition;
+
+    /// <summary>ジェスチャアリーナがこの認識器を受理したかどうか。</summary>
     private bool _acceptedByArena;
+
+    /// <summary>移動量がしきい値を超え、ドラッグ開始を通知済みかどうか。</summary>
     private bool _started;
 
+    /// <inheritdoc />
     protected override void AddAllowedPointer(PointerEvent downEvent)
     {
         _initialPosition = downEvent.Position;
@@ -31,6 +39,7 @@ public sealed class PanGestureRecognizer : GestureRecognizer
         _started = false;
     }
 
+    /// <inheritdoc />
     protected override void HandleEvent(PointerEvent pointerEvent)
     {
         switch (pointerEvent.Phase)
@@ -73,11 +82,21 @@ public sealed class PanGestureRecognizer : GestureRecognizer
         }
     }
 
-    // アリーナ勝利は「ドラッグ資格の確定」まで。実際の開始(OnPanStart)はスロップ超過時に行う。
+    /// <inheritdoc />
+    /// <remarks>
+    /// アリーナでの勝利はドラッグ資格だけを確定します。
+    /// <see cref="OnPanStart"/>は移動量がしきい値を超えた時点で通知します。
+    /// </remarks>
     public override void AcceptGesture(int pointer) => _acceptedByArena = true;
 
+    /// <inheritdoc />
+    /// <remarks>対象ポインターのイベント購読を解除します。</remarks>
     public override void RejectGesture(int pointer) => StopTrackingPointer(pointer);
 
+    /// <summary>2点間のユークリッド距離を計算します。</summary>
+    /// <param name="a">一方の位置。</param>
+    /// <param name="b">もう一方の位置。</param>
+    /// <returns>2点間の距離。単位は論理ピクセルです。</returns>
     private static double Distance(Offset a, Offset b)
     {
         var dx = a.X - b.X;
