@@ -5,6 +5,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <Authors>Sumx21t</Authors>
         <Copyright>Copyright (c) 2026 Sumx21t</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -14,6 +19,10 @@
         <PackageTags>steamvr;openvr;overlay;vr;ui;skiasharp;declarative-ui</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Roslynator.Analyzers" Version="4.13.1" PrivateAssets="all" />
+    </ItemGroup>
 
     <ItemGroup>
         <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="\" Visible="false" />

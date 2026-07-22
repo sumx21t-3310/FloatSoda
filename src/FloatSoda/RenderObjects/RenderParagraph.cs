@@ -2,6 +2,7 @@
 using FloatSoda.Core;
 using SkiaSharp;
 using Topten.RichTextKit;
+using HitTestResult = FloatSoda.Gesture.HitTestResult;
 
 namespace FloatSoda.RenderObjects;
 
@@ -57,6 +58,10 @@ public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
     }
 
     public override void Paint(PaintingContext context, Offset offset) => _textPainter.Paint(context.Canvas, offset);
+
+    public override bool HitTestSelf(Offset position) => true;
+
+    public override bool HitTestChildren(HitTestResult result, Offset position) => false;
 }
 
 public record TextSpan(string Text)

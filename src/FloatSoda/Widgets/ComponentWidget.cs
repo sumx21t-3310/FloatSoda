@@ -22,10 +22,9 @@ public abstract record StatefulWidget<T> : Widget where T : StatefulWidget<T>
     public abstract State<T> CreateState();
 }
 
-public abstract record State<T> where T : StatefulWidget<T>
+public abstract class State<T> where T : StatefulWidget<T>
 {
     public T? Widget { get; set; }
-
 
     public StatefulElement<T>? Element { get; set; }
     public IBuildContext Context => Element!;

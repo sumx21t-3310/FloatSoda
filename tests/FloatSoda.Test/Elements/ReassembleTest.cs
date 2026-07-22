@@ -34,7 +34,7 @@ public class ReassembleTest
         public override State<InnerWidget> CreateState() => new InnerState();
     }
 
-    private record InnerState : State<InnerWidget>
+    private class InnerState : State<InnerWidget>
     {
         private int _field;
 

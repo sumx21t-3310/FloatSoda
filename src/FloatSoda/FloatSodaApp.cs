@@ -4,10 +4,14 @@ using System.Collections.Concurrent;
 using FloatSoda.Abstractions.Scheduling;
 using FloatSoda.Core;
 using FloatSoda.Engine;
+using FloatSoda.OVR.Input;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.Logging;
 using OverlayWindow = FloatSoda.Widgets.OverlayWindow;
+using DesktopWindow = FloatSoda.Widgets.DesktopWindow;
+using EngineOverlayWindow = FloatSoda.Engine.OverlayWindow;
+using EngineDesktopWindow = FloatSoda.Engine.DesktopWindow;
 
 namespace FloatSoda;
 
@@ -20,6 +24,8 @@ public class FloatSodaApp : IDisposable
 
     private OVRApplication? _openVR;
     private VRSystemEventDispatcher? _dispatcher;
+    private VRInputUpdater? _inputUpdater;
+    private readonly IReadOnlyList<InputActionMap> _inputActionMaps;
 
     private readonly CancellationTokenSource _cts = new();
     private readonly IFramePacer _mainFramePacer;
@@ -40,10 +46,12 @@ public class FloatSodaApp : IDisposable
     internal FloatSodaApp(IFramePacer mainFramePacer,
         IFramePacer renderFramePacer,
         OVRAppInfo appInfo, ILoggerFactory? loggerFactory = null,
-        TimeProvider? timeProvider = null)
+        TimeProvider? timeProvider = null,
+        IReadOnlyList<InputActionMap>? inputActionMaps = null)
     {
         _mainFramePacer = mainFramePacer;
         _appInfo = appInfo;
+        _inputActionMaps = inputActionMaps ?? [];
         _timeProvider = timeProvider ?? TimeProvider.System;
         _startTimestamp = _timeProvider.GetTimestamp();
         _renderThreadRunner =
@@ -76,26 +84,29 @@ public class FloatSodaApp : IDisposable
     }
 
     /// <summary>
-    /// ウィンドウ定義 <see cref="WindowWidget"/> からオーバーレイウィンドウを作成します。
-    /// <see cref="WindowWidget"/> はウィジェットツリーのルートとしてマウントされ、
-    /// <see cref="WindowWidget.Size"/> が null の場合、オーバーレイのサイズは
+    /// ウィンドウ定義 <see cref="WindowWidget"/> からウィンドウを作成します。
+    /// <see cref="OverlayWindow"/> 系はOpenVRオーバーレイとして、<see cref="DesktopWindow"/> は
+    /// デスクトップ上の可視ウィンドウとして表示されます。<see cref="WindowWidget"/> はウィジェットツリーの
+    /// ルートとしてマウントされ、<see cref="WindowWidget.Size"/> が null の場合、ウィンドウのサイズは
     /// <see cref="InheritedWidget.Child"/> のレイアウト結果に追従します。
     /// </summary>
     public void CreateWindow(WindowWidget window)
     {
-        // 現状はOpenVRオーバーレイのみ対応。デスクトップウィンドウ等は今後の派生で追加する。
-        if (window is not OverlayWindow overlayWindow)
+        Action<WidgetBinding> initialize = window switch
         {
-            throw new NotSupportedException($"{window.GetType().Name} は未対応のウィンドウ種別です。");
-        }
+            OverlayWindow overlayWindow => binding => binding.EnsureInitialized(window.Title, _renderThreadRunner,
+                renderer => new EngineOverlayWindow(overlayWindow.CreateOverlay(), renderer, overlayWindow.Dpm)),
+            DesktopWindow => binding => binding.EnsureInitialized(window.Title, _renderThreadRunner,
+                renderer => new EngineDesktopWindow(renderer), visible: true),
+            _ => throw new NotSupportedException($"{window.GetType().Name} は未対応のウィンドウ種別です。")
+        };
 
         _pendingTasks.Enqueue(() =>
         {
             var title = window.Title;
             var widgetBinding = new WidgetBinding();
             _bindings.TryAdd(title, widgetBinding);
-            widgetBinding.EnsureInitialized(title, _renderThreadRunner, _ => overlayWindow.CreateOverlay(),
-                overlayWindow.Dpm);
+            initialize(widgetBinding);
             widgetBinding.AttachRootWidget(window);
             _logger?.LogInformation("{Title}を作成しました", title);
         });
@@ -157,6 +168,7 @@ public class FloatSodaApp : IDisposable
             try
             {
                 PollEvents();
+                _inputUpdater?.Update();
             }
             catch (Exception e)
             {
@@ -211,6 +223,20 @@ public class FloatSodaApp : IDisposable
             
             _dispatcher.Register(EVREventType.VREvent_TrackedDeviceRoleChanged,
                 (in _) => ReapplyPendingDeviceTrackedTransforms());
+
+            if (_inputActionMaps.Count > 0)
+            {
+                try
+                {
+                    var manifestPath = ActionManifestWriter.Write(_appInfo.Key, _inputActionMaps);
+                    _inputUpdater = new VRInputUpdater(manifestPath, _inputActionMaps);
+                }
+                catch (VRInputException e)
+                {
+                    // 入力が使えなくてもオーバーレイの表示は継続できるため、致命的エラーにしない。
+                    _logger?.LogWarning("アクション入力の初期化に失敗しました: {Message}", e.Message);
+                }
+            }
 
             _renderThreadRunner.Start(_cts.Token);
         }

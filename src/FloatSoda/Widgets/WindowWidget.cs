@@ -136,3 +136,18 @@ public record DeviceTrackedWindow : OverlayWindow
         return overlay;
     }
 }
+
+/// <summary>
+/// 開発機のデスクトップ上にGLFWの可視ウィンドウとして表示されるウィンドウ。
+/// SteamVRオーバーレイとは独立に、描画結果をそのまま画面へミラー表示する。
+/// 目視確認・デバッグ用途を主眼とする。
+/// </summary>
+public record DesktopWindow : WindowWidget
+{
+    /// <summary>
+    /// 最も近い祖先の <see cref="DesktopWindow"/> を取得し、依存関係を登録します。
+    /// </summary>
+    public new static DesktopWindow Of(IBuildContext context) =>
+        WindowWidget.Of(context) as DesktopWindow ??
+        throw new InvalidOperationException("DesktopWindowが祖先に見つかりません。");
+}

@@ -1,8 +1,11 @@
-﻿using FloatSoda.Abstractions.Engine;
+﻿using System.Diagnostics;
+using FloatSoda.Abstractions.Engine;
 using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Abstractions.Input;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.Elements;
 using FloatSoda.Engine;
+using FloatSoda.Gesture;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
@@ -11,7 +14,7 @@ using OverlayWindow = FloatSoda.Engine.OverlayWindow;
 
 namespace FloatSoda.Core;
 
-public class WidgetBinding : IFrameScheduler
+public class WidgetBinding : IFrameScheduler, IHitTestTarget
 {
     public WidgetBinding()
     {
@@ -35,12 +38,16 @@ public class WidgetBinding : IFrameScheduler
 
     public int NextFrameCallbackId { get; private set; } = 0;
 
-    private Dictionary<int, Action<TimeSpan>> _transientCallbacks = [];
+    private readonly Dictionary<int, Action<TimeSpan>> _transientCallbacks = [];
+
+    private readonly Dictionary<int, HitTestResult> _hitTests = [];
+
+    private PointerController? _pointerController;
 
     private bool _hasScheduledFrame;
 
     public void EnsureInitialized(string windowName, RenderThreadRunner renderThreadRunner,
-        Func<string, IOverlay> overlayFactory, Dpm dpm)
+        Func<Renderer, IEngineWindow> windowFactory, bool visible = false)
     {
         if (Initialized) return;
         Initialized = true;
@@ -53,12 +60,10 @@ public class WidgetBinding : IFrameScheduler
         {
             var renderer = new Renderer
             {
-                GLView = new GLView(Size)
+                GLView = new GLView(Size, visible, windowName)
             };
 
-            var overlay = overlayFactory(WindowName);
-
-            Window = new OverlayWindow(overlay, renderer, dpm);
+            Window = windowFactory(renderer);
         });
 
 
@@ -151,6 +156,7 @@ public class WidgetBinding : IFrameScheduler
     public void BeginFrame(TimeSpan elapsedTime)
     {
         if (!Initialized) return;
+        FlushPointerEvents();
         _hasScheduledFrame = false;
         var callbacks = _transientCallbacks.Values.ToList();
         _transientCallbacks.Clear();
@@ -181,5 +187,87 @@ public class WidgetBinding : IFrameScheduler
         if (_hasScheduledFrame) return;
 
         _hasScheduledFrame = true;
+    }
+
+    
+    
+    /// <summary>
+    /// ウィンドウ由来の生ポインタイベントをポンプ・変換し、ヒットテストへディスパッチします。
+    /// Window はレンダースレッドで非同期に生成されるため、生成が観測できたフレームから配線されます。
+    /// </summary>
+    private void FlushPointerEvents()
+    {
+        var window = Window;
+        if (window == null) return;
+
+        (window as OverlayWindow)?.PollInputEvents();
+
+        if (_pointerController == null && window.PointerSource is { } pointerSource)
+        {
+            _pointerController = new PointerController(pointerSource);
+            _pointerController.OnPointerEvent += HandlePointerEvent;
+        }
+
+        _pointerController?.Flush();
+    }
+
+    private void HandlePointerEvent(PointerEvent pointerEvent)
+    {
+        switch (pointerEvent.Phase)
+        {
+            case PointerEventPhase.Down:
+            {
+                var result = new HitTestResult();
+                HitTest(result, pointerEvent.Position);
+                _hitTests[pointerEvent.PointerId] = result;
+                DispatchEvent(pointerEvent, result);
+                break;
+            }
+            case PointerEventPhase.Move:
+            case PointerEventPhase.Up:
+            {
+                // Down時のヒットパスへ届け続ける（ポインタキャプチャ）。配線前にDownが起きていた場合は捨てる。
+                if (!_hitTests.TryGetValue(pointerEvent.PointerId, out var result)) return;
+                DispatchEvent(pointerEvent, result);
+
+                if (pointerEvent.Phase == PointerEventPhase.Up)
+                {
+                    _hitTests.Remove(pointerEvent.PointerId);
+                }
+
+                break;
+            }
+            case PointerEventPhase.Add:
+            case PointerEventPhase.Remove:
+            default:
+                DispatchEvent(pointerEvent, null);
+                break;
+        }
+    }
+
+    private void HitTest(HitTestResult hitTestResult, Offset position)
+    {
+        Pipeline?.RenderView.HitTest(hitTestResult, position);
+        
+        hitTestResult.Add(new HitTestEntry(this));
+    }
+    
+    public void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry)
+    {
+        // None
+    }
+
+    private void DispatchEvent(PointerEvent pointerEvent, HitTestResult? hitTestResult)
+    {
+        if (hitTestResult is null)
+        {
+            Debug.Assert(pointerEvent.Phase is PointerEventPhase.Add or PointerEventPhase.Remove);
+            return;
+        }
+
+        foreach (var entry in hitTestResult.Path)
+        {
+            entry.Target.HandleEvent(pointerEvent, entry);
+        }
     }
 }

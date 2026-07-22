@@ -1,6 +1,7 @@
 ﻿using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Geometrics;
+using FloatSoda.Gesture;
 using SkiaSharp;
 
 namespace FloatSoda.RenderObjects.Layout;
@@ -232,5 +233,24 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
                 context.PaintChild(child, offset + childParentData.Offset);
             }
         }
+    }
+
+    public override bool HitTestChildren(HitTestResult result, Offset position)
+    {
+        // 描画順の逆（手前に描かれた子から）に判定し、最初にヒットした子で打ち切る
+        foreach (var child in Children.Reverse())
+        {
+            var childParentData = child.ParentData as BoxParentData;
+
+            var isHit = result.AddWidthPaintOffset(
+                childParentData?.Offset,
+                position,
+                (testResult, transformed) => child.HitTest(testResult, transformed)
+            );
+
+            if (isHit) return true;
+        }
+
+        return false;
     }
 }

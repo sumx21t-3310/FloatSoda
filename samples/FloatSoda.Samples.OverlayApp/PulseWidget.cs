@@ -7,7 +7,6 @@ using FloatSoda.Widgets.Animation;
 using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
-using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using Topten.RichTextKit;
 
@@ -22,7 +21,7 @@ public record PulseWidget : StatefulWidget<PulseWidget>
     public override State<PulseWidget> CreateState() => new PulseState();
 }
 
-public record PulseState : TickerProviderState<PulseWidget>
+public class PulseState : TickerProviderState<PulseWidget>
 {
     private AnimationController? _opacity;
 

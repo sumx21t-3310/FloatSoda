@@ -12,6 +12,17 @@
 
 C# のオブジェクト初期化子構文を活用することで、マークアップに近い読みやすいUIコードを実現します。
 
+### 判断原則: 概念とツリーの語彙は Flutter に、その表現手段は C# に従う
+
+Flutter を参考にする範囲と、C# の慣習を優先する範囲を次のように使い分けます。
+
+- **UIドメインの語彙の層** — Flutter に準拠します。ウィジェット名・レイアウト用語（`MainAxisAlignment`, `CrossAxisAlignment`）・`Child` / `Children` などの木構造の語彙は Flutter の名前をそのまま使います。Flutter を参照する利用者・コード生成AIが自然に書く形をそのまま正解にするためです。
+- **言語機構・実装パターンの層** — C# として自然な API や慣習があればそちらを優先します。Dart の言語制約に由来する実装パターン（例: `addListener` / `removeListener`）は直訳せず、C# の言語機構（`event`, `init`, `required`, `record struct`, `extension` プロパティ等）で同じ意図を表現します。
+
+本ドキュメントの個別ルールの多くはこの原則の適用例です: リスナーパターンではなく `event`（セクション3.6）、`is null` パターン（3.5）、ジオメトリの `record struct`（8）、単位リテラルの拡張プロパティ（7.5）、`init` / `required` によるイミュータビリティと必須値の表現（4・5）。
+
+ただし C# の一般慣習が常に勝つわけではありません。フレームワークの読みやすさのために意図的に逸脱する場合は、逸脱の理由を明記します（例: 兄弟ウィジェットの同一ファイル配置は StyleCop SA1402 から意図的に外れる — セクション2.5）。
+
 ```csharp
 // 推奨: オブジェクト初期化子によるツリー構造
 var ui = new Column
@@ -209,6 +220,23 @@ public Action<string>? OnChanged { get; init; }
 // キャンセル可能な非同期処理
 public Func<Task>? OnSubmitAsync { get; init; }
 ```
+
+### 入力語彙は「ポインター (Pointer)」で統一する
+
+FloatSoda が命名する型・メンバー・ドキュメントでは、入力デバイスの語彙として「マウス (Mouse)」を使わず「ポインター (Pointer)」に統一します。VR ではレーザーポインターが、デスクトップではマウスが同じ役割を担うため、デバイス非依存の語彙を採用します（Flutter の `PointerEvent` 系とも一致）。
+
+```csharp
+// ✅ 良い例: FloatSoda が命名するものはすべて Pointer
+public interface IRawPointerSource;
+public enum PointerButton { Left, Middle, Right }
+
+// ❌ 悪い例: FloatSoda の公開APIに Mouse を持ち込む
+public enum MouseButton { Left, Middle, Right }
+```
+
+**例外**: 外部 API（OpenVR / GLFW）の固有名詞をそのまま写す層は対象外です。`FloatSoda.OVR` の `SetMouseScale` のように下位 API（`SetOverlayMouseScale`）との対応が分かることに価値がある薄いラッパーは、元の語彙を維持します。
+
+ドキュメントコメントの説明文でも「マウス」単独ではなく「ポインター（レーザーポインター／マウス）」のように書きます。
 
 ---
 

@@ -1,5 +1,7 @@
 using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Abstractions.Input;
 using FloatSoda.Core;
+using FloatSoda.Gesture;
 using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;
@@ -7,6 +9,26 @@ namespace FloatSoda.RenderObjects;
 public abstract class RenderBox : RenderObject
 {
     public override SKSize Size { get; protected set; } = SKSize.Empty;
+
+    public virtual bool HitTest(HitTestResult result, Offset position)
+    {
+        if (!Size.Contains(position)) return false;
+
+        if (!HitTestChildren(result, position) && !HitTestSelf(position)) return false;
+
+        result.Add(new HitTestEntry(this));
+
+        return true;
+    }
+
+    public virtual bool HitTestChildren(HitTestResult result, Offset position) => false;
+
+    public virtual bool HitTestSelf(Offset position) => false;
+
+    public override void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry)
+    {
+        // do nothing
+    }
 }
 
 public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject
@@ -62,4 +84,9 @@ public abstract class RenderProxyBox : RenderBox, IHasSingleChildRenderObject
     public override void VisitChildren(Action<RenderObject> visitor) => _child.VisitChildren(visitor);
 
     public override void RedepthChildren() => VisitChildren(RedepthChild);
+
+    public override bool HitTestChildren(HitTestResult result, Offset position)
+    {
+        return Child?.HitTest(result, position) ?? false;
+    }
 }

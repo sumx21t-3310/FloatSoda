@@ -8,7 +8,7 @@ namespace FloatSoda.Animation;
 /// 生成されたTickerは自Elementが属するウィンドウのWidgetBinding(BuildOwner.FrameScheduler)から
 /// フレームコールバックを受け取ります。
 /// </summary>
-public abstract record TickerProviderState<T> : State<T>, ITickerProvider
+public abstract class TickerProviderState<T> : State<T>, ITickerProvider
     where T : StatefulWidget<T>
 {
     // 継承ではなくTickerProviderへの委譲で実装する。

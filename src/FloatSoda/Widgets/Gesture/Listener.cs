@@ -1,11 +1,28 @@
-﻿using FloatSoda.Elements;
+﻿using FloatSoda.Abstractions.Input;
+using FloatSoda.RenderObjects;
 
 namespace FloatSoda.Widgets.Gesture;
 
-public record Listener : Widget
+public record Listener : SingleChildRenderObjectWidget<RenderPointerListener>
 {
-    public override Element CreateElement()
+    public Action<PointerEvent>? OnPointerDown { get; init; }
+    public Action<PointerEvent>? OnPointerUp { get; init; }
+    public Action<PointerEvent>? OnPointerMove { get; init; }
+
+    public override RenderPointerListener CreateRenderObject()
     {
-        throw new NotImplementedException();
+        return new RenderPointerListener()
+        {
+            OnPointerDown = OnPointerDown,
+            OnPointerUp = OnPointerUp,
+            OnPointerMove = OnPointerMove,
+        };
+    }
+
+    public override void UpdateRenderObject(RenderPointerListener renderObject)
+    {
+        renderObject.OnPointerDown = OnPointerDown;
+        renderObject.OnPointerUp = OnPointerUp;
+        renderObject.OnPointerMove = OnPointerMove;
     }
 }
