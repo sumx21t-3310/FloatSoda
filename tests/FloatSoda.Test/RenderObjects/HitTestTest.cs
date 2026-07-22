@@ -4,6 +4,7 @@ using FloatSoda.Core;
 using FloatSoda.Geometrics;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects;
+using FloatSoda.RenderObjects.Gesture;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
 

@@ -47,6 +47,7 @@ public class StatefulElement<T> : ComponentElement where T : StatefulWidget<T>
     public State<T> State => _stateInternal!;
     private State<T>? _stateInternal = null;
     private bool _didChangeDependencies = false;
+    private bool _stateDisposed = false;
 
     public override void Mount(Element? parent)
     {
@@ -92,5 +93,19 @@ public class StatefulElement<T> : ComponentElement where T : StatefulWidget<T>
     {
         base.DidChangeDependencies();
         _didChangeDependencies = true;
+    }
+
+    /// <summary>
+    /// このElement(＝State)がツリーから恒久的に取り除かれるときに呼ばれる。
+    /// 子を先に非活性化してから自身のStateを破棄することで、深い側から順に解放される。
+    /// 再活性プールを持たない現状のツリーでは Deactivate が終端(unmount相当)となる。
+    /// </summary>
+    protected override void Deactivate()
+    {
+        base.Deactivate();
+
+        if (_stateDisposed) return;
+        _stateDisposed = true;
+        State.Dispose();
     }
 }

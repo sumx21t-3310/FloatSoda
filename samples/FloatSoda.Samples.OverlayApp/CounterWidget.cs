@@ -26,10 +26,9 @@ public class CounterState : State<CounterWidget>
 
     private Widget BuildButton(string label, Action onPressed)
     {
-        // TODO: GestureDetector(タップ認識)が実装されたら Listener から置き換える
-        return new Listener
+        return new GestureDetector
         {
-            OnPointerUp = _ => SetState(onPressed),
+            OnTap = () => SetState(onPressed),
             Child = new ClipRoundRect
             {
                 BorderRadius = BorderRadius.All(Radius.Circular(15)),
@@ -152,9 +151,9 @@ public class CounterState : State<CounterWidget>
 
                             // リセットボタン
                             new SizedBox { Height = 40 },
-                            new Listener
+                            new GestureDetector
                             {
-                                OnPointerUp = _ => SetState(() => _count = 0),
+                                OnTap = () => SetState(() => _count = 0),
                                 Child = new ClipRoundRect
                                 {
                                     BorderRadius = BorderRadius.All(Radius.Circular(15)),

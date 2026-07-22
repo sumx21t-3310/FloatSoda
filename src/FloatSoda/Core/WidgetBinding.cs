@@ -14,12 +14,18 @@ using OverlayWindow = FloatSoda.Engine.OverlayWindow;
 
 namespace FloatSoda.Core;
 
-public class WidgetBinding : IFrameScheduler, IHitTestTarget
+public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 {
     public WidgetBinding()
     {
-        BuildOwner = new BuildOwner(EnsureVisualUpdate) { FrameScheduler = this };
+        BuildOwner = new BuildOwner(EnsureVisualUpdate) { FrameScheduler = this, GestureBinding = this };
     }
+
+    /// <inheritdoc />
+    public GestureArenaManager GestureArena { get; } = new();
+
+    /// <inheritdoc />
+    public PointerRouter PointerRouter { get; } = new();
 
     private RenderPipeline? Pipeline { get; set; }
     private BuildOwner BuildOwner { get; set; }
@@ -254,7 +260,20 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget
     
     public void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry)
     {
-        // None
+        // ヒットパス末尾のこのエントリで、ジェスチャ認識器へのルーティングとアリーナ調停を行う
+        // (Flutter の GestureBinding.handleEvent 相当)。Down のディスパッチ中に各認識器が
+        // AddPointer でルータ購読・アリーナ参加済みなので、ここでの Route が Down を届ける。
+        PointerRouter.Route(pointerEvent);
+
+        switch (pointerEvent.Phase)
+        {
+            case PointerEventPhase.Down:
+                GestureArena.Close(pointerEvent.PointerId);
+                break;
+            case PointerEventPhase.Up:
+                GestureArena.Sweep(pointerEvent.PointerId);
+                break;
+        }
     }
 
     private void DispatchEvent(PointerEvent pointerEvent, HitTestResult? hitTestResult)

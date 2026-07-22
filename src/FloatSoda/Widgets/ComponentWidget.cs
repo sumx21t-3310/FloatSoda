@@ -41,5 +41,11 @@ public abstract class State<T> where T : StatefulWidget<T>
 
     public virtual void DidChangeDependencies() { }
 
+    /// <summary>
+    /// この State がツリーから恒久的に取り除かれるときに一度だけ呼ばれる。
+    /// 購読・タイマー・認識器など、State が確保した外部リソースをここで解放する。
+    /// </summary>
+    public virtual void Dispose() { }
+
     public abstract Widget Build(IBuildContext context);
 }

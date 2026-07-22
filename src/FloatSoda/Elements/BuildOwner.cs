@@ -1,4 +1,5 @@
 ﻿using FloatSoda.Core;
+using FloatSoda.Gesture;
 
 namespace FloatSoda.Elements;
 
@@ -9,6 +10,12 @@ public class BuildOwner(Action onBuildScheduled)
     /// TickerがElement.Owner経由で自ウィンドウのフレームコールバックへ到達するために使います。
     /// </summary>
     public IFrameScheduler? FrameScheduler { get; init; }
+
+    /// <summary>
+    /// このツリーが属するウィンドウのジェスチャ調停基盤(通常はWidgetBinding)。
+    /// GestureDetectorがElement.Owner経由で共有のアリーナ／ルータへ到達するために使います。
+    /// </summary>
+    public IGestureBinding? GestureBinding { get; init; }
 
     private readonly List<Element> _dirtyElements = [];
     private bool? _dirtyElementsNeedsRestoring;
