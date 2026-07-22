@@ -74,6 +74,14 @@ app.CreateWindow(new DashboardWindow
     Child = new CounterWidget()
 });
 
+// ドラッグのデモ。GestureDetector.OnPanUpdate でボックスを掴んで動かせる。
+app.CreateWindow(new DashboardWindow
+{
+    Dpm = new Dpm(1000),
+    Title = "Drag",
+    Child = new DragBoxWidget()
+});
+
 // Position 省略時はプレイエリア中央から前方1m・高さ1mに表示される。
 app.CreateWindow(new WorldSpaceWindow
 {

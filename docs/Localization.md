@@ -85,7 +85,7 @@ graph LR
 
 ## 4. XML ドキュメントコメント
 
-ソースコードの XML ドキュメントコメント(`/// <summary>`)は**日本語のみ**で書きます。1つのソースに2言語を併記することはしません。
+ソースコードの XML ドキュメントコメントを**日本語のみ**で書く方針は [DocumentationComments](DocumentationComments.md) に移動しました。ここではローカライズの仕組みだけを扱います。
 
 resx と違い、XML ドキュメントコメントはビルド時に `FloatSoda.OVR.xml` のような単一の XML ファイルに書き出されるため、resx の仕組みではローカライズできません。ローカライズする場合は、NuGet パッケージの `lib/net10.0/{culture}/FloatSoda.OVR.xml` にカルチャ別の翻訳済み XML を同梱する方式(サテライト XML)になります。Visual Studio / Rider の IntelliSense はこの配置を認識します。
 

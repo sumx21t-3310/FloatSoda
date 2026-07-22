@@ -23,6 +23,29 @@ Flutter を参考にする範囲と、C# の慣習を優先する範囲を次の
 
 ただし C# の一般慣習が常に勝つわけではありません。フレームワークの読みやすさのために意図的に逸脱する場合は、逸脱の理由を明記します（例: 兄弟ウィジェットの同一ファイル配置は StyleCop SA1402 から意図的に外れる — セクション2.5）。
 
+### 判断原則: 対象ユーザー・ランタイムに不要な Flutter API は移植しない
+
+Flutter の API がすべて FloatSoda に必要なわけではありません。対象ユーザー(→ [TargetUsers](TargetUsers.md))の需要がなく、かつ FloatSoda のランタイム(Skia → OpenGL → OpenVR オーバーレイテクスチャ)に受け皿がない機能は、Flutter 由来のコードを移植する際にフックだけ先に置くことをせず、削除します。
+
+#### 実装しない API — Semantics (アクセシビリティツリー)
+
+Flutter の `SemanticsNode` / `SemanticsConfiguration` / `PipelineOwner.semanticsOwner` に相当する **並行ツリー** は FloatSoda では実装しません。
+
+理由:
+
+- **出力先に経路がない** — VR オーバーレイテクスチャは OS ネイティブのアクセシビリティ API (Windows Narrator / UI Automation / macOS VoiceOver 等) に接続する自然なフックを持たない。SteamVR / OpenVR にもスクリーンリーダー統合の仕組みは存在しない。
+- **ターゲットユーザーに需要がない** — FloatSoda の 3 ペルソナ(バイブコーディング VRChatter / Booth 創作者 / uGUI 回避エンジニア)にアクセシビリティ需要は乗っていない。
+- **部分導入は無意味** — `markNeedsSemanticsUpdate()` だけ実装しても `SemanticsNode` ツリーと `SemanticsOwner` が無ければ実質 no-op になる。逆に本気で入れるなら Semantics ツリー全体の設計が必要で、その時点で改めて設計し直す方が自然。
+
+したがって Flutter 本家から移植するときは、以下のような API・プロパティは **持ち込まない**:
+
+- `RenderObject.markNeedsSemanticsUpdate()`
+- `describeSemanticsConfiguration(SemanticsConfiguration config)`
+- `SemanticsConfiguration` / `SemanticsNode` 系型
+- ウィジェット側の `ignoringSemantics` / `excludeSemantics` / `semanticContainer` などのフラグ
+
+将来 VR 空間内でアクセシビリティ情報を表現する自然な経路が見つかった時点で、個別に設計します。それまでは Flutter 側コードの semantics 関連呼び出しは移植せず削除する、を規約とします。
+
 ```csharp
 // 推奨: オブジェクト初期化子によるツリー構造
 var ui = new Column
@@ -236,7 +259,7 @@ public enum MouseButton { Left, Middle, Right }
 
 **例外**: 外部 API（OpenVR / GLFW）の固有名詞をそのまま写す層は対象外です。`FloatSoda.OVR` の `SetMouseScale` のように下位 API（`SetOverlayMouseScale`）との対応が分かることに価値がある薄いラッパーは、元の語彙を維持します。
 
-ドキュメントコメントの説明文でも「マウス」単独ではなく「ポインター（レーザーポインター／マウス）」のように書きます。
+ドキュメントコメントの説明文でも「マウス」単独ではなく「ポインター（レーザーポインター／マウス）」のように書きます（→ [DocumentationComments](DocumentationComments.md)）。
 
 ---
 
@@ -634,17 +657,13 @@ var darkSection = parentTheme with
 
 ## 10. ドキュメントコメント規約
 
-すべての public プロパティには XML ドキュメントコメントを記載します。
+ドキュメントコメント(XML ドキュメントコメント)の規約は独立したページに分離しました。適用範囲・契約の書き方・Dirty フラグなどの副作用の明記・関連型への参照・記述言語などは [DocumentationComments](DocumentationComments.md) を参照してください。
 
-```csharp
-/// <summary>ボタンの中身。</summary>
-/// <example>
-/// <code>
-/// new Button { Child = new Text("送信"), OnPressed = OnSubmit }
-/// </code>
-/// </example>
-public required Widget Child { get; init; }
-```
+要点は次の通りです。
+
+- アクセス修飾子を問わず、原則としてすべての型およびメンバーに記述する(`public` だけでなく `private` も対象)。
+- ドキュメントコメントは正式な API Reference の原稿として扱い、役割・契約・副作用を完結させる。使い方・チュートリアルはドキュメントサイト側へ分離する。
+- `<example>` は原則として使用しない。
 
 ---
 
