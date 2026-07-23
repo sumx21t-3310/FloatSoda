@@ -23,6 +23,8 @@ public class PointerController : IDisposable
     /// <summary>変換済みポインタイベントの通知。<see cref="Flush"/> を呼んだスレッドで発火します。</summary>
     public event Action<PointerEvent>? OnPointerEvent;
 
+    /// <summary>指定された生ポインター入力源を購読するコントローラーを作成します。</summary>
+    /// <param name="pointerSource">購読する生ポインター入力源。<see langword="null"/>は指定できず、破棄するまで保持されます。</param>
     public PointerController(IRawPointerSource pointerSource)
     {
         _pointerSource = pointerSource;
@@ -138,6 +140,8 @@ public class PointerController : IDisposable
         }
     }
 
+    /// <summary>生ポインター入力源の購読を解除し、以後に発生するイベントの受信を停止します。</summary>
+    /// <remarks>破棄前にキューへ追加済みのイベントは削除されず、その後の<see cref="Flush"/>で通知されます。</remarks>
     public void Dispose()
     {
         _pointerSource.OnPointerEvent -= Enqueue;

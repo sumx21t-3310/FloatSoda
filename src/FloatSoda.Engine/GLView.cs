@@ -4,11 +4,32 @@ using SkiaSharp;
 
 namespace FloatSoda.Engine;
 
+/// <summary>
+/// GLFW の OpenGL コンテキストと、描画先となる Skia サーフェスおよび OpenGL テクスチャを管理します。
+/// OpenGL リソースを所有するレンダースレッド上で作成、使用、破棄してください。
+/// </summary>
 public class GLView : IDisposable
 {
+    /// <summary>
+    /// OpenGL バックエンドに接続された Skia の GPU コンテキストを取得します。
+    /// </summary>
     public GRContext GrContext { get; }
+
+    /// <summary>
+    /// 現在の OpenGL テクスチャを描画先とする Skia サーフェスを取得します。
+    /// リサイズすると既存のサーフェスは破棄され、新しいインスタンスに置き換わります。
+    /// </summary>
     public SKSurface Surface { get; private set; }
+
+    /// <summary>
+    /// 描画結果を保持する OpenGL 2D テクスチャのハンドルを取得します。
+    /// リサイズすると既存のテクスチャは削除され、値が更新されます。
+    /// </summary>
     public int TextureHandle { get; private set; }
+
+    /// <summary>
+    /// 描画先のピクセルサイズを取得します。
+    /// </summary>
     public SKSizeI Size { get; private set; }
 
     /// <summary>
@@ -21,6 +42,15 @@ public class GLView : IDisposable
     private readonly unsafe Window* _window;
     private bool _disposed;
 
+    /// <summary>
+    /// GLFW ウィンドウと、その OpenGL コンテキストへ接続された Skia 描画先を作成します。
+    /// </summary>
+    /// <param name="initialSize">描画先の初期ピクセルサイズ。null の場合は1000×1000です。</param>
+    /// <param name="visible">OS 上に GLFW ウィンドウを表示する場合は <see langword="true"/>。</param>
+    /// <param name="title">可視ウィンドウのタイトル。</param>
+    /// <exception cref="InvalidOperationException">
+    /// GLFW ウィンドウ、Skia GPU コンテキスト、または Skia サーフェスを作成できない場合にスローされます。
+    /// </exception>
     public GLView(SKSizeI? initialSize = null, bool visible = false, string title = "")
     {
         Size = initialSize ?? new SKSizeI(1000, 1000);
@@ -72,6 +102,11 @@ public class GLView : IDisposable
     /// <summary>
     /// 描画先のサイズを変更します。既存のテクスチャとSurfaceは破棄され、再作成されます。
     /// </summary>
+    /// <param name="width">新しい描画先の幅（ピクセル）。</param>
+    /// <param name="height">新しい描画先の高さ（ピクセル）。</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="width"/> または <paramref name="height"/> が0以下の場合にスローされます。
+    /// </exception>
     public void Resize(int width, int height)
     {
         if (width <= 0 || height <= 0)
@@ -101,8 +136,18 @@ public class GLView : IDisposable
         Surface = newSurface;
     }
 
+    /// <summary>
+    /// 描画先を指定したピクセルサイズへ変更します。
+    /// </summary>
+    /// <param name="size">新しい描画先のピクセルサイズ。</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// <paramref name="size"/> の幅または高さが0以下の場合にスローされます。
+    /// </exception>
     public void Resize(SKSizeI size) => Resize(size.Width, size.Height);
 
+    /// <summary>
+    /// OpenGL コンテキストを現在のスレッドへ関連付け、描画先を透明色でクリアします。
+    /// </summary>
     public void Clear()
     {
         unsafe
@@ -115,6 +160,9 @@ public class GLView : IDisposable
         Surface.Canvas.Clear(SKColors.Transparent);
     }
 
+    /// <summary>
+    /// GLFW ウィンドウのフロントバッファとバックバッファを交換します。
+    /// </summary>
     public void SwapBuffers()
     {
         unsafe
@@ -123,6 +171,9 @@ public class GLView : IDisposable
         }
     }
 
+    /// <summary>
+    /// Skia と OpenGL に保留されている描画コマンドを送信します。
+    /// </summary>
     public void Flush()
     {
         Surface.Flush();
@@ -131,6 +182,9 @@ public class GLView : IDisposable
         GL.Flush();
     }
 
+    /// <summary>
+    /// Skia と OpenGL の描画リソースを解放し、GLFW ウィンドウを破棄します。
+    /// </summary>
     public void Dispose()
     {
         if (_disposed) return;
