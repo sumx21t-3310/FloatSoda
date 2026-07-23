@@ -3,10 +3,17 @@ using SkiaSharp;
 
 namespace FloatSoda.RenderObjects;
 
+/// <summary>
+/// 画像を自身の領域へ拡縮して描画し、その上に任意の子を描画するRenderObjectです。
+/// </summary>
 public class RenderImage : RenderProxyBox
 {
+    /// <summary>
+    /// 描画する画像を取得します。
+    /// </summary>
     public required SKImage Image { get; init; }
 
+    /// <inheritdoc/>
     public override void PerformLayout()
     {
         if (Child != null)
@@ -20,6 +27,7 @@ public class RenderImage : RenderProxyBox
         }
     }
 
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
     {
         context.Canvas.DrawImage(Image, SKRect.Create(offset, Size));

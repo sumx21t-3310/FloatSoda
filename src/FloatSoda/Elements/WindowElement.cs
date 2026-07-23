@@ -9,12 +9,14 @@ namespace FloatSoda.Elements;
 /// </summary>
 public class WindowElement : InheritedElement
 {
+    /// <inheritdoc />
     public override void Mount(Element? parent)
     {
         base.Mount(parent);
         ApplySizeToRenderView();
     }
 
+    /// <inheritdoc />
     public override void Update(Widget newWidget)
     {
         base.Update(newWidget);

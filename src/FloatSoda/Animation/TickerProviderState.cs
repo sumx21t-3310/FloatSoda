@@ -20,7 +20,9 @@ public abstract class TickerProviderState<T> : State<T>, ITickerProvider
         ResolveScheduler = () => Element?.Owner?.FrameScheduler
     };
 
+    /// <inheritdoc />
     public WidgetTicker CreateTicker(Action<TimeSpan> onTick) => TickerProvider.CreateTicker(onTick);
 
+    /// <inheritdoc />
     public void RemoveTicker(WidgetTicker ticker) => TickerProvider.RemoveTicker(ticker);
 }
