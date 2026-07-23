@@ -7,6 +7,17 @@
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-24
+
+### Added
+
+- RenderObjects/Widgets具象クラスとCore/Animation/GeometricsにXMLドキュメントコメントを整備
+- UI/Cream/FizzyPop/Testingの残りのXMLドキュメントコメントを整備
+
+### Changed
+
+- `RenderPadding` が未実装であることをドキュメントに明記
+
 ## [0.3.0] - 2026-07-23
 
 ### Added
