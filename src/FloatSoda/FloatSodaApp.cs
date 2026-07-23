@@ -15,6 +15,9 @@ using EngineDesktopWindow = FloatSoda.Engine.DesktopWindow;
 
 namespace FloatSoda;
 
+/// <summary>OpenVRのイベント処理と各ウィンドウのフレーム処理を実行するFloatSodaアプリケーションです。</summary>
+/// <remarks>作成したウィンドウはメインループで初期化され、描画処理は専用のレンダースレッドへ送られます。</remarks>
+/// <seealso cref="WidgetBinding"/>
 public class FloatSodaApp : IDisposable
 {
     private readonly RenderThreadRunner _renderThreadRunner;
@@ -113,6 +116,8 @@ public class FloatSodaApp : IDisposable
     }
 
 
+    /// <summary>アプリケーションを初期化し、停止要求を受けるまでメインループを実行します。</summary>
+    /// <remarks>メインループ終了時には、このインスタンスが保持するOpenVRおよびレンダースレッドのリソースを解放します。</remarks>
     [STAThread]
     public void Run()
         => Run(CancellationToken.None, static () => { });
@@ -274,6 +279,7 @@ public class FloatSodaApp : IDisposable
         }
     }
 
+    /// <summary>メインループへ停止を要求し、レンダースレッドとOpenVRリソースを解放します。</summary>
     public void Dispose()
     {
         Dispose(true);

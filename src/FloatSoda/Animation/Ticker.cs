@@ -93,6 +93,7 @@ public class WidgetTicker(
     /// <summary>次フレームのコールバックが登録済みかどうか。</summary>
     public bool Scheduled => _animationId != null;
 
+    /// <summary>フレームコールバックを解除し、生成元による追跡からこのTickerを取り除きます。</summary>
     public void Dispose()
     {
         creator.RemoveTicker(this);
@@ -104,7 +105,12 @@ public class WidgetTicker(
 /// <summary>Tickerの供給元。FlutterのTickerProvider相当。</summary>
 public interface ITickerProvider
 {
+    /// <summary>指定された処理へフレームごとの経過時間を通知するTickerを作成します。</summary>
+    /// <param name="onTick">フレームごとに呼び出す処理。引数はTicker開始からの経過時間です。</param>
+    /// <returns>この供給元が追跡するTicker。</returns>
     WidgetTicker CreateTicker(Action<TimeSpan> onTick);
+    /// <summary>指定されたTickerを供給元の追跡対象から取り除きます。</summary>
+    /// <param name="ticker">追跡を終了するTicker。</param>
     void RemoveTicker(WidgetTicker ticker);
 }
 
@@ -122,6 +128,7 @@ public class TickerProvider : ITickerProvider
 
     private readonly HashSet<WidgetTicker> _tickers = [];
 
+    /// <inheritdoc />
     public WidgetTicker CreateTicker(Action<TimeSpan> onTick)
     {
         var result = new WidgetTicker(onTick, this, ResolveScheduler);
@@ -131,5 +138,6 @@ public class TickerProvider : ITickerProvider
         return result;
     }
 
+    /// <inheritdoc />
     public void RemoveTicker(WidgetTicker ticker) => _tickers.Remove(ticker);
 }

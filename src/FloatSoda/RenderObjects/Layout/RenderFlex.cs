@@ -6,33 +6,74 @@ using SkiaSharp;
 
 namespace FloatSoda.RenderObjects.Layout;
 
+/// <summary>
+/// 複数の子を主軸に沿って並べ、主軸と交差軸の配置を調整するRenderObjectです。
+/// </summary>
 public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
 {
+    /// <summary>
+    /// レイアウト対象となる子のコレクションを取得します。
+    /// </summary>
     public MultiChildrenCollection<RenderBox> Children { get; }
 
+    /// <summary>
+    /// 子を持たないFlexレイアウトを初期化します。
+    /// </summary>
     public RenderFlex() => Children = new MultiChildrenCollection<RenderBox>(this);
 
+    /// <summary>
+    /// 指定したRenderObjectを末尾の子として追加します。
+    /// </summary>
+    /// <param name="child">追加するRenderObject。<see cref="RenderBox"/>である必要があります。</param>
+    /// <remarks>
+    /// このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に全ての子のサイズと位置を再計算します。
+    /// </remarks>
     public void AddChild(RenderObject child) => Children.Add((RenderBox)child);
+
+    /// <summary>
+    /// 指定したRenderObjectを子のコレクションから削除します。
+    /// </summary>
+    /// <param name="child">削除するRenderObject。<see cref="RenderBox"/>である必要があります。</param>
+    /// <returns>子が見つかり削除された場合は<c>true</c>、それ以外の場合は<c>false</c>。</returns>
+    /// <remarks>
+    /// 子が削除された場合、このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に残りの子のサイズと位置を再計算します。
+    /// 子が見つからなかった場合、Dirty状態は変更されません。
+    /// </remarks>
     public bool RemoveChild(RenderObject child) => Children.Remove((RenderBox)child);
 
+    /// <inheritdoc/>
     public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
 
+    /// <inheritdoc/>
     public override void Attach(RenderPipeline? owner)
     {
         base.Attach(owner);
         Children.Attach(owner);
     }
 
+    /// <inheritdoc/>
     public override void Detach()
     {
         base.Detach();
         Children.Detach();
     }
 
+    /// <inheritdoc/>
     public override void VisitChildren(Action<RenderObject> visitor) => Children.VisitChildren(visitor);
 
+    /// <inheritdoc/>
     public override void RedepthChildren() => VisitChildren(RedepthChild);
 
+    /// <summary>
+    /// 子を並べる主軸の方向を取得または設定します。
+    /// </summary>
+    /// <remarks>
+    /// 値が変更された場合、このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に各子のサイズと位置を再計算します。
+    /// 値が変更されなかった場合、Dirty状態は変更されません。
+    /// </remarks>
     public Axis Direction
     {
         get;
@@ -44,6 +85,14 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     } = Axis.Vertical;
 
+    /// <summary>
+    /// 主軸方向の子の配置方法を取得または設定します。
+    /// </summary>
+    /// <remarks>
+    /// 値が変更された場合、このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に主軸方向の余白と各子の位置を再計算します。
+    /// 値が変更されなかった場合、Dirty状態は変更されません。
+    /// </remarks>
     public MainAxisAlignment MainAxisAlignment
     {
         get;
@@ -55,6 +104,14 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     } = MainAxisAlignment.Start;
 
+    /// <summary>
+    /// 主軸方向に利用可能な領域を占有する方法を取得または設定します。
+    /// </summary>
+    /// <remarks>
+    /// 値が変更された場合、このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に主軸方向のサイズと各子の位置を再計算します。
+    /// 値が変更されなかった場合、Dirty状態は変更されません。
+    /// </remarks>
     public MainAxisSize MainAxisSize
     {
         get;
@@ -66,6 +123,14 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     } = MainAxisSize.Max;
 
+    /// <summary>
+    /// 交差軸方向の子の配置方法を取得または設定します。
+    /// </summary>
+    /// <remarks>
+    /// 値が変更された場合、このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に交差軸方向の制約と各子の位置を再計算します。
+    /// 値が変更されなかった場合、Dirty状態は変更されません。
+    /// </remarks>
     public CrossAxisAlignment CrossAxisAlignment
     {
         get;
@@ -77,6 +142,14 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     } = CrossAxisAlignment.Center;
 
+    /// <summary>
+    /// 垂直方向における開始側と終了側の向きを取得または設定します。
+    /// </summary>
+    /// <remarks>
+    /// 値が変更された場合、このRenderObjectをLayout Dirtyとしてマークし、
+    /// 次のパイプライン更新時に各子の配置順と位置を再計算します。
+    /// 値が変更されなかった場合、Dirty状態は変更されません。
+    /// </remarks>
     public VerticalDirection VerticalDirection
     {
         get;
@@ -192,6 +265,7 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     }
 
+    /// <inheritdoc/>
     public override void PerformLayout()
     {
         MeasureCrossAxis(Constraints, out var allocatedSize, out var crossSize);
@@ -224,6 +298,7 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     }
 
 
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
     {
         foreach (var child in Children)
@@ -235,6 +310,7 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     }
 
+    /// <inheritdoc/>
     public override bool HitTestChildren(HitTestResult result, Offset position)
     {
         // 描画順の逆（手前に描かれた子から）に判定し、最初にヒットした子で打ち切る

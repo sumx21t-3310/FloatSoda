@@ -7,13 +7,25 @@ using FloatSoda.OVR.Overlay;
 
 namespace FloatSoda.Engine;
 
+/// <summary>SteamVRオーバーレイを描画先とする<see cref="IEngineWindow"/>の実装です。</summary>
+/// <seealso cref="IOverlay"/>
 public class OverlayWindow : IEngineWindow
 {
     private readonly Renderer renderer;
     private readonly Dpm dpm;
 
+    /// <summary>このウィンドウが描画先とするOpenVRオーバーレイを取得します。</summary>
     public IOverlay Overlay { get; }
 
+    /// <summary>指定されたオーバーレイを描画先とするウィンドウを作成します。</summary>
+    /// <param name="overlay">描画先となるOpenVRオーバーレイ。</param>
+    /// <param name="renderer">レイヤーツリーをテクスチャへ描画するレンダラー。</param>
+    /// <param name="dpm">ピクセルサイズをオーバーレイの物理幅へ換算する際に使用する密度。</param>
+    /// <remarks>
+    /// <paramref name="overlay"/>がダッシュボードオーバーレイの場合、入力方式をマウスへ設定し、
+    /// SteamVRのレーザーポインター入力を受け取る<see cref="PointerSource"/>を生成します。
+    /// それ以外のオーバーレイでは<see cref="PointerSource"/>は<see langword="null"/>のままです。
+    /// </remarks>
     public OverlayWindow(IOverlay overlay, Renderer renderer, Dpm dpm)
     {
         Overlay = overlay;
@@ -30,6 +42,11 @@ public class OverlayWindow : IEngineWindow
         }
     }
 
+    /// <summary>
+    /// 指定されたレイヤーツリーを描画し、結果のテクスチャをオーバーレイへ反映します。
+    /// </summary>
+    /// <param name="layer">描画するレイヤーツリー。<see langword="null"/>は指定できません。</param>
+    /// <remarks>レンダースレッド上で呼び出します。</remarks>
     public void Present(ILayer layer)
     {
         renderer.Render(layer);
@@ -60,6 +77,8 @@ public class OverlayWindow : IEngineWindow
         }
     }
 
+    /// <summary>このウィンドウの生ポインター入力源を取得します。</summary>
+    /// <value>ダッシュボードオーバーレイの場合はレーザーポインター入力源。それ以外では<see langword="null"/>です。</value>
     public IRawPointerSource? PointerSource { get; }
 
     /// <summary>
@@ -73,6 +92,7 @@ public class OverlayWindow : IEngineWindow
         Overlay.EventDispatcher.PollEvents();
     }
 
+    /// <summary>このウィンドウの生ポインター入力源とオーバーレイを破棄します。</summary>
     public void Dispose()
     {
         PointerSource?.Dispose();
