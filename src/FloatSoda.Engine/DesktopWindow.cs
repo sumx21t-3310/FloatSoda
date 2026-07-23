@@ -7,11 +7,19 @@ using SkiaSharp;
 
 namespace FloatSoda.Engine;
 
+/// <summary>
+/// GLFW の可視ウィンドウへレイヤーツリーを表示するデスクトップ向けエンジンウィンドウです。
+/// 描画結果を既定のフレームバッファへ転送し、ウィンドウ固有のポインター入力を提供します。
+/// </summary>
 public class DesktopWindow : IEngineWindow
 {
     private readonly Renderer renderer;
     private int _blitFbo;
 
+    /// <summary>
+    /// 指定したレンダラーの GLFW ウィンドウを表示先として使用するインスタンスを初期化します。
+    /// </summary>
+    /// <param name="renderer">描画と GLFW ウィンドウの管理に使用するレンダラー。</param>
     public DesktopWindow(Renderer renderer)
     {
         this.renderer = renderer;
@@ -22,6 +30,7 @@ public class DesktopWindow : IEngineWindow
         }
     }
 
+    /// <inheritdoc />
     public void Present(ILayer layer)
     {
         renderer.Render(layer);
@@ -46,6 +55,7 @@ public class DesktopWindow : IEngineWindow
         renderer.GLView.SwapBuffers();
     }
 
+    /// <inheritdoc />
     public void Resize(SKSizeI size)
     {
         renderer.Resize(size.Width, size.Height);
@@ -56,8 +66,12 @@ public class DesktopWindow : IEngineWindow
         }
     }
 
+    /// <inheritdoc />
     public IRawPointerSource? PointerSource { get; }
 
+    /// <summary>
+    /// ポインター入力と、表示に使用した OpenGL フレームバッファを解放します。
+    /// </summary>
     public void Dispose()
     {
         PointerSource?.Dispose();

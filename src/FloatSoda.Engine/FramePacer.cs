@@ -3,6 +3,10 @@ using FloatSoda.Abstractions.Scheduling;
 
 namespace FloatSoda.Engine;
 
+/// <summary>
+/// スリープとスピン待機を組み合わせ、フレームループを指定した頻度に制限します。
+/// </summary>
+/// <param name="targetFrameRate">1秒あたりの目標フレーム数。既定値は60です。</param>
 public class FramePacer(int targetFrameRate = 60) : IFramePacer
 {
     private readonly Stopwatch _stopwatch = Stopwatch.StartNew();
@@ -10,6 +14,7 @@ public class FramePacer(int targetFrameRate = 60) : IFramePacer
     // 1フレームあたりの目標時間を「ティック単位」で計算
     private readonly double _targetTicksPerFrame = Stopwatch.Frequency / (double)targetFrameRate;
 
+    /// <inheritdoc />
     public void WaitForNextFrame(CancellationToken cancellationToken = default)
     {
         // 1. 前回のSyncから経過した時間を取得

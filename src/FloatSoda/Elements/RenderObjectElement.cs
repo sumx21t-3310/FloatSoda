@@ -3,11 +3,18 @@ using FloatSoda.Widgets;
 
 namespace FloatSoda.Elements;
 
+/// <summary>
+/// 対応するRenderObjectを祖先のRenderObjectツリーへ接続するElementの基底クラスです。
+/// </summary>
+/// <seealso cref="RenderObject"/>
 public abstract class RenderObjectElement : Element
 {
     private RenderObjectElement? _ancestorRenderObjectElement;
 
 
+    /// <summary>
+    /// 最近傍の祖先RenderObjectElementへ、このElementのRenderObjectを子として接続します。
+    /// </summary>
     public override void AttachRenderObject()
     {
         _ancestorRenderObjectElement = FindAncestorRenderObjectElement();
@@ -15,6 +22,9 @@ public abstract class RenderObjectElement : Element
     }
 
 
+    /// <summary>
+    /// 接続先として記録された祖先RenderObjectElementから、このElementのRenderObjectを切り離します。
+    /// </summary>
     public override void DetachRenderObject()
     {
         if (_ancestorRenderObjectElement == null) return;
@@ -23,12 +33,26 @@ public abstract class RenderObjectElement : Element
     }
 
 
+    /// <summary>
+    /// このElementのRenderObjectへ子RenderObjectを挿入します。
+    /// </summary>
+    /// <param name="child">挿入する子RenderObject。子を持たないことを表す場合は<see langword="null"/>。</param>
     public virtual void InsertRenderObjectChild(RenderObject? child) { }
 
 
+    /// <summary>
+    /// このElementのRenderObjectから子RenderObjectを取り除きます。
+    /// </summary>
+    /// <param name="child">取り除く子RenderObject。対象がない場合は<see langword="null"/>。</param>
     public virtual void RemoveRenderObjectChild(RenderObject? child) { }
 
 
+    /// <summary>
+    /// Elementツリーを親方向へ探索し、最も近いRenderObjectElementを取得します。
+    /// </summary>
+    /// <returns>
+    /// 最も近い祖先のRenderObjectElement。該当する祖先が存在しない場合は<see langword="null"/>。
+    /// </returns>
     public RenderObjectElement? FindAncestorRenderObjectElement()
     {
         var ancestor = Parent;
@@ -41,6 +65,15 @@ public abstract class RenderObjectElement : Element
         return ancestor as RenderObjectElement;
     }
 
+    /// <summary>
+    /// 複数の子Elementを新しいWidget一覧へ更新し、型とキーが一致する子を再利用します。
+    /// </summary>
+    /// <param name="oldChildren">更新前の子Element一覧。</param>
+    /// <param name="newWidgets">更新後に子として構成するWidget一覧。</param>
+    /// <param name="forgottenChildren">
+    /// 再利用候補から除外する子Elementの集合。除外する子がない場合は<see langword="null"/>。
+    /// </param>
+    /// <returns>新しいWidget一覧と同じ順序で構成された更新後の子Element一覧。</returns>
     protected List<Element> UpdateChildren(
         List<Element> oldChildren,
         List<Widget> newWidgets,
@@ -152,12 +185,25 @@ public abstract class RenderObjectElement : Element
     }
 }
 
+/// <summary>
+/// 指定した型のRenderObjectを生成・更新するRenderObjectWidgetに対応するElementの基底クラスです。
+/// </summary>
+/// <typeparam name="T">このElementが管理するRenderObjectの型。</typeparam>
+/// <seealso cref="RenderObjectWidget{T}"/>
 public abstract class RenderObjectElement<T> : RenderObjectElement where T : RenderObject
 {
+    /// <summary>
+    /// このElementが管理するRenderObjectを取得します。
+    /// RenderObjectがまだ生成されていない場合は<see langword="null"/>です。
+    /// </summary>
     public abstract override RenderObject? RenderObject { get; protected set; }
     private RenderObjectWidget<T>? WidgetCascaded => Widget as RenderObjectWidget<T>;
 
 
+    /// <summary>
+    /// Elementツリーへ接続し、対応するWidgetからRenderObjectを生成してRenderObjectツリーへ接続します。
+    /// </summary>
+    /// <param name="parent">接続先の親Element。ルートとして接続する場合は<see langword="null"/>。</param>
     public override void Mount(Element? parent)
     {
         base.Mount(parent);
@@ -167,6 +213,10 @@ public abstract class RenderObjectElement<T> : RenderObjectElement where T : Ren
     }
 
 
+    /// <summary>
+    /// 管理するWidgetを置き換え、その構成を既存のRenderObjectへ直ちに反映します。
+    /// </summary>
+    /// <param name="newWidget">同じRenderObjectを引き継ぐ新しいWidget。</param>
     public override void Update(Widget newWidget)
     {
         base.Update(newWidget);
@@ -174,6 +224,9 @@ public abstract class RenderObjectElement<T> : RenderObjectElement where T : Ren
     }
 
 
+    /// <summary>
+    /// 現在のWidgetの構成を管理対象のRenderObjectへ反映し、再構築が必要な状態を解除します。
+    /// </summary>
     public override void PerformRebuild()
     {
         WidgetCascaded?.UpdateRenderObject(RenderObject as T);

@@ -21,6 +21,11 @@ public sealed unsafe class GLFWRawPointerSource : IRawPointerSource
     /// <inheritdoc />
     public event Action<RawPointerEvent>? OnPointerEvent;
 
+    /// <summary>
+    /// 指定した GLFW ウィンドウへマウスコールバックを登録します。
+    /// </summary>
+    /// <param name="handle">入力を監視する GLFW ウィンドウのネイティブハンドル。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="handle"/> が null の場合にスローされます。</exception>
     public GLFWRawPointerSource(Window* handle)
     {
         if (handle is null)
@@ -70,6 +75,9 @@ public sealed unsafe class GLFWRawPointerSource : IRawPointerSource
         _ => null,
     };
 
+    /// <summary>
+    /// GLFW ウィンドウから登録済みのマウスコールバックを解除します。
+    /// </summary>
     public void Dispose()
     {
         GLFW.SetCursorEnterCallback(_handle, null);

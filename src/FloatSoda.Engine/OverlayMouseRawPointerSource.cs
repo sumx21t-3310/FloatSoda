@@ -22,6 +22,9 @@ public sealed class OverlayMouseRawPointerSource : IRawPointerSource
     /// <inheritdoc />
     public event Action<RawPointerEvent>? OnPointerEvent;
 
+    /// <summary>
+    /// 指定したイベントディスパッチャへ OpenVR のマウスイベントハンドラーを登録します。
+    /// </summary>
     /// <param name="dispatcher">対象オーバーレイのイベントディスパッチャ。</param>
     public OverlayMouseRawPointerSource(VREventDispatcher dispatcher)
     {
@@ -76,6 +79,9 @@ public sealed class OverlayMouseRawPointerSource : IRawPointerSource
         _ => null,
     };
 
+    /// <summary>
+    /// イベントディスパッチャから登録済みの OpenVR マウスイベントハンドラーを解除します。
+    /// </summary>
     public void Dispose()
     {
         _dispatcher.Unregister(EVREventType.VREvent_FocusEnter, OnFocusEnter);
