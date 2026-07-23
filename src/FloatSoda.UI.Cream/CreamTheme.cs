@@ -19,5 +19,6 @@ public record CreamTheme : InheritedWidget
     public static CreamTheme? Of(IBuildContext context) =>
         context.DependOnInheritedWidgetOfExactType<CreamTheme>();
 
+    /// <inheritdoc/>
     public override bool UpdateShouldNotify(InheritedWidget oldWidget) => !Equals(oldWidget, this);
 }

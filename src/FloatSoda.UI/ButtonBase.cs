@@ -19,11 +19,17 @@ public record ButtonBase : StatefulWidget<ButtonBase>
     /// <summary>操作を無効化するかどうか。</summary>
     public bool IsDisabled { get; init; }
 
+    /// <inheritdoc/>
     public override State<ButtonBase> CreateState() => new ButtonBaseState();
 }
 
+/// <summary>
+/// <see cref="ButtonBase"/>の押下・無効化状態を管理し、<see cref="InteractionState"/>を
+/// <see cref="ButtonBase.Builder"/>へ渡して見た目を構築する状態です。
+/// </summary>
 public class ButtonBaseState : State<ButtonBase>
 {
+    /// <inheritdoc/>
     public override Widget Build(IBuildContext context)
     {
         // TODO: ジェスチャ/ヒットテスト実装後に GestureDetector を配線する
