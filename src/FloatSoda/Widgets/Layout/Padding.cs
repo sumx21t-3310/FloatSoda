@@ -115,8 +115,13 @@ public class RenderSiftedBox : RenderBox, IHasSingleChildRenderObject
 }
 
 /// <summary>
-/// 子RenderBoxの周囲に一定の余白を確保して配置するRenderObjectです。
+/// <see cref="Spacing"/>で指定した余白を保持するRenderObjectです。
 /// </summary>
+/// <remarks>
+/// レイアウト処理は未実装です。<see cref="Spacing"/>の値は保持されるのみで、
+/// 基底の<see cref="RenderSiftedBox.PerformLayout"/>実装により、
+/// レイアウト時に<see cref="NotImplementedException"/>がスローされます。
+/// </remarks>
 public class RenderPadding : RenderSiftedBox
 {
     /// <summary>子RenderBoxの周囲に適用する余白を取得します。</summary>
