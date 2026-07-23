@@ -38,8 +38,21 @@ public abstract record WindowWidget : InheritedWidget
         context.DependOnInheritedWidgetOfExactType<WindowWidget>() ??
         throw new InvalidOperationException("WindowWidgetが祖先に見つかりません。");
 
+    /// <summary>
+    /// ウィンドウ設定が更新前から変化したかを判定します。
+    /// </summary>
+    /// <param name="oldWidget">更新前に同じElementが保持していたウィンドウウィジェット。</param>
+    /// <returns>レコードとして等しくない場合は<see langword="true"/>。等しい場合は<see langword="false"/>。</returns>
+    /// <remarks>
+    /// <see langword="true"/>を返すと、このウィンドウ設定に依存するElementへ再構築を要求します。
+    /// </remarks>
     public override bool UpdateShouldNotify(InheritedWidget oldWidget) => !Equals(oldWidget, this);
 
+    /// <summary>
+    /// ウィンドウ設定の共有とルート描画領域へのサイズ反映を管理するElementを生成します。
+    /// </summary>
+    /// <returns>このウィンドウウィジェットを保持する未マウントのElement。</returns>
+    /// <seealso cref="WindowElement"/>
     public override Element CreateElement() => new WindowElement { Widget = this };
 }
 

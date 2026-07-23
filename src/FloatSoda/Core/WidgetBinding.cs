@@ -14,8 +14,13 @@ using OverlayWindow = FloatSoda.Engine.OverlayWindow;
 
 namespace FloatSoda.Core;
 
+/// <summary>1つのウィンドウについてWidgetの再構築、レイアウト、描画、入力処理をフレーム単位で調整します。</summary>
+/// <remarks>再構築またはRenderObjectのDirty通知で視覚更新を予約し、次のフレームで必要な処理だけを実行します。</remarks>
+/// <seealso cref="RenderPipeline"/>
+/// <seealso cref="BuildOwner"/>
 public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 {
+    /// <summary>フレーム予約とジェスチャ処理をこのウィンドウへ関連付けたバインディングを初期化します。</summary>
     public WidgetBinding()
     {
         BuildOwner = new BuildOwner(EnsureVisualUpdate) { FrameScheduler = this, GestureBinding = this };
@@ -29,19 +34,29 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 
     private RenderPipeline? Pipeline { get; set; }
     private BuildOwner BuildOwner { get; set; }
+    /// <summary>ウィンドウのWidgetツリーをRenderViewへ接続するルートElementを取得します。</summary>
+    /// <value>ルートWidgetが接続される前は<see langword="null"/>です。</value>
     public Element? RenderViewElement { get; private set; }
     private RenderThreadRunner? RenderThreadRunner { get; set; }
     private IEngineWindow? Window { get; set; }
+    /// <summary>描画ウィンドウとパイプラインの初期化が開始済みかを取得します。</summary>
     public bool Initialized { get; private set; }
+    /// <summary>次のフレームでレイアウトまたは描画を処理する必要があるかを取得します。</summary>
+    /// <remarks><see cref="EnsureVisualUpdate"/>で設定され、<see cref="DrawFrame"/>が更新処理を開始すると解除されます。</remarks>
     public bool NeedsVisualUpdate { get; private set; }
 
+    /// <summary>このバインディングが管理するウィンドウ名を取得します。</summary>
+    /// <value>初期化前は<see langword="null"/>です。</value>
     public string? WindowName { get; private set; }
 
+    /// <summary>直近のレイアウトで確定したウィンドウのピクセル単位の大きさを取得します。</summary>
+    /// <value>パイプラインの初期化前は空のサイズです。</value>
     public SKSizeI Size => Pipeline?.RenderView.Size.ToSizeI() ?? SKSizeI.Empty;
 
     /// <summary>直近でレンダースレッドへ通知したオーバーレイサイズ。変化検知に使用する。</summary>
     private SKSizeI _lastPostedSize = SKSizeI.Empty;
 
+    /// <summary>直近に発行したフレームコールバック識別子を取得します。初期値は0です。</summary>
     public int NextFrameCallbackId { get; private set; } = 0;
 
     private readonly Dictionary<int, Action<TimeSpan>> _transientCallbacks = [];
@@ -52,6 +67,12 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 
     private bool _hasScheduledFrame;
 
+    /// <summary>このバインディングの描画パイプラインとエンジンウィンドウを初回だけ初期化します。</summary>
+    /// <param name="windowName">作成するウィンドウの識別名。</param>
+    /// <param name="renderThreadRunner">ウィンドウ作成と描画処理を実行するレンダースレッド。</param>
+    /// <param name="windowFactory">初期化済みレンダラーからエンジンウィンドウを作成する処理。</param>
+    /// <param name="visible">デスクトップウィンドウを作成時から表示する場合は<see langword="true"/>。既定値は<see langword="false"/>です。</param>
+    /// <remarks>エンジンウィンドウの作成はレンダースレッドへ予約されるため、このメソッドから戻った時点では完了していない場合があります。</remarks>
     public void EnsureInitialized(string windowName, RenderThreadRunner renderThreadRunner,
         Func<Renderer, IEngineWindow> windowFactory, bool visible = false)
     {
@@ -82,6 +103,8 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         Pipeline.RenderView.PrepareInitialFrame();
     }
 
+    /// <summary>次のフレームで視覚更新が必要であることを記録します。</summary>
+    /// <remarks>DirtyなElementまたはRenderObjectから呼び出され、<see cref="DrawFrame"/>による再構築、レイアウト、描画の実行を予約します。</remarks>
     public void EnsureVisualUpdate() => NeedsVisualUpdate = true;
 
     /// <summary>
@@ -98,6 +121,9 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         RenderThreadRunner?.PostTask(transform.Apply);
     }
 
+    /// <summary>指定されたWidgetをこのウィンドウのRenderViewへルートとして接続します。</summary>
+    /// <param name="rootWidget">接続または更新するルートWidget。</param>
+    /// <remarks>初回接続では視覚更新を予約します。接続済みの場合は既存Elementを再利用して更新します。</remarks>
     public void AttachRootWidget(Widget rootWidget)
     {
         var isBootStrapFrame = RenderViewElement == null;
@@ -121,6 +147,8 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     /// </summary>
     public void Reassemble() => RenderViewElement?.Reassemble();
 
+    /// <summary>予約済みのWidget再構築と視覚更新を処理し、完成したレイヤーをレンダースレッドへ送ります。</summary>
+    /// <remarks>Elementの再構築は毎フレーム確認します。<see cref="NeedsVisualUpdate"/>が未設定の場合、またはウィンドウ作成前の場合はレイアウトと描画を行いません。</remarks>
     public void DrawFrame()
     {
         if (RenderViewElement != null)
@@ -159,6 +187,9 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         RenderThreadRunner?.PostTask(() => window.Resize(newSize));
     }
 
+    /// <summary>1フレーム分の入力、コールバック、および描画処理を実行します。</summary>
+    /// <param name="elapsedTime">アプリケーション開始からの単調な経過時間。</param>
+    /// <remarks>未初期化の場合は何も行いません。登録済みの一時コールバックはこのフレームで一度だけ実行されます。</remarks>
     public void BeginFrame(TimeSpan elapsedTime)
     {
         if (!Initialized) return;
@@ -175,6 +206,7 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         DrawFrame();
     }
 
+    /// <inheritdoc />
     public int ScheduleFrameCallback(Action<TimeSpan> callback)
     {
         ScheduleFrame();
@@ -186,8 +218,11 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         return NextFrameCallbackId;
     }
 
+    /// <inheritdoc />
     public void CancelFrameCallback(int id) => _transientCallbacks.Remove(id);
 
+    /// <summary>次のフレーム処理が必要であることを記録します。</summary>
+    /// <remarks>同一フレーム内で複数回呼び出しても予約状態は1件にまとめられ、<see cref="BeginFrame"/>の開始時に解除されます。</remarks>
     public void ScheduleFrame()
     {
         if (_hasScheduledFrame) return;
