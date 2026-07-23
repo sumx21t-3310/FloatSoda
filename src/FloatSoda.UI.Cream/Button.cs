@@ -23,6 +23,7 @@ public record Button : StatelessWidget
     /// <summary>見た目のスタイル。未指定なら祖先の <see cref="CreamTheme"/>、それも無ければ既定値。</summary>
     public ButtonStyle? Style { get; init; }
 
+    /// <inheritdoc/>
     public override Widget Build(IBuildContext context)
     {
         return new ButtonBase

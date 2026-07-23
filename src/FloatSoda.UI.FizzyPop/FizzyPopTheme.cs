@@ -19,5 +19,6 @@ public record FizzyPopTheme : InheritedWidget
     public static FizzyPopTheme? Of(IBuildContext context) =>
         context.DependOnInheritedWidgetOfExactType<FizzyPopTheme>();
 
+    /// <inheritdoc/>
     public override bool UpdateShouldNotify(InheritedWidget oldWidget) => !Equals(oldWidget, this);
 }

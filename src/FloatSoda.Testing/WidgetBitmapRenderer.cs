@@ -14,6 +14,12 @@ public sealed class WidgetBitmapRenderer
 {
     private readonly LayerBitmapRenderer _layerRenderer = new();
 
+    /// <summary>
+    /// 指定したWidgetツリーを単独のパイプラインでビルド・レイアウト・ペイントし、結果をBitmapへ描画します。
+    /// </summary>
+    /// <param name="widget">描画対象のルートとなるWidget。<see langword="null"/>は指定できません。</param>
+    /// <param name="imageSize">出力するBitmapのピクセルサイズ。</param>
+    /// <returns>描画結果を格納したBitmap。レイヤーが生成されなかった場合は空のBitmap。</returns>
     public SKBitmap Render(Widget widget, SKSizeI imageSize)
     {
         ArgumentNullException.ThrowIfNull(widget);

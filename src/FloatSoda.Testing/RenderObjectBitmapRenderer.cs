@@ -12,6 +12,12 @@ public sealed class RenderObjectBitmapRenderer
 {
     private readonly LayerBitmapRenderer _layerRenderer = new();
 
+    /// <summary>
+    /// 指定したRenderObjectツリーを単独のパイプラインでレイアウト・ペイントし、結果をBitmapへ描画します。
+    /// </summary>
+    /// <param name="renderObject">描画対象のルートとなるRenderBox。<see langword="null"/>は指定できません。</param>
+    /// <param name="imageSize">出力するBitmapのピクセルサイズ。</param>
+    /// <returns>描画結果を格納したBitmap。レイヤーが生成されなかった場合は空のBitmap。</returns>
     public SKBitmap Render(RenderBox renderObject, SKSizeI imageSize)
     {
         ArgumentNullException.ThrowIfNull(renderObject);
