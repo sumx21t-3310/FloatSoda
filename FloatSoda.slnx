@@ -14,8 +14,8 @@
     <Folder Name="/samples/">
         <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
         <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
-        <Project Path="samples/FloatSoda.Samples.PrimitiveOverlay/FloatSoda.Samples.PrimitiveOverlay.csproj" />
         <Project Path="samples/FloatSoda.Samples.PointerRegion/FloatSoda.Samples.PointerRegion.csproj" />
+        <Project Path="samples/FloatSoda.Samples.PrimitiveOverlay/FloatSoda.Samples.PrimitiveOverlay.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/FloatSoda.Rendering.Test/FloatSoda.Rendering.Test.csproj" />
