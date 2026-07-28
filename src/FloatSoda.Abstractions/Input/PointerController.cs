@@ -53,7 +53,7 @@ public class PointerController : IDisposable
                 SendPointerEvent(PointerEventPhase.Add, rawEvent.Position);
                 break;
             case RawPointerKind.Leave:
-                SendPointerEvent(PointerEventPhase.Remove, rawEvent.Position);
+                OnPointerLeft(rawEvent.Position);
                 break;
             case RawPointerKind.Move:
                 OnPointerMoved(rawEvent.Position);
@@ -70,17 +70,30 @@ public class PointerController : IDisposable
 
     private void OnPointerMoved(Offset position)
     {
-        if (!_buttonPressed && !_pointerCurrentlyDown) return;
-
         var phase = (_buttonPressed, _pointerCurrentlyDown) switch
         {
             (true, true) => PointerEventPhase.Move,
             (true, false) => PointerEventPhase.Down,
             (false, true) => PointerEventPhase.Up,
-            _ => throw new UnreachableException()
+            (false, false) => PointerEventPhase.Move,
         };
 
         SendPointerEvent(phase, position);
+    }
+
+    private void OnPointerLeft(Offset position)
+    {
+        if (_pointerCurrentlyDown)
+        {
+            SendPointerEvent(PointerEventPhase.Cancel, position);
+        }
+
+        if (_pointerCurrentlyAdded)
+        {
+            SendPointerEvent(PointerEventPhase.Remove, position);
+        }
+
+        _buttonPressed = false;
     }
 
     private void OnPointerButton(RawPointerEvent rawEvent)
@@ -127,13 +140,17 @@ public class PointerController : IDisposable
                 break;
             case PointerEventPhase.Remove:
                 _pointerCurrentlyAdded = false;
+                _pointerCurrentlyDown = false;
                 break;
             case PointerEventPhase.Down:
                 _pointerCurrentlyDown = true;
                 break;
             case PointerEventPhase.Up:
+            case PointerEventPhase.Cancel:
                 _pointerCurrentlyDown = false;
                 break;
+            case PointerEventPhase.Enter:
+            case PointerEventPhase.Exit:
             case PointerEventPhase.Move:
             default:
                 break;

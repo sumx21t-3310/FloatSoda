@@ -75,4 +75,24 @@ public class GestureArenaTest
         Assert.Equal(1, quitter.Rejected);
         Assert.Equal(1, survivor.Accepted);
     }
+
+    [Fact]
+    public void Cancel_RejectsAllMembers_AndRemovesArena()
+    {
+        var arena = new GestureArenaManager();
+        var first = new FakeMember();
+        var second = new FakeMember();
+
+        arena.Add(1, first);
+        arena.Add(1, second);
+        arena.Close(1);
+
+        arena.Cancel(1);
+        arena.Sweep(1);
+
+        Assert.Equal(1, first.Rejected);
+        Assert.Equal(1, second.Rejected);
+        Assert.Equal(0, first.Accepted);
+        Assert.Equal(0, second.Accepted);
+    }
 }

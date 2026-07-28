@@ -126,6 +126,18 @@ public sealed class GestureArenaManager
         }
     }
 
+    /// <summary>ポインター列を中断し、残っているすべてのメンバーを敗北として通知します。</summary>
+    /// <param name="pointer">中断するポインター識別子。</param>
+    internal void Cancel(int pointer)
+    {
+        if (!_arenas.Remove(pointer, out var state)) return;
+
+        foreach (var member in state.Members)
+        {
+            member.RejectGesture(pointer);
+        }
+    }
+
     /// <summary>メンバーからの勝敗宣言を処理する。</summary>
     /// <param name="pointer">宣言対象のポインター識別子。</param>
     /// <param name="member">勝敗を宣言するメンバー。</param>

@@ -17,6 +17,15 @@ public class RenderPointerListener : RenderProxyBox
     /// <summary>ポインターが移動したときに呼び出すコールバックを取得または設定します。</summary>
     public Action<PointerEvent>? OnPointerMove { get; set; }
 
+    /// <summary>ポインターがヒット領域へ入ったときに呼び出すコールバックを取得または設定します。</summary>
+    public Action<PointerEvent>? OnPointerEnter { get; set; }
+
+    /// <summary>ポインターがヒット領域から出たときに呼び出すコールバックを取得または設定します。</summary>
+    public Action<PointerEvent>? OnPointerExit { get; set; }
+
+    /// <summary>押下中のポインター列が中断されたときに呼び出すコールバックを取得または設定します。</summary>
+    public Action<PointerEvent>? OnPointerCancel { get; set; }
+
     /// <summary>ヒットテストでの振る舞い。空白領域を掴めるか／背後へ通すかを決める。</summary>
     public HitTestBehaviour Behaviour { get; set; } = HitTestBehaviour.DeferToChild;
 
@@ -59,6 +68,9 @@ public class RenderPointerListener : RenderProxyBox
             PointerEventPhase.Down => OnPointerDown,
             PointerEventPhase.Move => OnPointerMove,
             PointerEventPhase.Up => OnPointerUp,
+            PointerEventPhase.Enter => OnPointerEnter,
+            PointerEventPhase.Exit => OnPointerExit,
+            PointerEventPhase.Cancel => OnPointerCancel,
             _ => null,
         };
 

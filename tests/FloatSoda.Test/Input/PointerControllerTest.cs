@@ -75,7 +75,7 @@ public class PointerControllerTest
     }
 
     [Fact]
-    public void MoveWithoutPress_IsSuppressed()
+    public void MoveWithoutPress_EmitsHoverMove()
     {
         var (source, controller, events) = Build();
 
@@ -83,7 +83,30 @@ public class PointerControllerTest
         source.Raise(new RawPointerEvent(RawPointerKind.Move, new Offset(10, 10)));
         controller.Flush();
 
-        Assert.Equal([PointerEventPhase.Add], events.Select(e => e.Phase));
+        Assert.Equal(
+            [PointerEventPhase.Add, PointerEventPhase.Move],
+            events.Select(e => e.Phase));
+    }
+
+    [Fact]
+    public void LeaveWhileDown_EmitsCancelThenRemove_AndSuppressesLaterUp()
+    {
+        var (source, controller, events) = Build();
+
+        source.Raise(new RawPointerEvent(RawPointerKind.Enter, new Offset(10, 20)));
+        source.Raise(new RawPointerEvent(RawPointerKind.ButtonDown, new Offset(10, 20)));
+        source.Raise(new RawPointerEvent(RawPointerKind.Leave, new Offset(30, 40)));
+        source.Raise(new RawPointerEvent(RawPointerKind.ButtonUp, new Offset(30, 40)));
+        controller.Flush();
+
+        Assert.Equal(
+            [
+                PointerEventPhase.Add,
+                PointerEventPhase.Down,
+                PointerEventPhase.Cancel,
+                PointerEventPhase.Remove,
+            ],
+            events.Select(e => e.Phase));
     }
 
     [Fact]

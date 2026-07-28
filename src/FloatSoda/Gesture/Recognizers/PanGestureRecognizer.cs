@@ -79,6 +79,10 @@ public sealed class PanGestureRecognizer : GestureRecognizer
                     StopTrackingPointer(pointerEvent.PointerId);
                 }
                 break;
+
+            case PointerEventPhase.Cancel:
+                StopTrackingPointer(pointerEvent.PointerId);
+                break;
         }
     }
 
