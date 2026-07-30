@@ -4,7 +4,7 @@
 
 > **実装状況:**
 > - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **未実装:** `Padding`, `Container`, `ListView`, `GridView`, `SingleChildScrollView`, `Opacity` は `internal` で、公開 API から除外されています。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
+> - **未実装:** `Padding`, `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
 ## 三ツリーの役割
@@ -136,7 +136,7 @@ public override Widget Build(IBuildContext context)
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
 | `Padding` | ✗ `internal` スタブ | 子に余白を追加(`RenderSiftedBox.PerformLayout` 未実装) | `Spacing` (`EdgeInsets`), `Child` |
-| `Container` | ✗ `internal` スタブ | パディング・色・サイズなどを一括指定 | — |
+| `Container` | ✓ | 配置・装飾・サイズ・変換を既存ウィジェットで合成。Padding は #192 取り込み後に対応 | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
 | `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
 | `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
@@ -145,13 +145,15 @@ public override Widget Build(IBuildContext context)
 
 | ウィジェット | 実装状況 | 説明 | 主なプロパティ |
 |---|---|---|---|
-| `ColoredBox` | ✓ | 単色背景 | `Color` (`SKColor`), `Child` |
+| `ColoredBox` | ✓ | 単色背景 | `Color` (`Color`), `Child` |
+| `DecoratedBox` | ✓ | `BoxDecoration` の背景色・角丸・ボーダーを子の前面または背面へ描画 | `Decoration`, `Position`, `Child` |
 | `Image` (Paint) | ✓ | `ImageProvider` 経由で画像を表示 | `ImageProvider`, `Child` |
 | `ClipRect` | ✓ | 矩形クリップ | `Clipper`, `ClipBehavior`, `Child` |
 | `ClipRoundRect` | ✓ | 角丸矩形クリップ | `BorderRadius`, `Clipper`, `ClipBehavior`, `Child` |
 | `ClipOval` | ✓ | 楕円クリップ | `CustomClipper`, `ClipBehavior`, `Child` |
 | `ClipCustomPath` | ✓ | カスタムパスクリップ | `Clipper`, `ClipBehavior`, `Child` |
-| `Opacity` | ✗ `internal` スタブ | 透明度を適用 | `Child` |
+| `Opacity` | ✓ | 0から1までの固定不透明度を合成レイヤーで適用 | `Value`, `Child` |
+| `Transform` | ✓ | レイアウト後に `Matrix3x2` の2次元変換を適用 | `Matrix`, `Origin`, `Alignment`, `TransformHitTests`, `Child` |
 
 ### Animation
 
