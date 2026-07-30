@@ -49,8 +49,37 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 
 ```bash
 # 特定のテストのみ実行する例
-dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.TopLeft"
+dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.ComputeOffset"
 ```
+
+### テストの命名
+
+テストメソッド名は **`対象メンバー名_条件_期待結果`** の形式で、条件と期待結果を**日本語**で書きます。クラス名とメンバー名の部分は英語のままにします。
+
+```csharp
+[Fact]
+public void ComputeOffset_親子が同サイズ_原点を返す() { ... }
+
+[Fact]
+public void BorderSide_Widthが負_ArgumentOutOfRangeExceptionを投げる() { ... }
+
+[Theory]
+[MemberData(nameof(PresetData))]
+public void Preset_各プリセット_XYが仕様どおり(Alignment alignment, float x, float y) { ... }
+```
+
+| 要素 | 言語 | 理由 |
+|---|---|---|
+| テストクラス名(`DecoratedBoxTest`) | 英語 | テスト対象の型名のミラー。ファイル名と `--filter` に揃える |
+| メソッド名の先頭(対象メンバー名) | 英語 | API をリネームするとき「この API のテストはどこか」を grep で辿れるようにする |
+| 条件・期待結果 | 日本語 | `SameSize_ReturnsZero` のような英語圧縮では仕様の粒度が落ちる。日本語なら同じ長さで正確に書ける |
+| ヘルパーメソッド・ローカル変数 | 英語 | 通常のコーディング規約に従う |
+
+補足:
+
+- `[Fact(DisplayName = "…")]` は**使いません**。メソッド名と説明の二重管理になり、片方だけ更新される事故を招くためです。
+- 既存テストの一括リネームはしません。新規テストから適用し、既存は別の理由で触るついでに寄せてください。
+- この方針は「ニュートラル = 日本語」という設計判断([docs/Localization.md](docs/Localization.md))の一部です。
 
 ---
 
