@@ -49,7 +49,7 @@ dotnet test tests/FloatSoda.Test
 dotnet test tests/FloatSoda.Rendering.Test
 
 # Run a specific test by name
-dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.TopLeft"
+dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.ComputeOffset"
 ```
 
 Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widgets. `FloatSoda.Rendering.Test` tests the Layer tree.
