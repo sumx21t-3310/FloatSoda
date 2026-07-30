@@ -55,7 +55,7 @@ public abstract class GestureRecognizer : IGestureArenaMember, IDisposable
     /// <param name="downEvent">受理したDownフェーズのポインターイベント。</param>
     protected abstract void AddAllowedPointer(PointerEvent downEvent);
 
-    /// <summary>ルータ経由で届く後続イベント（Down/Move/Up）を処理する。</summary>
+    /// <summary>ルータ経由で届く後続イベント（Down/Move/Up/Cancel）を処理する。</summary>
     /// <param name="pointerEvent">処理するポインターイベント。</param>
     protected abstract void HandleEvent(PointerEvent pointerEvent);
 

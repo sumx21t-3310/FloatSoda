@@ -37,6 +37,13 @@ public class GestureRecognizerTest
             Router.Route(new PointerEvent(pointer, PointerEventPhase.Up, position));
             Arena.Sweep(pointer);
         }
+
+        public void Cancel(Offset position, int pointer = 1)
+        {
+            Router.Route(new PointerEvent(pointer, PointerEventPhase.Cancel, position));
+            Arena.Cancel(pointer);
+            Router.Clear(pointer);
+        }
     }
 
     [Fact]
@@ -108,5 +115,21 @@ public class GestureRecognizerTest
 
         Assert.Equal(1, tapped);
         Assert.Equal(0, panStarted);
+    }
+
+    [Fact]
+    public void Tap_DoesNotFire_AfterCancelAndLaterUp()
+    {
+        var harness = new Harness();
+        var tapped = 0;
+        var canceled = 0;
+        harness.Add(new TapGestureRecognizer { OnTap = () => tapped++, OnTapCancel = () => canceled++ });
+
+        harness.Down(new Offset(5, 5));
+        harness.Cancel(new Offset(50, 50));
+        harness.Up(new Offset(50, 50));
+
+        Assert.Equal(0, tapped);
+        Assert.Equal(1, canceled);
     }
 }

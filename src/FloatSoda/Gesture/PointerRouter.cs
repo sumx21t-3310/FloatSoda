@@ -3,7 +3,7 @@ using FloatSoda.Abstractions.Input;
 namespace FloatSoda.Gesture;
 
 /// <summary>
-/// ポインター識別子ごとに購読者を登録し、後続イベント（Down/Move/Up）を配送する。
+/// ポインター識別子ごとに購読者を登録し、後続イベント（Down/Move/Up/Cancel）を配送する。
 /// 最初のヒットテストは Down 位置でしか行われないため、ドラッグ中に指がウィジェット外へ
 /// 出ても認識器へイベントを届け続けるための経路を担う。Flutter の <c>PointerRouter</c> に相当。
 /// </summary>
@@ -37,6 +37,10 @@ public sealed class PointerRouter
         list.Remove(route);
         if (list.Count == 0) _routes.Remove(pointer);
     }
+
+    /// <summary>指定したポインターに登録されたすべての購読を破棄します。</summary>
+    /// <param name="pointer">購読を破棄するポインター識別子。</param>
+    internal void Clear(int pointer) => _routes.Remove(pointer);
 
     /// <summary>イベントを、そのポインターの全購読者へ配送する。</summary>
     /// <param name="pointerEvent">配送するポインターイベント。</param>

@@ -108,16 +108,29 @@ public class HitTestTest
             OnPointerDown = e => received.Add(e.Phase),
             OnPointerMove = e => received.Add(e.Phase),
             OnPointerUp = e => received.Add(e.Phase),
+            OnPointerEnter = e => received.Add(e.Phase),
+            OnPointerExit = e => received.Add(e.Phase),
+            OnPointerCancel = e => received.Add(e.Phase),
         };
         var entry = new HitTestEntry(listener);
 
         listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Down, Offset.Zero), entry);
         listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Move, Offset.Zero), entry);
         listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Up, Offset.Zero), entry);
+        listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Enter, Offset.Zero), entry);
+        listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Exit, Offset.Zero), entry);
+        listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Cancel, Offset.Zero), entry);
         listener.HandleEvent(new PointerEvent(1, PointerEventPhase.Add, Offset.Zero), entry);
 
         Assert.Equal(
-            [PointerEventPhase.Down, PointerEventPhase.Move, PointerEventPhase.Up],
+            [
+                PointerEventPhase.Down,
+                PointerEventPhase.Move,
+                PointerEventPhase.Up,
+                PointerEventPhase.Enter,
+                PointerEventPhase.Exit,
+                PointerEventPhase.Cancel,
+            ],
             received);
     }
 }

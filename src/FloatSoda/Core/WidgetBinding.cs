@@ -26,6 +26,17 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         BuildOwner = new BuildOwner(EnsureVisualUpdate) { FrameScheduler = this, GestureBinding = this };
     }
 
+    internal WidgetBinding(RenderView renderView) : this()
+    {
+        Pipeline = new RenderPipeline
+        {
+            OnNeedVisualUpdate = EnsureVisualUpdate,
+            RenderView = renderView
+        };
+
+        renderView.PrepareInitialFrame();
+    }
+
     /// <inheritdoc />
     public GestureArenaManager GestureArena { get; } = new();
 
@@ -62,6 +73,10 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     private readonly Dictionary<int, Action<TimeSpan>> _transientCallbacks = [];
 
     private readonly Dictionary<int, HitTestResult> _hitTests = [];
+
+    private readonly PointerHoverTracker _pointerHoverTracker = new();
+
+    private readonly Dictionary<int, Offset> _pointerPositions = [];
 
     private PointerController? _pointerController;
 
@@ -161,6 +176,8 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 
         Pipeline?.FlushLayout();
 
+        UpdatePointerHoverAfterLayout();
+
         // レイアウト結果サイズ = オーバーレイサイズ。変化していればレンダースレッドで GLView をリサイズする。
         // 初回生成時だけでなく、MarkNeedsLayout 起点の再レイアウト（テキスト変更やホットリロード）でも
         // FlushLayout 後にここで検知されるため、同じ経路でサイズ追従できる。
@@ -252,45 +269,102 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         _pointerController?.Flush();
     }
 
-    private void HandlePointerEvent(PointerEvent pointerEvent)
+    internal void HandlePointerEvent(PointerEvent pointerEvent)
     {
         switch (pointerEvent.Phase)
         {
+            case PointerEventPhase.Add:
+            {
+                _pointerPositions[pointerEvent.PointerId] = pointerEvent.Position;
+                _pointerHoverTracker.Update(pointerEvent, HitTest(pointerEvent.Position));
+                break;
+            }
             case PointerEventPhase.Down:
             {
-                var result = new HitTestResult();
-                HitTest(result, pointerEvent.Position);
+                _pointerPositions[pointerEvent.PointerId] = pointerEvent.Position;
+                var result = HitTest(pointerEvent.Position);
+                _pointerHoverTracker.Update(pointerEvent, result);
                 _hitTests[pointerEvent.PointerId] = result;
                 DispatchEvent(pointerEvent, result);
                 break;
             }
             case PointerEventPhase.Move:
-            case PointerEventPhase.Up:
             {
-                // Down時のヒットパスへ届け続ける（ポインタキャプチャ）。配線前にDownが起きていた場合は捨てる。
-                if (!_hitTests.TryGetValue(pointerEvent.PointerId, out var result)) return;
-                DispatchEvent(pointerEvent, result);
+                _pointerPositions[pointerEvent.PointerId] = pointerEvent.Position;
+                _pointerHoverTracker.Update(pointerEvent, HitTest(pointerEvent.Position));
 
-                if (pointerEvent.Phase == PointerEventPhase.Up)
+                // 押下中はDown時のヒットパスへ届け続ける（ポインターキャプチャ）。
+                if (_hitTests.TryGetValue(pointerEvent.PointerId, out var result))
                 {
-                    _hitTests.Remove(pointerEvent.PointerId);
+                    DispatchEvent(pointerEvent, result);
                 }
 
                 break;
             }
-            case PointerEventPhase.Add:
+            case PointerEventPhase.Up:
+            {
+                _pointerPositions[pointerEvent.PointerId] = pointerEvent.Position;
+                _pointerHoverTracker.Update(pointerEvent, HitTest(pointerEvent.Position));
+
+                // Down時のヒットパスへ届け続ける（ポインターキャプチャ）。配線前にDownが起きていた場合は捨てる。
+                if (!_hitTests.TryGetValue(pointerEvent.PointerId, out var result)) return;
+                DispatchEvent(pointerEvent, result);
+                _hitTests.Remove(pointerEvent.PointerId);
+                break;
+            }
+            case PointerEventPhase.Cancel:
+            {
+                if (_hitTests.Remove(pointerEvent.PointerId, out var result))
+                {
+                    DispatchEvent(pointerEvent, result);
+                }
+                else
+                {
+                    CancelPointerState(pointerEvent.PointerId);
+                }
+
+                break;
+            }
             case PointerEventPhase.Remove:
+                // 入力源がCancelを先に合成できなかった場合も、Removeだけで押下状態を残さない。
+                if (_hitTests.Remove(pointerEvent.PointerId, out var capturedResult))
+                {
+                    DispatchEvent(pointerEvent with { Phase = PointerEventPhase.Cancel }, capturedResult);
+                }
+
+                _pointerPositions.Remove(pointerEvent.PointerId);
+                _pointerHoverTracker.Update(pointerEvent, null);
+                break;
+            case PointerEventPhase.Enter:
+            case PointerEventPhase.Exit:
             default:
-                DispatchEvent(pointerEvent, null);
                 break;
         }
     }
 
-    private void HitTest(HitTestResult hitTestResult, Offset position)
+    internal void FlushBuildAndLayout()
     {
+        BuildOwner.BuildScope();
+        Pipeline?.FlushLayout();
+        UpdatePointerHoverAfterLayout();
+    }
+
+    private void UpdatePointerHoverAfterLayout()
+    {
+        foreach (var (pointerId, position) in _pointerPositions)
+        {
+            var pointerEvent = new PointerEvent(pointerId, PointerEventPhase.Move, position);
+            _pointerHoverTracker.Update(pointerEvent, HitTest(position));
+        }
+    }
+
+    private HitTestResult HitTest(Offset position)
+    {
+        var hitTestResult = new HitTestResult();
         Pipeline?.RenderView.HitTest(hitTestResult, position);
         
         hitTestResult.Add(new HitTestEntry(this));
+        return hitTestResult;
     }
     
     /// <summary>
@@ -316,7 +390,16 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
             case PointerEventPhase.Up:
                 GestureArena.Sweep(pointerEvent.PointerId);
                 break;
+            case PointerEventPhase.Cancel:
+                CancelPointerState(pointerEvent.PointerId);
+                break;
         }
+    }
+
+    private void CancelPointerState(int pointerId)
+    {
+        GestureArena.Cancel(pointerId);
+        PointerRouter.Clear(pointerId);
     }
 
     private void DispatchEvent(PointerEvent pointerEvent, HitTestResult? hitTestResult)
@@ -329,7 +412,7 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 
         foreach (var entry in hitTestResult.Path)
         {
-            entry.Target.HandleEvent(pointerEvent, entry);
+            entry.Target.HandleEvent(pointerEvent with { Transform = entry.Transform }, entry);
         }
     }
 }

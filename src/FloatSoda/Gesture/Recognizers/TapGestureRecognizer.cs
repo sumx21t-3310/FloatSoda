@@ -68,6 +68,10 @@ public sealed class TapGestureRecognizer : GestureRecognizer
                 Resolve(pointerEvent.PointerId, GestureDisposition.Accepted);
                 CheckFire(pointerEvent.PointerId);
                 break;
+
+            case PointerEventPhase.Cancel:
+                Cancel(pointerEvent.PointerId);
+                break;
         }
     }
 
