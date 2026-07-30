@@ -1,10 +1,24 @@
 # AGENTS.md
 
-This file provides guidance to coding agents (Codex etc.) when working with code in this repository.
+This file provides guidance to coding agents — Codex, Claude Code (claude.ai/code), and others — when working with code in this repository.
+
+> **This file is the single source of project instructions for every agent.** Codex and other AGENTS.md-aware tools read it directly; Claude Code reads it through a one-line `@AGENTS.md` import in `CLAUDE.md`. Put project instructions here, never in `CLAUDE.md` — anything added there is invisible to every other agent.
 
 ## Working Style
 
 The repository owner develops hands-on and tracks the implementation themselves. By default, **investigate and explain — do not modify code.** When asked about a bug or behavior, report the root cause, the relevant files/lines, and (optionally) how a fix would look, but leave the actual implementation to the owner unless they explicitly ask you to make the change.
+
+## Output Language
+
+**Write all output to the repository owner in Japanese.** This is a hard requirement, not a preference.
+
+- **Code review** — findings, severity reasoning, and suggested fixes are written in Japanese, even though the code and identifiers under review are English.
+- **Investigation reports** — root cause, affected files/lines, and how a fix would look.
+- **Commit messages and PR titles/bodies.**
+
+Do not translate identifiers, type names, file paths, or code fences — those stay verbatim as they appear in the source.
+
+Rationale: FloatSoda treats **Japanese as the neutral (default) language** — see `docs/Localization.md`. `docs/`, XML doc comments, and exception messages are all Japanese by design. Review output in Japanese keeps the entire surface consistent for the owner and for the LLMs that relay it to end users. If you feel English "should" be the default here, read `docs/Localization.md` before changing anything.
 
 ## Project Overview
 
@@ -39,6 +53,20 @@ dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~AlignmentTest.TopL
 ```
 
 Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widgets. `FloatSoda.Rendering.Test` tests the Layer tree.
+
+### Test naming
+
+Test method names follow **`MemberName_条件_期待結果`**: the leading member name stays English, the condition and expected result are written in **Japanese**. Test class names stay English (they mirror the type under test).
+
+```csharp
+[Fact]
+public void ComputeOffset_親子が同サイズ_原点を返す() { ... }
+
+[Fact]
+public void BorderSide_Widthが負_ArgumentOutOfRangeExceptionを投げる() { ... }
+```
+
+Do not use `[Fact(DisplayName = "…")]` — it duplicates the intent and drifts. Do not bulk-rename existing tests; apply this to new tests only. Full rules: `CONTRIBUTING.md`.
 
 ## Project Structure
 
