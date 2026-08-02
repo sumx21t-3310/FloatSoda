@@ -1,35 +1,39 @@
-﻿using FloatSoda.Abstractions.Geometries;
-using FloatSoda.Abstractions.Input;
-using FloatSoda.Gesture;
-using FloatSoda.RenderObjects;
-using SkiaSharp;
+using FloatSoda.RenderObjects.Painting;
 
 namespace FloatSoda.Widgets.Paint;
 
-internal record Opacity : SingleChildRenderObjectWidget<RenderOpacity>
+/// <summary>
+/// 子要素を指定した不透明度で合成します。
+/// </summary>
+/// <remarks>
+/// 値が0または1の場合は中間レイヤーを作成しない高速経路を使用します。
+/// </remarks>
+/// <seealso cref="RenderOpacity"/>
+public record Opacity : SingleChildRenderObjectWidget<RenderOpacity>
 {
-    public override RenderOpacity CreateRenderObject()
+    /// <summary>
+    /// 子要素へ適用する0から1までの不透明度を取得します。
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// 値が0から1の範囲外、または有限値ではありません。
+    /// </exception>
+    public double Value
     {
-        throw new NotImplementedException();
-    }
-}
+        get;
+        init
+        {
+            if (!double.IsFinite(value) || value is < 0 or > 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "不透明度には0から1までの有限値を指定してください。");
+            }
 
-internal class RenderOpacity : RenderObject
-{
-    public override SKSize Size { get; protected set; }
+            field = value;
+        }
+    } = 1;
 
-    public override void PerformLayout()
-    {
-        throw new NotImplementedException();
-    }
+    /// <inheritdoc/>
+    public override RenderOpacity CreateRenderObject() => new() { Opacity = Value };
 
-    public override void Paint(PaintingContext context, Offset offset)
-    {
-        throw new NotImplementedException();
-    }
-
-    public override void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry)
-    {
-        throw new NotImplementedException();
-    }
+    /// <inheritdoc/>
+    public override void UpdateRenderObject(RenderOpacity renderObject) => renderObject.Opacity = Value;
 }
