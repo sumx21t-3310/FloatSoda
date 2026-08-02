@@ -19,6 +19,23 @@ public abstract class RenderObjectElement : Element
     {
         _ancestorRenderObjectElement = FindAncestorRenderObjectElement();
         _ancestorRenderObjectElement?.InsertRenderObjectChild(RenderObject);
+        ApplyParentData();
+    }
+
+    private void ApplyParentData()
+    {
+        if (RenderObject is not { } renderObject) return;
+
+        var ancestor = Parent;
+        while (ancestor is not null && ancestor != _ancestorRenderObjectElement)
+        {
+            if (ancestor is IParentDataElement parentDataElement)
+            {
+                parentDataElement.ApplyParentData(renderObject);
+            }
+
+            ancestor = ancestor.Parent;
+        }
     }
 
 
