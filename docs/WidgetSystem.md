@@ -147,12 +147,26 @@ public override Widget Build(IBuildContext context)
 | `Row` | ✓ | 水平方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
-| `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
+| `ConstrainedBox` | ✓ | 親の制約と交差する追加制約を子へ適用 | `AdditionalConstraints` (`BoxConstraints`, 必須), `Child` |
 | `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
 | `Container` | ✓ | 配置・装飾・サイズ・変換を既存ウィジェットで合成。`Padding` の合成は未対応(→ [#196](https://github.com/sumx21t-3310/FloatSoda/issues/196)) | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
 | `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
 | `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
+
+`ConstrainedBox` は、親から渡される制約を無視せず、その範囲内で追加の最小・最大サイズを子へ適用します。
+
+```csharp
+Widget panel = new ConstrainedBox
+{
+    AdditionalConstraints = new BoxConstraints(
+        MinWidth: 240,
+        MaxWidth: 400,
+        MinHeight: 120,
+        MaxHeight: 240),
+    Child = new SizedBox { Width = 320, Height = 180 }
+};
+```
 
 ### Painting
 
