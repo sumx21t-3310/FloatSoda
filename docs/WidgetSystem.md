@@ -4,7 +4,7 @@
 
 > **実装状況:**
 > - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **未実装:** `Padding`, `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
+> - **未実装:** `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Padding`, `Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
 ## 三ツリーの役割
@@ -148,8 +148,8 @@ public override Widget Build(IBuildContext context)
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
-| `Padding` | ✗ `internal` スタブ | 子に余白を追加(`RenderSiftedBox.PerformLayout` 未実装) | `Spacing` (`EdgeInsets`), `Child` |
-| `Container` | ✓ | 配置・装飾・サイズ・変換を既存ウィジェットで合成。Padding は #192 取り込み後に対応 | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
+| `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
+| `Container` | ✓ | 配置・装飾・サイズ・変換を既存ウィジェットで合成。`Padding` の合成は未対応(→ [#196](https://github.com/sumx21t-3310/FloatSoda/issues/196)) | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
 | `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
 | `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
