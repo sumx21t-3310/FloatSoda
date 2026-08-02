@@ -180,8 +180,28 @@ public override Widget Build(IBuildContext context)
 
 | ウィジェット | 実装状況 | 説明 | 主なプロパティ |
 |---|---|---|---|
-| `RichText` | ✓ | スタイル付きテキスト(Topten.RichTextKit) | `Text` (`TextSpan`) |
-| `Text` | ✓ | プレーンテキスト表示(`RichText` に委譲) | `Data` (string) |
+| `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
+| `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
+
+`Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。`Style` を省略すると、フォントサイズ30、Arial、黒、ウェイト400の既定書式を使用します。空文字列は有効です。
+
+```csharp
+using FloatSoda.Geometrics;
+using FloatSoda.Painting;
+using FloatSoda.Widgets.Components;
+
+new Text("Hello, VR!")
+{
+    Style = new TextStyle
+    {
+        FontSize = 36,
+        Color = new Color(255, 255, 255),
+        FontFamily = "Arial",
+        FontWeight = 700,
+        IsItalic = false
+    }
+}
+```
 
 `Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` にあります。詳細は [UILayering](UILayering.md) を参照してください。
 

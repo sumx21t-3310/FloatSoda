@@ -1,12 +1,12 @@
 ﻿using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
-using Topten.RichTextKit;
 
 
 namespace FloatSoda.Samples.OverlayApp;
@@ -49,9 +49,9 @@ public class WatchState : State<WatchWidget>
                             {
                                 Text = new TextSpan(_time)
                                 {
-                                    Style = new Style
+                                    Style = new TextStyle
                                     {
-                                        TextColor = SKColor.FromHsv(0, 0, 10),
+                                        Color = SKColor.FromHsv(0, 0, 10),
                                         FontSize = 100
                                     }
                                 }

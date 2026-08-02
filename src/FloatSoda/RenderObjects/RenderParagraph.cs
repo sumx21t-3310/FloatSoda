@@ -1,5 +1,6 @@
 ﻿using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
+using FloatSoda.Painting;
 using SkiaSharp;
 using Topten.RichTextKit;
 using HitTestResult = FloatSoda.Gesture.HitTestResult;
@@ -93,23 +94,46 @@ public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
 /// <summary>
 /// 文字列とその書式を表すテキスト範囲です。
 /// </summary>
-/// <param name="Text">この範囲に含める文字列。</param>
-public record TextSpan(string Text)
+public record TextSpan
 {
+    /// <summary>
+    /// 指定した文字列を含むテキスト範囲を初期化します。
+    /// </summary>
+    /// <param name="text">この範囲に含める文字列。空文字列も指定できます。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="text"/>が<see langword="null"/>です。</exception>
+    public TextSpan(string text)
+    {
+        ArgumentNullException.ThrowIfNull(text);
+        Text = text;
+    }
+
+    /// <summary>この範囲に含める文字列を取得します。</summary>
+    /// <exception cref="ArgumentNullException">値が<see langword="null"/>です。</exception>
+    public string Text
+    {
+        get;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value, nameof(Text));
+            field = value;
+        }
+    }
+
     /// <summary>
     /// この範囲へ適用する書式を取得します。
     /// </summary>
     /// <remarks>
     /// <c>null</c>の場合、構築時に渡された既定の書式を使用します。
     /// </remarks>
-    public Style? Style { get; init; }
+    public TextStyle? Style { get; init; }
 
     /// <summary>
     /// この範囲の文字列を書式付きテキストブロックへ追加します。
     /// </summary>
     /// <param name="textBlock">文字列を追加するテキストブロック。</param>
     /// <param name="defaultStyle"><see cref="Style"/>が<c>null</c>の場合に使用する書式。</param>
-    public void Build(TextBlock textBlock, Style defaultStyle) => textBlock.AddText(Text, Style ?? defaultStyle);
+    internal void Build(TextBlock textBlock, Style defaultStyle) =>
+        textBlock.AddText(Text, Style?.ToRichTextKitStyle() ?? defaultStyle);
 }
 
 /// <summary>

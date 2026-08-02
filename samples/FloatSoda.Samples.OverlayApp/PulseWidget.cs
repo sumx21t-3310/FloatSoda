@@ -1,6 +1,7 @@
 using FloatSoda.Animation;
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Animation;
@@ -8,7 +9,6 @@ using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
-using Topten.RichTextKit;
 
 namespace FloatSoda.Samples.OverlayApp;
 
@@ -74,9 +74,9 @@ public class PulseState : TickerProviderState<PulseWidget>
                                 {
                                     Text = new TextSpan("Pulse")
                                     {
-                                        Style = new Style
+                                        Style = new TextStyle
                                         {
-                                            TextColor = SKColors.WhiteSmoke,
+                                            Color = SKColors.WhiteSmoke,
                                             FontSize = 80
                                         }
                                     }
