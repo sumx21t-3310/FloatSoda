@@ -3,7 +3,7 @@
 # ウィジェット/エレメントシステム
 
 > **実装状況:**
-> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
+> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
 > - **未実装:** `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Padding`, `Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
@@ -111,6 +111,66 @@ public record WatchState : State<WatchWidget>
 
 ツリーの下方にコンテキスト(テーマなど)を伝播させるためのウィジェットです。`InheritedElement` が依存する子孫を追跡し、`UpdateShouldNotify(InheritedWidget oldWidget)` が `true` を返したときに依存側を再ビルド対象にします。
 
+現在位置から最も近いスコープを読み、その更新通知を購読するには、`IBuildContext.DependOnInheritedWidgetOfExactType<T>()` を使います。テーマ側に `Of(IBuildContext)` を用意すると、利用側が照会方法を毎回書かずに済みます。
+
+### Builder
+
+`Builder` は新しい `IBuildContext` を1段挟み、`ChildBuilder` で子を構築します。同じ `Build()` 内で作成した `InheritedWidget` を、その子側のコンテキストから解決したい場合に使います。
+
+```csharp
+using FloatSoda.Elements;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+
+public sealed record AlbumTheme : InheritedWidget
+{
+    public required string Title { get; init; }
+
+    public static AlbumTheme? Of(IBuildContext context) =>
+        context.DependOnInheritedWidgetOfExactType<AlbumTheme>();
+
+    public override bool UpdateShouldNotify(InheritedWidget oldWidget) =>
+        oldWidget is AlbumTheme oldTheme && oldTheme.Title != Title;
+}
+
+Widget album = new AlbumTheme
+{
+    Title = "VRChat photos",
+    Child = new Builder
+    {
+        ChildBuilder = context =>
+            new Text(AlbumTheme.Of(context)?.Title ?? "No title")
+    }
+};
+```
+
+Issue 記載時の `BuildContext` ではなく、FloatSoda の公開コンテキスト契約である `IBuildContext` を受け取ります。
+
+### KeyedSubtree
+
+`KeyedSubtree` は子の内容を変えず、ラッパーに指定した `Key` でサブツリーの同一性を制御します。同じ位置・同じキーなら子の Element / State を保持し、キーを変えるとサブツリーを差し替えます。
+
+```csharp
+new KeyedSubtree
+{
+    Key = new ValueKey<string>(albumId),
+    Child = BuildAlbum(albumId)
+};
+```
+
+### RepaintBoundary
+
+`RepaintBoundary` は子を独立した合成レイヤーへ記録します。境界内の `MarkNeedsPaint()` は `RenderRepaintBoundary` で止まり、変更されていない祖先を再描画しません。
+
+```csharp
+using FloatSoda.Widgets.Paint;
+
+new RepaintBoundary
+{
+    Child = BuildFrequentlyChangingWidget()
+};
+```
+
 ---
 
 ## Hooks(FloatSoda.Hooks)
@@ -169,6 +229,7 @@ public override Widget Build(IBuildContext context)
 | `ClipCustomPath` | ✓ | カスタムパスクリップ | `Clipper`, `ClipBehavior`, `Child` |
 | `Opacity` | ✓ | 0から1までの固定不透明度を合成レイヤーで適用 | `Value`, `Child` |
 | `Transform` | ✓ | レイアウト後に `Matrix3x2` の2次元変換を適用 | `Matrix`, `Origin`, `Alignment`, `TransformHitTests`, `Child` |
+| `RepaintBoundary` | ✓ | 子の再描画を独立した合成レイヤー内に限定 | `Child` |
 
 ### Animation
 
@@ -197,6 +258,8 @@ public override Widget Build(IBuildContext context)
 ## Key
 
 `IKey` / `ValueKey<T>` / `UniqueKey` が定義され、`Widget.Key` プロパティと差分判定に組み込まれています。`Widget.CanUpdate(old, new)` は「同じ実行時型かつ `Key` が等しい」なら既存 Element を再利用します(Flutter と同じ型 + Key 判定)。`Element.UpdateChild` は先に record 等値の高速パスで同一 Widget をスキップし、その後 `CanUpdate` で更新可否を判断します。`MultiChildRenderObjectElement` の子リスト差分でも `Key` を使って要素の同一性を追跡します(詳細は [BuildPipeline](BuildPipeline.md))。
+
+既存の子ウィジェット自体を変更せずにキーを付けたい場合は、`KeyedSubtree` の `Key` と `Child` を指定します。
 
 ---
 
