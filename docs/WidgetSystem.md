@@ -148,7 +148,7 @@ public override Widget Build(IBuildContext context)
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
-| `Padding` | ✗ `internal` スタブ | 子に余白を追加(`RenderSiftedBox.PerformLayout` 未実装) | `Spacing` (`EdgeInsets`), `Child` |
+| `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
 | `Container` | ✗ `internal` スタブ | パディング・色・サイズなどを一括指定 | — |
 | `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
 | `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
