@@ -106,6 +106,22 @@ public class PaintingContext(ContainerLayer containerLayer, SKRect estimatedBoun
         return layer;
     }
 
+    /// <summary>子の描画へ2次元変換を適用する合成レイヤーを追加します。</summary>
+    /// <param name="transform">子のローカル座標から親の座標へ変換する行列。</param>
+    /// <param name="painter">変換レイヤー内へ描画命令を記録する処理。</param>
+    /// <param name="oldLayer">再利用する既存レイヤー。新しく生成する場合は<see langword="null"/>です。</param>
+    /// <returns>描画内容を保持する変換レイヤー。</returns>
+    public TransformLayer PushTransform(
+        SKMatrix transform,
+        Action<PaintingContext, Offset> painter,
+        TransformLayer? oldLayer = null)
+    {
+        var layer = oldLayer ?? new TransformLayer();
+        layer.Transform = transform;
+        PushLayer(layer, painter, Offset.Zero);
+        return layer;
+    }
+
     /// <summary>任意形状で子の描画を切り抜く合成レイヤーを追加します。</summary>
     /// <param name="offset">親の座標系における子の描画原点。</param>
     /// <param name="bounds">子のローカル座標系における推定描画範囲。</param>
