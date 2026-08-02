@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using FloatSoda.Geometrics;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects.Painting;
@@ -15,7 +15,7 @@ public class TransformTest
     private static readonly SKSizeI Size = new(100, 100);
 
     [Fact]
-    public void TranslationMovesPaintingWithoutChangingLayout()
+    public void Transform_平行移動行列を指定_レイアウトを変えずに描画位置だけ移動する()
     {
         var widget = new SizedBox
         {
@@ -44,7 +44,7 @@ public class TransformTest
     }
 
     [Fact]
-    public void RejectsNonFiniteMatrix()
+    public void Transform_Matrixが非有限値_ArgumentOutOfRangeExceptionを投げる()
     {
         var matrix = Matrix3x2.Identity;
         matrix.M11 = float.NaN;
@@ -53,7 +53,7 @@ public class TransformTest
     }
 
     [Fact]
-    public void HitTestingUsesInverseTransformWhenEnabled()
+    public void HitTest_TransformHitTestsが有効_逆変換した座標で判定する()
     {
         var renderTransform = new RenderTransform
         {

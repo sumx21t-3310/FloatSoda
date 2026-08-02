@@ -1,4 +1,4 @@
-using System.Numerics;
+﻿using System.Numerics;
 using FloatSoda.Geometrics;
 using FloatSoda.Painting;
 using FloatSoda.Testing;
@@ -14,7 +14,7 @@ public class ContainerTest
     private static readonly SKSizeI Size = new(100, 100);
 
     [Fact]
-    public void ComposesSizeColorAndAlignment()
+    public void Container_WidthとHeightとColorとAlignmentを指定_指定サイズの色付き領域に子が配置される()
     {
         var widget = new Align
         {
@@ -42,7 +42,7 @@ public class ContainerTest
     }
 
     [Fact]
-    public void ComposesDecorationAndTransform()
+    public void Container_DecorationとTransformを指定_装飾が変換後の位置へ描画される()
     {
         var widget = new Align
         {
@@ -67,7 +67,7 @@ public class ContainerTest
     }
 
     [Fact]
-    public void RejectsColorTogetherWithDecoration()
+    public void Container_ColorとDecorationを同時に指定_InvalidOperationExceptionを投げる()
     {
         var container = new Container
         {
@@ -82,7 +82,7 @@ public class ContainerTest
     [InlineData(-1)]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
-    public void RejectsInvalidDimensions(double value)
+    public void Container_WidthとHeightが負数または非有限値_ArgumentOutOfRangeExceptionを投げる(double value)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new Container { Width = value });
         Assert.Throws<ArgumentOutOfRangeException>(() => new Container { Height = value });

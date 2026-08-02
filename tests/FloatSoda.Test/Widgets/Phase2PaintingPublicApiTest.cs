@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using FloatSoda.Painting;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
@@ -8,7 +8,7 @@ namespace FloatSoda.Test.Widgets;
 public class Phase2PaintingPublicApiTest
 {
     [Fact]
-    public void NewPublicApiDoesNotExposeSkiaTypes()
+    public void PublicMembers_Phase2で追加した公開API_SkiaSharp型を公開しない()
     {
         Type[] types =
         [

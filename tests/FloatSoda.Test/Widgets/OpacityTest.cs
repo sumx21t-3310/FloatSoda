@@ -1,4 +1,4 @@
-using FloatSoda.Geometrics;
+﻿using FloatSoda.Geometrics;
 using FloatSoda.Testing;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
@@ -12,7 +12,7 @@ public class OpacityTest
     private static readonly SKSizeI Size = new(40, 40);
 
     [Fact]
-    public void PaintsChildWithRequestedOpacity()
+    public void Opacity_Valueが0_5_子が半透明で描画される()
     {
         var widget = new SizedBox
         {
@@ -33,7 +33,7 @@ public class OpacityTest
     }
 
     [Fact]
-    public void ZeroSkipsChildPainting()
+    public void Opacity_Valueが0_子を描画しない()
     {
         var widget = new SizedBox
         {
@@ -56,7 +56,7 @@ public class OpacityTest
     [InlineData(1.01)]
     [InlineData(double.NaN)]
     [InlineData(double.PositiveInfinity)]
-    public void RejectsInvalidOpacity(double value)
+    public void Opacity_Valueが0から1の範囲外または非有限値_ArgumentOutOfRangeExceptionを投げる(double value)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new Opacity { Value = value });
     }

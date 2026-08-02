@@ -191,8 +191,22 @@ public sealed record BoxDecoration
             return;
         }
 
-        var maxInset = Math.Max(0, Math.Min(bounds.Width, bounds.Height) / 2f);
-        var inset = Math.Min((float)side.Width / 2f, maxInset);
+        // ボーダーがボックスの短辺以上に太い場合、中心線の内側寄せ(inset)だけを制限してもストローク幅は元の値のままとなり、
+        // 装飾の外形をはみ出して周囲の兄弟まで覆ってしまう。この場合はボーダーが内側を覆い尽くすため、外形を塗りつぶす。
+        var shortSide = Math.Max(0, Math.Min(bounds.Width, bounds.Height));
+        if (side.Width >= shortSide)
+        {
+            using var fillPaint = new SKPaint
+            {
+                Color = side.Color,
+                IsAntialias = true,
+                Style = SKPaintStyle.Fill
+            };
+            canvas.DrawRoundRect(BorderRadius.ToRoundRect(bounds), fillPaint);
+            return;
+        }
+
+        var inset = (float)side.Width / 2f;
         var borderBounds = bounds;
         borderBounds.Inflate(-inset, -inset);
 

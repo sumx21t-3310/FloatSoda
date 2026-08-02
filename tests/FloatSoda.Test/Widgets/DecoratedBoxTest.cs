@@ -1,6 +1,7 @@
-using FloatSoda.Geometrics;
+﻿using FloatSoda.Geometrics;
 using FloatSoda.Painting;
 using FloatSoda.Testing;
+using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
 
@@ -12,7 +13,7 @@ public class DecoratedBoxTest
     private static readonly SKSizeI Size = new(60, 60);
 
     [Fact]
-    public void PaintsBackgroundColorAndBorder()
+    public void DecoratedBox_背景色とボーダーを指定_外周がボーダー色で内側が背景色になる()
     {
         var widget = Fill(new DecoratedBox
         {
@@ -34,7 +35,7 @@ public class DecoratedBoxTest
     }
 
     [Fact]
-    public void RoundedCornersDoNotPaintOutsideShape()
+    public void DecoratedBox_BorderRadiusを指定_角丸の外側は描画されない()
     {
         var widget = Fill(new DecoratedBox
         {
@@ -52,7 +53,7 @@ public class DecoratedBoxTest
     }
 
     [Fact]
-    public void ForegroundDecorationPaintsOverChild()
+    public void DecoratedBox_PositionがForeground_子の前面へ装飾が描画される()
     {
         var widget = Fill(new DecoratedBox
         {
@@ -67,7 +68,39 @@ public class DecoratedBoxTest
     }
 
     [Fact]
-    public void RejectsNegativeAndNonFiniteBorderWidths()
+    public void DecoratedBox_ボーダーがボックスの短辺より太い_装飾の外形からはみ出さない()
+    {
+        var widget = new Align
+        {
+            Alignment = Alignment.TopLeft,
+            Child = new SizedBox
+            {
+                Width = 10,
+                Height = 10,
+                Child = new DecoratedBox
+                {
+                    Decoration = new BoxDecoration
+                    {
+                        Border = Border.All(new BorderSide
+                        {
+                            Color = new Color(255, 0, 0),
+                            Width = 100
+                        })
+                    }
+                }
+            }
+        };
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        Assert.Equal(SKColors.Red, bitmap.GetPixel(5, 5));
+        Assert.Equal(0, bitmap.GetPixel(11, 5).Alpha);
+        Assert.Equal(0, bitmap.GetPixel(5, 11).Alpha);
+        Assert.Equal(0, bitmap.GetPixel(30, 30).Alpha);
+    }
+
+    [Fact]
+    public void BorderSide_Widthが負数または非有限値_ArgumentOutOfRangeExceptionを投げる()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new BorderSide { Width = -1 });
         Assert.Throws<ArgumentOutOfRangeException>(() => new BorderSide { Width = double.NaN });
@@ -75,7 +108,7 @@ public class DecoratedBoxTest
     }
 
     [Fact]
-    public void RejectsInvalidCornerRadius()
+    public void BoxDecoration_BorderRadiusが負数_ArgumentOutOfRangeExceptionを投げる()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new BoxDecoration
         {
