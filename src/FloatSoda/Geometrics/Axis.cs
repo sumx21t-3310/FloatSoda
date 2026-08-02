@@ -93,3 +93,16 @@ public enum VerticalDirection
     /// <summary>上端から下端へ進みます。</summary>
     Down,
 }
+
+/// <summary>Stack内の非Positioned子へ渡す制約の方式を表します。</summary>
+public enum StackFit
+{
+    /// <summary>親制約の最小値を取り除いた緩い制約を渡します。</summary>
+    Loose,
+
+    /// <summary>有限な最大寸法まで子を広げる制約を渡します。</summary>
+    Expand,
+
+    /// <summary>Stackが受け取った制約をそのまま子へ渡します。</summary>
+    Passthrough,
+}

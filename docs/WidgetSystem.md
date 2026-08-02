@@ -149,7 +149,9 @@ public override Widget Build(IBuildContext context)
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 追加制約を適用 | `Constraints` (`BoxConstraints`), `Child` |
 | `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
-| `Container` | ✓ | 配置・装飾・サイズ・変換を既存ウィジェットで合成。`Padding` の合成は未対応(→ [#196](https://github.com/sumx21t-3310/FloatSoda/issues/196)) | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
+| `Stack` | ✓ | 複数の子を重ね、非Positioned子を`Alignment`と`Fit`で配置 | `Children`, `Alignment`, `Fit` |
+| `Positioned` | ✓ | `Stack`の子を辺からの距離または固定寸法で絶対配置 | `Left`, `Top`, `Right`, `Bottom`, `Width`, `Height`, `Child` |
+| `Container` | ✗ `internal` スタブ | パディング・色・サイズなどを一括指定 | — |
 | `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
 | `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
