@@ -3,6 +3,7 @@
 # ウィジェット/エレメントシステム
 
 > **実装状況:**
+> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `ConstraintsTransformBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
 > - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Stack`, `Offstage`, `IndexedStack`, `RotatedBox`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
 > - **未実装:** `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Padding`, `Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
@@ -213,6 +214,8 @@ public override Widget Build(IBuildContext context)
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 親の制約と交差する追加制約を子へ適用 | `AdditionalConstraints` (`BoxConstraints`, 必須), `Child` |
+| `ConstraintsTransformBox` | ✓ | 親制約を任意の `BoxConstraintsTransform` で変換し、子を配置 | `ConstraintsTransform` (必須), `Alignment`, `ClipBehavior`, `Child` |
+| `UnconstrainedBox` | ✓ | 両軸または指定軸以外の制約を外して子を自然サイズで配置 | `ConstrainedAxis`, `Alignment`, `ClipBehavior`, `Child` |
 | `IntrinsicWidth` | ✓ | 子の最大intrinsic幅へ収縮し、任意のstep単位で切り上げ | `StepWidth`, `Child` |
 | `IntrinsicHeight` | ✓ | 子の最大intrinsic高さへ収縮し、任意のstep単位で切り上げ | `StepHeight`, `Child` |
 | `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
@@ -241,6 +244,50 @@ Widget panel = new ConstrainedBox
         MinHeight: 120,
         MaxHeight: 240),
     Child = new SizedBox { Width = 320, Height = 180 }
+};
+```
+
+`ConstraintsTransformBox` は、親制約を `BoxConstraintsTransform` delegateで変換してから子へ渡します。
+子の自然サイズが親制約を超えた場合、自身は親制約内のサイズを採用し、`Alignment` に従って子を配置します。
+`ClipBehavior = Clip.None` ではoverflow部分も描画し、`Clip.HardEdge` または `Clip.Antialias` では自身の矩形で切り抜きます。
+`Clip` は `FloatSoda.Rendering.Layers` 名前空間の型なので、使用ファイルへ同名前空間をimportしてください。
+
+```csharp
+using FloatSoda.Rendering.Layers;
+
+Widget wideLogRow = new ConstraintsTransformBox
+{
+    // 最小幅は維持し、最大幅だけを外す。
+    ConstraintsTransform = ConstraintsTransformBox.MaxWidthUnconstrained,
+    Alignment = Alignment.CenterRight,
+    ClipBehavior = Clip.HardEdge,
+    Child = new Text("VRChatの長いログメッセージ")
+};
+```
+
+定型的な変換には次のstaticメソッドをそのままdelegateとして指定できます。
+
+- `Unmodified`: 制約を変更しない
+- `Unconstrained`: 両軸の最小・最大制約を外す
+- `WidthUnconstrained` / `HeightUnconstrained`: 指定軸の最小・最大制約を外す
+- `MaxWidthUnconstrained` / `MaxHeightUnconstrained`: 指定軸の最大制約だけを外す
+- `MaxUnconstrained`: 両軸の最大制約だけを外す
+
+独自変換の戻り値は、最小値が0以上の有限値、最大値が対応する最小値以上の値または正の無限大である必要があります。
+NaN、負値、負の無限大、最小値が最大値を超える制約は、子のレイアウト前に `ArgumentException` になります。
+
+`UnconstrainedBox` は `ConstraintsTransformBox` を合成する簡易ウィジェットです。
+`ConstrainedAxis = null`（既定値）では両軸の制約を外します。`Axis.Horizontal` では横軸の制約だけを維持し、`Axis.Vertical` では縦軸の制約だけを維持します。
+
+```csharp
+Widget naturalWidthRow = new UnconstrainedBox
+{
+    ConstrainedAxis = Axis.Vertical,
+    Alignment = Alignment.CenterLeft,
+    Child = new Row
+    {
+        Children = [new Text("自然な幅で並べるログ行")]
+    }
 };
 ```
 
