@@ -124,6 +124,44 @@ public class RenderPositionedBox : RenderBox, IHasSingleChildRenderObject
         }
     }
 
+    /// <inheritdoc/>
+    internal override SkiaSharp.SKSize ComputeDryLayout(BoxConstraints constraints)
+    {
+        var shrinkWrapWidth = WidthFactor.HasValue || IsPositiveInfinity(constraints.MaxWidth);
+        var shrinkWrapHeight = HeightFactor.HasValue || IsPositiveInfinity(constraints.MaxHeight);
+        if (Child is null)
+        {
+            return constraints.Constrain(
+                shrinkWrapWidth ? 0 : PositiveInfinity,
+                shrinkWrapHeight ? 0 : PositiveInfinity);
+        }
+
+        var child = GetRenderBoxChild();
+        var childSize = child.GetDryLayout(constraints.Loosen);
+        return constraints.Constrain(
+            shrinkWrapWidth ? childSize.Width * (WidthFactor ?? 1) : PositiveInfinity,
+            shrinkWrapHeight ? childSize.Height * (HeightFactor ?? 1) : PositiveInfinity);
+    }
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicWidth(double height) =>
+        (Child is null ? 0 : GetRenderBoxChild().GetMinIntrinsicWidth(height)) * (WidthFactor ?? 1);
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicWidth(double height) =>
+        (Child is null ? 0 : GetRenderBoxChild().GetMaxIntrinsicWidth(height)) * (WidthFactor ?? 1);
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicHeight(double width) =>
+        (Child is null ? 0 : GetRenderBoxChild().GetMinIntrinsicHeight(width)) * (HeightFactor ?? 1);
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicHeight(double width) =>
+        (Child is null ? 0 : GetRenderBoxChild().GetMaxIntrinsicHeight(width)) * (HeightFactor ?? 1);
+
+    private RenderBox GetRenderBoxChild() => Child as RenderBox ?? throw new NotSupportedException(
+        $"{GetType().Name}のintrinsic測定にはRenderBoxの子が必要です。");
+
     private void AlignChild()
     {
         if (Child?.ParentData is not BoxParentData childParentData) return;

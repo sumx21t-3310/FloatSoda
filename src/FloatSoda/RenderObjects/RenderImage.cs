@@ -28,6 +28,22 @@ public class RenderImage : RenderProxyBox
     }
 
     /// <inheritdoc/>
+    internal override SKSize ComputeDryLayout(FloatSoda.Geometrics.BoxConstraints constraints) =>
+        Child?.GetDryLayout(constraints) ?? constraints.Constrain(Image.Width, Image.Height);
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicWidth(double height) => Child?.GetMinIntrinsicWidth(height) ?? Image.Width;
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicWidth(double height) => Child?.GetMaxIntrinsicWidth(height) ?? Image.Width;
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicHeight(double width) => Child?.GetMinIntrinsicHeight(width) ?? Image.Height;
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicHeight(double width) => Child?.GetMaxIntrinsicHeight(width) ?? Image.Height;
+
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
     {
         context.Canvas.DrawImage(Image, SKRect.Create(offset, Size));
