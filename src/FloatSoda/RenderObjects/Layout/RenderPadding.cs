@@ -58,6 +58,33 @@ public class RenderPadding : RenderProxyBox
     }
 
     /// <inheritdoc/>
+    internal override SkiaSharp.SKSize ComputeDryLayout(BoxConstraints constraints)
+    {
+        var horizontal = Padding.Left + Padding.Right;
+        var vertical = Padding.Top + Padding.Bottom;
+        if (Child is null) return constraints.Constrain(horizontal, vertical);
+
+        var childSize = Child.GetDryLayout(Deflate(constraints, horizontal, vertical));
+        return constraints.Constrain(childSize.Width + horizontal, childSize.Height + vertical);
+    }
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicWidth(double height) =>
+        Padding.Left + Padding.Right + (Child?.GetMinIntrinsicWidth(DeflateDimension(height, Padding.Top + Padding.Bottom)) ?? 0);
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicWidth(double height) =>
+        Padding.Left + Padding.Right + (Child?.GetMaxIntrinsicWidth(DeflateDimension(height, Padding.Top + Padding.Bottom)) ?? 0);
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicHeight(double width) =>
+        Padding.Top + Padding.Bottom + (Child?.GetMinIntrinsicHeight(DeflateDimension(width, Padding.Left + Padding.Right)) ?? 0);
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicHeight(double width) =>
+        Padding.Top + Padding.Bottom + (Child?.GetMaxIntrinsicHeight(DeflateDimension(width, Padding.Left + Padding.Right)) ?? 0);
+
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
     {
         if (Child is null) return;
@@ -86,6 +113,9 @@ public class RenderPadding : RenderProxyBox
             MinHeight: Math.Max(0, constraints.MinHeight - vertical),
             MaxHeight: Math.Max(0, constraints.MaxHeight - vertical));
     }
+
+    private static double DeflateDimension(double value, double amount) =>
+        double.IsPositiveInfinity(value) ? value : Math.Max(0, value - amount);
 
     private static void Validate(EdgeInsets padding)
     {

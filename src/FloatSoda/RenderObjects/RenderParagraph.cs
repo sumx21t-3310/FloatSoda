@@ -82,6 +82,36 @@ public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
     }
 
     /// <inheritdoc/>
+    internal override SKSize ComputeDryLayout(FloatSoda.Geometrics.BoxConstraints constraints) =>
+        constraints.Constrain(Measure(constraints.MaxWidth));
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicWidth(double height)
+    {
+        var segments = Text.Text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries);
+        return segments.Length == 0 ? 0 : segments.Max(segment => Measure(double.PositiveInfinity, segment).Width);
+    }
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicWidth(double height) => Measure(double.PositiveInfinity).Width;
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicHeight(double width) => Measure(width).Height;
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicHeight(double width) => Measure(width).Height;
+
+    private SKSize Measure(double maxWidth, string? text = null)
+    {
+        var painter = new TextPainter
+        {
+            Text = text is null ? Text : Text with { Text = text }
+        };
+        painter.Layout(0, maxWidth);
+        return painter.Size;
+    }
+
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset) => _textPainter.Paint(context.Canvas, offset);
 
     /// <inheritdoc/>

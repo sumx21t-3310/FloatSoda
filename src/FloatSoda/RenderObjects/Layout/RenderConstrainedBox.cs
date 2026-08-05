@@ -35,4 +35,45 @@ public class RenderConstrainedBox : RenderProxyBox
 
         Size = Child?.Size ?? enforcedConstraints.Constrain(Size);
     }
+
+    /// <inheritdoc/>
+    internal override SkiaSharp.SKSize ComputeDryLayout(BoxConstraints constraints)
+    {
+        var enforcedConstraints = AdditionalConstraints.Enforce(constraints);
+        return Child?.GetDryLayout(enforcedConstraints) ?? enforcedConstraints.Smallest;
+    }
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicWidth(double height) => ComputeIntrinsicWidth(height, true);
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicWidth(double height) => ComputeIntrinsicWidth(height, false);
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicHeight(double width) => ComputeIntrinsicHeight(width, true);
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicHeight(double width) => ComputeIntrinsicHeight(width, false);
+
+    private double ComputeIntrinsicWidth(double height, bool minimum)
+    {
+        if (AdditionalConstraints.HasTightWidth) return AdditionalConstraints.MinWidth;
+
+        var constrainedHeight = AdditionalConstraints.ConstrainHeight(height);
+        var childWidth = Child is null
+            ? 0
+            : minimum ? Child.GetMinIntrinsicWidth(constrainedHeight) : Child.GetMaxIntrinsicWidth(constrainedHeight);
+        return AdditionalConstraints.ConstrainWidth(childWidth);
+    }
+
+    private double ComputeIntrinsicHeight(double width, bool minimum)
+    {
+        if (AdditionalConstraints.HasTightHeight) return AdditionalConstraints.MinHeight;
+
+        var constrainedWidth = AdditionalConstraints.ConstrainWidth(width);
+        var childHeight = Child is null
+            ? 0
+            : minimum ? Child.GetMinIntrinsicHeight(constrainedWidth) : Child.GetMaxIntrinsicHeight(constrainedWidth);
+        return AdditionalConstraints.ConstrainHeight(childHeight);
+    }
 }
