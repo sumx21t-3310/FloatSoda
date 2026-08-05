@@ -1,5 +1,6 @@
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Components;
@@ -7,7 +8,6 @@ using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
-using Topten.RichTextKit;
 
 namespace FloatSoda.Samples.OverlayApp;
 
@@ -78,9 +78,9 @@ public class DragBoxState : State<DragBoxWidget>
                                             {
                                                 Text = new TextSpan("Drag")
                                                 {
-                                                    Style = new Style
+                                                    Style = new TextStyle
                                                     {
-                                                        TextColor = SKColors.WhiteSmoke,
+                                                        Color = SKColors.WhiteSmoke,
                                                         FontSize = 40,
                                                         FontWeight = 700
                                                     }

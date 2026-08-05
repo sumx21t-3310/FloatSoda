@@ -1,5 +1,6 @@
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Components;
@@ -7,7 +8,6 @@ using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
-using Topten.RichTextKit;
 
 namespace FloatSoda.Samples.OverlayApp;
 
@@ -52,9 +52,9 @@ public class CounterState : State<CounterWidget>
                             {
                                 Text = new TextSpan(label)
                                 {
-                                    Style = new Style
+                                    Style = new TextStyle
                                     {
-                                        TextColor = SKColors.WhiteSmoke,
+                                        Color = SKColors.WhiteSmoke,
                                         FontSize = 50,
                                         FontWeight = 700
                                     }
@@ -97,9 +97,9 @@ public class CounterState : State<CounterWidget>
                                     {
                                         Text = new TextSpan("Counter")
                                         {
-                                            Style = new Style
+                                            Style = new TextStyle
                                             {
-                                                TextColor = SKColors.Black,
+                                                Color = SKColors.Black,
                                                 FontSize = 60,
                                                 FontWeight = 700
                                             }
@@ -125,9 +125,9 @@ public class CounterState : State<CounterWidget>
                                             {
                                                 Text = new TextSpan(_count.ToString())
                                                 {
-                                                    Style = new Style
+                                                    Style = new TextStyle
                                                     {
-                                                        TextColor = SKColors.DarkSlateGray,
+                                                        Color = SKColors.DarkSlateGray,
                                                         FontSize = 120,
                                                         FontWeight = 700
                                                     }
@@ -178,9 +178,9 @@ public class CounterState : State<CounterWidget>
                                                 {
                                                     Text = new TextSpan("Reset")
                                                     {
-                                                        Style = new Style
+                                                        Style = new TextStyle
                                                         {
-                                                            TextColor = SKColors.White,
+                                                            Color = SKColors.White,
                                                             FontSize = 40,
                                                             FontWeight = 700
                                                         }

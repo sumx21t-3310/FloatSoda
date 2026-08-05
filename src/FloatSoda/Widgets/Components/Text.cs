@@ -1,4 +1,5 @@
 ﻿using FloatSoda.Elements;
+using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 
 namespace FloatSoda.Widgets.Components;
@@ -35,10 +36,36 @@ public sealed record RichText : MultiChildRenderObjectWidget<RenderParagraph>
 /// <summary>
 /// 単一の書式で文字列を表示するウィジェットです。
 /// </summary>
-/// <param name="Data">表示する文字列。<see langword="null"/>は指定できません。</param>
 /// <seealso cref="RichText"/>
-public sealed record Text(string Data) : StatelessWidget
+public sealed record Text : StatelessWidget
 {
+    /// <summary>
+    /// 表示する文字列を指定してウィジェットを初期化します。
+    /// </summary>
+    /// <param name="data">表示する文字列。空文字列も指定できます。</param>
+    /// <exception cref="ArgumentNullException"><paramref name="data"/>が<see langword="null"/>です。</exception>
+    public Text(string data)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        Data = data;
+    }
+
+    /// <summary>表示する文字列を取得します。</summary>
+    /// <exception cref="ArgumentNullException">値が<see langword="null"/>です。</exception>
+    public string Data
+    {
+        get;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value, nameof(Data));
+            field = value;
+        }
+    }
+
+    /// <summary>文字列に適用する書式を取得します。</summary>
+    /// <remarks><see langword="null"/>の場合は段落の既定書式を使用します。</remarks>
+    public TextStyle? Style { get; init; }
+
     /// <summary>
     /// 文字列を段落として描画する子ウィジェットを構築します。
     /// </summary>
@@ -46,7 +73,7 @@ public sealed record Text(string Data) : StatelessWidget
     /// <returns><see cref="Data"/>を表示する<see cref="RichText"/>。</returns>
     public override Widget Build(IBuildContext context)
     {
-        var text = new TextSpan(Data);
+        var text = new TextSpan(Data) { Style = Style };
 
         return new RichText
         {
