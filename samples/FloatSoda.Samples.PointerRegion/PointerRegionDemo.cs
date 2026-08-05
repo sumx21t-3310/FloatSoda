@@ -1,6 +1,7 @@
 using FloatSoda.Abstractions.Input;
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.Painting;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
@@ -9,7 +10,6 @@ using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
-using Topten.RichTextKit;
 
 namespace FloatSoda.Samples.PointerRegionSample;
 
@@ -204,9 +204,9 @@ public sealed class PointerRegionDemoState : State<PointerRegionDemo>
         {
             Text = new TextSpan(text)
             {
-                Style = new Style
+                Style = new TextStyle
                 {
-                    TextColor = color,
+                    Color = color,
                     FontSize = fontSize,
                     FontWeight = fontWeight,
                 }
