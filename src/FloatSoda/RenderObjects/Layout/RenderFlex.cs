@@ -297,6 +297,87 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         ArrangeChildren(crossSize, idealMainSize, leadingSpace, betweenSpace);
     }
 
+    /// <inheritdoc/>
+    internal override SKSize ComputeDryLayout(BoxConstraints constraints)
+    {
+        double allocatedSize = 0;
+        double crossSize = 0;
+        foreach (var child in Children)
+        {
+            var childConstraints = GetChildConstraints(constraints);
+            var childSize = child.GetDryLayout(childConstraints);
+            allocatedSize += GetMainSize(childSize);
+            crossSize = Math.Max(crossSize, GetCrossSize(childSize));
+        }
+
+        var maxMainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;
+        var idealMainSize = double.IsFinite(maxMainSize) && MainAxisSize == MainAxisSize.Max
+            ? maxMainSize
+            : allocatedSize;
+        return Direction switch
+        {
+            Axis.Horizontal => constraints.Constrain(idealMainSize, crossSize),
+            Axis.Vertical => constraints.Constrain(crossSize, idealMainSize),
+            _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+        };
+    }
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicWidth(double height) => Direction switch
+    {
+        Axis.Horizontal => Children.Sum(child => child.GetMinIntrinsicWidth(height)),
+        Axis.Vertical => Children.Count == 0 ? 0 : Children.Max(child => child.GetMinIntrinsicWidth(height)),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicWidth(double height) => Direction switch
+    {
+        Axis.Horizontal => Children.Sum(child => child.GetMaxIntrinsicWidth(height)),
+        Axis.Vertical => Children.Count == 0 ? 0 : Children.Max(child => child.GetMaxIntrinsicWidth(height)),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
+
+    /// <inheritdoc/>
+    protected override double ComputeMinIntrinsicHeight(double width) => Direction switch
+    {
+        Axis.Horizontal => ComputeHorizontalIntrinsicHeight(width, true),
+        Axis.Vertical => Children.Sum(child => child.GetMinIntrinsicHeight(width)),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
+
+    /// <inheritdoc/>
+    protected override double ComputeMaxIntrinsicHeight(double width) => Direction switch
+    {
+        Axis.Horizontal => ComputeHorizontalIntrinsicHeight(width, false),
+        Axis.Vertical => Children.Sum(child => child.GetMaxIntrinsicHeight(width)),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
+
+    private BoxConstraints GetChildConstraints(BoxConstraints constraints) => (CrossAxisAlignment, Direction) switch
+    {
+        (CrossAxisAlignment.Stretch, Axis.Horizontal) when double.IsFinite(constraints.MaxHeight) =>
+            BoxConstraints.TightFor(height: constraints.MaxHeight),
+        (CrossAxisAlignment.Stretch, Axis.Vertical) when double.IsFinite(constraints.MaxWidth) =>
+            BoxConstraints.TightFor(width: constraints.MaxWidth),
+        (_, Axis.Horizontal) => new BoxConstraints(MaxHeight: constraints.MaxHeight),
+        (_, Axis.Vertical) => new BoxConstraints(MaxWidth: constraints.MaxWidth),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
+
+    private double ComputeHorizontalIntrinsicHeight(double width, bool minimum)
+    {
+        if (Children.Count == 0) return 0;
+
+        var naturalWidths = Children.Select(child => child.GetMaxIntrinsicWidth(double.PositiveInfinity)).ToArray();
+        var totalWidth = naturalWidths.Sum();
+        var scale = double.IsFinite(width) && totalWidth > width && totalWidth > 0 ? width / totalWidth : 1;
+        return Children.Select((child, index) => minimum
+                ? child.GetMinIntrinsicHeight(naturalWidths[index] * scale)
+                : child.GetMaxIntrinsicHeight(naturalWidths[index] * scale))
+            .Max();
+    }
+
 
     /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)

@@ -58,6 +58,11 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 状態を持たない純粋関数コンポーネント。`Build(IBuildContext)` でウィジェットツリーを返します。
 
 ```csharp
+using FloatSoda.Elements;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+using FloatSoda.Widgets.Layout;
+
 public record MyWidget : StatelessWidget
 {
     public required string Title { get; init; }
@@ -248,6 +253,8 @@ public override Widget Build(IBuildContext context)
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 親の制約と交差する追加制約を子へ適用 | `AdditionalConstraints` (`BoxConstraints`, 必須), `Child` |
+| `IntrinsicWidth` | ✓ | 子の最大intrinsic幅へ収縮し、任意のstep単位で切り上げ | `StepWidth`, `Child` |
+| `IntrinsicHeight` | ✓ | 子の最大intrinsic高さへ収縮し、任意のstep単位で切り上げ | `StepHeight`, `Child` |
 | `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
 | `Stack` | ✓ | 複数の子を重ね、非Positioned子を`Alignment`と`Fit`で配置 | `Children`, `Alignment`, `Fit` |
 | `Positioned` | ✓ | `Stack`の子を辺からの距離または固定寸法で絶対配置 | `Left`, `Top`, `Right`, `Bottom`, `Width`, `Height`, `Child` |
@@ -269,6 +276,21 @@ Widget panel = new ConstrainedBox
     Child = new SizedBox { Width = 320, Height = 180 }
 };
 ```
+
+`IntrinsicWidth` / `IntrinsicHeight` は、通常レイアウトの前に子へ自然な寸法を問い合わせます。
+`StepWidth` / `StepHeight` を指定すると、計測値をその正の有限値の倍数へ切り上げます。
+たとえば内容量が異なるカードを一定のstep幅へ揃える場合に使えます。
+
+```csharp
+Widget statusCard = new IntrinsicWidth
+{
+    StepWidth = 40,
+    Child = new Text("VRChat: Online")
+};
+```
+
+intrinsic測定は追加のツリー走査を必要とし、入れ子では最悪O(N²)になり得ます。
+スクロール領域や大量の項目を持つツリーでは使用せず、寸法が分かる場合は`SizedBox`や`ConstrainedBox`を優先してください。
 
 ### Painting
 
