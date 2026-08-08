@@ -6,6 +6,40 @@ using SkiaSharp;
 
 namespace FloatSoda.RenderObjects.Layout;
 
+/// <summary>Flex の子ごとの配置位置と余剰領域の分配方法を保持します。</summary>
+public class FlexParentData : BoxParentData
+{
+    /// <summary>余剰領域を分配するときの比率を取得または設定します。0 は分配対象外を表します。</summary>
+    public int Flex
+    {
+        get;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(Flex), value, "Flex には 0 以上の整数を指定してください。");
+            }
+
+            field = value;
+        }
+    }
+
+    /// <summary>割り当てられた主軸領域を子へ適用する方法を取得または設定します。</summary>
+    public FlexFit Fit
+    {
+        get;
+        set
+        {
+            if (!Enum.IsDefined(value))
+            {
+                throw new ArgumentOutOfRangeException(nameof(Fit), value, "定義済みの FlexFit を指定してください。");
+            }
+
+            field = value;
+        }
+    } = FlexFit.Loose;
+}
+
 /// <summary>
 /// 複数の子を主軸に沿って並べ、主軸と交差軸の配置を調整するRenderObjectです。
 /// </summary>
@@ -44,7 +78,7 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     public bool RemoveChild(RenderObject child) => Children.Remove((RenderBox)child);
 
     /// <inheritdoc/>
-    public override void SetupParentData(RenderObject child) => child.ParentData = new BoxParentData();
+    public override void SetupParentData(RenderObject child) => child.ParentData = new FlexParentData();
 
     /// <inheritdoc/>
     public override void Attach(RenderPipeline? owner)
@@ -175,29 +209,6 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
     };
 
-    private void MeasureCrossAxis(BoxConstraints constraints, out double allocatedSize, out double crossSize)
-    {
-        crossSize = 0.0;
-        allocatedSize = 0.0;
-
-        foreach (var child in Children)
-        {
-            child.ParentData ??= new BoxParentData();
-
-            var innerAxisSize = (CrossAxisAlignment, Direction) switch
-            {
-                (CrossAxisAlignment.Stretch, Axis.Horizontal) => BoxConstraints.TightFor(height: constraints.MaxHeight),
-                (CrossAxisAlignment.Stretch, Axis.Vertical) => BoxConstraints.TightFor(width: constraints.MaxWidth),
-                (_, Axis.Horizontal) => new BoxConstraints(MaxHeight: constraints.MaxHeight),
-                (_, Axis.Vertical) => new BoxConstraints(MaxWidth: constraints.MaxWidth),
-            };
-
-            child.Layout(innerAxisSize, parentUseSize: true);
-            allocatedSize += GetMainSize(child.Size);
-            crossSize = Math.Max(crossSize, GetCrossSize(child.Size));
-        }
-    }
-
     private double CalcBetweenSpace(double remainingSpace) => MainAxisAlignment switch
     {
         MainAxisAlignment.Start or MainAxisAlignment.End or MainAxisAlignment.Center => 0.0,
@@ -268,12 +279,44 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     /// <inheritdoc/>
     public override void PerformLayout()
     {
-        MeasureCrossAxis(Constraints, out var allocatedSize, out var crossSize);
+        var maxMainSize = GetMaxMainSize(Constraints);
+        var totalFlex = Children.Sum(child => (long)GetParentData(child).Flex);
+        EnsureFiniteMainAxisForFlex(maxMainSize, totalFlex);
 
-        var mainSize = Direction == Axis.Horizontal ? Constraints.MaxWidth : Constraints.MaxHeight;
-        var canFlex = mainSize < double.PositiveInfinity;
+        double allocatedSize = 0;
+        double crossSize = 0;
+        foreach (var child in Children)
+        {
+            if (GetParentData(child).Flex != 0) continue;
 
-        var idealMainSize = canFlex && MainAxisSize == MainAxisSize.Max ? mainSize : allocatedSize;
+            child.Layout(GetChildConstraints(Constraints), parentUseSize: true);
+            allocatedSize += GetMainSize(child.Size);
+            crossSize = Math.Max(crossSize, GetCrossSize(child.Size));
+        }
+
+        var freeSpace = totalFlex > 0 ? Math.Max(0, maxMainSize - allocatedSize) : 0;
+        double distributedSpace = 0;
+        long distributedFlex = 0;
+        foreach (var child in Children)
+        {
+            var parentData = GetParentData(child);
+            if (parentData.Flex == 0) continue;
+
+            distributedFlex += parentData.Flex;
+            var extent = distributedFlex == totalFlex
+                ? freeSpace - distributedSpace
+                : freeSpace * parentData.Flex / totalFlex;
+            distributedSpace += extent;
+
+            var minExtent = parentData.Fit == FlexFit.Tight ? extent : 0;
+            child.Layout(GetChildConstraints(Constraints, minExtent, extent), parentUseSize: true);
+            allocatedSize += GetMainSize(child.Size);
+            crossSize = Math.Max(crossSize, GetCrossSize(child.Size));
+        }
+
+        var idealMainSize = double.IsFinite(maxMainSize) && MainAxisSize == MainAxisSize.Max
+            ? maxMainSize
+            : allocatedSize;
 
         Size = Direction switch
         {
@@ -300,17 +343,42 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     /// <inheritdoc/>
     internal override SKSize ComputeDryLayout(BoxConstraints constraints)
     {
+        var maxMainSize = GetMaxMainSize(constraints);
+        var totalFlex = Children.Sum(child => (long)GetParentData(child).Flex);
+        EnsureFiniteMainAxisForFlex(maxMainSize, totalFlex);
+
         double allocatedSize = 0;
         double crossSize = 0;
         foreach (var child in Children)
         {
+            if (GetParentData(child).Flex != 0) continue;
+
             var childConstraints = GetChildConstraints(constraints);
             var childSize = child.GetDryLayout(childConstraints);
             allocatedSize += GetMainSize(childSize);
             crossSize = Math.Max(crossSize, GetCrossSize(childSize));
         }
 
-        var maxMainSize = Direction == Axis.Horizontal ? constraints.MaxWidth : constraints.MaxHeight;
+        var freeSpace = totalFlex > 0 ? Math.Max(0, maxMainSize - allocatedSize) : 0;
+        double distributedSpace = 0;
+        long distributedFlex = 0;
+        foreach (var child in Children)
+        {
+            var parentData = GetParentData(child);
+            if (parentData.Flex == 0) continue;
+
+            distributedFlex += parentData.Flex;
+            var extent = distributedFlex == totalFlex
+                ? freeSpace - distributedSpace
+                : freeSpace * parentData.Flex / totalFlex;
+            distributedSpace += extent;
+
+            var minExtent = parentData.Fit == FlexFit.Tight ? extent : 0;
+            var childSize = child.GetDryLayout(GetChildConstraints(constraints, minExtent, extent));
+            allocatedSize += GetMainSize(childSize);
+            crossSize = Math.Max(crossSize, GetCrossSize(childSize));
+        }
+
         var idealMainSize = double.IsFinite(maxMainSize) && MainAxisSize == MainAxisSize.Max
             ? maxMainSize
             : allocatedSize;
@@ -323,60 +391,127 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     }
 
     /// <inheritdoc/>
-    protected override double ComputeMinIntrinsicWidth(double height) => Direction switch
-    {
-        Axis.Horizontal => Children.Sum(child => child.GetMinIntrinsicWidth(height)),
-        Axis.Vertical => Children.Count == 0 ? 0 : Children.Max(child => child.GetMinIntrinsicWidth(height)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMinIntrinsicWidth(double height) => ComputeIntrinsicSize(
+        Axis.Horizontal,
+        height,
+        (child, extent) => child.GetMinIntrinsicWidth(extent));
 
     /// <inheritdoc/>
-    protected override double ComputeMaxIntrinsicWidth(double height) => Direction switch
-    {
-        Axis.Horizontal => Children.Sum(child => child.GetMaxIntrinsicWidth(height)),
-        Axis.Vertical => Children.Count == 0 ? 0 : Children.Max(child => child.GetMaxIntrinsicWidth(height)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMaxIntrinsicWidth(double height) => ComputeIntrinsicSize(
+        Axis.Horizontal,
+        height,
+        (child, extent) => child.GetMaxIntrinsicWidth(extent));
 
     /// <inheritdoc/>
-    protected override double ComputeMinIntrinsicHeight(double width) => Direction switch
-    {
-        Axis.Horizontal => ComputeHorizontalIntrinsicHeight(width, true),
-        Axis.Vertical => Children.Sum(child => child.GetMinIntrinsicHeight(width)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMinIntrinsicHeight(double width) => ComputeIntrinsicSize(
+        Axis.Vertical,
+        width,
+        (child, extent) => child.GetMinIntrinsicHeight(extent));
 
     /// <inheritdoc/>
-    protected override double ComputeMaxIntrinsicHeight(double width) => Direction switch
-    {
-        Axis.Horizontal => ComputeHorizontalIntrinsicHeight(width, false),
-        Axis.Vertical => Children.Sum(child => child.GetMaxIntrinsicHeight(width)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMaxIntrinsicHeight(double width) => ComputeIntrinsicSize(
+        Axis.Vertical,
+        width,
+        (child, extent) => child.GetMaxIntrinsicHeight(extent));
 
-    private BoxConstraints GetChildConstraints(BoxConstraints constraints) => (CrossAxisAlignment, Direction) switch
+    private BoxConstraints GetChildConstraints(
+        BoxConstraints constraints,
+        double minMainSize = 0,
+        double maxMainSize = double.PositiveInfinity) => (CrossAxisAlignment, Direction) switch
     {
         (CrossAxisAlignment.Stretch, Axis.Horizontal) when double.IsFinite(constraints.MaxHeight) =>
-            BoxConstraints.TightFor(height: constraints.MaxHeight),
+            new BoxConstraints(minMainSize, maxMainSize, constraints.MaxHeight, constraints.MaxHeight),
         (CrossAxisAlignment.Stretch, Axis.Vertical) when double.IsFinite(constraints.MaxWidth) =>
-            BoxConstraints.TightFor(width: constraints.MaxWidth),
-        (_, Axis.Horizontal) => new BoxConstraints(MaxHeight: constraints.MaxHeight),
-        (_, Axis.Vertical) => new BoxConstraints(MaxWidth: constraints.MaxWidth),
+            new BoxConstraints(constraints.MaxWidth, constraints.MaxWidth, minMainSize, maxMainSize),
+        (_, Axis.Horizontal) => new BoxConstraints(minMainSize, maxMainSize, 0, constraints.MaxHeight),
+        (_, Axis.Vertical) => new BoxConstraints(0, constraints.MaxWidth, minMainSize, maxMainSize),
         _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
     };
 
-    private double ComputeHorizontalIntrinsicHeight(double width, bool minimum)
+    private double GetMaxMainSize(BoxConstraints constraints) => Direction switch
     {
-        if (Children.Count == 0) return 0;
+        Axis.Horizontal => constraints.MaxWidth,
+        Axis.Vertical => constraints.MaxHeight,
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
 
-        var naturalWidths = Children.Select(child => child.GetMaxIntrinsicWidth(double.PositiveInfinity)).ToArray();
-        var totalWidth = naturalWidths.Sum();
-        var scale = double.IsFinite(width) && totalWidth > width && totalWidth > 0 ? width / totalWidth : 1;
-        return Children.Select((child, index) => minimum
-                ? child.GetMinIntrinsicHeight(naturalWidths[index] * scale)
-                : child.GetMaxIntrinsicHeight(naturalWidths[index] * scale))
-            .Max();
+    private static FlexParentData GetParentData(RenderBox child)
+        => child.ParentData as FlexParentData
+           ?? throw new InvalidOperationException("RenderFlex の子には FlexParentData が必要です。");
+
+    private void EnsureFiniteMainAxisForFlex(double maxMainSize, long totalFlex)
+    {
+        if (totalFlex > 0 && !double.IsFinite(maxMainSize))
+        {
+            var axisName = Direction == Axis.Horizontal ? "幅" : "高さ";
+            throw new InvalidOperationException(
+                $"RenderFlex は主軸の最大{axisName}が有限でない制約では flex 子をレイアウトできません。" +
+                " Expanded/Flexible/Spacer を外すか、親から有限の主軸制約を与えてください。");
+        }
     }
+
+    private double ComputeIntrinsicSize(
+        Axis sizingDirection,
+        double extent,
+        Func<RenderBox, double, double> childSize)
+    {
+        if (Direction == sizingDirection)
+        {
+            long totalFlex = 0;
+            double inflexibleSpace = 0;
+            double maxFlexFraction = 0;
+            foreach (var child in Children)
+            {
+                var flex = GetParentData(child).Flex;
+                totalFlex += flex;
+                if (flex > 0)
+                {
+                    maxFlexFraction = Math.Max(maxFlexFraction, childSize(child, extent) / flex);
+                }
+                else
+                {
+                    inflexibleSpace += childSize(child, extent);
+                }
+            }
+
+            return inflexibleSpace + maxFlexFraction * totalFlex;
+        }
+
+        long crossTotalFlex = Children.Sum(child => (long)GetParentData(child).Flex);
+        double allocatedMainSize = 0;
+        double crossSize = 0;
+        foreach (var child in Children)
+        {
+            if (GetParentData(child).Flex != 0) continue;
+
+            var mainSize = GetMaxIntrinsicMainSize(child);
+            allocatedMainSize += mainSize;
+            crossSize = Math.Max(crossSize, childSize(child, mainSize));
+        }
+
+        var freeSpace = double.IsFinite(extent)
+            ? Math.Max(0, extent - allocatedMainSize)
+            : double.PositiveInfinity;
+        foreach (var child in Children)
+        {
+            var flex = GetParentData(child).Flex;
+            if (flex == 0) continue;
+
+            var mainSize = double.IsFinite(freeSpace)
+                ? freeSpace * flex / crossTotalFlex
+                : GetMaxIntrinsicMainSize(child);
+            crossSize = Math.Max(crossSize, childSize(child, mainSize));
+        }
+
+        return crossSize;
+    }
+
+    private double GetMaxIntrinsicMainSize(RenderBox child) => Direction switch
+    {
+        Axis.Horizontal => child.GetMaxIntrinsicWidth(double.PositiveInfinity),
+        Axis.Vertical => child.GetMaxIntrinsicHeight(double.PositiveInfinity),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
 
 
     /// <inheritdoc/>

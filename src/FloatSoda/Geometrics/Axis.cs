@@ -85,6 +85,16 @@ public enum MainAxisSize
     Max,
 }
 
+/// <summary>Flex の子へ割り当てた主軸領域を、子にどのように適用するかを表します。</summary>
+public enum FlexFit
+{
+    /// <summary>子は割り当てられた主軸領域をすべて使用します。</summary>
+    Tight,
+
+    /// <summary>子は割り当てられた主軸領域を上限として、より小さいサイズを選択できます。</summary>
+    Loose,
+}
+
 /// <summary>垂直軸の進行方向を表します。</summary>
 public enum VerticalDirection
 {

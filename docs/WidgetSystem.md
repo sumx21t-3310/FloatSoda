@@ -252,6 +252,9 @@ public override Widget Build(IBuildContext context)
 | `Column` | ✓ | 垂直方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Row` | ✓ | 水平方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
+| `Flexible` | ✓ | `Flex`系の余剰主軸領域を比率で受け取り、子が割当量以下の大きさを選択可能 | `Flex`, `Fit`, `Child` (必須) |
+| `Expanded` | ✓ | `Flex`系の余剰主軸領域を比率で受け取り、子を割当量いっぱいに拡張 | `Flex`, `Child` (必須) |
+| `Spacer` | ✓ | `Flex`系へ比率指定できる空白を挿入 | `Flex` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 親の制約と交差する追加制約を子へ適用 | `AdditionalConstraints` (`BoxConstraints`, 必須), `Child` |
 | `ConstraintsTransformBox` | ✓ | 親制約を任意の `BoxConstraintsTransform` で変換し、子を配置 | `ConstraintsTransform` (必須), `Alignment`, `ClipBehavior`, `Child` |
@@ -274,6 +277,43 @@ public override Widget Build(IBuildContext context)
 
 `IndexedStack.Index` は0始まりです。`null`は全子をレイアウトしたまま全非表示にし、負値または`Children`の範囲外は`ArgumentOutOfRangeException`になります。
 `RotatedBox`は回転後の幅と高さをレイアウトへ反映します。レイアウト寸法を変えず描画だけを任意角度で変形する`Transform`とは用途が異なります。
+
+`Expanded` / `Flexible` / `Spacer` は `Row`、`Column`、`Flex` の直接の子として使用します。
+`Flex` は1以上の整数で、たとえば `Flex = 2` は `Flex = 1` の子の2倍の余剰領域を受け取ります。
+`Expanded` は `FlexFit.Tight` 固定、`Flexible` は既定で `FlexFit.Loose` です。
+主軸の最大制約が無限のときは余剰領域を決められないため、flex子を含む `Flex` は `InvalidOperationException` を投げます。親の `SizedBox` / `ConstrainedBox` などから有限の幅（`Row`）または高さ（`Column`）を与えてください。
+
+```csharp
+using FloatSoda.Geometrics;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+using FloatSoda.Widgets.Layout;
+
+Widget toolbar = new SizedBox
+{
+    Width = 600,
+    Height = 64,
+    Child = new Row
+    {
+        CrossAxisAlignment = CrossAxisAlignment.Stretch,
+        Children =
+        [
+            new Expanded
+            {
+                Flex = 2,
+                Child = new Text("VRChat status")
+            },
+            new Spacer { Flex = 1 },
+            new Flexible
+            {
+                Flex = 1,
+                Fit = FlexFit.Loose,
+                Child = new Text("Settings")
+            }
+        ]
+    }
+};
+```
 
 ```csharp
 Widget panel = new ConstrainedBox
