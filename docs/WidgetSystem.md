@@ -177,6 +177,46 @@ new RepaintBoundary
 };
 ```
 
+### ListenableBuilder
+
+`ListenableBuilder` はBCLの `INotifyPropertyChanged` を購読し、通知が届いたときに `ChildBuilder` 配下だけを再構築します。ViewModel全体をStatefulWidgetへ写し替えず、変更される表示領域を局所化したい場合に使います。プロパティ名によるフィルタは行わないため、`PropertyChanged` のどの通知でも再構築します。
+
+```csharp
+using System.ComponentModel;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+
+sealed class CounterState : INotifyPropertyChanged
+{
+    private int _count;
+
+    public int Count
+    {
+        get => _count;
+        set
+        {
+            if (_count == value) return;
+            _count = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+}
+
+var counter = new CounterState();
+
+Widget counterLabel = new ListenableBuilder
+{
+    Listenable = counter,
+    ChildBuilder = _ => new Text($"Count: {counter.Count}")
+};
+```
+
+`Listenable` を同じ位置の新しい `ListenableBuilder` で差し替えると、古いオブジェクトの購読を解除して新しいオブジェクトへ付け替えます。ツリーから外れたときも購読を解除します。
+
+> **スレッド契約:** `PropertyChanged` は `ListenableBuilder` がマウントされたスレッド（通常はFloatSodaのメインループ）から発火してください。OSC受信やネットワーク処理などのバックグラウンドスレッドから直接通知すると `InvalidOperationException` を投げます。現時点では任意スレッドの通知をメインループへ自動マーシャリングする公開APIはありません。状態の変更と通知を呼び出し側でメインループへ移してから発火してください。
+
 ---
 
 ## Hooks(FloatSoda.Hooks)
