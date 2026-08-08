@@ -391,36 +391,28 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     }
 
     /// <inheritdoc/>
-    protected override double ComputeMinIntrinsicWidth(double height) => Direction switch
-    {
-        Axis.Horizontal => Children.Sum(child => child.GetMinIntrinsicWidth(height)),
-        Axis.Vertical => Children.Count == 0 ? 0 : Children.Max(child => child.GetMinIntrinsicWidth(height)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMinIntrinsicWidth(double height) => ComputeIntrinsicSize(
+        Axis.Horizontal,
+        height,
+        (child, extent) => child.GetMinIntrinsicWidth(extent));
 
     /// <inheritdoc/>
-    protected override double ComputeMaxIntrinsicWidth(double height) => Direction switch
-    {
-        Axis.Horizontal => Children.Sum(child => child.GetMaxIntrinsicWidth(height)),
-        Axis.Vertical => Children.Count == 0 ? 0 : Children.Max(child => child.GetMaxIntrinsicWidth(height)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMaxIntrinsicWidth(double height) => ComputeIntrinsicSize(
+        Axis.Horizontal,
+        height,
+        (child, extent) => child.GetMaxIntrinsicWidth(extent));
 
     /// <inheritdoc/>
-    protected override double ComputeMinIntrinsicHeight(double width) => Direction switch
-    {
-        Axis.Horizontal => ComputeHorizontalIntrinsicHeight(width, true),
-        Axis.Vertical => Children.Sum(child => child.GetMinIntrinsicHeight(width)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMinIntrinsicHeight(double width) => ComputeIntrinsicSize(
+        Axis.Vertical,
+        width,
+        (child, extent) => child.GetMinIntrinsicHeight(extent));
 
     /// <inheritdoc/>
-    protected override double ComputeMaxIntrinsicHeight(double width) => Direction switch
-    {
-        Axis.Horizontal => ComputeHorizontalIntrinsicHeight(width, false),
-        Axis.Vertical => Children.Sum(child => child.GetMaxIntrinsicHeight(width)),
-        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
-    };
+    protected override double ComputeMaxIntrinsicHeight(double width) => ComputeIntrinsicSize(
+        Axis.Vertical,
+        width,
+        (child, extent) => child.GetMaxIntrinsicHeight(extent));
 
     private BoxConstraints GetChildConstraints(
         BoxConstraints constraints,
@@ -458,18 +450,68 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
         }
     }
 
-    private double ComputeHorizontalIntrinsicHeight(double width, bool minimum)
+    private double ComputeIntrinsicSize(
+        Axis sizingDirection,
+        double extent,
+        Func<RenderBox, double, double> childSize)
     {
-        if (Children.Count == 0) return 0;
+        if (Direction == sizingDirection)
+        {
+            long totalFlex = 0;
+            double inflexibleSpace = 0;
+            double maxFlexFraction = 0;
+            foreach (var child in Children)
+            {
+                var flex = GetParentData(child).Flex;
+                totalFlex += flex;
+                if (flex > 0)
+                {
+                    maxFlexFraction = Math.Max(maxFlexFraction, childSize(child, extent) / flex);
+                }
+                else
+                {
+                    inflexibleSpace += childSize(child, extent);
+                }
+            }
 
-        var naturalWidths = Children.Select(child => child.GetMaxIntrinsicWidth(double.PositiveInfinity)).ToArray();
-        var totalWidth = naturalWidths.Sum();
-        var scale = double.IsFinite(width) && totalWidth > width && totalWidth > 0 ? width / totalWidth : 1;
-        return Children.Select((child, index) => minimum
-                ? child.GetMinIntrinsicHeight(naturalWidths[index] * scale)
-                : child.GetMaxIntrinsicHeight(naturalWidths[index] * scale))
-            .Max();
+            return inflexibleSpace + maxFlexFraction * totalFlex;
+        }
+
+        long crossTotalFlex = Children.Sum(child => (long)GetParentData(child).Flex);
+        double allocatedMainSize = 0;
+        double crossSize = 0;
+        foreach (var child in Children)
+        {
+            if (GetParentData(child).Flex != 0) continue;
+
+            var mainSize = GetMaxIntrinsicMainSize(child);
+            allocatedMainSize += mainSize;
+            crossSize = Math.Max(crossSize, childSize(child, mainSize));
+        }
+
+        var freeSpace = double.IsFinite(extent)
+            ? Math.Max(0, extent - allocatedMainSize)
+            : double.PositiveInfinity;
+        foreach (var child in Children)
+        {
+            var flex = GetParentData(child).Flex;
+            if (flex == 0) continue;
+
+            var mainSize = double.IsFinite(freeSpace)
+                ? freeSpace * flex / crossTotalFlex
+                : GetMaxIntrinsicMainSize(child);
+            crossSize = Math.Max(crossSize, childSize(child, mainSize));
+        }
+
+        return crossSize;
     }
+
+    private double GetMaxIntrinsicMainSize(RenderBox child) => Direction switch
+    {
+        Axis.Horizontal => child.GetMaxIntrinsicWidth(double.PositiveInfinity),
+        Axis.Vertical => child.GetMaxIntrinsicHeight(double.PositiveInfinity),
+        _ => throw new ArgumentOutOfRangeException(nameof(Direction), Direction, null)
+    };
 
 
     /// <inheritdoc/>

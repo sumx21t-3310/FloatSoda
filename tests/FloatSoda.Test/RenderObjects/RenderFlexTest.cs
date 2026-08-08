@@ -1,5 +1,6 @@
 using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Geometrics;
+using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Layout;
 using SkiaSharp;
 
@@ -123,6 +124,98 @@ public class RenderFlexTest
     }
 
     [Fact]
+    public void GetIntrinsicDimension_RowのFlex比率と固定子を反映する()
+    {
+        var fixedChild = IntrinsicBox(20, 10);
+        var firstFlex = IntrinsicBox(100, 10);
+        var secondFlex = IntrinsicBox(10, 10);
+        var flex = new RenderFlex
+        {
+            Direction = Axis.Horizontal,
+            Children = { fixedChild, firstFlex, secondFlex }
+        };
+        SetFlex(firstFlex, 1, FlexFit.Tight);
+        SetFlex(secondFlex, 1, FlexFit.Loose);
+
+        Assert.Equal(220, flex.GetMinIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(220, flex.GetMaxIntrinsicWidth(double.PositiveInfinity));
+    }
+
+    [Fact]
+    public void GetIntrinsicDimension_ColumnのFlex比率と固定子を反映する()
+    {
+        var fixedChild = IntrinsicBox(10, 20);
+        var firstFlex = IntrinsicBox(10, 40);
+        var secondFlex = IntrinsicBox(10, 30);
+        var flex = new RenderFlex
+        {
+            Direction = Axis.Vertical,
+            Children = { fixedChild, firstFlex, secondFlex }
+        };
+        SetFlex(firstFlex, 1, FlexFit.Loose);
+        SetFlex(secondFlex, 3, FlexFit.Tight);
+
+        Assert.Equal(180, flex.GetMinIntrinsicHeight(double.PositiveInfinity));
+        Assert.Equal(180, flex.GetMaxIntrinsicHeight(double.PositiveInfinity));
+    }
+
+    [Fact]
+    public void PerformLayout_IntrinsicWidthはFlex比率を満たす主軸寸法を使用する()
+    {
+        var first = IntrinsicBox(100, 10);
+        var second = IntrinsicBox(10, 10);
+        var flex = new RenderFlex { Direction = Axis.Horizontal, Children = { first, second } };
+        SetFlex(first, 1, FlexFit.Tight);
+        SetFlex(second, 1, FlexFit.Tight);
+        var intrinsic = new RenderIntrinsicWidth { Child = flex };
+
+        intrinsic.Layout(new BoxConstraints(MaxWidth: 500, MaxHeight: 100));
+
+        Assert.Equal(200, intrinsic.Size.Width);
+        Assert.Equal(100, first.Size.Width);
+        Assert.Equal(100, second.Size.Width);
+    }
+
+    [Fact]
+    public void GetMaxIntrinsicHeight_RowはFlex子へ割り当てた幅で交差軸を測定する()
+    {
+        var first = IntrinsicBox(100, 10, heightForWidth: width => width >= 100 ? 20 : 80);
+        var second = IntrinsicBox(10, 10, heightForWidth: width => width >= 100 ? 15 : 60);
+        var flex = new RenderFlex { Direction = Axis.Horizontal, Children = { first, second } };
+        SetFlex(first, 1, FlexFit.Tight);
+        SetFlex(second, 1, FlexFit.Loose);
+
+        Assert.Equal(20, flex.GetMaxIntrinsicHeight(200));
+    }
+
+    [Fact]
+    public void GetMaxIntrinsicWidth_ColumnはFlex子へ割り当てた高さで交差軸を測定する()
+    {
+        var first = IntrinsicBox(10, 100, widthForHeight: height => height <= 100 ? 20 : 80);
+        var second = IntrinsicBox(10, 10, widthForHeight: height => height <= 100 ? 15 : 60);
+        var flex = new RenderFlex { Direction = Axis.Vertical, Children = { first, second } };
+        SetFlex(first, 1, FlexFit.Loose);
+        SetFlex(second, 1, FlexFit.Tight);
+
+        Assert.Equal(20, flex.GetMaxIntrinsicWidth(200));
+    }
+
+    [Fact]
+    public void GetMinIntrinsicHeight_Rowは固定子を除いた幅をFlex子へ割り当てる()
+    {
+        var fixedChild = IntrinsicBox(50, 10);
+        var flexChild = IntrinsicBox(100, 10, heightForWidth: width => width >= 150 ? 20 : 80);
+        var flex = new RenderFlex
+        {
+            Direction = Axis.Horizontal,
+            Children = { fixedChild, flexChild }
+        };
+        SetFlex(flexChild, 1, FlexFit.Tight);
+
+        Assert.Equal(20, flex.GetMinIntrinsicHeight(200));
+    }
+
+    [Fact]
     public void FlexParentData_不正なFlexとFlexFitを拒否する()
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new FlexParentData { Flex = -1 });
@@ -134,13 +227,43 @@ public class RenderFlexTest
         AdditionalConstraints = BoxConstraints.Tight(width, height)
     };
 
-    private static FlexParentData ParentData(RenderConstrainedBox child)
+    private static IntrinsicTestBox IntrinsicBox(
+        double width,
+        double height,
+        Func<double, double>? widthForHeight = null,
+        Func<double, double>? heightForWidth = null) =>
+        new(width, height, widthForHeight, heightForWidth);
+
+    private static FlexParentData ParentData(RenderBox child)
         => Assert.IsType<FlexParentData>(child.ParentData);
 
-    private static void SetFlex(RenderConstrainedBox child, int flex, FlexFit fit)
+    private static void SetFlex(RenderBox child, int flex, FlexFit fit)
     {
         var parentData = ParentData(child);
         parentData.Flex = flex;
         parentData.Fit = fit;
+    }
+
+    private sealed class IntrinsicTestBox(
+        double width,
+        double height,
+        Func<double, double>? widthForHeight,
+        Func<double, double>? heightForWidth) : RenderBox
+    {
+        public override void PerformLayout() => Size = Constraints.Constrain(width, height);
+
+        protected override double ComputeMinIntrinsicWidth(double availableHeight) =>
+            widthForHeight?.Invoke(availableHeight) ?? width;
+
+        protected override double ComputeMaxIntrinsicWidth(double availableHeight) =>
+            widthForHeight?.Invoke(availableHeight) ?? width;
+
+        protected override double ComputeMinIntrinsicHeight(double availableWidth) =>
+            heightForWidth?.Invoke(availableWidth) ?? height;
+
+        protected override double ComputeMaxIntrinsicHeight(double availableWidth) =>
+            heightForWidth?.Invoke(availableWidth) ?? height;
+
+        public override void Paint(PaintingContext context, Offset offset) { }
     }
 }
