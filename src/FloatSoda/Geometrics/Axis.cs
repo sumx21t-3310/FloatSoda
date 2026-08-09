@@ -95,6 +95,41 @@ public enum FlexFit
     Loose,
 }
 
+/// <summary>Wrap の run 内または run 間で要素を配置する方法を表します。</summary>
+public enum WrapAlignment
+{
+    /// <summary>要素を軸の開始側へ寄せます。</summary>
+    Start,
+
+    /// <summary>要素を軸の終了側へ寄せます。</summary>
+    End,
+
+    /// <summary>要素を軸の中央へ寄せます。</summary>
+    Center,
+
+    /// <summary>先頭と末尾を両端へ置き、要素間に均等な空きを配置します。</summary>
+    SpaceBetween,
+
+    /// <summary>各要素の前後に均等な空きを配置し、両端の空きを要素間の半分にします。</summary>
+    SpaceAround,
+
+    /// <summary>両端を含むすべての空きを均等に配置します。</summary>
+    SpaceEvenly,
+}
+
+/// <summary>Wrap の各 run 内で子要素を交差軸方向へ配置する方法を表します。</summary>
+public enum WrapCrossAlignment
+{
+    /// <summary>子要素を run の交差軸開始側へ寄せます。</summary>
+    Start,
+
+    /// <summary>子要素を run の交差軸終了側へ寄せます。</summary>
+    End,
+
+    /// <summary>子要素を run の交差軸中央へ寄せます。</summary>
+    Center,
+}
+
 /// <summary>垂直軸の進行方向を表します。</summary>
 public enum VerticalDirection
 {
