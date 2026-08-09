@@ -64,6 +64,11 @@ even more here. Hand it the **PR branch's** docs.
 Keep the task realistic (still the VRChatter voice) but shaped so the new API is on the critical path — not
 mentioned by name (that would leak the answer), but unavoidable by function.
 
+> **Phase 2 exception — read this first.** While Phase 2 is running, every gate PR ports one named Flutter
+> widget, and the task for those runs is **required** to come from that widget's Flutter documentation, not
+> from an invented persona scenario. See "🧩 Phase 2" at the bottom of this file; the template below applies
+> to non-Phase-2 API additions.
+
 **Template:**
 
 > FloatSodaで、〔新APIを使わないと自然には解けない、ペルソナ①らしい小道具〕を作って。
@@ -83,3 +88,59 @@ the finding — the new API wasn't discoverable, or its shape wasn't the intuiti
 When picking the requirement, target the *function* of the new API, then check the failure against the
 four-category triage in `SKILL.md`. A "hallucination" of a cleaner shape than what the PR built is the most
 valuable outcome — it's a direct argument to reshape the API before merge.
+
+---
+
+## 🧩 Phase 2 — per-widget gate runs must be derived from Flutter's own docs
+
+**Applies to: the new-API PR gate during Phase 2** — i.e. a run testing a single ported widget (`Wrap`,
+`FittedBox`, `CustomPaint`, …), which is every Phase 2 widget PR. For those runs the task is **not** invented:
+it **must be derived from that widget's own Flutter documentation**, using `api.flutter.dev`, the widget
+catalog sample, or the `flutter-widget-source` skill's pointer to the canonical implementation. Writing a
+VRChatter-voice pretext that happens to require the widget is not an accepted substitute here.
+
+The reason it's mandatory rather than merely allowed: Phase 2 ports are 1:1, so Flutter's own description is
+the authoritative statement of what the widget must produce. Grounding the task there makes the run a
+comparison against a fixed reference instead of against the test author's improvised idea of the widget —
+which is what lets results be compared across widgets and across releases.
+
+(Release-gate runs are unaffected — those stay app-shaped and in the persona voice. See the top of this file.)
+
+### How to reshape a sample description into a prompt
+
+The best raw material is the one-sentence prose intro Flutter puts above each `{@tool snippet}` — it states
+the intended outcome authoritatively, in one sentence, for every widget. `Wrap`'s reads:
+
+> This example renders some `[Chip]`s representing four contacts in a `[Wrap]` so that they flow across
+> lines as necessary.
+
+It cannot be used verbatim: it names the answer (`[Wrap]`) and depends on a Material widget FloatSoda
+doesn't have (`[Chip]`, which would surface as a bogus category-ⓐ "hallucinated API" finding). Reshape it:
+
+1. **Drop the meta-frame.** "This example renders…" → a request ("〜を作って").
+2. **Delete the bracketed widget name, keep the behavior clause after it.** `[Wrap]` goes; "so that they
+   flow across lines as necessary" stays — that clause *is* the spec.
+3. **Restate Flutter-only widgets by appearance.** `[Chip]` → 「小さい角丸のラベル」.
+4. **Keep concrete counts and data.** "four contacts" → 「4人」. Concrete output is checkable by eye.
+
+Then **top it up from the class doc prose above the sample**, because the one sentence usually only forces
+the widget's headline behavior. `Wrap`'s sample sentence forces wrapping but never `Spacing` / `RunSpacing` /
+`Alignment`; those come from the paragraphs describing `alignment` / `runSpacing` / `runAlignment`. Cover the
+surface the PR under test actually adds.
+
+Worked result for `Wrap`:
+
+> FloatSodaで、連絡先4人の名前を小さい角丸ラベルにして横に並べるパネルを作って。
+> 幅に入りきらなくなったら次の行に折り返してほしい。
+> ラベル同士の間隔と、行と行の間隔は別々に調整できるようにして。
+
+### The rule that keeps it valid
+
+- **Do not point the junior at Flutter's docs.** The Flutter source is the *test author's* input, not the
+  junior's. FloatSoda mirrors Flutter's naming, so a junior reading `api.flutter.dev` would "discover"
+  `RunSpacing` from Flutter rather than from FloatSoda's `WidgetSystem.md` — which is exactly the signal
+  this gate exists to measure. The black-box docs pointer stays FloatSoda-only.
+
+The VRChatter voice is dropped here; a bare layout request is what you want. What that costs is the realism
+of persona #1's phrasing, which is why the **release gate** keeps the persona voice — that's the run
+measuring whether a real user's fuzzy request survives the docs, and this one isn't trying to.
