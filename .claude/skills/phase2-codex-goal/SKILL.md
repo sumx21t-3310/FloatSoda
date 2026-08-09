@@ -11,7 +11,7 @@ description: >
 
 # Phase2 リモート状況確認 → Codex /goal プロンプト生成
 
-FloatSoda(`C:\Users\sumx21t\projects\libs\FloatSoda`)の Phase 2 は、Flutter の基礎ウィジェット約48個を
+FloatSoda(`%USERPROFILE%\projects\libs\FloatSoda`)の Phase 2 は、Flutter の基礎ウィジェット約48個を
 Widget / Element / RenderObject の3層で移植するフェーズ。進捗はトラッキング Issue **#178** の
 チェックリストで管理され、Codex が `codex/phase2-<issue番号>-<slug>` ブランチで Draft PR を作る運用。
 
@@ -25,7 +25,7 @@ Widget / Element / RenderObject の3層で移植するフェーズ。進捗は�
 FloatSoda リポジトリで以下を確認する(独立なコマンドは並列で実行してよい):
 
 ```bash
-cd C:\Users\sumx21t\projects\libs\FloatSoda
+cd "$USERPROFILE/projects/libs/FloatSoda"
 git fetch --all --quiet
 git branch -a                # codex/phase2-* ブランチの有無
 git log --oneline -10 --all --date=short --pretty='%h %ad %d %s'
@@ -57,7 +57,7 @@ CI 状態(build-and-test)とマージ可否まで確認する。Draft かどう�
 
 ```
 /goal
-GOAL: FloatSoda リポジトリ(C:\Users\sumx21t\projects\libs\FloatSoda)で Issue #<番号> を実装する。
+GOAL: FloatSoda リポジトリ(<リポジトリの絶対パス>)で Issue #<番号> を実装する。
 <対象ウィジェット群>を、既存の Widget / Element / RenderObject 3層パイプラインに接続して public 化する。
 Flutter 本家の同名ウィジェットの設計を正典として踏襲しつつ、FloatSoda 既存の
 RenderProxyBox・dirty layout/paint 設計・命名規約に合わせること。
@@ -103,6 +103,9 @@ RenderProxyBox・dirty layout/paint 設計・命名規約に合わせること�
 ```
 
 `<最新mainのSHA>` は調査時の `origin/main` の short SHA を実際に埋める。
+`<リポジトリの絶対パス>` は手元のチェックアウトの絶対パスを実際に埋める(Codex に渡す
+プロンプトには実パスが必要。このスキル本体は公開リポジトリに入るので、テンプレート側には
+絶対パスを書かない)。
 
 完了条件 5 の issue クローズについて。このリポジトリは PR を
 **マージコミット**で取り込む運用(`Merge pull request #187 from ...`)なので、

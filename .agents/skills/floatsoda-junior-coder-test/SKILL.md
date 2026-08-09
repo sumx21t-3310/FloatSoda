@@ -44,7 +44,9 @@ pick the task (step 1) differs.
   overfit to one scenario. Blocks the release if a docs bug (ⓑ) or library bug (ⓒ) surfaces.
 - **New-API PR gate** (see `CONTRIBUTING.md`): run on a PR that adds or changes **public, documented API**.
   Write a **targeted task that cannot be completed without the new API**, and hand the junior the PR branch's
-  **updated docs only**. This is the higher-leverage use: it catches a misuse-prone API while it can still be
+  **updated docs only**. **During Phase 2** every such PR ports one named Flutter widget, and the task must be
+  **derived from that widget's Flutter documentation** rather than invented — see the "🧩 Phase 2" section of
+  `references/prompts.md` for the required reshaping steps. This is the higher-leverage use: it catches a misuse-prone API while it can still be
   changed, before it's public and locked in. Read the failure as a design signal:
   - *can't find it* → discoverability / docs gap (not in WidgetSystem, non-intuitive name)
   - *uses it wrong* → the API isn't misuse-proof, or the docs are ambiguous
@@ -67,10 +69,16 @@ Confirm the chosen task with the user before spending a subagent on it.
 
 ### 2. Set up an isolated scratch project
 
-Create (or reuse) a .NET console project **outside the repo**, e.g. `../FloatSodaJuniorTest/`.
+Create (or reuse) a .NET console project at **`%USERPROFILE%\projects\test\FloatSodaJuniorTest\`**
+(resolve `%USERPROFILE%` yourself; it is written that way to keep an absolute local path out of this public
+repo). This exact location is required: do **not** use the session scratchpad under `AppData\Local\Temp`, and
+do not create it inside the repo. It has to persist across sessions — step 5 (the VR run) is manual, so the
+owner needs a stable path to launch the exe from, and "wipe prior `*.cs`" below assumes the same directory is
+reused every run.
+
 It should reference the **local** FloatSoda projects (so current source, including uncommitted fixes on
-the working branch, is what gets tested) via `ProjectReference` to `src/FloatSoda/FloatSoda.csproj`
-(and any other needed projects). Referencing local source — not the published NuGet — is deliberate:
+the working branch, is what gets tested) via `ProjectReference` to the checkout — from that directory,
+`..\..\libs\FloatSoda\src\FloatSoda\FloatSoda.csproj` (and any other needed projects). Referencing local source — not the published NuGet — is deliberate:
 it lets the test catch bugs in the code you're actively changing. The black-box rule keeps the model
 honest even though the source is reachable on disk.
 
