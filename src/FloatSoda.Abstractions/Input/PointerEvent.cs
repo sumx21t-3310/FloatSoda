@@ -1,3 +1,4 @@
+using System.Numerics;
 using FloatSoda.Abstractions.Geometries;
 
 namespace FloatSoda.Abstractions.Input;
@@ -34,4 +35,4 @@ public readonly record struct PointerEvent(
     int PointerId,
     PointerEventPhase Phase,
     Offset Position,
-    Offset? Transform = null);
+    Matrix3x2? Transform = null);

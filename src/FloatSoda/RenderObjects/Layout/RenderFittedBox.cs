@@ -123,10 +123,10 @@ public sealed class RenderFittedBox : RenderProxyBox
         if (Child is null || Size.IsEmpty || Child.Size.IsEmpty) return false;
 
         UpdatePaintData();
-        if (!Matrix3x2.Invert(_effectiveTransform!.Value, out var inverse)) return false;
-
-        var transformed = Vector2.Transform(new Vector2((float)position.X, (float)position.Y), inverse);
-        return Child.HitTest(result, new Offset(transformed.X, transformed.Y));
+        return result.AddWithPaintTransform(
+            _effectiveTransform!.Value,
+            position,
+            (hitTestResult, transformed) => Child.HitTest(hitTestResult, transformed));
     }
 
     private void PaintChildWithTransform(PaintingContext context, Offset offset)

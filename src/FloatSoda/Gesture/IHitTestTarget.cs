@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Abstractions.Input;
 
@@ -15,15 +16,15 @@ public interface IHitTestTarget
     void HandleEvent(PointerEvent pointerEvent, HitTestEntry entry);
 }
 
-/// <summary>ヒットした対象と、その対象のローカル座標へ変換するオフセットを表す不変値です。</summary>
+/// <summary>ヒットした対象と、その対象のローカル座標へ変換する行列を表す不変値です。</summary>
 /// <param name="Target">ポインターイベントを受け取る対象。</param>
-/// <param name="Transform">グローバル座標へ加算して対象のローカル座標へ変換するオフセット。未指定の場合は<see langword="null"/>です。</param>
+/// <param name="Transform">グローバル座標から対象のローカル座標へ変換する行列。未指定の場合は<see langword="null"/>です。</param>
 /// <seealso cref="IHitTestTarget"/>
 /// <seealso cref="HitTestResult"/>
-public readonly record struct HitTestEntry(IHitTestTarget Target, Offset? Transform = null);
+public readonly record struct HitTestEntry(IHitTestTarget Target, Matrix3x2? Transform = null);
 
 /// <summary>ポインター位置でヒットした対象の経路と、走査中の座標変換を保持します。</summary>
-/// <remarks>座標変換は<see cref="PushOffset"/>と<see cref="PopTransform"/>を対にして管理し、<see cref="Add"/>時点の累積値を各エントリへ保存します。</remarks>
+/// <remarks>座標変換は<see cref="PushOffset"/>または<see cref="PushTransform"/>と<see cref="PopTransform"/>を対にして管理し、<see cref="Add"/>時点の累積値を各エントリへ保存します。</remarks>
 /// <seealso cref="HitTestEntry"/>
 public class HitTestResult
 {
@@ -32,9 +33,9 @@ public class HitTestResult
 
     private readonly List<HitTestEntry> _pathInternal = [];
 
-    private readonly List<Offset> _transforms = [Offset.Zero];
+    private readonly List<Matrix3x2> _transforms = [Matrix3x2.Identity];
 
-    private readonly List<Offset> _localTransform = [];
+    private readonly List<Matrix3x2> _localTransform = [];
 
 
     private void GlobalizeTransform()
@@ -45,16 +46,16 @@ public class HitTestResult
 
         foreach (var part in _localTransform)
         {
-            last = part + last;
+            last *= part;
             _transforms.Add(last);
         }
 
         _localTransform.Clear();
     }
 
-    /// <summary>現在のグローバル座標からローカル座標への累積オフセットを取得します。</summary>
-    /// <remarks>まだ確定していないオフセットがある場合は、取得時に累積変換へ反映します。</remarks>
-    public Offset LastTransform
+    /// <summary>現在のグローバル座標からローカル座標への累積変換を取得します。</summary>
+    /// <remarks>まだ確定していない変換がある場合は、取得時に累積変換へ反映します。</remarks>
+    public Matrix3x2 LastTransform
     {
         get
         {
@@ -67,10 +68,16 @@ public class HitTestResult
     /// <summary>子要素のヒットテスト中に適用する座標オフセットを積みます。</summary>
     /// <param name="offset">現在の座標へ加算する論理ピクセル単位のオフセット。</param>
     /// <remarks>走査を戻る際は<see cref="PopTransform"/>を同じ回数だけ呼び出します。</remarks>
-    public void PushOffset(Offset offset) => _localTransform.Add(offset);
+    public void PushOffset(Offset offset) => PushTransform(
+        Matrix3x2.CreateTranslation((float)offset.X, (float)offset.Y));
 
-    /// <summary>直前に積まれた座標オフセットを取り除きます。</summary>
-    /// <remarks><see cref="PushOffset"/>と対にして呼び出す必要があります。未確定のオフセットがあればそれを、なければ確定済みの累積変換を1段戻します。</remarks>
+    /// <summary>子要素のヒットテスト中に適用するアフィン座標変換を積みます。</summary>
+    /// <param name="transform">現在の座標から子要素のローカル座標へ変換する行列。</param>
+    /// <remarks>走査を戻る際は<see cref="PopTransform"/>を同じ回数だけ呼び出します。</remarks>
+    public void PushTransform(Matrix3x2 transform) => _localTransform.Add(transform);
+
+    /// <summary>直前に積まれた座標変換を取り除きます。</summary>
+    /// <remarks><see cref="PushOffset"/>または<see cref="PushTransform"/>と対にして呼び出す必要があります。未確定の変換があればそれを、なければ確定済みの累積変換を1段戻します。</remarks>
     public void PopTransform()
     {
         if (_localTransform.Count != 0)
@@ -100,10 +107,38 @@ public class HitTestResult
 
         if (offset is not null) PushOffset(-offset.Value);
 
-        var isHit = hitTest(this, (Offset)transform);
+        try
+        {
+            return hitTest(this, (Offset)transform);
+        }
+        finally
+        {
+            if (offset is not null) PopTransform();
+        }
+    }
 
-        if (offset is not null) PopTransform();
+    /// <summary>描画時のアフィン変換を座標へ反映し、子要素のヒットテストを実行します。</summary>
+    /// <param name="transform">子要素のローカル座標から親座標へ変換する描画行列。</param>
+    /// <param name="position">親座標系におけるポインター位置。</param>
+    /// <param name="hitTest">この結果と子要素のローカル座標を受け取り、ヒット判定を行う処理。</param>
+    /// <returns>子要素がヒットした場合は<see langword="true"/>、ヒットしなかった場合は<see langword="false"/>。</returns>
+    /// <remarks>逆行列を計算できない場合はヒットしません。逆変換は処理の呼び出し中だけ積まれ、処理が戻ると元の変換状態へ戻されます。</remarks>
+    public bool AddWithPaintTransform(
+        Matrix3x2 transform,
+        Offset position,
+        Func<HitTestResult, Offset, bool> hitTest)
+    {
+        if (!Matrix3x2.Invert(transform, out var inverse)) return false;
 
-        return isHit;
+        var transformed = Vector2.Transform(new Vector2((float)position.X, (float)position.Y), inverse);
+        PushTransform(inverse);
+        try
+        {
+            return hitTest(this, new Offset(transformed.X, transformed.Y));
+        }
+        finally
+        {
+            PopTransform();
+        }
     }
 }
