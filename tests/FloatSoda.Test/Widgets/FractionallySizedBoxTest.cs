@@ -73,6 +73,34 @@ public class FractionallySizedBoxTest
         Assert.Throws<InvalidOperationException>(() => renderObject.Layout(BoxConstraints.Unbounded));
     }
 
+    [Fact]
+    public void GetMaxIntrinsicWidth_高さ無制約かつHeightFactorが0_子へ高さ0を渡す()
+    {
+        var child = new IntrinsicProbeBox();
+        var renderObject = new RenderFractionallySizedOverflowBox
+        {
+            HeightFactor = 0,
+            Child = child
+        };
+
+        Assert.Equal(40, renderObject.GetMaxIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(0, child.LastMaxIntrinsicWidthHeight);
+    }
+
+    [Fact]
+    public void GetMaxIntrinsicHeight_幅無制約かつWidthFactorが0_子へ幅0を渡す()
+    {
+        var child = new IntrinsicProbeBox();
+        var renderObject = new RenderFractionallySizedOverflowBox
+        {
+            WidthFactor = 0,
+            Child = child
+        };
+
+        Assert.Equal(20, renderObject.GetMaxIntrinsicHeight(double.PositiveInfinity));
+        Assert.Equal(0, child.LastMaxIntrinsicHeightWidth);
+    }
+
     [Theory]
     [MemberData(nameof(Alignments))]
     public void PerformLayout_Alignment各値_子のオフセットを設定する(
@@ -188,4 +216,27 @@ public class FractionallySizedBoxTest
 
     private static bool IsSkiaType(Type type) =>
         type.Namespace?.StartsWith("SkiaSharp", StringComparison.Ordinal) == true;
+
+    private sealed class IntrinsicProbeBox : RenderBox
+    {
+        public double LastMaxIntrinsicWidthHeight { get; private set; } = double.NaN;
+
+        public double LastMaxIntrinsicHeightWidth { get; private set; } = double.NaN;
+
+        public override void PerformLayout() => Size = Constraints.Smallest;
+
+        protected override double ComputeMaxIntrinsicWidth(double height)
+        {
+            LastMaxIntrinsicWidthHeight = height;
+            return 40;
+        }
+
+        protected override double ComputeMaxIntrinsicHeight(double width)
+        {
+            LastMaxIntrinsicHeightWidth = width;
+            return 20;
+        }
+
+        public override void Paint(PaintingContext context, Offset offset) { }
+    }
 }

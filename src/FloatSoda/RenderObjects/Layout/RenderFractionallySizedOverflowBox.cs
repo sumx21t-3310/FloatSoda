@@ -171,7 +171,7 @@ public sealed class RenderFractionallySizedOverflowBox : RenderBox, IHasSingleCh
     {
         if (Child is null) return 0;
         if (WidthFactor == 0) return 0;
-        var adjustedHeight = height * (HeightFactor ?? 1);
+        var adjustedHeight = HeightFactor == 0 ? 0 : height * (HeightFactor ?? 1);
         var result = minimum
             ? GetRenderBoxChild().GetMinIntrinsicWidth(adjustedHeight)
             : GetRenderBoxChild().GetMaxIntrinsicWidth(adjustedHeight);
@@ -182,7 +182,7 @@ public sealed class RenderFractionallySizedOverflowBox : RenderBox, IHasSingleCh
     {
         if (Child is null) return 0;
         if (HeightFactor == 0) return 0;
-        var adjustedWidth = width * (WidthFactor ?? 1);
+        var adjustedWidth = WidthFactor == 0 ? 0 : width * (WidthFactor ?? 1);
         var result = minimum
             ? GetRenderBoxChild().GetMinIntrinsicHeight(adjustedWidth)
             : GetRenderBoxChild().GetMaxIntrinsicHeight(adjustedWidth);
