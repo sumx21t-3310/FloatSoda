@@ -3,8 +3,7 @@
 # ウィジェット/エレメントシステム
 
 > **実装状況:**
-> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Clip*`, `SizedBox`, `ConstrainedBox`, `ConstraintsTransformBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Stack`, `Offstage`, `IndexedStack`, `RotatedBox`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
+> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Stack`, `AspectRatio`, `FittedBox`, `LimitedBox`, `Offstage`, `IndexedStack`, `RotatedBox`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
 > - **未実装:** `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Padding`, `Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
 > - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
 
@@ -252,11 +251,15 @@ public override Widget Build(IBuildContext context)
 | `Column` | ✓ | 垂直方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Row` | ✓ | 水平方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
+| `Wrap` | ✓ | 主軸の利用可能領域で子を `run` へ折り返して配置 | `Direction`, `Children`, `Spacing`, `RunSpacing`, `Alignment`, `RunAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `Flexible` | ✓ | `Flex`系の余剰主軸領域を比率で受け取り、子が割当量以下の大きさを選択可能 | `Flex`, `Fit`, `Child` (必須) |
 | `Expanded` | ✓ | `Flex`系の余剰主軸領域を比率で受け取り、子を割当量いっぱいに拡張 | `Flex`, `Child` (必須) |
 | `Spacer` | ✓ | `Flex`系へ比率指定できる空白を挿入 | `Flex` |
 | `SizedBox` | ✓ | 固定サイズのボックス | `Width`, `Height`, `Child` |
 | `ConstrainedBox` | ✓ | 親の制約と交差する追加制約を子へ適用 | `AdditionalConstraints` (`BoxConstraints`, 必須), `Child` |
+| `AspectRatio` | ✓ | 親制約内で幅対高さの比率を維持して子へ固定寸法を適用 | `Ratio` (正の有限値、必須), `Child` |
+| `FittedBox` | ✓ | 子を自然サイズでレイアウトし、`BoxFit`と`Alignment`に従って拡大縮小・配置 | `Fit`, `Alignment`, `ClipBehavior`, `Child` |
+| `LimitedBox` | ✓ | 親の上限が無限の軸だけ、子へ最大寸法を適用 | `MaxWidth`, `MaxHeight`, `Child` |
 | `ConstraintsTransformBox` | ✓ | 親制約を任意の `BoxConstraintsTransform` で変換し、子を配置 | `ConstraintsTransform` (必須), `Alignment`, `ClipBehavior`, `Child` |
 | `UnconstrainedBox` | ✓ | 両軸または指定軸以外の制約を外して子を自然サイズで配置 | `ConstrainedAxis`, `Alignment`, `ClipBehavior`, `Child` |
 | `IntrinsicWidth` | ✓ | 子の最大intrinsic幅へ収縮し、任意のstep単位で切り上げ | `StepWidth`, `Child` |
@@ -277,6 +280,30 @@ public override Widget Build(IBuildContext context)
 | `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
 
 `ConstrainedBox` は、親から渡される制約を無視せず、その範囲内で追加の最小・最大サイズを子へ適用します。
+
+`AspectRatio.Ratio`は幅を高さで割った値です。両軸が可変なら幅の上限を優先し、収まらない場合は高さの上限から幅を再計算します。幅と高さの両方に上限がない場所ではサイズを決められないため、親の`SizedBox`や`ConstrainedBox`から少なくとも一方の上限を与えてください。
+
+`FittedBox`は子を制約なしの自然サイズでレイアウトしてから描画時に変換します。`BoxFit`には`Fill`, `Contain`, `Cover`, `FitWidth`, `FitHeight`, `None`, `ScaleDown`があり、`Cover`などではみ出す部分を切り抜く場合は`ClipBehavior`を指定します。
+
+`LimitedBox`は、親から受け取った最大幅または最大高さが正の無限大の場合だけ対応する上限を適用します。有限の親制約がある場合は`MaxWidth` / `MaxHeight`を適用しません。
+
+```csharp
+using FloatSoda.Geometrics;
+using FloatSoda.Rendering.Layers;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Layout;
+
+Widget thumbnail = new AspectRatio
+{
+    Ratio = 16.0 / 9.0,
+    Child = new FittedBox
+    {
+        Fit = BoxFit.Cover,
+        ClipBehavior = Clip.HardEdge,
+        Child = new SizedBox { Width = 1920, Height = 1080 }
+    }
+};
+```
 
 `IndexedStack.Index` は0始まりです。`null`は全子をレイアウトしたまま全非表示にし、負値または`Children`の範囲外は`ArgumentOutOfRangeException`になります。
 `RotatedBox`は回転後の幅と高さをレイアウトへ反映します。レイアウト寸法を変えず描画だけを任意角度で変形する`Transform`とは用途が異なります。
