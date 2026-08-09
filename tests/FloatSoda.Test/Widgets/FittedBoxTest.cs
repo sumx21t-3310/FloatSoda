@@ -1,12 +1,15 @@
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Abstractions.Input;
 using FloatSoda.Core;
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
 using FloatSoda.Gesture;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.RenderObjects;
+using FloatSoda.RenderObjects.Gesture;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Testing;
@@ -170,6 +173,35 @@ public class FittedBoxTest
 
         Assert.True(renderObject.HitTest(new HitTestResult(), new Offset(20, 20)));
         Assert.False(renderObject.HitTest(new HitTestResult(), new Offset(20, 5)));
+    }
+
+    [Fact]
+    public void HitTestChildren_Containで縮小_逆変換をPointerEventへ保持する()
+    {
+        PointerEvent? received = null;
+        var listener = new RenderPointerListener
+        {
+            Behaviour = HitTestBehaviour.Opaque,
+            OnPointerDown = pointerEvent => received = pointerEvent,
+            Child = new RenderConstrainedBox { AdditionalConstraints = BoxConstraints.Tight(80, 20) }
+        };
+        var renderObject = new RenderFittedBox { Fit = BoxFit.Contain, Child = listener };
+        renderObject.Layout(BoxConstraints.Tight(40, 40));
+
+        var result = new HitTestResult();
+        Assert.True(renderObject.HitTest(result, new Offset(20, 20)));
+        var entry = Assert.Single(result.Path, item => ReferenceEquals(item.Target, listener));
+
+        entry.Target.HandleEvent(
+            new PointerEvent(1, PointerEventPhase.Down, new Offset(20, 20), entry.Transform),
+            entry);
+
+        Assert.True(received.HasValue);
+        Assert.True(received.Value.Transform.HasValue);
+        var localPosition = Vector2.Transform(
+            new Vector2((float)received.Value.Position.X, (float)received.Value.Position.Y),
+            received.Value.Transform.Value);
+        Assert.Equal(new Vector2(40, 10), localPosition);
     }
 
     [Fact]
