@@ -271,6 +271,9 @@ public override Widget Build(IBuildContext context)
 | `Offstage` | ✓ | 子をレイアウトしたまま描画・ヒットテストから除外 | `IsOffstage`, `Child` |
 | `Visibility` | ✓ | `Visible`に応じて必須の`Child`と`Replacement`を切り替え。非表示子の状態保持は行わない | `Visible`, `Child` (必須), `Replacement` |
 | `RotatedBox` | ✓ | 90度単位でレイアウト寸法ごと時計回りに回転。負値・4以上は4を法として正規化 | `QuarterTurns`, `Child` |
+| `FractionallySizedBox` | ✓ | 親の最大寸法に対する割合を子へtight制約として適用し、子を配置 | `WidthFactor`, `HeightFactor`, `Alignment`, `Child` |
+| `OverflowBox` | ✓ | 親とは異なる制約を子へ渡し、自身の領域外への描画を許可 | `MinWidth`, `MaxWidth`, `MinHeight`, `MaxHeight`, `Fit`, `Alignment`, `Child` |
+| `SizedOverflowBox` | ✓ | 自身は指定サイズを採り、子へ親の元の制約を渡して配置 | `Size` (`Size`, 必須), `Alignment`, `Child` |
 | `Container` | ✗ `internal` スタブ | パディング・色・サイズなどを一括指定 | — |
 | `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
 | `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
@@ -394,6 +397,31 @@ Widget naturalWidthRow = new UnconstrainedBox
     Child = new Row
     {
         Children = [new Text("自然な幅で並べるログ行")]
+    }
+};
+```
+
+`FractionallySizedBox` は、`WidthFactor` / `HeightFactor` を指定した軸で親の最大寸法にfactorを乗算し、その寸法を子へtight制約として渡します。`null` の軸は親制約を変更しません。factorを使う軸には有限の最大制約が必要です。
+
+`OverflowBox` は、`MinWidth` / `MaxWidth` / `MinHeight` / `MaxHeight` のうち指定した境界だけを親制約から上書きします。`Fit = OverflowBoxFit.Max` は有限の親領域を最大まで使用し、`OverflowBoxFit.DeferToChild` は親制約内で子のサイズに従います。overflow部分は切り抜かず、そのまま描画します。
+
+`SizedOverflowBox` は、自身のサイズを `FloatSoda.Geometrics.Size` で指定する一方、子へは親から受け取った元の制約をそのまま渡します。自身と子を異なるサイズでレイアウトしたい場合に使用します。
+
+```csharp
+Widget overflowPreview = new SizedOverflowBox
+{
+    Size = new Size(240, 120),
+    Alignment = Alignment.Center,
+    Child = new OverflowBox
+    {
+        MinWidth = 320,
+        MaxWidth = 320,
+        Fit = OverflowBoxFit.Max,
+        Child = new FractionallySizedBox
+        {
+            HeightFactor = 0.5,
+            Child = new Text("VRChat preview")
+        }
     }
 };
 ```
