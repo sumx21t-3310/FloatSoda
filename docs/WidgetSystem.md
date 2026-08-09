@@ -251,6 +251,7 @@ public override Widget Build(IBuildContext context)
 | `Column` | ✓ | 垂直方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Row` | ✓ | 水平方向に並べる(`Flex` に委譲) | `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `MainAxisSize` |
 | `Flex` | ✓ | 方向指定のフレックスレイアウト。`UpdateRenderObject` と `Key` 対応の子リスト差分に対応 | `Direction`, `Children`, `MainAxisAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
+| `Wrap` | ✓ | 主軸の利用可能領域で子を `run` へ折り返して配置 | `Direction`, `Children`, `Spacing`, `RunSpacing`, `Alignment`, `RunAlignment`, `CrossAxisAlignment`, `VerticalDirection` |
 | `Flexible` | ✓ | `Flex`系の余剰主軸領域を比率で受け取り、子が割当量以下の大きさを選択可能 | `Flex`, `Fit`, `Child` (必須) |
 | `Expanded` | ✓ | `Flex`系の余剰主軸領域を比率で受け取り、子を割当量いっぱいに拡張 | `Flex`, `Child` (必須) |
 | `Spacer` | ✓ | `Flex`系へ比率指定できる空白を挿入 | `Flex` |
