@@ -26,8 +26,6 @@ using var app = new OVRApplication(
 | `Background` | SteamVR を起動しないバックグラウンドアプリ |
 | `Utility` | ハードウェア不要のユーティリティ（インストーラーなど） |
 
----
-
 ## オーバーレイ種別
 
 ```mermaid
@@ -80,8 +78,6 @@ overlay.Transform.Position = new Vector3(0, 0.05f, 0); // コントローラー�
 
 `TrackedDevice` の値: `LeftController`, `RightController`, `HMD`
 
----
-
 ## オーバーレイプロパティ
 
 すべての `IOverlay` 実装は以下のプロパティ（ケーパビリティオブジェクト）を持ちます。
@@ -106,8 +102,6 @@ overlay.Transform.Position = new Vector3(0, 0.05f, 0); // コントローラー�
 | `IMovableOverlay` | `Intersection` | レイとオーバーレイ表面の交差判定 |
 | `IMovableOverlay` | `Transform` | `Position`, `Rotation` で位置・向きを設定 |
 
----
-
 ## VREventDispatcher
 
 `VREventDispatcher` は `PollEvents()` を呼ぶたびに OpenVR のイベントキューを消費し、登録されたハンドラを呼び出します。抽象クラスであり、用途に応じたサブクラスを使います。
@@ -131,8 +125,6 @@ dispatcher.PollEvents();
 ```
 
 FloatSodaのHostedServiceは `VREvent_Quit` / `VREvent_ProcessQuit` を自動登録し、受信時にGeneric Host全体へ停止を通知します。
-
----
 
 ## 例外体系
 
@@ -162,8 +154,6 @@ catch (VRInitializeException ex)
 }
 ```
 
----
-
 ## Math — Matrix ヘルパー
 
 `FloatSoda.OVR.Math.Matrix` は `System.Numerics.Matrix4x4` と OpenVR の `HmdMatrix34_t` を相互変換するヘルパーです。
@@ -175,8 +165,6 @@ OpenVR.Overlay.SetOverlayTransformAbsolute(handle, origin, ref hmd);
 ```
 
 `OverlayTransform` サブクラスを実装する場合は `GetMatrix()` が `Position` + `Rotation` から `Matrix4x4` を生成するので、`Apply()` で `ToHmdMatrix34_t()` を呼ぶだけで済みます。
-
----
 
 ## 関連ページ
 
