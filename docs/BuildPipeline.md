@@ -38,8 +38,6 @@ sequenceDiagram
 2. **レイアウト/ペイントフェーズ** — RenderObject 側の dirty フラグに基づき `RenderPipeline` が差分レイアウト・差分ペイントを実行します。
 3. **合成フェーズ** — レイヤーツリーをクローンしてレンダースレッドへ送ります([Architecture](Architecture.md) 参照)。
 
----
-
 ## BuildOwner と dirty list
 
 `BuildOwner`(`src/FloatSoda/Elements/BuildOwner.cs`)は Element の再ビルドをスケジュールする中枢です。`WidgetBinding` が 1 つ保持し、ルート Element の `Mount` 時にツリー全体へ伝播します。
@@ -67,8 +65,6 @@ public void MarkNeedsBuild()
 ビルド中に新たな Element が dirty になった場合(ビルド中の `MarkNeedsBuild`)はリストを再ソートしてループを継続します。ループ終了後に `InDirtyList` フラグをクリアして dirty list を空にします。
 
 `Element` は `IComparable<Element>` を実装しており、`Depth` → `Dirty` の順で比較されます。
-
----
 
 ## Element の再ビルドと UpdateChild
 
@@ -112,8 +108,6 @@ Widget が変わる
           → FlushLayout / FlushPaint(変わった部分だけ)
 ```
 
----
-
 ## ルートの接続: RenderObjectToWidgetAdapter
 
 Widget ツリーのルートは `RenderObjectToWidgetAdapter`(Widget)と `RenderObjectToWidgetElement<RenderView>`(Element)のペアが `RenderView` に橋渡しします。
@@ -131,8 +125,6 @@ RenderViewElement = new RenderObjectToWidgetAdapter
 
 - **初回(`element == null`)** — Element を生成し、`owner.BuildScope(() => result.Mount(null))` でビルドスコープ内にツリー全体を `Mount` します。
 - **2 回目以降** — 既存 Element の `NewWidget` に新しいルート Widget をセットして `MarkNeedsBuild()` するだけです。実際の適用は次の `BuildScope()` 内の `PerformRebuild()` で行われます(ホットリロードやルート差し替えに対応)。
-
----
 
 ## WidgetBinding.DrawFrame
 
@@ -166,18 +158,16 @@ public void DrawFrame()
 
 つまり **Widget にも RenderObject にも変更がないフレームでは、レイアウト・ペイント・合成のすべてがスキップされます**。
 
----
-
 ## 未実装の領域
 
 | 対象 | 現状 |
 |---|---|
-| 一部の便利ウィジェット | `Padding` / `Container` / `ListView` / `GridView` / `SingleChildScrollView` / `Opacity` と旧 `Components.Icon` / `Components.Image` は未実装のため `internal`。入力系の `GestureDetector` / `Listener` は公開スタブ |
-| デザインシステムの `Button` | `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` にスケルトン実装済み。ジェスチャ・ヒットテストとの配線待ち |
-| ジェスチャ・ヒットテスト | 宣言的な入力(タップ・ドラッグ)は未実装 |
+| スクロール系ウィジェット | `ListView` / `GridView` / `SingleChildScrollView` は `internal` で公開 API から除外。viewport 基盤とあわせて Phase 3 で実装 |
+| 画像・アイコン | `Components.Icon` / `Components.Image` は `internal`。描画系の `Paint.Image` は使用可能 |
+| `Container` の `Padding` | `Container` 自体は使用可能だが、`Padding` の合成にまだ対応していない。余白は `Padding` を明示的に入れ子にする |
+| ポインタ入力源 | ヒットテストとジェスチャ認識は実装済み。ただし座標の供給元がダッシュボードオーバーレイにしか接続されておらず、`WorldSpaceWindow` / `DeviceTrackedWindow` では入力が届かない |
+| UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`) | Phase 5 の予定。`ButtonBase` / `Button` / `ButtonStyle` の型はあるが `GestureDetector` へ未配線で、3プロジェクトとも NuGet 未配布 |
 | `FloatSoda.Hooks` | `HookWidget` / `HookElement`(R3 の `ReactiveProperty` による `UseState`)が部分実装。フレームワークのビルドループとは未統合で、`HookExtension` の各ヘルパーは `NotImplementedException` |
-
----
 
 ## 関連ページ
 

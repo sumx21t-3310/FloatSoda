@@ -2,10 +2,13 @@
 
 # ウィジェット/エレメントシステム
 
-> **実装状況:**
-> - **実装済み:** `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element が動作します。`State.SetState()` による再ビルド、`InheritedWidget` の依存追跡・通知、`MultiChildRenderObjectElement` の `Key` 対応の子リスト差分も実装済みです。ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` と、`ParentDataWidget<T>` による親固有レイアウト情報の適用にも対応しています。`SingleChildRenderObjectWidget<T>` / `MultiChildRenderObjectWidget<T>` ベースのウィジェット(`ColoredBox`, `Align`, `Flex`, `Stack`, `AspectRatio`, `FittedBox`, `LimitedBox`, `Offstage`, `IndexedStack`, `RotatedBox`, `Clip*`, `SizedBox`, `ConstrainedBox`, `RichText`, `Text` など)も使用可能で、`BuildOwner` による差分ビルドが動作します([BuildPipeline](BuildPipeline.md) 参照)。
-> - **未実装:** `ListView`, `GridView`, `SingleChildScrollView` は `internal` で、公開 API から除外されています。`Padding`, `Container`, `DecoratedBox`, `Opacity`, `Transform` は公開 API として利用できます。入力系の `GestureDetector` / `Listener` は公開スタブです。`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました(→ [UILayering](UILayering.md))。
-> - **WIP:** `FloatSoda.Hooks`(R3 ベースの `UseState` など)はフレームワークのビルドループと未統合です。ジェスチャ・ヒットテストは未実装です。
+> **実装状況** — `✓` 使用可能 / `△` 使えるが一部の機能が未完成 / `✗` `internal` で公開 API から使えない
+> - **✓** Widget / Element / State の基盤(`StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>`、`BuildOwner` による差分ビルド、`Key` 対応の子リスト差分)
+> - **✓** ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` / `ListenableBuilder`
+> - **✓** レイアウト系・描画系・入力系のウィジェット。**下の[一覧](#組み込みウィジェット一覧)で `✓` が付いているものが使えます**
+> - **△** `Container`(`Padding` の合成が未対応)、`FloatSoda.Hooks`(ビルドループと未統合)
+> - **✗** スクロール系の `ListView` / `GridView` / `SingleChildScrollView` と `Components.Image` / `Components.Icon`。画像は描画系の `Paint.Image` を使ってください
+> - **予定** `Button` / `Icon` を担う UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 の予定で、まだ提供していません。ボタンは `GestureDetector` で組み立ててください(→ [押せるボタンを作る](#押せるボタンを作る))
 
 ## 三ツリーの役割
 
@@ -23,8 +26,6 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 - **Element** — Widget と RenderObject を橋渡しする永続ノード。ウィジェットが更新されても Element は再利用される。再ビルドの仕組みは [BuildPipeline](BuildPipeline.md) を参照。
 - **RenderObject** — `PerformLayout` と `Paint` を実装する描画エンジン。詳細は [RenderObjects](RenderObjects.md) を参照。
 
----
-
 ## Widget の階層
 
 | 基底クラス | 役割 | 対応する Element |
@@ -40,8 +41,6 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 | `MultiChildRenderObjectWidget<T>` | `Children`(`List<Widget>`)を持つ RenderObjectWidget | `MultiChildRenderObjectElement<T>` ✓(`Key` 対応の子リスト差分) |
 | `RenderObjectToWidgetAdapter` | Widget ツリーのルートを `RenderView` に接続 | `RenderObjectToWidgetElement<RenderView>` ✓ |
 
----
-
 ## ParentDataWidget
 
 `ParentDataWidget<T>` は、自身ではRenderObjectを作らず、子RenderObjectの `ParentData` を更新します。
@@ -50,8 +49,6 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 
 `Flexible` や `Positioned` のように「親レイアウトだけが解釈する子ごとの情報」を宣言的なWidget APIとして表現するための基盤です。
 対応するParentDataを用意しない親の下で使用すると `InvalidOperationException` になります。
-
----
 
 ## StatelessWidget
 
@@ -79,8 +76,6 @@ public record MyWidget : StatelessWidget
 
 `Build()` はマウント時と、`MarkNeedsBuild()` でスケジュールされた再ビルド時に `BuildOwner` から呼ばれます。
 
----
-
 ## StatefulWidget / State
 
 `StatefulWidget<T>` は Widget から `State<T>` を分離するパターンです。`State.SetState(Action)` は状態を書き換えたうえで `Element.MarkNeedsBuild()` を呼び、次フレームの `BuildScope()` で再ビルドされます。
@@ -91,7 +86,7 @@ public record WatchWidget : StatefulWidget<WatchWidget>
     public override State<WatchWidget> CreateState() => new WatchState();
 }
 
-public record WatchState : State<WatchWidget>
+public class WatchState : State<WatchWidget>
 {
     private Timer? _timer;
     private string _time = "00:00:00";
@@ -110,13 +105,75 @@ public record WatchState : State<WatchWidget>
 
 `State<T>` のライフサイクルメソッド: `InitState()` / `SetState(Action)` / `DidUpdateWidget(T oldWidget)` / `DidChangeDependencies()`。
 
----
-
 ## InheritedWidget
 
 ツリーの下方にコンテキスト(テーマなど)を伝播させるためのウィジェットです。`InheritedElement` が依存する子孫を追跡し、`UpdateShouldNotify(InheritedWidget oldWidget)` が `true` を返したときに依存側を再ビルド対象にします。
 
 現在位置から最も近いスコープを読み、その更新通知を購読するには、`IBuildContext.DependOnInheritedWidgetOfExactType<T>()` を使います。テーマ側に `Of(IBuildContext)` を用意すると、利用側が照会方法を毎回書かずに済みます。
+
+### 組み込みの `InheritedWidget`
+
+自分で `InheritedWidget` を定義しなくても、フレームワークが2つを用意しています。
+どちらも `Of(IBuildContext)` で最も近い祖先を取得し、同時に依存として登録します。
+
+#### ServiceProvider — DI コンテナへ到達する
+
+`ServiceProvider` は `IServiceProvider` をウィジェットツリーへ公開します。
+`Widget` は `record` でコンストラクタ注入ができないため、**ビルド中にサービスを解決する経路はこれです。**
+
+```csharp
+using FloatSoda.Elements;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+using Microsoft.Extensions.DependencyInjection;
+
+public record StatusLabel : StatelessWidget
+{
+    public override Widget Build(IBuildContext context)
+    {
+        var services = ServiceProvider.Of(context);
+        // IOscClient は FloatSoda が提供する型ではなく、利用側が Host へ登録した自前のサービス。
+        var osc = services.GetRequiredService<IOscClient>();
+
+        return new Text(osc.IsConnected ? "接続中" : "切断");
+    }
+}
+```
+
+祖先に `ServiceProvider` が無い場合、`Of` は `InvalidOperationException` を投げます。
+ツリーの上位へ次のように挿しておきます。
+
+```csharp
+Widget root = new ServiceProvider
+{
+    Services = host.Services,
+    Child = new StatusLabel()
+};
+```
+
+#### WindowWidget — 自分が載っているウィンドウを知る
+
+`WindowWidget`(と派生の `DashboardWindow` / `WorldSpaceWindow` / `DeviceTrackedWindow`)も
+`InheritedWidget` です。`app.CreateWindow(...)` に渡した時点でウィジェットツリーのルートになるため、
+どのウィジェットからでも `WindowWidget.Of(context)` で `Title` や `Size` を読めます。
+
+```csharp
+var window = WindowWidget.Of(context);
+Widget caption = new Text(window.Title);
+```
+
+`WindowWidget` は `ScopeType` を基底型に固定しているため、
+派生型で `CreateWindow` していても `WindowWidget.Of` で引けます。
+オーバーレイ種別で表示を変えたい場合は型で分岐してください。
+
+```csharp
+Widget hint = WindowWidget.Of(context) is DashboardWindow
+    ? new Text("レーザーポインターで操作できます")
+    : new Text("このオーバーレイは表示専用です");
+```
+
+派生型にも `Of` があります(`DashboardWindow.Of(context)` など)が、
+ルートが別の種別だった場合は `InvalidOperationException` を投げます。
 
 ### Builder
 
@@ -216,11 +273,9 @@ Widget counterLabel = new ListenableBuilder
 
 > **スレッド契約:** `PropertyChanged` は `ListenableBuilder` がマウントされたスレッド（通常はFloatSodaのメインループ）から発火してください。OSC受信やネットワーク処理などのバックグラウンドスレッドから直接通知すると `InvalidOperationException` を投げます。現時点では任意スレッドの通知をメインループへ自動マーシャリングする公開APIはありません。状態の変更と通知を呼び出し側でメインループへ移してから発火してください。
 
----
-
 ## Hooks(FloatSoda.Hooks)
 
-> **WIP:** `FloatSoda.Hooks` プロジェクトに R3 ベースの `HookWidget` / `HookElement` が部分実装されていますが、フレームワークのビルドループとは未統合です。`HookExtension` の `UseState` / `UseEffect` / `Depends` / `UseMemo` / `UseAction` は `NotImplementedException` を投げます。
+> **△ 部分実装:** `FloatSoda.Hooks` プロジェクトに R3 ベースの `HookWidget` / `HookElement` がありますが、フレームワークのビルドループとは未統合です。`HookExtension` の `UseState` / `UseEffect` / `Depends` / `UseMemo` / `UseAction` は `NotImplementedException` を投げます。Phase 4 で統合します。
 
 `HookWidget.Build()` 内で `UseState(initialValue)` を呼ぶと `ReactiveProperty<T>` が返り、値の変更が再ビルドをトリガーする、という React フック風の API を目指しています。
 
@@ -237,8 +292,6 @@ public override Widget Build(IBuildContext context)
     };
 }
 ```
-
----
 
 ## 組み込みウィジェット一覧
 
@@ -274,10 +327,40 @@ public override Widget Build(IBuildContext context)
 | `FractionallySizedBox` | ✓ | 親の最大寸法に対する割合を子へtight制約として適用し、子を配置 | `WidthFactor`, `HeightFactor`, `Alignment`, `Child` |
 | `OverflowBox` | ✓ | 親とは異なる制約を子へ渡し、自身の領域外への描画を許可 | `MinWidth`, `MaxWidth`, `MinHeight`, `MaxHeight`, `Fit`, `Alignment`, `Child` |
 | `SizedOverflowBox` | ✓ | 自身は指定サイズを採り、子へ親の元の制約を渡して配置 | `Size` (`Size`, 必須), `Alignment`, `Child` |
-| `Container` | ✗ `internal` スタブ | パディング・色・サイズなどを一括指定 | — |
-| `ListView` | ✗ `internal` スタブ | スクロール可能なリスト | `Children` |
-| `GridView` | ✗ `internal` スタブ | グリッドレイアウト | — |
-| `SingleChildScrollView` | ✗ `internal` スタブ | 単一子をスクロール | `Child` |
+| `Container` | △ 部分実装 | 配置・装飾・寸法・変換を1つのウィジェットで合成。`Padding` の合成は未対応 | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
+| `ListView` | ✗ 未実装(`internal`) | スクロール可能なリスト | — |
+| `GridView` | ✗ 未実装(`internal`) | グリッドレイアウト | — |
+| `SingleChildScrollView` | ✗ 未実装(`internal`) | 単一子をスクロール | — |
+
+`Container` は、`Align` / `DecoratedBox` / `SizedBox` / `Transform` の組み合わせを1つのウィジェットにまとめた合成ウィジェットです。
+指定したプロパティに対応するウィジェットだけを、内側から配置・装飾・寸法・変換の順で重ねます。
+`Color` と `Decoration` を同時に指定すると `InvalidOperationException` になります。背景色と角丸を両方使う場合は `BoxDecoration.Color` へまとめてください。
+
+**`Container` にはまだ `Padding` プロパティがありません。** 内側に余白を入れる場合は `Padding` を明示的に入れ子にします。
+
+```csharp
+using FloatSoda.Geometrics;
+using FloatSoda.Painting;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+using FloatSoda.Widgets.Layout;
+
+Widget card = new Container
+{
+    Width = 320,
+    Decoration = new BoxDecoration
+    {
+        Color = new Color(32, 32, 40),
+        BorderRadius = BorderRadius.Circular(12)
+    },
+    // Container 自身は Padding を合成しないため、余白は明示的に入れ子にする。
+    Child = new Padding
+    {
+        Spacing = EdgeInsets.All(16),
+        Child = new Text("VRChat: Online")
+    }
+};
+```
 
 `ConstrainedBox` は、親から渡される制約を無視せず、その範囲内で追加の最小・最大サイズを子へ適用します。
 
@@ -307,6 +390,36 @@ Widget thumbnail = new AspectRatio
 
 `IndexedStack.Index` は0始まりです。`null`は全子をレイアウトしたまま全非表示にし、負値または`Children`の範囲外は`ArgumentOutOfRangeException`になります。
 `RotatedBox`は回転後の幅と高さをレイアウトへ反映します。レイアウト寸法を変えず描画だけを任意角度で変形する`Transform`とは用途が異なります。
+
+#### 表示・非表示の3つのウィジェットの使い分け
+
+`Visibility` / `Offstage` / `IndexedStack` はどれも「表示するものを切り替える」用途に見えますが、
+**非表示にした子の状態(`State`)を保つかどうか**と、**非表示の間もレイアウトを計算するか**が違います。
+
+| ウィジェット | 非表示の子の `State` | 非表示の子のレイアウト | 向いている用途 |
+|---|---|---|---|
+| `Visibility` | 失われる | 計算しない | 二度と戻さない、または状態を持たない表示切り替え |
+| `Offstage` | 保たれる | 計算する | 戻したときに元の状態でいてほしい単一の子 |
+| `IndexedStack` | 保たれる | 全子ぶん計算する | タブのように複数の候補から1つを選ぶ |
+
+`Visibility` は `Visible = false` のとき、`Child` の代わりに `Replacement`(省略時は空のボックス)を
+ツリーへ置きます。`Child` はツリーから外れるため、その Element と `State` は破棄されます。
+スクロール位置や入力途中の値を持つ子には使わないでください。
+
+`Offstage` と `IndexedStack` は非表示の子もツリーに残すため状態が保たれますが、
+その代わり**表示していない子のレイアウトコストを毎フレーム払います**。
+候補が多い場合や、子のレイアウトが重い場合はコストが積み上がります。
+
+```csharp
+// 状態を保ちたい: 開閉してもスクロール位置を維持する
+new Offstage { IsOffstage = !isExpanded, Child = BuildDetails() }
+
+// 状態を保たなくてよい: 通知の有無で出し分けるだけ
+new Visibility { Visible = hasNotification, Child = new Text("新着あり") }
+
+// 複数候補から1つ: タブごとの入力内容を保つ
+new IndexedStack { Index = selectedTab, Children = [BuildHome(), BuildSettings()] }
+```
 
 `Expanded` / `Flexible` / `Spacer` は `Row`、`Column`、`Flex` の直接の子として使用します。
 `Flex` は1以上の整数で、たとえば `Flex = 2` は `Flex = 1` の子の2倍の余剰領域を受け取ります。
@@ -468,6 +581,8 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 |---|---|---|---|
 | `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
 | `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
+| `Components.Image` | ✗ 未実装(`internal`) | `ImageProvider` の拡充とセットで実装予定。画像表示には描画系の `Paint.Image` を使う | — |
+| `Components.Icon` | ✗ 未実装(`internal`) | アイコンフォントによる記号表示 | — |
 
 `Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。`Style` を省略すると、フォントサイズ30、Arial、黒、ウェイト400の既定書式を使用します。空文字列は有効です。
 
@@ -489,24 +604,201 @@ new Text("Hello, VR!")
 }
 ```
 
-`Button` / `Icon` はデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)へ移動しました。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` にあります。詳細は [UILayering](UILayering.md) を参照してください。
+`Button` / `Icon` は、コアではなくデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)が担う設計です。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` に置きます。**この3層はまだ提供していません**(→ [UILayering](UILayering.md#実装状況))。いま必要なボタンは [押せるボタンを作る](#押せるボタンを作る) の方法で組み立ててください。
 
 ### Gesture
 
-| ウィジェット | 実装状況 | 説明 |
-|---|---|---|
-| `GestureDetector` | ✗ スタブ | タップ・ドラッグ検知 |
-| `Listener` | ✗ スタブ | 低レベル入力ハンドラ |
+| ウィジェット | 実装状況 | 説明 | 主なプロパティ |
+|---|---|---|---|
+| `GestureDetector` | ✓ | タップとパン(ドラッグ)を検知する | `OnTap`, `OnPanStart`, `OnPanUpdate`, `OnPanEnd`, `Behaviour`, `Child` (必須) |
+| `RawGestureDetector` | ✓ | 独自の `GestureRecognizer` を登録して認識器の組み合わせを自分で決める | `Gestures`, `Behaviour`, `Child` (必須) |
+| `Listener` | ✓ | 意味付けされていない生のポインターイベントを受け取る | `OnPointerDown`, `OnPointerUp`, `OnPointerMove`, `OnPointerEnter`, `OnPointerExit`, `OnPointerCancel`, `Behaviour`, `Child` |
+| `PointerRegion` | ✓ | 押下に依存しないホバー(領域への出入り)だけを受け取る | `OnPointerEnter`, `OnPointerExit`, `Behaviour`, `Child` |
+| `AbsorbPointer` | ✓ | 自身をヒットさせたうえで、子へのヒットテストを止める | `Absorbing` (既定 `true`), `Child` |
+| `IgnorePointer` | ✓ | 自身と子をヒットテストの対象から外し、背後の兄弟へ通す | `Ignoring` (既定 `false`), `Child` |
 
----
+## ジェスチャとヒットテスト
+
+ヒットテストは「ポインタ座標から、そこにある RenderObject を特定する」仕組みで、
+ジェスチャ認識は「特定した対象に届いたポインターイベント列を、タップやパンという意味へ解釈する」仕組みです。
+FloatSoda では**どちらも実装済み**です。
+
+```csharp
+using FloatSoda.Geometrics;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+using FloatSoda.Widgets.Gesture;
+using FloatSoda.Widgets.Layout;
+
+Widget tappable = new GestureDetector
+{
+    OnTap = () => Console.WriteLine("押された"),
+    Child = new Container
+    {
+        Width = 200,
+        Height = 60,
+        Color = new Color(80, 120, 200),
+        Alignment = Alignment.Center,
+        Child = new Text("Tap me")
+    }
+};
+```
+
+### ポインタ入力が届く範囲
+
+**現時点でポインタ座標が届くのは、ダッシュボードオーバーレイ(`DashboardWindow`)だけです。**
+SteamVR はダッシュボード上のレーザーポインターをマウスイベントとして送ってくるため、
+FloatSoda はそれを `IRawPointerSource` として受け取っています。
+`WorldSpaceWindow` と `DeviceTrackedWindow` にはコントローラーレイ経路がまだ接続されておらず、
+ヒットテスト自体は動いても、そこへ渡す座標が供給されません。この接続は Phase 1 の残件です。
+
+つまり、`GestureDetector` を書いたコードは `WorldSpaceWindow` でもコンパイルは通り、
+例外も出ませんが、コールバックが呼ばれることはありません。
+
+### ヒットテストの振る舞い
+
+`Behaviour`(`HitTestBehaviour`)は、ウィジェット自身をヒット対象に含めるかどうかを決めます。
+
+| 値 | 意味 |
+|---|---|
+| `DeferToChild` | 子がヒットしたときだけ自身もヒットする |
+| `Opaque` | 自身の領域全体をヒットとして扱い、背後の兄弟への探索を止める |
+| `Translucent` | 自身をヒットパスへ加えたうえで、背後の兄弟への探索も続ける |
+
+子を持たない領域(`SizedBox` だけの余白など)をタップ可能にしたい場合は、`Behaviour = HitTestBehaviour.Opaque` を指定します。
+`DeferToChild` では、描画内容を持たない子はヒットしません。
+
+**既定値はウィジェットによって違います。**
+
+| ウィジェット | `Behaviour` の既定値 | 理由 |
+|---|---|---|
+| `GestureDetector` / `RawGestureDetector` / `Listener` | `DeferToChild` | 押下対象は子の描画領域と一致するのが普通で、余白まで拾うと背後のウィジェットを意図せず塞ぐ |
+| `PointerRegion` | `Opaque` | ホバー領域は子の隙間を含む矩形全体で扱いたい。隙間でホバーが切れると、状態が細かく点滅する |
+
+`PointerRegion` で子の描画領域だけをホバー対象にしたい場合は、`Behaviour = HitTestBehaviour.DeferToChild` を明示してください。
+
+### 押せるボタンを作る
+
+`GestureDetector` と `StatefulWidget` を組み合わせると、押すたびに表示が変わるボタンになります。
+`OnTap` の中で `SetState` を呼ぶと、状態を書き換えたうえで再ビルドがスケジュールされます。
+
+```csharp
+using FloatSoda.Elements;
+using FloatSoda.Geometrics;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Components;
+using FloatSoda.Widgets.Gesture;
+using FloatSoda.Widgets.Layout;
+
+public record CounterPanel : StatefulWidget<CounterPanel>
+{
+    public override State<CounterPanel> CreateState() => new CounterPanelState();
+}
+
+public class CounterPanelState : State<CounterPanel>
+{
+    private int _count;
+
+    public override Widget Build(IBuildContext context) => new GestureDetector
+    {
+        OnTap = () => SetState(() => _count++),
+        Child = new Container
+        {
+            Width = 200,
+            Height = 60,
+            Color = new Color(80, 120, 200),
+            Alignment = Alignment.Center,
+            Child = new Text($"押した回数: {_count}")
+        }
+    };
+}
+```
+
+`State<T>` の派生は **`class` で宣言します**(`record` は `record` 以外のクラスを継承できません)。
+
+**押した瞬間に色を変えたい場合、`GestureDetector` だけでは足りません。**
+`GestureDetector.OnTap` は指を離した後に一度だけ呼ばれ、押し下げの瞬間を知らせる口がないためです。
+押下中の見た目を変えるには、次のどちらかを使います。
+
+| やりたいこと | 使うもの |
+|---|---|
+| 押し下げ・離す・取り消しを個別に扱う | `RawGestureDetector` + `TapGestureRecognizer` の `OnTapDown` / `OnTapUp` / `OnTapCancel`(下の「認識器を自分で組む」) |
+| ホバー(領域への出入り)で見た目を変える | `PointerRegion`(`OnPointerEnter` / `OnPointerExit`) |
+
+動くコードは次のサンプルにあります。
+
+- `samples/FloatSoda.Samples.OverlayApp/CounterWidget.cs` — `GestureDetector` + `SetState` のカウンター
+- `samples/FloatSoda.Samples.PointerRegion/PointerRegionDemo.cs` — ホバー・押下・取り消しの状態をすべて表示するデモ
+
+### 用意された `Button` はまだありません
+
+`Button` を提供するのは UI3層構成(`FloatSoda.UI` と `Cream` / `FizzyPop`)ですが、**これは Phase 5 の予定で、まだ使えません。**
+リポジトリには `ButtonBase` / `Button` / `ButtonStyle` の型が置いてあるものの、
+`ButtonBase` が `GestureDetector` へ配線されていないため押下・ホバーの状態が更新されず、
+3プロジェクトとも NuGet に配布していません(→ [UILayering](UILayering.md#実装状況))。
+
+**足りないのはフレームワークのジェスチャ基盤ではなく、その上に乗せる層です。**
+ボタンは上の[押せるボタンを作る](#押せるボタンを作る)の方法で組み立ててください。
+
+### 認識器を自分で組む(`RawGestureDetector`)
+
+`GestureDetector` はタップとパンだけを扱う既製の組み合わせです。
+それ以外の解釈が必要な場合は `RawGestureDetector` を使い、`GestureRecognizer` を自分で登録します。
+
+組み込みの認識器は2つあります。
+
+| 認識器 | コールバック |
+|---|---|
+| `TapGestureRecognizer` | `OnTap`, `OnTapDown`, `OnTapUp`, `OnTapCancel` |
+| `PanGestureRecognizer` | `OnPanStart`, `OnPanUpdate`, `OnPanEnd` |
+
+`Gestures` は `Dictionary<Type, GestureRecognizerFactory>` です。
+キーは認識器の型、値は「生成するデリゲート」と「コールバックを設定するデリゲート」の組です。
+
+```csharp
+using FloatSoda.Gesture;
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Gesture;
+
+Widget tapOnly = new RawGestureDetector
+{
+    Gestures = new Dictionary<Type, GestureRecognizerFactory>
+    {
+        [typeof(TapGestureRecognizer)] = new GestureRecognizerFactory<TapGestureRecognizer>(
+            // 1つ目: 認識器を生成する。再構築のたびには呼ばれない。
+            () => new TapGestureRecognizer(),
+            // 2つ目: 再構築のたびに呼ばれ、最新のコールバックを差し込む。
+            recognizer =>
+            {
+                recognizer.OnTapDown = position => Console.WriteLine($"押下: {position}");
+                recognizer.OnTap = () => Console.WriteLine("確定");
+                recognizer.OnTapCancel = () => Console.WriteLine("取り消し");
+            })
+    },
+    Child = BuildSurface()
+};
+```
+
+**生成と設定を2つのデリゲートに分けているのは、認識器のインスタンスを再構築をまたいで保つためです。**
+`Widget` は `record` なので毎回作り直されますが、認識器は押下の途中経過を持っています。
+毎回作り直すと、押下中に再構築が起きた時点でジェスチャが途切れます。
+
+複数の認識器を登録すると、どれが勝つかは `GestureArenaManager` が決めます。決着のつき方は2通りです。
+
+1. **どれかが勝利を宣言した時点で確定する。** たとえばパンは、指が一定距離を超えて動いた時点で
+   自分のジェスチャだと宣言します。このとき他の認識器は `RejectGesture` を受けて脱落します
+2. **誰も宣言しないままポインタが上がったら、最初に登録された認識器が勝つ。**
+   `Dictionary` の列挙順に依存するため、優先したい認識器を先に入れてください
+
+**組み込みの2つはどちらも自分で宣言するため、通常は1で決着します。**
+タップとパンを両方登録した場合、指をほとんど動かさずに離せばタップが、動かせばパンが勝ちます。
+2のルートは、勝利も辞退も宣言しない認識器を自作したときの保険です。
 
 ## Key
 
 `IKey` / `ValueKey<T>` / `UniqueKey` が定義され、`Widget.Key` プロパティと差分判定に組み込まれています。`Widget.CanUpdate(old, new)` は「同じ実行時型かつ `Key` が等しい」なら既存 Element を再利用します(Flutter と同じ型 + Key 判定)。`Element.UpdateChild` は先に record 等値の高速パスで同一 Widget をスキップし、その後 `CanUpdate` で更新可否を判断します。`MultiChildRenderObjectElement` の子リスト差分でも `Key` を使って要素の同一性を追跡します(詳細は [BuildPipeline](BuildPipeline.md))。
 
 既存の子ウィジェット自体を変更せずにキーを付けたい場合は、`KeyedSubtree` の `Key` と `Child` を指定します。
-
----
 
 ## 関連ページ
 

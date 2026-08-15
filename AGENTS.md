@@ -78,17 +78,18 @@ Do not use `[Fact(DisplayName = "…")]` — it duplicates the intent and drifts
 | `src/FloatSoda.OVR` | OpenVR wrappers, overlay types (`DashboardOverlay`, `WorldSpaceOverlay`, `DeviceTrackedOverlay`), `VREventDispatcher`, and exception types |
 | `src/FloatSoda` | Framework core: RenderObject tree, Widget/Element system, `RenderPipeline`, `FloatSodaApp` |
 | `src/FloatSoda.Testing` | Headless Widget and RenderObject bitmap renderers for tests and tooling |
-| `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets (`ButtonBase`, `InteractionState`), no visuals — see `docs/UILayering.md` |
-| `src/FloatSoda.UI.Cream` | Design system #1: retro creamy colors, flat design (`Button`, `ButtonStyle`, `CreamTheme`) |
-| `src/FloatSoda.UI.FizzyPop` | Design system #2: translucency / glassmorphism (`Button`, `ButtonStyle`, `FizzyPopTheme`) |
+| `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets (`ButtonBase`, `InteractionState`), no visuals — see `docs/UILayering.md`. **Planned for Phase 5, not yet usable** |
+| `src/FloatSoda.UI.Cream` | Design system #1: retro creamy colors, flat design (`Button`, `ButtonStyle`, `CreamTheme`). **Planned for Phase 5, not yet usable** |
+| `src/FloatSoda.UI.FizzyPop` | Design system #2: translucency / glassmorphism (`Button`, `ButtonStyle`, `FizzyPopTheme`). **Planned for Phase 5, not yet usable** |
+| `src/FloatSoda.Hooks` | R3-based `HookWidget` / `HookElement`; partially implemented, not yet integrated with the build loop |
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
 | `tests/FloatSoda.Rendering.Test` | xunit tests for the Layer tree |
-| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, APIDesign, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, Input, APIDesign, DocumentationComments, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` — every `.md` under `docs/` becomes a wiki page, so do not put scratch files there |
 
 ### UI Layering Rules (see `docs/UILayering.md`)
 
-The UI is split into three layers: `FloatSoda` (core + primitive widgets; anything touching Skia/render-tree types), `FloatSoda.UI` (headless behavior: interaction state machines, typed builder slots), and two parallel design systems `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` (state→visual mapping only). Two rules: (1) behavior/state machines always go in `FloatSoda.UI`, never in a design system; (2) `FloatSoda.UI` widgets must work without any design-system `InheritedWidget` (themes' `Of()` returns null and components fall back to defaults). Litmus test: each design system must be buildable without copying code from the other. Design systems never reference each other.
+The UI is split into three layers: `FloatSoda` (core + primitive widgets; anything touching Skia/render-tree types), `FloatSoda.UI` (headless behavior: interaction state machines, typed builder slots), and two parallel design systems `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` (state→visual mapping only). **Only the core layer ships today** — the upper two are skeletons planned for Phase 5, marked `IsPackable=false`, and `ButtonBase` is not yet wired to `GestureDetector`. The rules below still bind: they decide where new code goes when that work lands. Two rules: (1) behavior/state machines always go in `FloatSoda.UI`, never in a design system; (2) `FloatSoda.UI` widgets must work without any design-system `InheritedWidget` (themes' `Of()` returns null and components fall back to defaults). Litmus test: each design system must be buildable without copying code from the other. Design systems never reference each other.
 
 ## Architecture: Three Trees
 
@@ -120,7 +121,7 @@ The layer tree is **cloned** (`ILayer.Clone()`) before being handed to the rende
 
 ### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Core implemented
 
-Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatefulWidget` / `InheritedWidget` and their elements are all wired, including incremental rebuilds via `BuildOwner` and keyed two-ended list diffing in `MultiChildRenderObjectElement`. Remaining gaps: many convenience widgets (`Padding`, `Container`, `ListView`, `GridView`, `Opacity`, `GestureDetector`, `Listener`) are still `NotImplementedException` stubs, and gesture/hit-testing is not implemented (`Button`/`Icon` now live in the design-system layer; see UI Layering Rules above):
+Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>` and their elements are all wired, including incremental rebuilds via `BuildOwner` and keyed two-ended list diffing in `MultiChildRenderObjectElement`. Layout, painting, and input widgets have all landed — `Padding`, `Container`, `Stack`, `Wrap`, `Expanded`, `AspectRatio`, `Opacity`, `Transform`, `GestureDetector`, `Listener`, and the rest are `public` and working. Remaining gaps: scrolling widgets (`ListView`, `GridView`, `SingleChildScrollView`) and `Components.Icon` / `Components.Image` are still `internal` stubs; `Container` does not yet compose `Padding`; and pointer coordinates only reach dashboard overlays, so `GestureDetector` callbacks never fire on `WorldSpaceWindow` / `DeviceTrackedWindow` (`Button`/`Icon` now live in the design-system layer; see UI Layering Rules above):
 - `Widget` — immutable `abstract record`; declares `CreateElement()` and holds an optional `Key`. `Widget.CanUpdate` is Flutter-style (same runtime type + equal `Key`); a fast-path record-equality check in `Element.UpdateChild` short-circuits identical widgets before that
 - `RenderObjectWidget<T>` — widget that owns a `RenderObject`; declares `CreateRenderObject()` / `UpdateRenderObject(T)`
 - `StatelessWidget` — `Build()` is called by `StatelessElement`; usable today

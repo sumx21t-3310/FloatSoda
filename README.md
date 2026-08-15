@@ -11,8 +11,6 @@
 
 **FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。SkiaSharp → OpenGL → OpenVR という経路でレンダリングし、複数のオーバーレイを統一的に管理できます。
 
----
-
 ## 特徴
 
 - **Flutter-like な開発体験**: `StatelessWidget` / `StatefulWidget` による宣言的な UI 構築と `SetState()` による再ビルド
@@ -21,8 +19,6 @@
 - **複数オーバーレイ対応**: ダッシュボード・ワールド座標固定・デバイス追従を同時に管理
 - **Skia による描画**: SkiaSharp を使用した高品質なレンダリング
 - **スレッドセーフ**: メインスレッドとレンダースレッドをレイヤークローンで分離
-
----
 
 ## Getting Started
 
@@ -83,8 +79,6 @@ app.CreateWindow(new DashboardWindow { Title = "MyDashboard", Child = root });
 await host.RunAsync();
 ```
 
----
-
 ## レンダリングライフサイクル
 
 ```mermaid
@@ -123,8 +117,6 @@ sequenceDiagram
 
 > 詳細は [docs/Architecture.md](docs/Architecture.md) を参照。
 
----
-
 ## 実装済みの Widget
 
 **レイアウト系**
@@ -132,19 +124,39 @@ sequenceDiagram
 | クラス | 説明 |
 |---|---|
 | `Row` / `Column` / `Flex` | 子を水平・垂直に並べる。`MainAxisAlignment` / `CrossAxisAlignment` を指定可 |
+| `Expanded` / `Flexible` / `Spacer` | `Flex` 系の余剰領域を比率で分配する |
+| `Wrap` | 主軸が尽きたら次の行(`run`)へ折り返して並べる |
 | `Align` / `Center` | 子を `Alignment` で配置 |
+| `Padding` | 子の周囲に `EdgeInsets` の余白を取る |
+| `Container` | 配置・装飾・寸法・変換をまとめて指定する合成ウィジェット |
 | `SizedBox` | `Width` / `Height` で固定サイズを与える |
-| `ConstrainedBox` | 子に `BoxConstraints` を付与してサイズを制約 |
+| `ConstrainedBox` / `LimitedBox` / `ConstraintsTransformBox` / `UnconstrainedBox` | 子へ渡す `BoxConstraints` を加工する |
+| `Stack` / `Positioned` / `IndexedStack` | 子を重ねる。`Positioned` で絶対配置、`IndexedStack` で1つだけ表示 |
+| `AspectRatio` / `FittedBox` / `RotatedBox` | 比率の維持、`BoxFit` による拡大縮小、90度単位の回転 |
+| `FractionallySizedBox` / `OverflowBox` / `SizedOverflowBox` | 親の寸法に対する割合指定と、領域外へのはみ出しを許す配置 |
+| `IntrinsicWidth` / `IntrinsicHeight` | 子の自然な寸法へ収縮する（コストが高いので多用しない） |
+| `Visibility` / `Offstage` | 表示の切り替えと、レイアウトを保ったままの非表示 |
 
 **描画系**
 
 | クラス | 説明 |
 |---|---|
 | `ColoredBox` | 矩形を指定色で塗りつぶす |
+| `DecoratedBox` | `BoxDecoration` の背景色・角丸・ボーダーを描画 |
+| `Opacity` / `Transform` | 不透明度の適用と、`Matrix3x2` による2次元変換 |
 | `Image` | `FileImageProvider` でロードした画像を描画 |
 | `Text` / `RichText` | テキストを描画（`Text` は `RichText` の簡易ラッパー） |
 | `ClipRect` / `ClipRoundRect` / `ClipOval` | 矩形・角丸矩形・楕円でクリップ |
 | `ClipCustomPath` | 任意の `SKPath` でクリップ（`CustomClipper<SKPath>` を渡す） |
+| `RepaintBoundary` | 子の再描画を独立した合成レイヤー内に閉じ込める |
+
+**入力系**
+
+| クラス | 説明 |
+|---|---|
+| `GestureDetector` | タップ・パン（ドラッグ）を検知する |
+| `Listener` / `PointerRegion` | 生のポインターイベントと、ホバーの出入りを受け取る |
+| `AbsorbPointer` / `IgnorePointer` | ヒットテストを止める・素通りさせる |
 
 **ウィンドウ系**
 
@@ -159,10 +171,14 @@ sequenceDiagram
 - `StatelessWidget` — `Build()` をオーバーライドして UI を宣言
 - `StatefulWidget<T>` + `State<T>` — `SetState()` で状態変更と再ビルド
 - `InheritedWidget` — ツリー下方向へのコンテキスト伝播
+- `ParentDataWidget<T>` — 親レイアウトだけが解釈する子ごとの情報を渡す（`Expanded` / `Positioned` の基盤）
 
-> `Container` / `Padding` / `Opacity` / `ListView` / `GridView` / `Button` / `GestureDetector` などは API 定義のみの未実装スタブです。
-
----
+> **まだ使えないもの:** スクロール系の `ListView` / `GridView` / `SingleChildScrollView` と、
+> `Components.Image` / `Components.Icon` は `internal` で公開 API から除外されています。
+> **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成
+> （`FloatSoda.UI` / `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`）は Phase 5 で、
+> 現時点では NuGet 未配布・押下も未反応です。ボタンは `GestureDetector` で組み立ててください。
+> `Container` は使えますが、`Padding` の合成にはまだ対応していません。余白は `Padding` を入れ子にしてください。
 
 ## ドキュメント
 
@@ -171,33 +187,39 @@ sequenceDiagram
 | ドキュメント | 内容 |
 |---|---|
 | [docs/Home.md](docs/Home.md) | ドキュメントトップ・全体像・実装状況サマリ |
+| [docs/TargetUsers.md](docs/TargetUsers.md) | 想定する3タイプの作り手と読み進め方 |
 | [docs/GettingStarted.md](docs/GettingStarted.md) | クイックスタートガイド |
 | [docs/Architecture.md](docs/Architecture.md) | アーキテクチャ概要・フレームパイプライン・スレッドモデル |
-| [docs/WidgetSystem.md](docs/WidgetSystem.md) | ウィジェット/エレメントシステム |
+| [docs/WidgetSystem.md](docs/WidgetSystem.md) | ウィジェット/エレメントシステム・組み込みウィジェット一覧 |
+| [docs/UILayering.md](docs/UILayering.md) | UI層の3層パッケージ構成(ヘッドレス / デザインシステム)。設計方針であり未提供 |
+| [docs/Animation.md](docs/Animation.md) | AnimationController・Ticker・Curves によるアニメーション |
 | [docs/BuildPipeline.md](docs/BuildPipeline.md) | BuildOwner による Widget 差分更新の仕組み |
 | [docs/RenderObjects.md](docs/RenderObjects.md) | RenderObject ツリーのリファレンス |
 | [docs/OVRIntegration.md](docs/OVRIntegration.md) | OpenVR インテグレーションリファレンス |
+| [docs/Input.md](docs/Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) |
 | [docs/APIDesign.md](docs/APIDesign.md) | API 設計規約 |
-
----
+| [docs/DocumentationComments.md](docs/DocumentationComments.md) | ドキュメントコメント規約 |
+| [docs/Localization.md](docs/Localization.md) | ローカライゼーション方針(日本語デフォルト) |
 
 ## 開発ステータス
 
-本プロジェクトは現在 **Alpha 段階・Phase 1(入力基盤)進行中** です。簡単なアプリケーションは動作しますが、API は予告なく変更されます。
+本プロジェクトは現在 **Alpha 段階・Phase 1(入力基盤)と Phase 2(表示系ウィジェット)が並行して進行中** です。簡単なアプリケーションは動作しますが、API は予告なく変更されます。
 
 開発は Phase 単位で進めています。Phase は「フレームワークとして何ができる段階か」を表す機能上の到達点で、NuGet のバージョン番号とは対応しません。バージョンはリリースの通し番号として独立に上がり、同じ Phase 中に複数のバージョンが公開されることがあります(バージョン番号から Phase を推定することはできません。`1.0.0` のみ Phase 7 に対応)。各 Phase の詳細スコープは [GitHub マイルストーン](https://github.com/sumx21t-3310/FloatSoda/milestones) を参照してください。
 
 | Phase | 内容 | 作れるようになるアプリ | 状況 |
 |---|---|---|---|
-| Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 操作できるパネル(GestureDetector で完全自作したボタン・トグル) | 🚧 進行中 |
-| Phase 2 | basic.dart 相当の表示系ウィジェット網羅(画像・アイコン含む) | リッチな HUD / 字幕オーバーレイ | 未着手 |
+| Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 操作できるパネル(GestureDetector で完全自作したボタン・トグル) | 🚧 進行中(残件は非ダッシュボードオーバーレイへのポインタ接続) |
+| Phase 2 | basic.dart 相当の表示系ウィジェット網羅(画像・アイコン含む) | リッチな HUD / 字幕オーバーレイ | 🚧 進行中(レイアウト・描画・入力系は一巡。残るのは画像・アイコン・`CustomPaint`・`DefaultTextStyle`・`ViewMetrics`) |
 | Phase 3 | スクロールとアニメーションの充実(Tween / 暗黙的アニメーション / 物理シミュレーション) | チャットビューア等のリスト系アプリ | 未着手 |
 | Phase 4 | Hooks・テキスト入力・API安定化 | VR 内メモ帳などの入力を伴うアプリ | 未着手 |
 | Phase 5 | Cream / FizzyPop デザインシステム完成 | テーマを選べる実用 UI アプリ | 未着手 |
 | Phase 6 | DX 向上(Storybook・manifest 自動生成・ライフサイクル) | デスクトップ常駐+VR のハイブリッドツール | 未着手 |
 | Phase 7 | 安定版リリース(1.0) | 実用オーバーレイ全般 | 未着手 |
 
-> ⚠️ Phase 1 が完了するまで、ヒットテスト・ボタン押下などの**ユーザー操作は動作しません**(表示専用)。
+> ⚠️ **ユーザー操作が動くのはダッシュボードオーバーレイだけです。** ヒットテストとジェスチャ認識は実装済みで、
+> `GestureDetector` でタップとパンを受け取れます。ただしポインタ座標の供給元(SteamVR のレーザーポインター)が
+> ダッシュボードオーバーレイにしか接続されていないため、`WorldSpaceWindow` と `DeviceTrackedWindow` は表示専用です。
 
 - [x] RenderObject ツリー（レイアウト・描画・クリップ・画像・差分更新）
 - [x] レイヤーツリー（ContainerLayer / PictureLayer / ClipLayer / OpacityLayer）
@@ -205,6 +227,9 @@ sequenceDiagram
 - [x] Widget → RenderObject への inflate パイプライン（StatelessWidget / StatefulWidget）
 - [x] BuildOwner による Widget 差分ビルド（Key による子リストの差分更新を含む）
 - [x] InheritedWidget によるコンテキスト伝播
+- [x] ParentDataWidget による親固有レイアウト情報の伝達（Expanded / Positioned）
 - [x] アニメーションシステム（AnimationController / Ticker / FadeTransition）
-- [ ] SteamVR のイベント処理と宣言的な入力（ヒットテスト）
+- [x] ヒットテストとジェスチャ認識（GestureDetector / Listener / タップ・パン）
+- [ ] 非ダッシュボードオーバーレイへのポインタ接続（コントローラーレイ経路）
+- [ ] スクロール（ListView / GridView / SingleChildScrollView）
 - [ ] マニフェストファイルの自動生成（検討中）

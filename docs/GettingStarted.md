@@ -8,8 +8,6 @@
 - SteamVR がインストール済みで、アプリ実行前に起動していること
 - OpenVR ランタイム（SteamVR に同梱）
 
----
-
 ## サンプルアプリを動かす（最速）
 
 リポジトリをクローンしたらまずサンプルアプリを起動してフレームワークの動作を確認できます。
@@ -25,7 +23,25 @@ SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動�
 
 > サンプルには `StatefulWidget` を使った時計ウィジェット(`WatchWidget.cs`)が含まれており、`SetState()` による毎秒の再ビルドで時刻が更新されます。
 
----
+### 用途別のサンプル一覧
+
+`samples/` には目的の異なる5つのプロジェクトがあります。
+
+| プロジェクト | 内容 | SteamVR |
+|---|---|---|
+| `FloatSoda.Samples.OverlayApp` | レイアウト・時計・アニメーション・カウンター・ドラッグの総合デモ。3種のオーバーレイを同時に生成する | 必要 |
+| `FloatSoda.Samples.GettingStarted` | 下の「最小構成のコード」とほぼ同じ最小アプリ | 必要 |
+| `FloatSoda.Samples.PointerRegion` | ホバー・押下・取り消しの状態を画面に出す入力デモ。`PointerRegion` と `Listener` の挙動を目で確かめられる | 必要 |
+| `FloatSoda.Samples.PrimitiveOverlay` | ウィジェット層を使わず、`FloatSoda.OVR` の低レベル API だけでオーバーレイを出す | 必要 |
+| `FloatSoda.Samples.PaintingSample` | Widget / RenderObject / Layer の各ツリーを PNG へ書き出す | **不要** |
+
+**`PaintingSample` だけは SteamVR も HMD もいりません。** `FloatSoda.Testing` のヘッドレスレンダラーで
+ツリーを画像化し、デスクトップへ `widget_tree_output.png` などを保存します。
+レイアウトの結果だけを確かめたいときは、HMD をかぶらずにこれで見られます。
+
+```bash
+dotnet run --project samples/FloatSoda.Samples.PaintingSample
+```
 
 ## 新しいアプリを作る
 
@@ -78,7 +94,9 @@ dotnet run
 
 Window の作成は Host 側で行います。`host.RunAsync()` は SteamVR が終了するまで待機し、SteamVR の終了イベント、Ctrl+C、または Host の停止要求を受けると正常終了します。
 
-> **Widget の実装状況:** `Center`, `Align`, `Column`, `Row`, `Flex`, `ColoredBox`, `SizedBox`, `ConstrainedBox`, `Clip*`, `RichText`, `Text` などは使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。未実装の `Padding`, `Container`, `ListView` などは公開 API から除外されています。`Button` は `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` にスケルトン実装がありますが、ジェスチャ・ヒットテスト未実装のため押下操作はまだ動作しません。詳細は [WidgetSystem.md](WidgetSystem.md) を参照。
+> **Widget の実装状況:** レイアウト系(`Center`, `Align`, `Row`, `Column`, `Padding`, `Container`, `Stack`, `Wrap`, `Expanded`, `AspectRatio` など)、描画系(`ColoredBox`, `DecoratedBox`, `Opacity`, `Transform`, `Clip*`)、入力系(`GestureDetector`, `Listener`)は使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。
+> `internal` のため公開 API から使えないのは、スクロール系の `ListView` / `GridView` / `SingleChildScrollView` と、`Components.Image` / `Components.Icon` です。
+> **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 で、現時点では NuGet 未配布・押下も未反応です(→ [UILayering](UILayering.md#実装状況))。ボタンは `GestureDetector` で組み立ててください(→ [WidgetSystem.md](WidgetSystem.md#押せるボタンを作る))。
 
 <details>
 <summary>RenderObject レベルの直接操作（低レベル API）</summary>
@@ -123,19 +141,22 @@ public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositio
 ```
 </details>
 
----
-
 ## オーバーレイ種別の選び方
 
 `app.CreateWindow(...)` に渡すウィンドウ定義 `WindowWidget` の種類でオーバーレイ種別を選びます。
 `Size` を指定しない場合、オーバーレイのサイズは `Child` ウィジェットのレイアウト結果に追従します
 （`Size` を指定するとそのサイズで固定されます）。
 
-| ウィンドウ定義 | オーバーレイ種別 | 位置の管理 |
-|---|---|---|
-| `DashboardWindow { Title, Child, Size? }` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） |
-| `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`、既定は前方1m・高さ1m） |
-| `DeviceTrackedWindow { Title, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） |
+| ウィンドウ定義 | オーバーレイ種別 | 位置の管理 | ポインタ入力 |
+|---|---|---|---|
+| `DashboardWindow { Title, Child, Size? }` | `DashboardOverlay` | SteamVR ダッシュボードが管理（ユーザーが開くタブ） | ✓ 届く |
+| `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`、既定は前方1m・高さ1m） | ✗ 届かない |
+| `DeviceTrackedWindow { Title, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） | ✗ 届かない |
+
+**ポインタ入力が届くのはダッシュボードオーバーレイだけです。** SteamVR はダッシュボード上のレーザーポインターを
+マウスイベントとして送ってくるため、FloatSoda はそれをそのままヒットテストへ流せます。
+ワールド座標固定とデバイス追従のオーバーレイには、コントローラーレイからポインタ座標を作る経路がまだありません。
+これらのウィンドウに `GestureDetector` を置いてもコンパイルは通り、例外も出ませんが、コールバックは呼ばれません。
 
 `Title` は SteamVR 上の表示名（ダッシュボードタブ名など）です。OpenVR のオーバーレイキーは
 「エントリアセンブリ名 + `Title` のスネークケース」から自動生成されます
@@ -152,8 +173,6 @@ app.CreateWindow(new WorldSpaceWindow { Title = "MyWorld", Child = root });
 app.CreateWindow(new DeviceTrackedWindow { Title = "MyHand", Child = root, Target = TrackedDevice.LeftController });
 ```
 
----
-
 ## フレームレート設定
 
 `FloatSodaOptions` でフレームレートを制御できます。
@@ -168,8 +187,6 @@ builder.Services.AddFloatSoda(new FloatSodaOptions
 ```
 
 `TargetFrameRate` を指定しない場合のデフォルトは 60fps です。オーバーレイアプリはシーンアプリではないため、`WaitGetPoses` によるフレーム同期は利用できません。
-
----
 
 ## 関連ページ
 

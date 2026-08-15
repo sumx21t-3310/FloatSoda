@@ -40,15 +40,14 @@ graph TD
 | `FloatSoda.OVR` | OpenVR 初期化（`Application`）、オーバーレイ型（`DashboardOverlay` / `WorldSpaceOverlay` / `DeviceTrackedOverlay`）、イベントディスパッチャ、例外体系 |
 | `FloatSoda` | ウィジェット/エレメントツリー、RenderObject ツリー、`RenderPipeline`、`FloatSodaApp`、Generic Host統合 |
 | `FloatSoda.Testing` | Widget・RenderObjectツリーをBitmapへ描画するヘッドレステスト支援 |
-| `FloatSoda.UI` | ヘッドレスUI層。振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder に委譲(→ [UILayering](UILayering.md)) |
-| `FloatSoda.UI.Cream` | デザインシステム①: レトロでクリーミーな色使いのフラットデザイン(`Button`, `ButtonStyle`, `CreamTheme`) |
-| `FloatSoda.UI.FizzyPop` | デザインシステム②: 透明感・グラスモーフィズム(`Button`, `ButtonStyle`, `FizzyPopTheme`) |
-
----
+| `FloatSoda.UI` | ヘッドレスUI層。振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder に委譲。**Phase 5 の予定で未提供**(→ [UILayering](UILayering.md#実装状況)) |
+| `FloatSoda.UI.Cream` | デザインシステム①: レトロでクリーミーな色使いのフラットデザイン(`Button`, `ButtonStyle`, `CreamTheme`)。**Phase 5 の予定で未提供** |
+| `FloatSoda.UI.FizzyPop` | デザインシステム②: 透明感・グラスモーフィズム(`Button`, `ButtonStyle`, `FizzyPopTheme`)。**Phase 5 の予定で未提供** |
+| `FloatSoda.Hooks` | R3 ベースの `HookWidget` / `HookElement`。フレームワークのビルドループとは未統合(部分実装) |
 
 ## ツリー構造
 
-FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が完全実装済みです。ウィジェット/エレメントツリーは `StatelessWidget` / `StatefulWidget` / `InheritedWidget` と `BuildOwner` による差分ビルド(`Key` 対応の子リスト差分を含む)が実装済みです。一部の便利ウィジェットはスタブのままです(詳細は [WidgetSystem](WidgetSystem.md) と [BuildPipeline](BuildPipeline.md))。
+FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が完全実装済みです。ウィジェット/エレメントツリーは `StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>` と、`BuildOwner` による差分ビルド(`Key` 対応の子リスト差分を含む)が実装済みです。レイアウト・描画・入力系のウィジェットは一巡し、残る未実装はスクロール系(`ListView` / `GridView` / `SingleChildScrollView`)と画像・アイコン(`Components.Image` / `Components.Icon`)です(詳細は [WidgetSystem](WidgetSystem.md) と [BuildPipeline](BuildPipeline.md))。
 
 ```mermaid
 graph LR
@@ -83,8 +82,6 @@ graph LR
 - **BuildOwner** — dirty な Element のリストを保持し、`Depth` 順(親が先)に再ビルドを実行するスケジューラ。`WidgetBinding` がウィンドウごとに 1 つ保持する。
 - **RenderObject** — レイアウト計算(`PerformLayout`)と描画コマンド記録(`Paint`)を担う。`MarkNeedsLayout` / `MarkNeedsPaint` の dirty フラグにより、変更があった部分だけを再レイアウト・再ペイントする。
 - **Layer** — `Paint` フェーズが生成する合成操作のツリー。クローンしてレンダースレッドに渡す。
-
----
 
 ## レンダリングライフサイクル
 
@@ -149,8 +146,6 @@ sequenceDiagram
     end
 ```
 
----
-
 ## スレッドモデル
 
 | スレッド | 所有物 | 通信方法 |
@@ -171,8 +166,6 @@ OpenGL のコンテキストはレンダースレッドが独占します。ウ�
                    └─ GLView.Clear() → layer.Paint() → GLView.Flush()
               └─ SetOverlayTexture(GL texture handle)
 ```
-
----
 
 ## 関連ページ
 
