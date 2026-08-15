@@ -172,8 +172,15 @@ Widget hint = WindowWidget.Of(context) is DashboardWindow
     : new Text("このオーバーレイは表示専用です");
 ```
 
-派生型にも `Of` があります(`DashboardWindow.Of(context)` など)が、
-ルートが別の種別だった場合は `InvalidOperationException` を投げます。
+**種別の判定には、上のようにパターンマッチを使ってください。**
+`DashboardWindow.Of(context)` のような書き方は種別の検証になりません。
+`Of` を独自に持つのは `WindowWidget` / `OverlayWindow` / `DesktopWindow` の3つだけで、
+`DashboardWindow` / `WorldSpaceWindow` / `DeviceTrackedWindow` は自前の `Of` を持たないためです。
+`DashboardWindow.Of(context)` と書いても、実際に呼ばれるのは継承した `OverlayWindow.Of` で、
+戻り値の型も `OverlayWindow` になります。ルートが `WorldSpaceWindow` でも例外にはなりません。
+
+`OverlayWindow.Of(context)` は、ルートがオーバーレイ以外(`DesktopWindow`)のときだけ
+`InvalidOperationException` を投げます。
 
 ### Builder
 
@@ -398,17 +405,27 @@ Widget thumbnail = new AspectRatio
 
 | ウィジェット | 非表示の子の `State` | 非表示の子のレイアウト | 向いている用途 |
 |---|---|---|---|
-| `Visibility` | 失われる | 計算しない | 二度と戻さない、または状態を持たない表示切り替え |
-| `Offstage` | 保たれる | 計算する | 戻したときに元の状態でいてほしい単一の子 |
-| `IndexedStack` | 保たれる | 全子ぶん計算する | タブのように複数の候補から1つを選ぶ |
+| `Visibility` | 通常は失われる(下記) | 計算しない | 状態を持たない表示切り替え |
+| `Offstage` | 保たれる | 再レイアウト時に計算する | 戻したときに元の状態でいてほしい単一の子 |
+| `IndexedStack` | 保たれる | 再レイアウト時に全子ぶん計算する | タブのように複数の候補から1つを選ぶ |
 
-`Visibility` は `Visible = false` のとき、`Child` の代わりに `Replacement`(省略時は空のボックス)を
-ツリーへ置きます。`Child` はツリーから外れるため、その Element と `State` は破棄されます。
-スクロール位置や入力途中の値を持つ子には使わないでください。
+`Visibility` は `Visible = false` のとき、`Child` の代わりに `Replacement`(省略時は空の `SizedBox`)を
+ツリーへ置きます。`Child` と `Replacement` の実行時型が違えば `Widget.CanUpdate` が `false` になり、
+`Child` の Element と `State` は破棄されます。既定の `Replacement` を使う通常のケースはこれにあたります。
+
+ただし**状態が必ず破棄されるわけではありません。** `Child` と `Replacement` が同じ実行時型で
+`Key` も等しい場合(どちらも `Key` を指定していない場合を含む)、`Element.UpdateChild` は
+既存の Element を再利用するため状態が残ります。
+非表示を状態のリセット手段として使うなら、型か `Key` を変えて破棄を確実にしてください。
 
 `Offstage` と `IndexedStack` は非表示の子もツリーに残すため状態が保たれますが、
-その代わり**表示していない子のレイアウトコストを毎フレーム払います**。
+その代わり**再レイアウトが走るときには、表示していない子の分も計算します**。
 候補が多い場合や、子のレイアウトが重い場合はコストが積み上がります。
+
+このコストは毎フレーム発生するわけではありません。ウィジェットにも RenderObject にも
+変更がないフレームはレイアウト自体がスキップされます(→ [BuildPipeline](BuildPipeline.md))。
+`IndexedStack` の `Index` を変えたときも `MarkNeedsPaint()` だけが走るため、
+タブの切り替えでは再レイアウトされません。
 
 ```csharp
 // 状態を保ちたい: 開閉してもスクロール位置を維持する
