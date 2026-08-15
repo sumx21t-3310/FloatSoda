@@ -8,8 +8,6 @@
 
 FloatSoda のアニメーションは Flutter のアニメーション基盤を踏襲しています。**Ticker がフレームごとに経過時間を供給し、AnimationController がそれを 0.0〜1.0 の値に変換し、値の変化を購読したものだけが再描画される**という構造です。`SetState()` によるリビルドを介さずにペイントだけを更新できるため、毎フレームのアニメーションでも Widget ツリーの再ビルドコストがかかりません。
 
----
-
 ## 全体像
 
 ```
@@ -37,8 +35,6 @@ FadeTransition → RenderAnimatedOpacity
 | `AnimationController` | `IAnimation<double>` の駆動役。Forward / Reverse / Stop / AnimateWith |
 | `ISimulation` | 時間→値の関数。標準実装は `InterpolationSimulation`(begin→end を Duration と Curve で補間) |
 | `ICurve` / `Curve` / `Curves` | イージング曲線。`Curves` に標準インスタンス一式 |
-
----
 
 ## AnimationController
 
@@ -75,8 +71,6 @@ controller.Stop();             // 停止(Value は現在値のまま)
 
 `Forward` / `Reverse` は内部で `InterpolationSimulation` を使いますが、`AnimateWith(ISimulation)` に任意の `ISimulation` 実装を渡せば、スプリングなど時間関数が非線形なアニメーションも駆動できます。
 
----
-
 ## Ticker と TickerProvider
 
 `AnimationController` は自分では時計を持ちません。`Vsync` に渡された `ITickerProvider` から `WidgetTicker` を生成し、フレームコールバック(`IFrameScheduler`、通常は `WidgetBinding`)経由でタイムスタンプを受け取ります。
@@ -101,8 +95,6 @@ public record PulseState : TickerProviderState<PulseWidget>
 ```
 
 `WidgetTicker` は `Muted = true` で(経過時間の基準を保ったまま)一時停止できます。`Dispose()` で Provider の追跡から外れます。
-
----
 
 ## Curve と Curves
 
@@ -138,8 +130,6 @@ Flutter の `Curves` と同じ係数で、命名は C# 規約(PascalCase)です�
 
 `Back` 系と `Elastic` 系は 0〜1 の範囲を行き過ぎる(オーバーシュートする)値を返します。`AnimationController` は `LowerBound`〜`UpperBound` で値をクランプするため、オーバーシュートをそのまま使いたい場合は注意してください。
 
----
-
 ## FadeTransition と RenderAnimatedOpacity
 
 `FadeTransition` は `IAnimation<double>` で子の不透明度を駆動するウィジェットです。
@@ -160,8 +150,6 @@ new FadeTransition
 
 毎フレーム値が変わるアニメーションで `SetState()` を使うとフレームごとに Widget ツリーの差分ビルドが走るため、アニメーション値は `*Transition` 系ウィジェット(現状は `FadeTransition`)で RenderObject に直結させるのが推奨パターンです。
 
----
-
 ## テストでの駆動
 
 `IFrameScheduler` を Fake に差し替えると、実時間なしでアニメーションを進められます(`tests/FloatSoda.Test/Animation/` の `FakeFrameScheduler` 参照):
@@ -175,8 +163,6 @@ controller.Forward();
 scheduler.Pump(TimeSpan.Zero);                 // 基準点
 scheduler.Pump(TimeSpan.FromSeconds(0.5));     // Value == 0.5
 ```
-
----
 
 ## 関連ページ
 

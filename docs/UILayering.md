@@ -2,7 +2,17 @@
 
 # UIレイヤリング(3層パッケージ構成)
 
-FloatSoda の UI 層は、Flutter で起きた「Material ロックイン」(振る舞い層が独立して存在せず、見た目と振る舞いが `material` パッケージに一体化した問題)を避けるため、3層のパッケージに分割されています。
+> **このページは実装ではなく設計方針です。** `FloatSoda.UI` / `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` の
+> 3プロジェクトは、いずれも `IsPackable=false` で **NuGet に配布していません**。
+> リポジトリには `ButtonBase` / `InteractionState` / `Button` / `ButtonStyle` / 各テーマの型が置いてありますが、
+> 骨組みだけで押下にもホバーにも反応しません([実装状況](#実装状況)を参照)。
+>
+> **いま UI を組む場合は、`FloatSoda` 本体のウィジェットを直接使ってください。**
+> 押せるボタンは `GestureDetector` で組み立てられます
+> (→ [WidgetSystem § 押せるボタンを作る](WidgetSystem.md#押せるボタンを作る))。
+> 3層構成の提供は Phase 5 の予定です。
+
+FloatSoda の UI 層は、Flutter で起きた「Material ロックイン」(振る舞い層が独立して存在せず、見た目と振る舞いが `material` パッケージに一体化した問題)を避けるため、3層のパッケージに分割する計画です。
 
 ```mermaid
 graph TD
@@ -16,20 +26,35 @@ graph TD
     UI --> FizzyPop
 ```
 
-| 層 | パッケージ | 中身 |
-|---|---|---|
-| プリミティブ | `FloatSoda` | RenderObject を持つウィジェットと、見た目の方針を持たない合成ウィジェット(`SizedBox`, `Flex`, `ColoredBox`, `Text` など) |
-| ヘッドレス | `FloatSoda.UI` | 振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder デリゲートに完全委譲 |
-| デザインシステム | `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` | ヘッドレスの状態から見た目へのマッピングと `*Style` レコード・テーマ |
+| 層 | パッケージ | 中身 | 提供状況 |
+|---|---|---|---|
+| プリミティブ | `FloatSoda` | RenderObject を持つウィジェットと、見た目の方針を持たない合成ウィジェット(`SizedBox`, `Flex`, `ColoredBox`, `Text` など) | ✓ NuGet で配布中 |
+| ヘッドレス | `FloatSoda.UI` | 振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder デリゲートに完全委譲 | 予定(Phase 5) |
+| デザインシステム | `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` | ヘッドレスの状態から見た目へのマッピングと `*Style` レコード・テーマ | 予定(Phase 5) |
 
-デザインシステム同士は互いに参照しません。下位層はすべて見える「緩いレイヤリング」です(デザインシステム層はプリミティブを直接使ってよい)。
+デザインシステム同士は互いに参照しません。下位層はすべて見える「緩いレイヤリング」にします(デザインシステム層はプリミティブを直接使ってよい)。
 
----
+## 実装状況
+
+`FloatSoda` のプリミティブ層だけが利用できます。上2層は設計を確定させた段階で、実装はこれからです。
+
+| 対象 | 状況 |
+|---|---|
+| `FloatSoda`(プリミティブ) | ✓ 使える。NuGet で配布中 |
+| `FloatSoda.UI`(`ButtonBase` / `InteractionState`) | 予定。型は存在するが `ButtonBase` が `GestureDetector` へ未配線で、`InteractionState` の `IsPressed` / `IsHovered` / `IsFocused` が常に `false` |
+| `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`(`Button` / `ButtonStyle` / 各テーマ) | 予定。`ButtonBase` に依存しているため同様に反応しない |
+
+3プロジェクトとも `IsPackable=false` のため、NuGet パッケージとしては存在しません。
+使うにはリポジトリをクローンしてプロジェクト参照を張る必要がありますが、
+上記のとおり押下もホバーも動かないため、現時点では実用になりません。
+
+`FloatSoda.UI` の残作業は Phase 5 のマイルストーンにあります(`ButtonBase` への `GestureDetector` 配線が #102、
+`Cream` / `FizzyPop` の `Button` 完成が #78 / #100、背景ブラーが #38)。
 
 ## 境界基準
 
 - **Skia / レンダーツリーの型に依存するウィジェットはコア**(`FloatSoda`)に置く。`RenderObjectWidget<T>` 系は必然的にコア。
-- 見た目の方針(意見)を持たない合成ウィジェット(`Center`, `Container` 予定)もコア。Flutter の `widgets` 層に相当。
+- 見た目の方針(意見)を持たない合成ウィジェット(`Center`, `Container` など)もコア。Flutter の `widgets` 層に相当。
 - **インタラクションの状態機械(pressed / hovered / focused / disabled など)は必ず `FloatSoda.UI`** に置く。
 - 色・余白・角丸などの具体的な見た目はデザインシステム層。
 
@@ -42,10 +67,12 @@ graph TD
 
 ## 見た目の注入方式
 
-Avalonia のルックレスコントロール(疑似クラス + `PART_` テンプレートパーツ)の契約を、型付きにした形を採用しています:
+Avalonia のルックレスコントロール(疑似クラス + `PART_` テンプレートパーツ)の契約を、型付きにした形を採ります:
 
 - 状態の公開 — 文字列の疑似クラスではなく `readonly record struct InteractionState`(型付き)
 - 見た目の注入 — 名前ベースの `PART_` 検索ではなく `required Func<IBuildContext, InteractionState, Widget> Builder`(型付きスロット、コンパイル時保証)
+
+次のコードは**目指す姿であり、いまは押下に反応しません。**
 
 ```csharp
 // ヘッドレス層(FloatSoda.UI): 振る舞いのみ
@@ -61,21 +88,28 @@ new Button { Child = new Text("OK"), OnPressed = () => ... };
 
 ## デザインシステム
 
+2つのデザインシステムを最初から並走させる計画です。どちらも Phase 5 で仕上げます。
+
 | | Cream | FizzyPop |
 |---|---|---|
 | コンセプト | レトロでクリーミーな色使い、フラットデザイン | 透明感、グラスモーフィズム |
 | テーマ | `CreamTheme` | `FizzyPopTheme` |
-| 現状 | `Button` スケルトン + `ButtonStyle` | 同構成。背景ブラーは未実装(下記) |
+| 現状 | `Button` + `ButtonStyle` の骨組みのみ。押下は未反応 | 同構成。加えて背景ブラーが未実装(下記) |
 
-テーマ(`XxxTheme.Of(context)`)はテーマ不在時に null を返し、コンポーネント側が既定スタイルへフォールバックします。テーマが無くても動くことが規約です。
+テーマ(`XxxTheme.Of(context)`)はテーマ不在時に null を返し、コンポーネント側が既定スタイルへフォールバックします。テーマが無くても動くことを規約にします。
 
 ## ロードマップ
 
 主要ヘッドレスUIライブラリ(Radix UI, Headless UI, React Aria, Ark UI, Base UI)の収録コンポーネントを横断調査すると、提供物は2層に分解できる: **Tier 1(分解不能な原始インタラクション)** と、**Tier 2(Tier 1 + Overlay の組み合わせでできる複合コンポーネント)**。この構造をそのままヘッドレス層の実装順に採用する。
 
-### 0. ジェスチャ・ヒットテスト(前提条件)
+### 0. ジェスチャ・ヒットテスト(前提条件) — 充足済み
 
-すべての Tier 1 コンポーネントが依存する基盤。ポインタイベント(press / hover / focus)がここに乗るまで、以下は着手できない。
+すべての Tier 1 コンポーネントが依存する基盤。コア側では実装済みで、`GestureDetector` / `Listener` /
+`PointerRegion` によって press / hover を受け取れる(→ [WidgetSystem § ジェスチャとヒットテスト](WidgetSystem.md#ジェスチャとヒットテスト))。
+残る制約は2つある。
+
+- ポインタ座標が届くのはダッシュボードオーバーレイだけ。他のオーバーレイ種別への接続は Phase 1 の残件
+- フォーカスの概念はまだ存在しない。`InteractionState.IsFocused` を埋める仕組みは未設計
 
 ### 1. Tier 1 — 原始インタラクション
 
@@ -83,7 +117,7 @@ new Button { Child = new Text("OK"), OnPressed = () => ... };
 
 | 順序 | コンポーネント | インタラクションモデル | 備考 |
 |---|---|---|---|
-| 1 | `ButtonBase` | 単発アクション(press) | 実装済み(スケルトン) |
+| 1 | `ButtonBase` | 単発アクション(press) | 型と `Builder` スロットは実装済み。`ButtonBaseState` から `GestureDetector` への配線が未了で、押下・ホバー状態がまだ更新されない |
 | 2 | `ToggleBase` | 二値切替(on/off) | Checkbox・Switch の共通基盤 |
 | 3 | `RadioGroupBase` | 排他選択(択一) | Tabs の選択状態管理とも共有可能 |
 | 4 | `SliderBase` | 連続値(ドラッグ) | |
