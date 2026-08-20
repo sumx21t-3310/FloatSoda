@@ -217,7 +217,10 @@ public class TextPainter
 
     private TextBlock CreateTextBlock()
     {
-        var textBlock = new TextBlock();
+        var textBlock = new TextBlock
+        {
+            FontMapper = FloatSodaFontMapper.Instance
+        };
         Text?.Build(textBlock, CreateDefaultStyle());
         return textBlock;
     }

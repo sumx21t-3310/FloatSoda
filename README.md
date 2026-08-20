@@ -174,7 +174,7 @@ sequenceDiagram
 - `ParentDataWidget<T>` — 親レイアウトだけが解釈する子ごとの情報を渡す（`Expanded` / `Positioned` の基盤）
 
 > **まだ使えないもの:** スクロール系の `ListView` / `GridView` / `SingleChildScrollView` と、
-> `Components.Image` / `Components.Icon` は `internal` で公開 API から除外されています。
+> 画像とアイコンには公開APIの `Paint.Image` / `Paint.Icon` を使用します。
 > **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成
 > （`FloatSoda.UI` / `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`）は Phase 5 で、
 > 現時点では NuGet 未配布・押下も未反応です。ボタンは `GestureDetector` で組み立ててください。
@@ -210,7 +210,7 @@ sequenceDiagram
 | Phase | 内容 | 作れるようになるアプリ | 状況 |
 |---|---|---|---|
 | Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 操作できるパネル(GestureDetector で完全自作したボタン・トグル) | 🚧 進行中(残件は非ダッシュボードオーバーレイへのポインタ接続) |
-| Phase 2 | basic.dart 相当の表示系ウィジェット網羅(画像・アイコン含む) | リッチな HUD / 字幕オーバーレイ | 🚧 進行中(レイアウト・描画・入力系は一巡。残るのは画像・アイコン・`CustomPaint`・`DefaultTextStyle`・`ViewMetrics`) |
+| Phase 2 | basic.dart 相当の表示系ウィジェット網羅 | リッチな HUD / 字幕オーバーレイ | 🚧 進行中(レイアウト・描画・入力・画像・アイコンは一巡。残るのは`CustomPaint`・`DefaultTextStyle`・`ViewMetrics`) |
 | Phase 3 | スクロールとアニメーションの充実(Tween / 暗黙的アニメーション / 物理シミュレーション) | チャットビューア等のリスト系アプリ | 未着手 |
 | Phase 4 | Hooks・テキスト入力・API安定化 | VR 内メモ帳などの入力を伴うアプリ | 未着手 |
 | Phase 5 | Cream / FizzyPop デザインシステム完成 | テーマを選べる実用 UI アプリ | 未着手 |

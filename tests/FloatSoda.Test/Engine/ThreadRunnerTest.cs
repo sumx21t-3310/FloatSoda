@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace FloatSoda.Test.Engine;
 
-public class ThreadRunnerTest
+public class PostTaskRunnerTest
 {
     private sealed class NoopFramePacer : IFramePacer
     {
@@ -26,9 +26,9 @@ public class ThreadRunnerTest
         }
     }
 
-    /// <summary>GLFW を起動せずに <see cref="ThreadRunner.DrainPendingTasks"/> だけを検証するための最小サブクラス。</summary>
-    private sealed class TestThreadRunner(ILogger? logger)
-        : ThreadRunner("Test", new NoopFramePacer(), logger)
+    /// <summary>GLFW を起動せずに <see cref="PostTaskRunner.DrainPendingTasks"/> だけを検証するための最小サブクラス。</summary>
+    private sealed class TestPostTaskRunner(ILogger? logger)
+        : PostTaskRunner("Test", new NoopFramePacer(), logger)
     {
         protected override void Update() { }
 
@@ -39,7 +39,7 @@ public class ThreadRunnerTest
     public void DrainPendingTasks_ThrowingTask_DoesNotStopSubsequentTasks()
     {
         var logger = new CountingLogger();
-        var runner = new TestThreadRunner(logger);
+        var runner = new TestPostTaskRunner(logger);
 
         var ran = new List<int>();
         runner.PostTask(() => ran.Add(1));
@@ -56,7 +56,7 @@ public class ThreadRunnerTest
     [Fact]
     public void DrainPendingTasks_ExecutesTasksInFifoOrder()
     {
-        var runner = new TestThreadRunner(logger: null);
+        var runner = new TestPostTaskRunner(logger: null);
 
         var order = new List<int>();
         for (var i = 0; i < 5; i++)

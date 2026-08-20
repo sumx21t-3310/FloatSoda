@@ -1,4 +1,5 @@
 using FloatSoda.OVR;
+using FloatSoda.Engine;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,9 @@ public class FloatSodaServiceCollectionExtensionsTest
 
         Assert.Same(options, host.Services.GetRequiredService<FloatSodaOptions>());
         Assert.Equal(options.AppKey, host.Services.GetRequiredService<OVRAppInfo>().Key);
+        Assert.Same(
+            host.Services.GetRequiredService<IOTaskRunner>(),
+            host.Services.GetRequiredService<IOTaskRunner>());
         Assert.Single(host.Services.GetServices<IHostedService>());
 
         app.CreateWindow(new DashboardWindow

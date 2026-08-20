@@ -1,7 +1,7 @@
 using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Abstractions.Input;
 
-namespace FloatSoda.Gesture;
+namespace FloatSoda.Gesture.Recognizers;
 
 /// <summary>
 /// ドラッグ（パン）を認識する。Down 後にスロップを超えて動いた時点でアリーナへ勝利を宣言し、

@@ -1,6 +1,7 @@
 using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Abstractions.Input;
 using FloatSoda.Gesture;
+using FloatSoda.Gesture.Recognizers;
 
 namespace FloatSoda.Test.Gesture;
 

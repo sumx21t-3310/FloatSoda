@@ -95,7 +95,7 @@ dotnet run
 Window の作成は Host 側で行います。`host.RunAsync()` は SteamVR が終了するまで待機し、SteamVR の終了イベント、Ctrl+C、または Host の停止要求を受けると正常終了します。
 
 > **Widget の実装状況:** レイアウト系(`Center`, `Align`, `Row`, `Column`, `Padding`, `Container`, `Stack`, `Wrap`, `Expanded`, `AspectRatio` など)、描画系(`ColoredBox`, `DecoratedBox`, `Opacity`, `Transform`, `Clip*`)、入力系(`GestureDetector`, `Listener`)は使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。
-> `internal` のため公開 API から使えないのは、スクロール系の `ListView` / `GridView` / `SingleChildScrollView` と、`Components.Image` / `Components.Icon` です。
+> `internal` のため公開 API から使えないのは、スクロール系の `ListView` / `GridView` / `SingleChildScrollView` です。画像とアイコンには描画系の `Paint.Image` / `Paint.Icon` を使用できます。
 > **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 で、現時点では NuGet 未配布・押下も未反応です(→ [UILayering](UILayering.md#実装状況))。ボタンは `GestureDetector` で組み立ててください(→ [WidgetSystem.md](WidgetSystem.md#押せるボタンを作る))。
 
 <details>

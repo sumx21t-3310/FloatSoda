@@ -147,7 +147,7 @@ public void DrawFrame()
 
     if (Pipeline?.RenderView.Layer?.Clone() is not ContainerLayer layer) return;
 
-    RenderThreadRunner?.PostRender(Window, layer);   // 4. レンダースレッドへ
+    RenderThreadRunner?.PostRender(Window, layer);   // 4. レンダースレッドへ (RenderPostTaskRunner)
 }
 ```
 
@@ -163,7 +163,7 @@ public void DrawFrame()
 | 対象 | 現状 |
 |---|---|
 | スクロール系ウィジェット | `ListView` / `GridView` / `SingleChildScrollView` は `internal` で公開 API から除外。viewport 基盤とあわせて Phase 3 で実装 |
-| 画像・アイコン | `Components.Icon` / `Components.Image` は `internal`。描画系の `Paint.Image` は使用可能 |
+| 画像・アイコン | 描画系の `Paint.Image` / `Paint.Icon` を使用可能。フォントは `FontProvider` 経由で解決 |
 | `Container` の `Padding` | `Container` 自体は使用可能だが、`Padding` の合成にまだ対応していない。余白は `Padding` を明示的に入れ子にする |
 | ポインタ入力源 | ヒットテストとジェスチャ認識は実装済み。ただし座標の供給元がダッシュボードオーバーレイにしか接続されておらず、`WorldSpaceWindow` / `DeviceTrackedWindow` では入力が届かない |
 | UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`) | Phase 5 の予定。`ButtonBase` / `Button` / `ButtonStyle` の型はあるが `GestureDetector` へ未配線で、3プロジェクトとも NuGet 未配布 |
