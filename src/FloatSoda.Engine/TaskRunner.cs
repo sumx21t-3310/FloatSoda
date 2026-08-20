@@ -51,6 +51,12 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
     private readonly object _gate = new();
     private readonly ILogger? _logger;
     private DedicatedThreadTaskScheduler? _scheduler;
+
+    /// <summary>
+    /// 停止を要求したが、専用スレッドの終了をまだ確認できていないスケジューラー。
+    /// 終了前に再開始すると前後2本のスレッドが同時にキューを処理するため、Startの判定に使う。
+    /// </summary>
+    private DedicatedThreadTaskScheduler? _stoppingScheduler;
     private TaskFactory? _taskFactory;
     private CancellationTokenRegistration _stopRegistration;
     private bool _disposed;
@@ -123,10 +129,19 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
         // 待機には上限があるため、終了を確認できないことがある。そのまま開始すると前後2本の
         // スレッドが同時にキューを処理し、このクラスが約束している「単一スレッドで投入順に1件ずつ」
         // が崩れる。黙って壊すより開始を失敗させる。
-        if (!StopCore())
+        var stopped = StopCore();
+
+        lock (_gate)
         {
-            throw new InvalidOperationException(
-                $"{ThreadName}の前回のスレッドが終了していないため、開始できません。投入済みの処理の完了を待ってから再度開始してください。");
+            // 自スレッドからの停止では終了を待てないため、_stoppingSchedulerが残る。
+            // 実際にスレッドが終了していれば、その事実をもって開始を許可する。
+            if (_stoppingScheduler is { IsThreadAlive: false }) _stoppingScheduler = null;
+
+            if (!stopped || _stoppingScheduler is not null)
+            {
+                throw new InvalidOperationException(
+                    $"{ThreadName}の前回のスレッドが終了していないため、開始できません。投入済みの処理の完了を待ってから再度開始してください。");
+            }
         }
 
         DedicatedThreadTaskScheduler scheduler;
@@ -191,10 +206,20 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
             registration = _stopRegistration;
             _stopRegistration = default;
             scheduler?.Complete();
+            if (scheduler is not null) _stoppingScheduler = scheduler;
         }
 
         registration.Dispose();
-        return WaitForExit(scheduler);
+
+        var exited = WaitForExit(scheduler);
+        if (!exited) return false;
+
+        lock (_gate)
+        {
+            if (ReferenceEquals(_stoppingScheduler, scheduler)) _stoppingScheduler = null;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -205,6 +230,12 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
     private bool WaitForExit(DedicatedThreadTaskScheduler? scheduler)
     {
         if (scheduler is null) return true;
+
+        // 専用スレッド自身からの停止では、自スレッドをJoinするとデッドロックするため待てない。
+        // 待てない以上「終了した」とは言えないので、確認できなかったものとして扱う。
+        // ここでtrueを返すと、実行中のタスクの中から呼ばれたStartが2本目のスレッドを立ててしまう。
+        if (scheduler.RunsTasksOnCurrentThread) return false;
+
         if (scheduler.WaitForExit(StopTimeout)) return true;
 
         _logger?.LogWarning("{ThreadName} の停止がタイムアウトしました", ThreadName);
@@ -319,12 +350,9 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
 
         public void Complete() => _tasks.CompleteAdding();
 
-        public bool WaitForExit(TimeSpan timeout)
-        {
-            if (RunsTasksOnCurrentThread) return true;
+        public bool IsThreadAlive => _thread.IsAlive;
 
-            return _thread.Join(timeout);
-        }
+        public bool WaitForExit(TimeSpan timeout) => _thread.Join(timeout);
 
         protected override void QueueTask(Task task)
         {

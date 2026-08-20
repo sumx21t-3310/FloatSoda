@@ -14,6 +14,27 @@ public class IOTaskRunnerTest
     }
 
     [Fact]
+    public async Task Start_専用スレッド自身から停止した直後_InvalidOperationExceptionを投げる()
+    {
+        using var runner = new IOTaskRunner("SelfStopIOThread");
+        runner.Start();
+
+        Exception? captured = null;
+
+        // 専用スレッド自身からのStopは、自スレッドをJoinできないため終了を待てない。
+        // このとき再開始を許すと、まだ動いているこのスレッドと2本目が並行してキューを処理する。
+        await runner.RunAsync(() =>
+        {
+            runner.Stop();
+            captured = Record.Exception(() => runner.Start());
+        });
+
+        var exception = Assert.IsType<InvalidOperationException>(captured);
+        // 「開始されていません」など別のInvalidOperationExceptionと取り違えないよう、対象を特定する。
+        Assert.Contains("SelfStopIOThread", exception.Message);
+    }
+
+    [Fact]
     public async Task RunAsync_開始済み_専用スレッドで実行する()
     {
         using var runner = new IOTaskRunner("TestIOThread");
