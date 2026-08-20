@@ -126,6 +126,21 @@ public class FontProviderTest
         Assert.Equal(char.ConvertFromUtf32(0xe88a), richText.Text.Text);
     }
 
+    [Fact]
+    public void Data_コンストラクタにnull_ArgumentNullExceptionを投げる()
+    {
+        Assert.Throws<ArgumentNullException>(() => new Icon(null!));
+    }
+
+    [Fact]
+    public void Data_with式でnullを代入_ArgumentNullExceptionを投げる()
+    {
+        var icon = new Icon(new IconData(0xe88a, new SystemFontProvider("Arial")));
+
+        // プロパティ初期化子はwith式で再実行されないため、initアクセサー側で弾く必要がある。
+        Assert.Throws<ArgumentNullException>(() => icon with { Data = null! });
+    }
+
     [Theory]
     [InlineData(-1)]
     [InlineData(0xd800)]

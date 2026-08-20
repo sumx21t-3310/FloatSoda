@@ -12,8 +12,20 @@ namespace FloatSoda.Widgets.Paint;
 public sealed record Icon(IconData Data) : StatelessWidget
 {
     /// <summary>表示するアイコンのコードポイントとフォントを取得します。</summary>
+    /// <remarks>
+    /// 初期化子とinitアクセサーの両方で検証します。初期化子はバッキングフィールドへ直接代入するため
+    /// initアクセサーを通らず、逆にinitアクセサーだけでは<c>with { Data = null! }</c>しか塞げません。
+    /// </remarks>
     /// <exception cref="ArgumentNullException">値が<see langword="null"/>です。</exception>
-    public IconData Data { get; init; } = Data ?? throw new ArgumentNullException(nameof(Data));
+    public IconData Data
+    {
+        get;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            field = value;
+        }
+    } = Data ?? throw new ArgumentNullException(nameof(Data));
 
     /// <summary>アイコンの一辺の長さを取得します。</summary>
     public double Size { get; init; } = 24;
