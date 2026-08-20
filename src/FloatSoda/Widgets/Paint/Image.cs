@@ -1,5 +1,6 @@
 ﻿using FloatSoda.Core.Providers;
 using FloatSoda.Elements;
+using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Widgets.Layout;
 
@@ -19,6 +20,16 @@ public record Image : StatefulWidget<Image>
     /// 描画する画像を読み込むプロバイダーを取得します。
     /// </summary>
     public required ImageProvider Provider { get; init; }
+
+    /// <summary>画像を自身の領域へ収める方法を取得します。</summary>
+    /// <remarks>
+    /// 既定は<see cref="BoxFit.Contain"/>で、縦横比を維持したまま領域内へ収めます。
+    /// 収めた結果が領域からはみ出す場合、はみ出した部分は切り抜かれません。
+    /// </remarks>
+    public BoxFit Fit { get; init; } = BoxFit.Contain;
+
+    /// <summary>収めた画像を自身の領域内へ配置する位置を取得します。</summary>
+    public Alignment Alignment { get; init; } = Alignment.Center;
 
     /// <summary>画像の上に配置する子ウィジェットを取得します。</summary>
     public Widget? Child { get; init; }
@@ -101,7 +112,13 @@ public record Image : StatefulWidget<Image>
             }
 
             return snapshot.HasData
-                ? new ResolvedImage { Image = snapshot.Data!, Child = Widget!.Child }
+                ? new ResolvedImage
+                {
+                    Image = snapshot.Data!,
+                    Fit = Widget!.Fit,
+                    Alignment = Widget!.Alignment,
+                    Child = Widget!.Child
+                }
                 : new SizedBox { Child = Widget!.Child };
         }
     }
@@ -110,8 +127,18 @@ public record Image : StatefulWidget<Image>
     {
         public required SkiaSharp.SKImage Image { get; init; }
 
-        public override RenderImage CreateRenderObject() => new() { Image = Image };
+        public required BoxFit Fit { get; init; }
 
-        public override void UpdateRenderObject(RenderImage renderObject) => renderObject.Image = Image;
+        public required Alignment Alignment { get; init; }
+
+        public override RenderImage CreateRenderObject() =>
+            new() { Image = Image, Fit = Fit, Alignment = Alignment };
+
+        public override void UpdateRenderObject(RenderImage renderObject)
+        {
+            renderObject.Image = Image;
+            renderObject.Fit = Fit;
+            renderObject.Alignment = Alignment;
+        }
     }
 }

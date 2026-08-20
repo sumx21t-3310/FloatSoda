@@ -591,8 +591,11 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 |---|---|---|---|
 | `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
 | `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
-| `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Child`, `OnError` |
+| `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Fit`, `Alignment`, `Child`, `OnError` |
 | `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
+
+`Paint.Image` の `Fit` は `FittedBox` と同じ `BoxFit` を使い、既定は `Contain`(縦横比を維持して領域内へ収める)です。収めた画像を領域内のどこへ置くかは `Alignment` で指定します(既定は `Alignment.Center`)。`Cover` や `FitWidth` のように収めた結果が領域からはみ出す場合、**はみ出した部分は切り抜かれません**。切り抜くには `ClipRect` で囲んでください。
+
 
 `Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。`Style` を省略すると、フォントサイズ30、Arial、黒、ウェイト400の既定書式を使用します。空文字列は有効です。
 
