@@ -104,6 +104,10 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
     /// 専用スレッドを開始します。すでに実行中の場合は何もしません。
     /// </summary>
     /// <exception cref="ObjectDisposedException">このインスタンスが破棄済みです。</exception>
+    /// <exception cref="InvalidOperationException">
+    /// 前回の専用スレッドが待機上限内に終了しませんでした。この状態で開始すると単一スレッドでの
+    /// 直列実行が保証できないため、開始しません。
+    /// </exception>
     /// <param name="token">専用スレッドの停止要求を通知するキャンセルトークン。</param>
     public void Start(CancellationToken token = default)
     {
@@ -115,7 +119,15 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
 
         // 停止トークンで受付を閉じた前回のスケジューラーがキューを消化中の場合、
         // その終了を待ってから新しい専用スレッドを開始する。
-        Stop();
+        //
+        // 待機には上限があるため、終了を確認できないことがある。そのまま開始すると前後2本の
+        // スレッドが同時にキューを処理し、このクラスが約束している「単一スレッドで投入順に1件ずつ」
+        // が崩れる。黙って壊すより開始を失敗させる。
+        if (!StopCore())
+        {
+            throw new InvalidOperationException(
+                $"{ThreadName}の前回のスレッドが終了していないため、開始できません。投入済みの処理の完了を待ってから再度開始してください。");
+        }
 
         DedicatedThreadTaskScheduler scheduler;
         lock (_gate)
@@ -161,7 +173,13 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
     /// 専用スレッド自身から呼び出した場合は終了待機を行いません。
     /// 投入済みの処理が長引く場合、待機は3秒で打ち切って警告を記録します。
     /// </remarks>
-    public void Stop()
+    public void Stop() => StopCore();
+
+    /// <summary>
+    /// 停止処理の本体。専用スレッドの終了を確認できた場合に <see langword="true"/> を返す。
+    /// 戻り値は再開始の可否判定に使う。
+    /// </summary>
+    private bool StopCore()
     {
         DedicatedThreadTaskScheduler? scheduler;
         CancellationTokenRegistration registration;
@@ -176,19 +194,21 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
         }
 
         registration.Dispose();
-        WaitForExit(scheduler);
+        return WaitForExit(scheduler);
     }
 
     /// <summary>
     /// 専用スレッドの終了を上限つきで待つ。上限を超えた場合は警告を記録し、呼び出し元へ制御を返す。
     /// 投入済みの処理には中断手段が無く、無期限に待つとアプリケーションの終了自体が止まるため。
     /// </summary>
-    private void WaitForExit(DedicatedThreadTaskScheduler? scheduler)
+    /// <returns>終了を確認できた場合は <see langword="true"/>。上限を超えた場合は <see langword="false"/>。</returns>
+    private bool WaitForExit(DedicatedThreadTaskScheduler? scheduler)
     {
-        if (scheduler is null) return;
-        if (scheduler.WaitForExit(StopTimeout)) return;
+        if (scheduler is null) return true;
+        if (scheduler.WaitForExit(StopTimeout)) return true;
 
         _logger?.LogWarning("{ThreadName} の停止がタイムアウトしました", ThreadName);
+        return false;
     }
 
     private void RequestStop(DedicatedThreadTaskScheduler targetScheduler)
@@ -273,7 +293,8 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
         }
 
         registration.Dispose();
-        WaitForExit(scheduler);
+        // 破棄時は上限超過でも続行する。呼び出し元へ制御を返さないとアプリケーションの終了が止まる。
+        _ = WaitForExit(scheduler);
     }
 
     private sealed class DedicatedThreadTaskScheduler : TaskScheduler
