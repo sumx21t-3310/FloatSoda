@@ -45,7 +45,11 @@ public interface ITaskRunner
 /// </remarks>
 public sealed class IOTaskRunner : ITaskRunner, IDisposable
 {
+    /// <summary>専用スレッドの終了を待つ上限。超過しても呼び出し元をブロックし続けない。</summary>
+    private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(3);
+
     private readonly object _gate = new();
+    private readonly ILogger? _logger;
     private DedicatedThreadTaskScheduler? _scheduler;
     private TaskFactory? _taskFactory;
     private CancellationTokenRegistration _stopRegistration;
@@ -55,10 +59,12 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
     /// I/Oタスクランナーを作成します。
     /// </summary>
     /// <param name="threadName">専用スレッドに設定する名前。</param>
-    public IOTaskRunner(string threadName = "IOThread")
+    /// <param name="logger">停止待機のタイムアウトを記録するロガー。記録しない場合は <see langword="null"/>。</param>
+    public IOTaskRunner(string threadName = "IOThread", ILogger? logger = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(threadName);
         ThreadName = threadName;
+        _logger = logger;
     }
 
     /// <summary>
@@ -153,6 +159,7 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
     /// </summary>
     /// <remarks>
     /// 専用スレッド自身から呼び出した場合は終了待機を行いません。
+    /// 投入済みの処理が長引く場合、待機は3秒で打ち切って警告を記録します。
     /// </remarks>
     public void Stop()
     {
@@ -169,7 +176,19 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
         }
 
         registration.Dispose();
-        scheduler?.WaitForExit();
+        WaitForExit(scheduler);
+    }
+
+    /// <summary>
+    /// 専用スレッドの終了を上限つきで待つ。上限を超えた場合は警告を記録し、呼び出し元へ制御を返す。
+    /// 投入済みの処理には中断手段が無く、無期限に待つとアプリケーションの終了自体が止まるため。
+    /// </summary>
+    private void WaitForExit(DedicatedThreadTaskScheduler? scheduler)
+    {
+        if (scheduler is null) return;
+        if (scheduler.WaitForExit(StopTimeout)) return;
+
+        _logger?.LogWarning("{ThreadName} の停止がタイムアウトしました", ThreadName);
     }
 
     private void RequestStop(DedicatedThreadTaskScheduler targetScheduler)
@@ -254,7 +273,7 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
         }
 
         registration.Dispose();
-        scheduler?.WaitForExit();
+        WaitForExit(scheduler);
     }
 
     private sealed class DedicatedThreadTaskScheduler : TaskScheduler
@@ -279,12 +298,11 @@ public sealed class IOTaskRunner : ITaskRunner, IDisposable
 
         public void Complete() => _tasks.CompleteAdding();
 
-        public void WaitForExit()
+        public bool WaitForExit(TimeSpan timeout)
         {
-            if (!RunsTasksOnCurrentThread)
-            {
-                _thread.Join();
-            }
+            if (RunsTasksOnCurrentThread) return true;
+
+            return _thread.Join(timeout);
         }
 
         protected override void QueueTask(Task task)

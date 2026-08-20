@@ -42,14 +42,28 @@ internal sealed class FontResolver
         // TypefaceFromStyleはレイアウト/描画中に同期的に呼ばれるため、I/Oランナーへ投げて待つと
         // 先にキューへ並んだ画像読み込みが全部終わるまでフレームスレッドが止まる。
         // ここでは呼び出しスレッド上で直接読み込み、キュー越しのブロックを避ける。
-        var resource = _resources.GetOrAdd(
+        var lazy = _resources.GetOrAdd(
             provider,
             static key => new Lazy<FontResource>(
                 () => key.LoadResource(),
-                LazyThreadSafetyMode.ExecutionAndPublication)).Value;
+                LazyThreadSafetyMode.ExecutionAndPublication));
 
-        typeface = resource.Resolve(style.FontWeight, style.FontItalic);
-        return true;
+        try
+        {
+            typeface = lazy.Value.Resolve(style.FontWeight, style.FontItalic);
+            return true;
+        }
+        catch (Exception)
+        {
+            // ここで投げるとレイアウト経路を貫通してFloatSodaApp.MainLoopまで届き、
+            // フォント1つの失敗でアプリ全体が停止する。既定の書体へフォールバックする。
+            //
+            // Lazyは例外もキャッシュするため、失敗したエントリを取り除いて次フレーム以降で
+            // 再試行できるようにする。取り除かないと、原因を解消しても永久に失敗し続ける。
+            _resources.TryRemove(new KeyValuePair<FontProvider, Lazy<FontResource>>(provider, lazy));
+            typeface = null;
+            return false;
+        }
     }
 }
 

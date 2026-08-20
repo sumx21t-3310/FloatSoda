@@ -39,7 +39,8 @@ public static class FloatSodaServiceCollectionExtensions
         services.TryAddSingleton(new OVRAppInfo(options.AppKey));
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddTransient<IFramePacer>(_ => new FramePacer(options.TargetFrameRate));
-        services.TryAddSingleton<IOTaskRunner>();
+        services.TryAddSingleton<IOTaskRunner>(provider =>
+            new IOTaskRunner(logger: provider.GetService<ILogger<IOTaskRunner>>()));
 
         services.TryAddSingleton<FloatSodaApp>(provider =>
         {

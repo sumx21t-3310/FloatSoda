@@ -34,6 +34,24 @@ public class TaskBuilderTest
     }
 
     [Fact]
+    public void InitState_Taskが未指定_Noneのまま初回構築する()
+    {
+        var recorder = new SnapshotRecorder<int>();
+
+        // Taskを指定しないのは公開APIの既定状態。Subscribeが早期returnしConnectionStateはNoneのまま。
+        Mount(new TaskBuilder<int>
+        {
+            InitialData = 5,
+            Builder = (_, snapshot) => Record(recorder, snapshot)
+        });
+
+        var snapshot = Assert.Single(recorder.Snapshots);
+        Assert.Equal(TaskConnectionState.None, snapshot.ConnectionState);
+        Assert.Equal(5, snapshot.Data);
+        Assert.True(snapshot.HasData);
+    }
+
+    [Fact]
     public void InitState_InitialData未指定でTaskが未完了_HasDataがfalseになる()
     {
         var source = new TaskCompletionSource<int>();

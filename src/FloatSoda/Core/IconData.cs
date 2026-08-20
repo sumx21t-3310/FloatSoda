@@ -3,7 +3,12 @@
 namespace FloatSoda.Core;
 
 /// <summary>アイコンフォント内の一つのグリフを表します。</summary>
-public readonly record struct IconData
+/// <remarks>
+/// 値型ではなく参照型です。<c>record struct</c>にすると<c>default(IconData)</c>や配列の初期化が
+/// コンストラクターを通らず、<see cref="Font"/>が<see langword="null"/>の不正な値を作れてしまうためです。
+/// Flutterの<c>IconData</c>も同じ理由で<c>final class</c>です。
+/// </remarks>
+public sealed record IconData
 {
     /// <summary>アイコンのコードポイントとフォントを指定して初期化します。</summary>
     /// <param name="codePoint">描画するUnicodeコードポイント。</param>

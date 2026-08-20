@@ -11,6 +11,10 @@ namespace FloatSoda.Widgets.Paint;
 /// <param name="Data">表示するアイコンのコードポイントとフォント。</param>
 public sealed record Icon(IconData Data) : StatelessWidget
 {
+    /// <summary>表示するアイコンのコードポイントとフォントを取得します。</summary>
+    /// <exception cref="ArgumentNullException">値が<see langword="null"/>です。</exception>
+    public IconData Data { get; init; } = Data ?? throw new ArgumentNullException(nameof(Data));
+
     /// <summary>アイコンの一辺の長さを取得します。</summary>
     public double Size { get; init; } = 24;
 

@@ -24,7 +24,8 @@ public record Image : StatefulWidget<Image>
     /// <summary>画像を自身の領域へ収める方法を取得します。</summary>
     /// <remarks>
     /// 既定は<see cref="BoxFit.Contain"/>で、縦横比を維持したまま領域内へ収めます。
-    /// 収めた結果が領域からはみ出す場合、はみ出した部分は切り抜かれません。
+    /// <see cref="BoxFit.Cover"/>のように画像の一部だけを使う場合は描画元の矩形を切り取るため、
+    /// どの値でも領域外へはみ出しません。
     /// </remarks>
     public BoxFit Fit { get; init; } = BoxFit.Contain;
 
@@ -89,15 +90,23 @@ public record Image : StatefulWidget<Image>
 
             if (!task.IsCompleted)
             {
+                // OnlyOnRanToCompletionにすると失敗時に継続が走らない。Stateが先に破棄されていると
+                // BuildSnapshotも呼ばれないため、例外が未観測のまま残りUnobservedTaskExceptionになる。
+                // 失敗も含めて完了時に必ず走らせ、例外を観測する。
                 _ = task.ContinueWith(
-                    static completed => completed.Result.Dispose(),
+                    static completed =>
+                    {
+                        if (completed.IsCompletedSuccessfully) completed.Result.Dispose();
+                        else _ = completed.Exception;
+                    },
                     CancellationToken.None,
-                    TaskContinuationOptions.OnlyOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously,
+                    TaskContinuationOptions.ExecuteSynchronously,
                     TaskScheduler.Default);
                 return;
             }
 
             if (task.IsCompletedSuccessfully) task.Result.Dispose();
+            else _ = task.Exception;
         }
 
         private Widget BuildSnapshot(TaskSnapshot<SkiaSharp.SKImage> snapshot)

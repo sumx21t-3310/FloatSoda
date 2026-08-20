@@ -66,6 +66,7 @@ public sealed class FontResource : IDisposable
     private readonly SkiaSharp.SKTypeface? _fixedTypeface;
     private readonly System.Collections.Concurrent.ConcurrentDictionary<(int Weight, bool IsItalic), SkiaSharp.SKTypeface>
         _systemTypefaces = [];
+    private readonly Lock _gate = new();
     private bool _disposed;
 
     private FontResource(string systemFamilyName)
@@ -111,34 +112,41 @@ public sealed class FontResource : IDisposable
 
     internal SkiaSharp.SKTypeface Resolve(int weight, bool isItalic)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
-
-        if (_fixedTypeface is not null)
+        // Disposeと直列化しないと、Clearの後にGetOrAddが書体を追加して誰も破棄しなくなる。
+        lock (_gate)
         {
-            return _fixedTypeface;
-        }
+            ObjectDisposedException.ThrowIf(_disposed, this);
 
-        return _systemTypefaces.GetOrAdd((weight, isItalic), key =>
-            SkiaSharp.SKTypeface.FromFamilyName(
-                _systemFamilyName!,
-                key.Weight,
-                (int)SkiaSharp.SKFontStyleWidth.Normal,
-                key.IsItalic ? SkiaSharp.SKFontStyleSlant.Italic : SkiaSharp.SKFontStyleSlant.Upright)
-            ?? throw new InvalidOperationException($"フォントファミリを解決できませんでした: {_systemFamilyName}"));
+            if (_fixedTypeface is not null)
+            {
+                return _fixedTypeface;
+            }
+
+            return _systemTypefaces.GetOrAdd((weight, isItalic), key =>
+                SkiaSharp.SKTypeface.FromFamilyName(
+                    _systemFamilyName!,
+                    key.Weight,
+                    (int)SkiaSharp.SKFontStyleWidth.Normal,
+                    key.IsItalic ? SkiaSharp.SKFontStyleSlant.Italic : SkiaSharp.SKFontStyleSlant.Upright)
+                ?? throw new InvalidOperationException($"フォントファミリを解決できませんでした: {_systemFamilyName}"));
+        }
     }
 
     /// <summary>所有するネイティブフォントリソースを解放します。</summary>
     public void Dispose()
     {
-        if (_disposed) return;
-
-        _fixedTypeface?.Dispose();
-        foreach (var typeface in _systemTypefaces.Values)
+        lock (_gate)
         {
-            typeface.Dispose();
-        }
+            if (_disposed) return;
 
-        _systemTypefaces.Clear();
-        _disposed = true;
+            _disposed = true;
+            _fixedTypeface?.Dispose();
+            foreach (var typeface in _systemTypefaces.Values)
+            {
+                typeface.Dispose();
+            }
+
+            _systemTypefaces.Clear();
+        }
     }
 }
