@@ -37,8 +37,11 @@ Flutter を参考にする範囲と、C# の慣習を優先する範囲を次の
 |---|---|---|
 | `addListener` / `removeListener` | `event` | 移植しない（セクション3.6） |
 | `operator==` / `hashCode` の手書き | `record` / `record struct` の値等価性 | 実装しない（セクション8・9） |
-| HTTP のリトライ・レート制限・同時接続数制御 | `DelegatingHandler`、`System.Threading.RateLimiting`、`SocketsHttpHandler.MaxConnectionsPerServer` | 実装しない。`HttpClient` を受け取る形にする |
-| 処理を直列化するための専用スレッド | `Task` とスレッドプール | 立てない。専用スレッドはスレッド親和性が要求される場合（GL コンテキスト等）に限る |
+| HTTP のリトライ・レート制限 | `Microsoft.Extensions.Http.Resilience`(`DelegatingHandler` として組み込む) | 実装しない。**設定済みの `HttpClient` を呼び出し元から受け取り、ポリシーは呼び出し元の責任とする** |
+| HTTP の同時接続数制御 | `SocketsHttpHandler.MaxConnectionsPerServer` | 実装しない |
+| 処理を直列化するための専用スレッド | `Channel<T>`(単一リーダー)、`SemaphoreSlim(1, 1)`、`ConcurrentExclusiveSchedulerPair.ExclusiveScheduler` | 立てない。専用スレッドはスレッド親和性が要求される場合（GL コンテキスト等）に限る |
+
+最後の行で `Task` とスレッドプールを挙げていないのは、**それらが直列化を保証しないため**です。素のスレッドプールは排他実行も FIFO 順序も約束しません。専用スレッドを避ける目的でスレッドプールへ置き換えると、`IOTaskRunner` のように「投入順に1件ずつ」を契約しているものは並行実行と順序逆転で壊れます。直列化が要件なら、直列化を実際に保証する機構へ置き換えてください。
 
 #### 「同等」の判定
 
