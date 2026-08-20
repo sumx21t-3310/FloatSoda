@@ -75,6 +75,9 @@ public sealed record ImageTestDemo : StatelessWidget
         Child = new ImageWidget
         {
             Provider = provider,
+            // 既定のBoxFit.Containでは縦横比が維持され、CONTAINカードと見分けがつかない。
+            // このカードは「領域いっぱいへ引き伸ばす」比較対象なのでFillを明示する。
+            Fit = BoxFit.Fill,
             Child = new Center
             {
                 Child = Label("CHILD ON TOP", 20, new Color(255, 111, 97), 700)

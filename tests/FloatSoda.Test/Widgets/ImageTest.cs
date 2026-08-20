@@ -208,6 +208,53 @@ public class ImageTest
     }
 
     [Fact]
+    public void Fit_Cover_描画元を切り取って領域全体を埋める()
+    {
+        // 左半分が赤、右半分が青の16x4を40x40へCoverで収める。
+        // Sourceは中央の4x4へ切り取られるので、赤と青の境目が領域の中央に来る。
+        // 切り取りではなく引き伸ばしなら、境目は中央に来ない。
+        var path = Path.Combine(Path.GetTempPath(), $"floatsoda-image-{Guid.NewGuid():N}.png");
+        using (var bitmap = new SKBitmap(16, 4))
+        {
+            for (var x = 0; x < 16; x++)
+            {
+                for (var y = 0; y < 4; y++)
+                {
+                    bitmap.SetPixel(x, y, x < 8 ? SKColors.Red : SKColors.Blue);
+                }
+            }
+
+            using var encoded = SKImage.FromBitmap(bitmap);
+            using var data = encoded.Encode(SKEncodedImageFormat.Png, 100);
+            using var stream = File.Create(path);
+            data.SaveTo(stream);
+        }
+
+        try
+        {
+            using var rendered = Renderer.Render(
+                new SizedBox
+                {
+                    Width = Size.Width,
+                    Height = Size.Height,
+                    Child = new ImageWidget { Provider = new FileImageProvider(path), Fit = BoxFit.Cover }
+                },
+                Size);
+
+            // 領域全体が埋まる(余白が残らない)。
+            Assert.Equal(SKColors.Red, rendered.GetPixel(2, 2));
+            Assert.Equal(SKColors.Blue, rendered.GetPixel(37, 37));
+            // 切り取り後の境目が中央に来る。
+            Assert.Equal(SKColors.Red, rendered.GetPixel(18, 20));
+            Assert.Equal(SKColors.Blue, rendered.GetPixel(22, 20));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void Fit_定義されていない値_ArgumentOutOfRangeExceptionを投げる()
     {
         using var image = CreateSolidImage();

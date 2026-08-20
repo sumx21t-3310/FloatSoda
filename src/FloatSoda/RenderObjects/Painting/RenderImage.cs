@@ -8,9 +8,11 @@ namespace FloatSoda.RenderObjects.Painting;
 /// 画像を自身の領域へ<see cref="Fit"/>に従って収めて描画し、その上に任意の子を描画するRenderObjectです。
 /// </summary>
 /// <remarks>
-/// <see cref="Fit"/>の結果が自身の領域からはみ出す場合(<see cref="BoxFit.FitWidth"/>や
-/// <see cref="BoxFit.Cover"/>など)、はみ出した部分は切り抜かれずそのまま描画されます。
-/// 切り抜きが必要な場合は<c>ClipRect</c>で囲んでください。
+/// <see cref="BoxFit.Cover"/>のように画像の一部だけを使う<see cref="Fit"/>では、描画元の矩形を
+/// 切り取って描画します。どの<see cref="Fit"/>でも描画先は自身の領域内に収まるため、
+/// 領域外へはみ出すことはありません。
+/// <see cref="FloatSoda.Widgets.Layout.FittedBox"/>が<c>ClipBehavior</c>を必要とするのは、
+/// 描画元を切り取れない子ウィジェットを拡大縮小するためで、この型では不要です。
 /// </remarks>
 public class RenderImage : RenderProxyBox
 {
