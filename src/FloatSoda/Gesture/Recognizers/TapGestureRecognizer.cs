@@ -1,7 +1,7 @@
 using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Abstractions.Input;
 
-namespace FloatSoda.Gesture;
+namespace FloatSoda.Gesture.Recognizers;
 
 /// <summary>
 /// タップ（Down → スロップ内で静止 → Up）を認識する。Down 後にスロップを超えて動くと辞退し、

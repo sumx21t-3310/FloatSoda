@@ -1,11 +1,11 @@
 using System.Reflection;
 using FloatSoda.Core;
+using FloatSoda.Core.Providers;
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
 using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 
 namespace FloatSoda.Test.Widgets;
 
@@ -40,7 +40,7 @@ public class TextTest
         {
             FontSize = 24,
             Color = new Color(10, 20, 30),
-            FontFamily = "Meiryo",
+            Font = new SystemFontProvider("Meiryo"),
             FontWeight = 700,
             IsItalic = true
         };
@@ -79,13 +79,10 @@ public class TextTest
         Assert.Throws<ArgumentOutOfRangeException>(() => new TextStyle { FontSize = value });
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public void TextStyle_FontFamilyがnullまたは空白_ArgumentExceptionを投げる(string? value)
+    [Fact]
+    public void TextStyle_Fontがnull_ArgumentNullExceptionを投げる()
     {
-        Assert.Throws<ArgumentException>(() => new TextStyle { FontFamily = value! });
+        Assert.Throws<ArgumentNullException>(() => new TextStyle { Font = null! });
     }
 
     [Theory]
@@ -103,7 +100,7 @@ public class TextTest
         {
             FontSize = 24,
             Color = new Color(10, 20, 30, 40),
-            FontFamily = "Meiryo",
+            Font = new SystemFontProvider("Meiryo"),
             FontWeight = 700,
             IsItalic = true
         };
@@ -112,7 +109,7 @@ public class TextTest
 
         Assert.Equal(24, renderingStyle.FontSize);
         Assert.Equal(new SkiaSharp.SKColor(10, 20, 30, 40), renderingStyle.TextColor);
-        Assert.Equal("Meiryo", renderingStyle.FontFamily);
+        Assert.StartsWith("$FloatSoda.Font.", renderingStyle.FontFamily);
         Assert.Equal(700, renderingStyle.FontWeight);
         Assert.True(renderingStyle.FontItalic);
     }
@@ -142,7 +139,11 @@ public class TextTest
     [Fact]
     public void PublicMembers_Text関連API_SkiaSharpとRichTextKit型を公開しない()
     {
-        Type[] types = [typeof(Text), typeof(RichText), typeof(TextSpan), typeof(TextStyle)];
+        Type[] types =
+        [
+            typeof(Text), typeof(RichText), typeof(TextSpan), typeof(TextStyle),
+            typeof(FontProvider), typeof(SystemFontProvider), typeof(FileFontProvider), typeof(FontResource)
+        ];
 
         var exposedTypes = types
             .SelectMany(type => type.GetMembers(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly))

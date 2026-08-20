@@ -2,7 +2,7 @@
 using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 
-namespace FloatSoda.Widgets.Components;
+namespace FloatSoda.Widgets;
 
 /// <summary>
 /// 書式付きテキストを段落としてレイアウトし、描画するウィジェットです。

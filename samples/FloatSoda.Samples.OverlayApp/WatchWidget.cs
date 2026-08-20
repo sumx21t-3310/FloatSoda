@@ -3,7 +3,6 @@ using FloatSoda.Geometrics;
 using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;

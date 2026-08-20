@@ -1,4 +1,5 @@
 using FloatSoda.Geometrics;
+using FloatSoda.Core.Providers;
 using RichTextKitStyle = Topten.RichTextKit.Style;
 
 namespace FloatSoda.Painting;
@@ -27,21 +28,17 @@ public sealed record TextStyle
     /// <summary>テキストの色を取得します。</summary>
     public Color Color { get; init; } = new(0, 0, 0);
 
-    /// <summary>フォントファミリ名を取得します。</summary>
-    /// <exception cref="ArgumentException">値が<see langword="null"/>、空、または空白だけです。</exception>
-    public string FontFamily
+    /// <summary>テキスト描画に使用するフォントを取得します。</summary>
+    /// <exception cref="ArgumentNullException">値が<see langword="null"/>です。</exception>
+    public FontProvider Font
     {
         get;
         init
         {
-            if (string.IsNullOrWhiteSpace(value))
-            {
-                throw new ArgumentException("フォントファミリ名を指定してください。", nameof(FontFamily));
-            }
-
+            ArgumentNullException.ThrowIfNull(value);
             field = value;
         }
-    } = "Arial";
+    } = new SystemFontProvider("Arial");
 
     /// <summary>フォントの太さを1から1000までの数値で取得します。400が標準、700が太字です。</summary>
     /// <exception cref="ArgumentOutOfRangeException">値が1未満または1000を上回っています。</exception>
@@ -66,7 +63,7 @@ public sealed record TextStyle
     {
         FontSize = (float)FontSize,
         TextColor = Color,
-        FontFamily = FontFamily,
+        FontFamily = FontResolver.Shared.Register(Font),
         FontWeight = FontWeight,
         FontItalic = IsItalic
     };

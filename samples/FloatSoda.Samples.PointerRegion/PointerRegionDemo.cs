@@ -5,7 +5,6 @@ using FloatSoda.Painting;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;

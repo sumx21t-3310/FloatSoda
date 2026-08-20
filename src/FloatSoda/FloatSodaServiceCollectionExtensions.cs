@@ -39,12 +39,14 @@ public static class FloatSodaServiceCollectionExtensions
         services.TryAddSingleton(new OVRAppInfo(options.AppKey));
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddTransient<IFramePacer>(_ => new FramePacer(options.TargetFrameRate));
+        services.TryAddSingleton<IOTaskRunner>();
 
         services.TryAddSingleton<FloatSodaApp>(provider =>
         {
             var mainFramePacer = provider.GetRequiredService<IFramePacer>();
             var renderFramePacer = provider.GetRequiredService<IFramePacer>();
             var appInfo = provider.GetRequiredService<OVRAppInfo>();
+            var ioTaskRunner = provider.GetRequiredService<IOTaskRunner>();
             var loggerFactory = provider.GetService<ILoggerFactory>();
             var timeProvider = provider.GetRequiredService<TimeProvider>();
 
@@ -52,6 +54,7 @@ public static class FloatSodaServiceCollectionExtensions
                 mainFramePacer,
                 renderFramePacer,
                 appInfo,
+                ioTaskRunner,
                 loggerFactory,
                 timeProvider,
                 options.InputActionMaps);

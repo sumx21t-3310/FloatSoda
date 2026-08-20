@@ -90,7 +90,7 @@ graph LR
 | Phase | 残件 |
 |---|---|
 | Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
-| Phase 2 | `Components.Image` / `Components.Icon` と `ImageProvider` の拡充、`CustomPaint`、`DefaultTextStyle`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
+| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`DefaultTextStyle`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
 
 ## 実装状況サマリ
 
@@ -121,6 +121,7 @@ graph LR
 | アニメーション(`AnimationController` / `Ticker` / `Curve`・`Curves` / `FadeTransition`) | ✓ 実装済み |
 | テキスト表示(`Text` / `RichText` / `TextSpan` / `TextStyle`) | ✓ 実装済み |
 | 画像表示(描画系の `Paint.Image` + `FileImageProvider`) | ✓ 実装済み |
+| アイコン表示(描画系の `Paint.Icon` + `IconData` / `FontProvider`) | ✓ 実装済み |
 | レイアウト系ウィジェット(`Padding` / `Stack` / `Wrap` / `Expanded` / `AspectRatio` ほか) | ✓ 実装済み(→ [WidgetSystem](WidgetSystem.md#組み込みウィジェット一覧)) |
 | 描画系ウィジェット(`DecoratedBox` / `Opacity` / `Transform` / `Clip*` / `RepaintBoundary`) | ✓ 実装済み |
 | intrinsic 測定(`IntrinsicWidth` / `IntrinsicHeight`) | ✓ 実装済み |
@@ -131,7 +132,6 @@ graph LR
 | UI3層構成(`FloatSoda.UI` ヘッドレス / `Cream` / `FizzyPop`) | 予定(Phase 5)。NuGet 未配布・骨組みのみ(→ [UILayering](UILayering.md#実装状況)) |
 | Hooks(`FloatSoda.Hooks` / R3 ベースの `UseState`) | △ 部分実装(フレームワーク未統合) |
 | スクロール(`ListView` / `GridView` / `SingleChildScrollView`) | ✗ 未実装(`internal`) |
-| 画像・アイコン(`Components.Image` / `Components.Icon`) | ✗ 未実装(`internal`。描画系の `Paint.Image` は使用可能) |
 
 ## リポジトリ構成
 

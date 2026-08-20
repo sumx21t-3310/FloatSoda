@@ -12,7 +12,7 @@ public class WidgetBindingTest
     private static WidgetBinding CreateInitializedBinding()
     {
         var binding = new WidgetBinding();
-        var runner = new RenderThreadRunner("TestRenderThread", new FramePacer());
+        var runner = new RenderPostTaskRunner("TestRenderThread", new FramePacer());
 
         binding.EnsureInitialized("test_window", runner,
             _ => throw new InvalidOperationException("ウィンドウ生成はテストでは呼ばれない想定"));

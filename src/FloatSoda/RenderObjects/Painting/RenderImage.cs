@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Abstractions.Geometries;
 using SkiaSharp;
 
-namespace FloatSoda.RenderObjects;
+namespace FloatSoda.RenderObjects.Painting;
 
 /// <summary>
 /// 画像を自身の領域へ拡縮して描画し、その上に任意の子を描画するRenderObjectです。
@@ -11,12 +11,21 @@ public class RenderImage : RenderProxyBox
     /// <summary>
     /// 描画する画像を取得します。
     /// </summary>
-    public required SKImage Image { get; init; }
+    public required SKImage Image
+    {
+        get;
+        set
+        {
+            if (ReferenceEquals(field, value)) return;
+            field = value;
+            MarkNeedsLayout();
+        }
+    }
 
     /// <inheritdoc/>
     public override void PerformLayout()
     {
-        if (Child != null)
+        if (Child is not null)
         {
             Child.Layout(Constraints);
             Size = Child.Size;
@@ -28,7 +37,7 @@ public class RenderImage : RenderProxyBox
     }
 
     /// <inheritdoc/>
-    internal override SKSize ComputeDryLayout(FloatSoda.Geometrics.BoxConstraints constraints) =>
+    internal override SKSize ComputeDryLayout(Geometrics.BoxConstraints constraints) =>
         Child?.GetDryLayout(constraints) ?? constraints.Constrain(Image.Width, Image.Height);
 
     /// <inheritdoc/>

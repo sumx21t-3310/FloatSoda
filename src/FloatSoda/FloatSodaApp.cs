@@ -20,7 +20,8 @@ namespace FloatSoda;
 /// <seealso cref="WidgetBinding"/>
 public class FloatSodaApp : IDisposable
 {
-    private readonly RenderThreadRunner _renderThreadRunner;
+    private readonly IOTaskRunner _ioTaskRunner;
+    private readonly RenderPostTaskRunner _renderPostTaskRunner;
 
     private readonly ILogger? _logger;
     private readonly ConcurrentDictionary<string, WidgetBinding> _bindings = [];
@@ -48,18 +49,19 @@ public class FloatSodaApp : IDisposable
 
     internal FloatSodaApp(IFramePacer mainFramePacer,
         IFramePacer renderFramePacer,
-        OVRAppInfo appInfo, ILoggerFactory? loggerFactory = null,
+        OVRAppInfo appInfo, IOTaskRunner ioTaskRunner, ILoggerFactory? loggerFactory = null,
         TimeProvider? timeProvider = null,
         IReadOnlyList<InputActionMap>? inputActionMaps = null)
     {
         _mainFramePacer = mainFramePacer;
+        _ioTaskRunner = ioTaskRunner;
         _appInfo = appInfo;
         _inputActionMaps = inputActionMaps ?? [];
         _timeProvider = timeProvider ?? TimeProvider.System;
         _startTimestamp = _timeProvider.GetTimestamp();
-        _renderThreadRunner =
-            new RenderThreadRunner("RenderThread", renderFramePacer,
-                loggerFactory?.CreateLogger<RenderThreadRunner>());
+        _renderPostTaskRunner =
+            new RenderPostTaskRunner("RenderThread", renderFramePacer,
+                loggerFactory?.CreateLogger<RenderPostTaskRunner>());
         _logger = loggerFactory?.CreateLogger<FloatSodaApp>();
         ActiveApps.TryAdd(this, 0);
     }
@@ -97,9 +99,9 @@ public class FloatSodaApp : IDisposable
     {
         Action<WidgetBinding> initialize = window switch
         {
-            OverlayWindow overlayWindow => binding => binding.EnsureInitialized(window.Title, _renderThreadRunner,
+            OverlayWindow overlayWindow => binding => binding.EnsureInitialized(window.Title, _renderPostTaskRunner,
                 renderer => new EngineOverlayWindow(overlayWindow.CreateOverlay(), renderer, overlayWindow.Dpm)),
-            DesktopWindow => binding => binding.EnsureInitialized(window.Title, _renderThreadRunner,
+            DesktopWindow => binding => binding.EnsureInitialized(window.Title, _renderPostTaskRunner,
                 renderer => new EngineDesktopWindow(renderer), visible: true),
             _ => throw new NotSupportedException($"{window.GetType().Name} は未対応のウィンドウ種別です。")
         };
@@ -107,7 +109,7 @@ public class FloatSodaApp : IDisposable
         _pendingTasks.Enqueue(() =>
         {
             var title = window.Title;
-            var widgetBinding = new WidgetBinding();
+            var widgetBinding = new WidgetBinding(_ioTaskRunner);
             _bindings.TryAdd(title, widgetBinding);
             initialize(widgetBinding);
             widgetBinding.AttachRootWidget(window);
@@ -243,7 +245,8 @@ public class FloatSodaApp : IDisposable
                 }
             }
 
-            _renderThreadRunner.Start(_cts.Token);
+            _ioTaskRunner.Start(_cts.Token);
+            _renderPostTaskRunner.Start(_cts.Token);
         }
         catch (OpenVRSystemException<EVRInitError> e)
         {
@@ -296,7 +299,8 @@ public class FloatSodaApp : IDisposable
         {
             _cts.Cancel();
 
-            _renderThreadRunner.Stop();
+            _renderPostTaskRunner.Stop();
+            _ioTaskRunner.Stop();
 
             _cts.Dispose();
         }

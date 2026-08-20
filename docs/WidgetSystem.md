@@ -7,7 +7,7 @@
 > - **✓** ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` / `ListenableBuilder`
 > - **✓** レイアウト系・描画系・入力系のウィジェット。**下の[一覧](#組み込みウィジェット一覧)で `✓` が付いているものが使えます**
 > - **△** `Container`(`Padding` の合成が未対応)、`FloatSoda.Hooks`(ビルドループと未統合)
-> - **✗** スクロール系の `ListView` / `GridView` / `SingleChildScrollView` と `Components.Image` / `Components.Icon`。画像は描画系の `Paint.Image` を使ってください
+> - **✗** スクロール系の `ListView` / `GridView` / `SingleChildScrollView`
 > - **予定** `Button` / `Icon` を担う UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 の予定で、まだ提供していません。ボタンは `GestureDetector` で組み立ててください(→ [押せるボタンを作る](#押せるボタンを作る))
 
 ## 三ツリーの役割
@@ -57,7 +57,6 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 ```csharp
 using FloatSoda.Elements;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 
 public record MyWidget : StatelessWidget
@@ -124,7 +123,6 @@ public class WatchState : State<WatchWidget>
 ```csharp
 using FloatSoda.Elements;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using Microsoft.Extensions.DependencyInjection;
 
 public record StatusLabel : StatelessWidget
@@ -189,7 +187,6 @@ Widget hint = WindowWidget.Of(context) is DashboardWindow
 ```csharp
 using FloatSoda.Elements;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 
 public sealed record AlbumTheme : InheritedWidget
 {
@@ -247,7 +244,6 @@ new RepaintBoundary
 ```csharp
 using System.ComponentModel;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 
 sealed class CounterState : INotifyPropertyChanged
 {
@@ -349,7 +345,6 @@ public override Widget Build(IBuildContext context)
 using FloatSoda.Geometrics;
 using FloatSoda.Painting;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 
 Widget card = new Container
@@ -446,7 +441,6 @@ new IndexedStack { Index = selectedTab, Children = [BuildHome(), BuildSettings()
 ```csharp
 using FloatSoda.Geometrics;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Layout;
 
 Widget toolbar = new SizedBox
@@ -577,7 +571,6 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 |---|---|---|---|
 | `ColoredBox` | ✓ | 単色背景 | `Color` (`Color`), `Child` |
 | `DecoratedBox` | ✓ | `BoxDecoration` の背景色・角丸・ボーダーを子の前面または背面へ描画 | `Decoration`, `Position`, `Child` |
-| `Image` (Paint) | ✓ | `ImageProvider` 経由で画像を表示 | `ImageProvider`, `Child` |
 | `ClipRect` | ✓ | 矩形クリップ | `Clipper`, `ClipBehavior`, `Child` |
 | `ClipRoundRect` | ✓ | 角丸矩形クリップ | `BorderRadius`, `Clipper`, `ClipBehavior`, `Child` |
 | `ClipOval` | ✓ | 楕円クリップ | `CustomClipper`, `ClipBehavior`, `Child` |
@@ -592,21 +585,22 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 |---|---|---|---|
 | `FadeTransition` | ✓ | `IAnimation<double>` で子の不透明度を駆動(リビルド不要、ペイントのみ)→ [Animation](Animation.md) | `Opacity` (`IAnimation<double>`), `Child` |
 
-### Components
+### Text / Paint
 
 | ウィジェット | 実装状況 | 説明 | 主なプロパティ |
 |---|---|---|---|
 | `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
 | `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
-| `Components.Image` | ✗ 未実装(`internal`) | `ImageProvider` の拡充とセットで実装予定。画像表示には描画系の `Paint.Image` を使う | — |
-| `Components.Icon` | ✗ 未実装(`internal`) | アイコンフォントによる記号表示 | — |
+| `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Child`, `OnError` |
+| `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
 
 `Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。`Style` を省略すると、フォントサイズ30、Arial、黒、ウェイト400の既定書式を使用します。空文字列は有効です。
 
 ```csharp
 using FloatSoda.Geometrics;
 using FloatSoda.Painting;
-using FloatSoda.Widgets.Components;
+using FloatSoda.Core.Providers;
+using FloatSoda.Widgets;
 
 new Text("Hello, VR!")
 {
@@ -614,14 +608,31 @@ new Text("Hello, VR!")
     {
         FontSize = 36,
         Color = new Color(255, 255, 255),
-        FontFamily = "Arial",
+        Font = new SystemFontProvider("Arial"),
         FontWeight = 700,
         IsItalic = false
     }
 }
 ```
 
-`Button` / `Icon` は、コアではなくデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)が担う設計です。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` に置きます。**この3層はまだ提供していません**(→ [UILayering](UILayering.md#実装状況))。いま必要なボタンは [押せるボタンを作る](#押せるボタンを作る) の方法で組み立ててください。
+システムにないフォントは `FileFontProvider` で指定します。同じ値のProviderは内部で共有され、複数の `Text` / `Icon` から使ってもフォントリソースは一度だけ読み込まれます。
+
+```csharp
+using FloatSoda.Core;
+using FloatSoda.Core.Providers;
+using FloatSoda.Geometrics;
+using FloatSoda.Widgets.Paint;
+
+var materialIcons = new FileFontProvider("Assets/MaterialIcons-Regular.otf");
+
+new Icon(new IconData(0xe88a, materialIcons))
+{
+    Size = 24,
+    Color = new Color(255, 255, 255)
+}
+```
+
+`Button` / `IconButton` は、コアではなくデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)が担う設計です。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` に置きます。**この3層はまだ提供していません**(→ [UILayering](UILayering.md#実装状況))。いま必要なボタンは [押せるボタンを作る](#押せるボタンを作る) の方法で組み立ててください。
 
 ### Gesture
 
@@ -643,7 +654,6 @@ FloatSoda では**どちらも実装済み**です。
 ```csharp
 using FloatSoda.Geometrics;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 
@@ -703,7 +713,6 @@ FloatSoda はそれを `IRawPointerSource` として受け取っています。
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Components;
 using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 
