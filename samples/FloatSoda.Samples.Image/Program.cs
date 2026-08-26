@@ -6,7 +6,13 @@ using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-var builder = Host.CreateApplicationBuilder(args);
+// --desktop を渡すと、SteamVRダッシュボードの代わりにデスクトップウィンドウへ表示する。
+// 目視確認をモニタ上で完結させるためのもの(SteamVRの起動自体は必要)。
+// Hostの構成バインダーは値を伴わない引数を解釈できないため、渡す前に取り除く。
+var useDesktop = args.Contains("--desktop");
+var hostArgs = args.Where(argument => argument != "--desktop").ToArray();
+
+var builder = Host.CreateApplicationBuilder(hostArgs);
 builder.Services.AddFloatSoda(new FloatSodaOptions
 {
     AppKey = new AppKey("FloatSoda.Samples.Image"),
@@ -15,14 +21,13 @@ builder.Services.AddFloatSoda(new FloatSodaOptions
 using var host = builder.Build();
 var app = host.Services.GetRequiredService<FloatSodaApp>();
 
-app.CreateWindow(new DashboardWindow
+var demo = new ImageTestDemo
 {
-    Dpm = new Dpm(1000),
-    Title = "Image Test",
-    Child = new ImageTestDemo
-    {
-        ImagePath = Path.Combine(AppContext.BaseDirectory, "assets", "logo-sketch.png")
-    }
-});
+    ImagePath = Path.Combine(AppContext.BaseDirectory, "assets", "logo-sketch.png")
+};
+
+app.CreateWindow(useDesktop
+    ? new DesktopWindow { Title = "Image Test", Child = demo }
+    : new DashboardWindow { Dpm = new Dpm(1000), Title = "Image Test", Child = demo });
 
 await host.RunAsync();

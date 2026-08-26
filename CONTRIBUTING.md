@@ -125,6 +125,95 @@ FloatSoda の第一の利用者は「コードを自分では書かず LLM に�
 
 ---
 
+## サンプルを追加する場合の規約
+
+`samples/` 配下のサンプルは、使い方の説明であると同時に **結合テストのシナリオ** でもあります。xunit はジオメトリ・レイアウト・描画の単体を押さえますが、「docs に書いてあるとおりに書いたら実際にそう表示されるか」は検証できません。サンプルがその役割を持ちます。
+
+さらに各サンプルの `README.md` は、将来のドキュメントサイトのページ本文にそのまま転用します。ページは **README 全文 + `<Name>Demo.cs` 全文 + XML ドキュメントコメントから生成した API リファレンス表** を連結して生成する想定です。**この3つを機械的に合成できる形を保つこと**が、以下の規約の目的です。
+
+### ディレクトリとファイル構成
+
+1つのサンプルにつき1プロジェクトを作り、`samples/FloatSoda.Samples.<Name>/` に置きます。
+
+| ファイル | 役割 |
+|---|---|
+| `Program.cs` | エントリーポイントのみ。Host の構築、表示先の切り替え、`CreateWindow`、`RunAsync`。**ウィジェットツリーを書かない** |
+| `<Name>Demo.cs` | サンプル本体。`StatelessWidget` / `StatefulWidget` として実装する |
+| `README.md` | チュートリアル本文。**そのままドキュメントサイトのページ本文になる** |
+| `checklist.md` | 目視確認手順。**結合テストのシナリオそのもの**。サイトへは転用しない |
+| `FloatSoda.Samples.<Name>.csproj` | `TargetFramework` を明示する(`samples/Directory.Build.props` は TFM を設定しない) |
+
+**ディレクトリ名・プロジェクト名・ルート名前空間は一致させます。** `samples/FloatSoda.Samples.Wrap/` なら、プロジェクトファイルは `FloatSoda.Samples.Wrap.csproj`、名前空間は `FloatSoda.Samples.Wrap` です。`Sample` のようなサフィックスを足したり、言い換えたりしないでください。
+
+作成したら `FloatSoda.slnx` の `<Folder Name="/samples/">` へ登録します。
+
+参考実装は [`samples/FloatSoda.Samples.Image`](samples/FloatSoda.Samples.Image) です。
+
+### 表示先の切り替え
+
+サンプルは `--desktop` 引数でデスクトップウィンドウへ表示できるようにします。
+
+```csharp
+// --desktop を渡すと、SteamVRダッシュボードの代わりにデスクトップウィンドウへ表示する。
+// 目視確認をモニタ上で完結させるためのもの(SteamVRの起動自体は必要)。
+// Hostの構成バインダーは値を伴わない引数を解釈できないため、渡す前に取り除く。
+var useDesktop = args.Contains("--desktop");
+var hostArgs = args.Where(argument => argument != "--desktop").ToArray();
+
+var builder = Host.CreateApplicationBuilder(hostArgs);
+
+// ...
+
+app.CreateWindow(useDesktop
+    ? new DesktopWindow { Title = "Image Test", Child = demo }
+    : new DashboardWindow { Dpm = new Dpm(1000), Title = "Image Test", Child = demo });
+```
+
+`DesktopWindow` は `GLFWRawPointerSource` によってマウス入力を受け取れるため、静的なレイアウト・描画に加えてポインタ操作の確認もモニタ上で行えます。HMD を被る回数を減らすための規約です。
+
+注意点が2つあります。
+
+- **`--desktop` でも HMD の接続と SteamVR の起動は必要です。** `FloatSodaApp.Initialize()` は表示先によらず OpenVR を初期化するため、HMD 未接続では `Init_HmdNotFound` で起動に失敗します(issue #140)。省けるのは「被る」ことだけです。
+- **デスクトップで動いたことは、ダッシュボードオーバーレイで動くことの証明にはなりません。** ウィンドウ種別ごとに入力経路が異なります(issue #182)。ポインタ操作を伴うサンプルの `checklist.md` には、必ずダッシュボードでの確認項目を含めてください。
+
+### README の構成
+
+```markdown
+# <ウィジェット名>
+
+## これは何か        — 対応する Flutter 公式 docs のページに相当する概念説明(1〜2段落)
+## 使い方            — 最小の例から段階的に機能を足す
+## Flutterとの違い   — 差異があれば明記する。無ければ「同等」と1行書く(節を空にしない)
+## 実行              — dotnet run コマンド2種(--desktop / ダッシュボード)
+## 関連              — docs/ の該当ページ、関連サンプル、checklist.md へのリンク
+```
+
+`## Flutterとの違い` は省略しないでください。FloatSoda の docs は Flutter の語彙で概念を教えるため、読者(と LLM)は Flutter の挙動を期待して来ます。**差異がバグでも意図的な設計判断でも、利用者が払うコストは同じ**です。
+
+### checklist.md の構成
+
+```markdown
+# <ウィジェット名> 確認手順
+
+## デスクトップ(`--desktop`)
+1. …
+
+## ダッシュボード(HMD を被って判定)
+1. …
+```
+
+HMD が要るかどうかは**節の見出しで区別**します(`★` のような記号は使いません)。デスクトップで完結する項目とダッシュボードが要る項目を最初から2節に分けておくと、実機セッションの前に全サンプルの「ダッシュボード」節だけを機械的に集約できます。
+
+### 禁止事項
+
+サイトへの機械的な合成を成立させるため、次を守ってください。
+
+- **README に架空のコードを書かない。** コードブロックは `<Name>Demo.cs` からの抜粋のみにします。README とコードの乖離を構造的に防ぐためです。
+- **`<Name>Demo.cs` を単体で読んで完結させる。** サンプル間で共有ヘルパーライブラリを作らないでください。サンプルコードはサイトに転載され読者がそのままコピーするため、外部依存があると成立しません。`--desktop` 判定の数行は各 `Program.cs` にコピーします。
+- **README に API リファレンス表を手書きしない。** 表は XML ドキュメントコメントから生成します。手書きすると、同じ表がサンプルの数だけ二重管理になります。
+
+---
+
 ## アーキテクチャを理解する
 
 FloatSoda は RenderObject ツリー / Layer ツリー / Widget-Element ツリーの三層構造を持ちます。コードを読み始める前に **[docs/Home.md](docs/Home.md)** から目を通すことを推奨します。
@@ -147,4 +236,5 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 - [ ] 追加した `public` プロパティに XML ドキュメントコメントを付けた
 - [ ] Wiki同期対象の `docs/*.md` を直接編集した(Wiki側は編集していない)
 - [ ] プリミティブ層(basic.dart相当)を超える複合ウィジェットを追加していない
+- [ ] **新しいウィジェットを追加した場合**、サンプル(README + checklist.md)を追加した(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))
 - [ ] **新しい public API を追加した場合**、docs を更新し、ジュニアコーダーテスト([`floatsoda-junior-coder-test`](.claude/skills/floatsoda-junior-coder-test/SKILL.md))を通した
