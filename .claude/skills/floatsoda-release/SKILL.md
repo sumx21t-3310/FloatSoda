@@ -112,20 +112,30 @@ and check them off literally. Two things this skill is responsible for:
 - **Rotate the theme.** Check the memory log (`vibe-coding-test-sonnet5-result`) for what the previous
   release used and pick a different one, so the surface isn't overfit to one scenario.
 - **Respect the block.** A ⓑ docs bug or ⓒ library bug **blocks the release**. Fix it, then re-run the
-  gate — do not proceed to step 6 with a known ⓑ/ⓒ and a promise to fix it next time.
+  gate — do not proceed to tagging with a known ⓑ/ⓒ and a promise to fix it next time.
 
-### 6. Tag and push — stop for approval
+### 6. Land the release commit on main
+
+The `<Version>` and `CHANGELOG.md` edits from steps 2-3 are still **uncommitted** at this point.
+Tagging now would put the tag on the old `HEAD`, and `release.yml` would fail its
+`Verify tag matches Directory.Build.props version` step with the CHANGELOG left out of the release.
+
+`main` takes no direct pushes, so this goes through the normal PR flow (`RELEASING.md` step 6 has the
+exact commands). Confirm the merge commit is the `HEAD` of `origin/main`, and that the working tree is
+clean, before moving on.
+
+### 7. Tag and push — stop for approval
 
 Present: version, CHANGELOG section, test results, pack list, gate verdict. Ask for the go-ahead.
 Only then `git tag vX.Y.Z` and `git push origin vX.Y.Z`.
 
-### 7. Watch the automated release
+### 8. Watch the automated release
 
 `gh run watch` (or `gh run list --workflow=Release`) until the Release workflow is green, then confirm
 the version is live on NuGet. If the workflow fails **after** a successful NuGet push, say so plainly —
 the version is public and cannot be reused; the fix is a new patch version, never a re-tag.
 
-### 8. Create the GitHub Release — stop for approval
+### 9. Create the GitHub Release — stop for approval
 
 Draft the notes from the CHANGELOG section for this version, propose the title
 (`vX.Y.Z — <short headline>`, matching the existing releases), show the draft, and create it only after

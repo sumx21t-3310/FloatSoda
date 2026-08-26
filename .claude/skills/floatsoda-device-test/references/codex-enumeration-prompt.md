@@ -9,7 +9,7 @@ must come from reading the file**. Both exist because they've been the failure m
 
 ---
 
-```
+```markdown
 # GOAL
 
 FloatSoda(.NET 10 / C# 14 の SteamVR オーバーレイUIフレームワーク)について、テストが存在せず
@@ -45,9 +45,11 @@ FloatSoda(.NET 10 / C# 14 の SteamVR オーバーレイUIフレームワーク)
 # CONSTRAINTS
 
 - sandbox: workspace-write(ただし書き込んでよいのは上記 `codex-scenarios.md` 1ファイルのみ。
-  リポジトリ `[REPO]` 配下は一切変更しない)
+  リポジトリ `[REPO]` 配下の**追跡対象ファイルは一切変更しない**)
 - 実装・テストの追加や修正をしない。`dotnet build` / `dotnet test` を実行してもよいが、
-  結果を根拠に使うだけでコードは変えない
+  結果を根拠に使うだけでコードは変えない。上の「変更しない」は追跡対象ファイルに対する制約で、
+  `bin/` `obj/` などのビルド生成物には及ばない。テスト結果は
+  `--results-directory <リポジトリ外の一時ディレクトリ>` を指定してリポジトリ外へ出す
 - ファイル:行 を挙げるときは必ず実ファイルを読んで確認する。存在しない行番号やそれらしいAPI名を
   推測で書かない。確認できなかったものは「未確認」と明記する
 - 出力は日本語で書く(識別子・型名・ファイルパス・コードは英語のまま)
@@ -97,9 +99,10 @@ FloatSoda(.NET 10 / C# 14 の SteamVR オーバーレイUIフレームワーク)
 
 [PASTE 最新の除外リスト。SKILL.md の "Known-issue exclusion list" を gh で更新してから貼る]
 
-なお `FloatSodaApp.MainLoop` はタスク処理・イベント処理・描画の各 `catch` で `break` するため
-(`src/FloatSoda/FloatSodaApp.cs:172, 183, 193`)、例外が出るとアプリごと終了する。
-これは調査済みの事実として使ってよい。
+なお `src/FloatSoda/FloatSodaApp.cs` の `FloatSodaApp.MainLoop` は、タスク処理・イベント処理・描画の
+3つの `catch (Exception)` ブロックそれぞれで `break` するため、例外が出るとアプリごと終了する。
+これは調査済みの事実として使ってよい。**ただしこの文書に書かれた行番号を再利用しないこと。**
+`file:line` を挙げるときは、実行時に現物を読んで現在の行番号を確認する。
 ```
 
 ---

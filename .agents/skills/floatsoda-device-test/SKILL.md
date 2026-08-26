@@ -142,8 +142,12 @@ A device failure loses its value the moment the operator forgets what "pass" loo
 ### 5. Owner runs it; then triage
 
 Ask the owner to run with SteamVR up and hand back the log. For each failure: attempt headless
-reproduction → classify as library bug / docs gap / intended behaviour → file the issue. Axis B
-findings get their provisional label confirmed or corrected.
+reproduction, then **propose** a classification — library bug / docs gap / intended behaviour.
+
+File the library-bug and docs-gap issues without waiting (existing repo practice). But **"intended
+behaviour", and every axis B label, is a design call and stays provisional until the owner confirms
+it** (hard stop 2). Do not record a divergence as accepted, and do not open the "document this
+deliberate divergence" issue, before that confirmation.
 
 Append newly confirmed divergences to `references/known-divergences.md` so the next enumeration
 starts further along.

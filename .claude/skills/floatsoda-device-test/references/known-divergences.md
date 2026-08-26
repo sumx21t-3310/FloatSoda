@@ -69,9 +69,11 @@ the highest-value category).
   `finalizeTree`, no compositing-bits flush, no semantics.
 - **Flutter**: transient → persistent (build / layout / compositing bits / paint / composite /
   semantics) → `finalizeTree` → post-frame callbacks.
-- **Observation**: `HEADLESS`, plus `VR` for the parts that cross the render thread
+- **Observation**: `HEADLESS` — every missing phase listed above is observable without a headset.
 - **Label**: unlabelled. The missing `addPostFrameCallback` equivalent is the one that bites porters
   most often; semantics is plausibly out of scope for VR overlays.
+- **When enumerating**: one scenario carries exactly one verdict. If a derived scenario depends on
+  render-thread timing rather than on the missing phase itself, enumerate it separately as `VR`.
 
 ## 7. Pointer input is quantised to the frame boundary
 
@@ -79,6 +81,15 @@ the highest-value category).
   (`src/FloatSoda/Core/WidgetBinding.cs:234`, implementation at `:277`), so input is processed once
   per frame.
 - **Flutter**: `GestureBinding.handlePointerEvent` dispatches independently of the frame.
-- **Observation**: **`VR`** — dropped or delayed input under a degraded frame rate only shows on
-  real hardware.
+- **Observation**: `HEADLESS` — the quantisation itself is verifiable by feeding several pointer
+  events within one frame and asserting they are dispatched together.
 - **Label**: unlabelled
+
+## 8. Input loss under a degraded frame rate
+
+- The user-visible consequence of #7. Whether events are dropped or merely delayed once frame pacing
+  slips depends on the real event source and the actual frame budget.
+- **Observation**: **`VR`** — needs SteamVR event delivery and a real frame rate; not reproducible
+  from a synthetic event queue.
+- **Label**: unlabelled — resolve #7 first; if the headless verdict already explains the behaviour,
+  this entry collapses into it.
