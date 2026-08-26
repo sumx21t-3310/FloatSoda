@@ -21,7 +21,7 @@ builder.Services.AddFloatSoda(new FloatSodaOptions
 using var host = builder.Build();
 var app = host.Services.GetRequiredService<FloatSodaApp>();
 
-var demo = new ImageTestDemo
+var demo = new ImageDemo
 {
     ImagePath = Path.Combine(AppContext.BaseDirectory, "assets", "logo-sketch.png")
 };

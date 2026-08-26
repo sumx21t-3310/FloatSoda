@@ -16,11 +16,15 @@
 using ImageWidget = FloatSoda.Widgets.Paint.Image;
 
 var provider = new FileImageProvider(ImagePath);
-
-Widget image = new ImageWidget { Provider = provider };
 ```
 
 このサンプルは名前空間が `FloatSoda.Samples.Image` で型名 `Image` と衝突するため、`ImageWidget` というエイリアスを使っています。名前空間が衝突しないアプリでは `new Image { ... }` と書けます。
+
+あとは `Provider` を渡すだけです。これが最小の形で、`ImageDemo.BuildFitted` では `FittedBox` の子として使っています。
+
+```csharp
+new ImageWidget { Provider = provider }
+```
 
 ### 領域への収め方を指定する
 
