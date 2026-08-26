@@ -127,7 +127,7 @@ clean, before moving on.
 ### 7. Tag and push — stop for approval
 
 Present: version, CHANGELOG section, test results, pack list, gate verdict. Ask for the go-ahead.
-Only then `git tag vX.Y.Z` and `git push origin vX.Y.Z`.
+Only then tag. Pin the tag to the SHA verified in step 6 (`git tag vX.Y.Z "$RELEASE_SHA"`) rather than re-pulling `main` — `RELEASING.md` step 7 has the exact commands. If `origin/main` moved since the gate, re-run step 5 against the commit that will actually be tagged.
 
 ### 8. Watch the automated release
 

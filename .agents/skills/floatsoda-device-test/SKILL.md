@@ -49,7 +49,7 @@ Three things are the owner's alone:
 2. **Final design calls** — whether a divergence is accepted or fixed.
 3. **Commit / push / tag** — always ask.
 
-Issue filing needs no confirmation (existing repo practice).
+Issue filing needs no confirmation (existing repo practice). But this is a **public repository**, so before pasting a device-test log or stack trace into an issue, strip the local environment out of it — absolute paths, machine and user names — as the repo's own rule requires.
 
 ## Workflow
 

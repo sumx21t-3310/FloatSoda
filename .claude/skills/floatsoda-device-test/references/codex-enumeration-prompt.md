@@ -4,6 +4,10 @@ The goal definition handed to `codex-runner` for step 1. Fill the bracketed slot
 known-issue list from `gh issue list --state open`, and paste the contents of
 `known-divergences.md` into the axis B section so Codex extends the list instead of rediscovering it.
 
+**Before handing the filled brief to Codex, grep it for `[` and confirm no bracketed slot survives.**
+A brief still carrying `[PASTE …]` makes Codex re-enumerate what is already known, which silently
+inflates both the scenario count and the HMD run.
+
 Keep the two hard rules intact when editing: **enumeration only, no code**, and **every `file:line`
 must come from reading the file**. Both exist because they've been the failure modes.
 

@@ -64,6 +64,8 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 
 下記「ジュニアコーダーゲート」を参照。
 
+このゲートは**最終的にタグを打つコミットに対して有効である必要があります**。手順6のマージ後に `origin/main` が動いていた場合は、手順7で通し直してください。
+
 ### 6. リリース変更をコミットして main へ反映する
 
 手順2・3で編集した `Directory.Build.props` の `<Version>` と `CHANGELOG.md` は、この時点ではまだ**未コミット**です。`main` へは直接pushできない([CONTRIBUTING.md](CONTRIBUTING.md) のブランチ・PRフロー)ため、他の変更と同じく通常のPRフローで反映します。
@@ -80,19 +82,25 @@ PRが `main` にマージされ、**そのマージコミットが `origin/main`
 
 ### 7. タグを切って push する
 
-```bash
-git checkout main && git pull origin main
-```
+タグは、手順6で `origin/main` の HEAD になったことを確認したリリースコミットに対して打ちます。**そのとき確認した SHA を固定して使ってください。** `git checkout main && git pull` で取り直すと、確認からタグ作成までの間に別のコミットが入った場合に、意図しないコミットへタグが付きます。release.yml の検証はタグ名と `<Version>` の一致しか見ないため、このズレは検出されません。
 
 ```bash
-git tag vX.Y.Z
+git fetch origin main
+RELEASE_SHA=<手順6で確認したマージコミットのSHA>
+test "$(git rev-parse origin/main)" = "$RELEASE_SHA"   # 一致しなければ止める
+```
+
+**`origin/main` が動いていた場合は、手順5のジュニアコーダーゲートをタグ対象のコミットで通し直します。** ゲートは特定のコミットの docs と API に対する検証なので、通過後に別のコミットが入ると、検証していない状態をリリースすることになります。
+
+```bash
+git tag vX.Y.Z "$RELEASE_SHA"
 ```
 
 ```bash
 git push origin vX.Y.Z
 ```
 
-タグは、直前の手順で `main` にマージされたリリースコミットに対して打ちます。タグ名は `Directory.Build.props` の `Version` と一致させます。以降は release.yml がタグ整合の確認 → Release ビルド/テスト → `dotnet pack` → NuGet push(Trusted Publishing)まで自動で行います。
+タグ名は `Directory.Build.props` の `Version` と一致させます。以降は release.yml がタグ整合の確認 → Release ビルド/テスト → `dotnet pack` → NuGet push(Trusted Publishing)まで自動で行います。
 
 ### 8. 自動リリースの完了を確認する
 
