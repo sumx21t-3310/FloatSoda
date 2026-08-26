@@ -11,7 +11,7 @@ using ImageWidget = FloatSoda.Widgets.Paint.Image;
 namespace FloatSoda.Samples.Image;
 
 /// <summary>画像の読み込み、拡縮、切り抜き、および子要素の重ね描きを実機で確認するサンプルです。</summary>
-public sealed record ImageTestDemo : StatelessWidget
+public sealed record ImageDemo : StatelessWidget
 {
     private const double CardWidth = 320;
     private const double ImageHeight = 220;
