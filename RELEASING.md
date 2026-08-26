@@ -64,7 +64,25 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 
 下記「ジュニアコーダーゲート」を参照。
 
-### 6. タグを切って push する
+### 6. リリース変更をコミットして main へ反映する
+
+手順2・3で編集した `Directory.Build.props` の `<Version>` と `CHANGELOG.md` は、この時点ではまだ**未コミット**です。`main` へは直接pushできない([CONTRIBUTING.md](CONTRIBUTING.md) のブランチ・PRフロー)ため、他の変更と同じく通常のPRフローで反映します。
+
+```bash
+git checkout -b release/vX.Y.Z
+git add Directory.Build.props CHANGELOG.md
+git commit -m "chore(release): vX.Y.Z のバージョンとCHANGELOGを確定する"
+git push origin release/vX.Y.Z
+gh pr create --base main --title "chore(release): vX.Y.Z"
+```
+
+PRが `main` にマージされ、**そのマージコミットが `origin/main` の HEAD になっていること**を確認してから次の手順に進みます。ここを飛ばしてタグだけ切ると、release.yml が旧 `<Version>` のコミットを checkout して `Verify tag matches Directory.Build.props version` ステップで失敗し、CHANGELOG の更新もリリースに含まれません。
+
+### 7. タグを切って push する
+
+```bash
+git checkout main && git pull origin main
+```
 
 ```bash
 git tag vX.Y.Z
@@ -74,14 +92,14 @@ git tag vX.Y.Z
 git push origin vX.Y.Z
 ```
 
-タグ名は `Directory.Build.props` の `Version` と一致させます。以降は release.yml がタグ整合の確認 → Release ビルド/テスト → `dotnet pack` → NuGet push(Trusted Publishing)まで自動で行います。
+タグは、直前の手順で `main` にマージされたリリースコミットに対して打ちます。タグ名は `Directory.Build.props` の `Version` と一致させます。以降は release.yml がタグ整合の確認 → Release ビルド/テスト → `dotnet pack` → NuGet push(Trusted Publishing)まで自動で行います。
 
-### 7. 自動リリースの完了を確認する
+### 8. 自動リリースの完了を確認する
 
 - GitHub Actions の Release ワークフローが緑であること
 - NuGet 上に新バージョンが公開されたこと(反映まで数分かかることがあります)
 
-### 8. GitHub Release を作成する
+### 9. GitHub Release を作成する
 
 release.yml は NuGet へ push するだけで、**GitHub Release ページは作りません**。NuGet の説明文だけでは変更点が利用者に届かないため、タグ push 後に必ず手で作成します。
 
