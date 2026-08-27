@@ -21,7 +21,7 @@ the highest-value category).
 
 ## Entry template
 
-The first four fields are the ones `docs/APIDesign.md` requires for every deliberate divergence
+The first five fields are the ones `docs/APIDesign.md` requires for every deliberate divergence
 (Flutter behaviour / FloatSoda behaviour / why / the test that pins it / user-facing docs).
 **A divergence with no `Test` will be silently reverted by the next port** — treat an unset `Test` on
 a `deliberate` entry as an open task, not a finished record.

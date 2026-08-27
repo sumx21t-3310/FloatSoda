@@ -55,7 +55,7 @@ CI 状態(build-and-test)とマージ可否まで確認する。Draft かどう�
 以下のテンプレートで出力する。Codex はこのプロンプトだけを見て自走するので、
 このセッションの文脈に依存しない自己完結した内容にすること。
 
-```
+```text
 /goal
 GOAL: FloatSoda リポジトリ(<リポジトリの絶対パス>)で Issue #<番号> を実装する。
 <対象ウィジェット群>を、既存の Widget / Element / RenderObject 3層パイプラインに接続して public 化する。

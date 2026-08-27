@@ -50,7 +50,7 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 
 人間が切る場合もエージェントが切る場合も、同じ規則を使います(必須)。
 
-```
+```text
 <type>/<issue-number>-<short-slug>   Issue がある場合
 <type>/<short-slug>                  Issue が無い場合
 ```
