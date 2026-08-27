@@ -99,9 +99,18 @@ GATED_SHA=<手順5でゲートを通したコミットのSHA>
 git diff --name-only "$GATED_SHA" "$RELEASE_SHA"
 ```
 
-出力が `Directory.Build.props` と `CHANGELOG.md` **だけ**なら、そのまま次へ進みます。バージョン番号とCHANGELOGはゲートの検証対象ではないためです。
+出力が `Directory.Build.props` と `CHANGELOG.md` **だけ**であることが第一の条件です。**それ以外のファイルが1つでも出た場合は、手順5のゲートを `RELEASE_SHA` に対して通し直してください。** マージ待ちの間に `main` へ別のコミットが入った場合がこれに当たります。
 
-**それ以外のファイルが1つでも出た場合は、手順5のゲートを `RELEASE_SHA` に対して通し直してください。** マージ待ちの間に `main` へ別のコミットが入った場合がこれに当たります。検証していない状態をリリースしないための条件です。
+ファイル名だけでは不十分です。`Directory.Build.props` にはアナライザや `GenerateDocumentationFile` などビルドに効く設定も入っており、版数以外の変更が同じファイルに混ざっていてもファイル名の確認は通ってしまいます。中身も確認します。
+
+```bash
+git diff -U0 "$GATED_SHA" "$RELEASE_SHA" -- Directory.Build.props |
+  grep -E '^[+-]' | grep -vE '^(\+\+\+|---)' | grep -vE '^[+-][[:space:]]*<Version>'
+```
+
+**出力が空**であれば、`Directory.Build.props` の変更は `<Version>` の値だけです。ここまで満たしたときに限り、ゲートの再実行を省いて次へ進みます。何か出力された場合は版数以外の変更が入っているので、ゲートを通し直してください。
+
+省略してよい根拠は「ゲートが測る docs と public API の面が変わっていない」ことだけです。それを確認せずに省略すると、検証していない状態をリリースすることになります。
 
 ```bash
 git tag vX.Y.Z "$RELEASE_SHA"
