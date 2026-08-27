@@ -29,9 +29,9 @@ hypothetical な指摘を量産する問題への対策でもある。書いて�
 - 重要度 7〜8(style / maintainability / 具体的影響のない performance)— 入口レビュー(CodeRabbit)の領分
 - SteamVR 実行時にしか観測できない挙動 — `floatsoda-device-test` の領分
 - docs の分かりにくさ・API の発見性 — `floatsoda-junior-coder-test` の領分
-- `.agents/skills/floatsoda-device-test/references/known-divergences.md` で `Label: deliberate` とされた
-  意図確定済みの差異(それ以外のラベル — unlabelled / port mistake — のエントリは意図が未確定なので、
-  除外どころか parity 軸の検証候補になる)
+- `.agents/skills/floatsoda-device-test/references/known-divergences.md` で `Label: deliberate` とされ、
+  **かつ差異を固定する `Test` が設定済み**のエントリ(それ以外 — unlabelled / port mistake、および
+  `Test: — (not set)` のままの deliberate — は、除外どころか parity 軸の検証候補になる)
 
 ## 手順
 
@@ -87,9 +87,13 @@ GOAL: FloatSoda リポジトリ(<リポジトリの絶対パス>)の Phase 2 成
 - Flutter parity の正典クローン: <flutter_reference の絶対パス>。
   期待値は Flutter 本家の実装・公式テストから引く。FloatSoda 側で期待値を想像しない。
 - 既知差異の台帳は .agents/skills/floatsoda-device-test/references/known-divergences.md。
-  `Label: deliberate` のエントリは finding にしない。unlabelled / port mistake のエントリは
-  意図が未確定なので、この軸に該当すれば検証候補として扱う。not ported とされた機能の欠落自体は、
-  既に台帳へ記録済みなので finding にしない(finding は新規の問題に限る)。
+  `Label: deliberate` かつ `Test` 設定済みのエントリは finding にしない。
+  `Test: — (not set)` の deliberate エントリは、台帳に記録された FloatSoda の挙動が現在も
+  成立するかを検証する — 黙って revert されていれば red test 付きの finding、成立していれば
+  白判定とし「ピン留めテスト未設定」の事実を報告に残す(テスト追加はオーナー判断)。
+  unlabelled / port mistake のエントリは意図が未確定なので、この軸に該当すれば検証候補として扱う。
+  not ported とされた機能の欠落自体は、既に台帳へ記録済みなので finding にしない
+  (finding は新規の問題に限る)。
 - <(任意)検証候補: 入口レビューで未対応だった CodeRabbit 指摘のうちこの軸に該当するもの>
 - ブランチは origin/main (<SHA>) から test/phase2-adversarial-<slug> を切り、
   オーナーの checkout ではなく専用 worktree で作業する。
@@ -133,8 +137,9 @@ red test の代わりに「clone でコピーされないフィールド / メ�
   codex-runner で起動してよい)。
 - Codex 完了後、受理条件を機械的に検証する:
   1. 監査ブランチで `dotnet test` を実行し、コミットされた各テストが**実際に失敗する**こと
-  2. `git diff --name-only origin/main` の全パスが tests/ 配下の**新規テストファイル**であること
-     (src/ に限らず、docs/・設定・プロジェクトファイルなど許可外のパスが1つでもあれば差し戻す)
+  2. `git diff --name-status origin/main` の全変更が status `A`(追加)で、パスが tests/ 配下の
+     **新規テストファイル**であること(既存テストの変更や、src/・docs/・設定・プロジェクトファイルなど
+     許可外のパスが1つでもあれば差し戻す)
   3. PR 本文の黒判定に重要度 7〜8 や住み分け違反(実機挙動・docs)が混ざっていないこと
   4. 白判定・未検証の節が省略されていないこと
 - 検証に落ちた項目は codex-runner の resume で差し戻す。
