@@ -14,3 +14,9 @@ riderModule.iml
 
 # Local AI tool config — local, not published
 .codex/
+
+# Local scratch plans (Hermes) — local, not published
+.hermes/
+
+# Local AI tool config — local, not published
+.ai/
