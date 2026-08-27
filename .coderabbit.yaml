@@ -41,7 +41,10 @@ reviews:
         - 指摘は REVIEW.md 1章の重要度順。style / 具体的影響のない performance は非ブロッキングの提案とする
         - Flutter 由来の挙動は REVIEW.md 3章の優先順位で判断する
           (FloatSoda の明示的設計判断 > Flutter 本家 > 既存実装は根拠にならない)
-        - .agents/skills/floatsoda-device-test/references/known-divergences.md に記録済みの差異は指摘しない
+        - .agents/skills/floatsoda-device-test/references/known-divergences.md のうち
+          `Label: deliberate` のエントリに該当する差異は指摘しない。それ以外のラベル
+          (unlabelled / port mistake / not ported)のエントリは確定した設計判断ではないので、
+          関連する変更は通常どおりレビューする
         - XML ドキュメントコメント・例外メッセージは日本語が正(docs/Localization.md)。英語化を提案しない
         - public API に Skia 型(SK*)を露出させない
         - namespace と物理ディレクトリの不一致を指摘する(CONTRIBUTING.md)

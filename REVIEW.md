@@ -47,7 +47,7 @@ blocking にしてよいのは、重要度 1〜5 に該当し、かつ concrete 
 
 仕様が食い違ったときは、**上から順に**確認します(必須)。
 
-1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test/references/known-divergences.md)、`docs/` 各ページの明記
+1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、正典としては扱いません
 2. **Flutter 由来機能は、Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無いなら、Flutter が正典です
 3. **既存の FloatSoda 実装は根拠になりません** — 実装がそうなっていることは、それが正しいことを意味しません
 

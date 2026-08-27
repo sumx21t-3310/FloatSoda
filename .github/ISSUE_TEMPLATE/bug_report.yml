@@ -26,6 +26,7 @@ body:
       placeholder: |
         app.CreateWindow(new DashboardWindow
         {
+            Title = "Repro",
             Child = new Padding
             {
                 Padding = EdgeInsets.All(8),

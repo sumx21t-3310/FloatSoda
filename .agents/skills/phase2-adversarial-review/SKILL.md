@@ -29,7 +29,9 @@ hypothetical な指摘を量産する問題への対策でもある。書いて�
 - 重要度 7〜8(style / maintainability / 具体的影響のない performance)— 入口レビュー(CodeRabbit)の領分
 - SteamVR 実行時にしか観測できない挙動 — `floatsoda-device-test` の領分
 - docs の分かりにくさ・API の発見性 — `floatsoda-junior-coder-test` の領分
-- `.agents/skills/floatsoda-device-test/references/known-divergences.md` に記録済みの意図的差異
+- `.agents/skills/floatsoda-device-test/references/known-divergences.md` で `Label: deliberate` とされた
+  意図確定済みの差異(それ以外のラベル — unlabelled / port mistake — のエントリは意図が未確定なので、
+  除外どころか parity 軸の検証候補になる)
 
 ## 手順
 
@@ -84,8 +86,10 @@ GOAL: FloatSoda リポジトリ(<リポジトリの絶対パス>)の Phase 2 成
 - 監査対象は Phase 2 で実装されたウィジェット群: <#178 から列挙したインベントリ>
 - Flutter parity の正典クローン: <flutter_reference の絶対パス>。
   期待値は Flutter 本家の実装・公式テストから引く。FloatSoda 側で期待値を想像しない。
-- 既知の意図的差異は .agents/skills/floatsoda-device-test/references/known-divergences.md に
-  記録済み。これらは finding にしない。
+- 既知差異の台帳は .agents/skills/floatsoda-device-test/references/known-divergences.md。
+  `Label: deliberate` のエントリは finding にしない。unlabelled / port mistake のエントリは
+  意図が未確定なので、この軸に該当すれば検証候補として扱う。not ported とされた機能の欠落自体は、
+  既に台帳へ記録済みなので finding にしない(finding は新規の問題に限る)。
 - <(任意)検証候補: 入口レビューで未対応だった CodeRabbit 指摘のうちこの軸に該当するもの>
 - ブランチは origin/main (<SHA>) から test/phase2-adversarial-<slug> を切り、
   オーナーの checkout ではなく専用 worktree で作業する。
