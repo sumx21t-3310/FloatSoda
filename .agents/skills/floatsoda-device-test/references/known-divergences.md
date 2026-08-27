@@ -86,6 +86,8 @@ has no agreed reason to record.
   `typeof(WindowWidget)` so all three concrete window kinds register under the base type and
   descendants keep their dependency when the concrete type changes.
 - **Flutter**: keyed by `runtimeType`; `dependOnInheritedWidgetOfExactType<T>()` is an exact match.
+- **Why**: descendants must keep their `WindowWidget` dependency when the concrete window type is
+  swapped, so all three window kinds register under the base type (issue #90 relies on this).
 - **Test**: — (not set)
 - **Docs**: — (not set)
 - **Observation**: `HEADLESS`
