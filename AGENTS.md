@@ -20,6 +20,47 @@ Do not translate identifiers, type names, file paths, or code fences — those s
 
 Rationale: FloatSoda treats **Japanese as the neutral (default) language** — see `docs/Localization.md`. `docs/`, XML doc comments, and exception messages are all Japanese by design. Review output in Japanese keeps the entire surface consistent for the owner and for the LLMs that relay it to end users. If you feel English "should" be the default here, read `docs/Localization.md` before changing anything.
 
+## Repository Conventions
+
+Conventions have one canonical home each. **Read the canon before acting on a convention, and do not copy its body into this file** — a duplicated rule is a rule that will drift.
+
+| What you need | Canon |
+|---|---|
+| Branch naming, namespace/directory layout, agent skills, PR flow, scope discipline, test perspectives | `CONTRIBUTING.md` |
+| Code review criteria — priorities, finding bar, FloatSoda tree invariants | `REVIEW.md` |
+| API design principles and Flutter parity (including when a divergence is allowed and how to record it) | `docs/APIDesign.md` |
+| Release procedure | `RELEASING.md` |
+
+Three that catch agents out most often:
+
+- **Branch names must not carry the name of the agent or tool that did the work.** No `codex/`, `claude/`, `agent/` prefixes. Use `<type>/<issue-number>-<short-slug>` — full rules in `CONTRIBUTING.md`.
+- **A C# namespace and its physical directory must match**, and must be changed together. Full rules in `CONTRIBUTING.md`.
+- **Do not mix unrelated refactoring, renames, cleanup, or dependency changes into a PR.** Full rules in `CONTRIBUTING.md`.
+
+## Repository Skills
+
+**Look in `.agents/skills/` first** — it is the single canon for repository-provided agent skills. Every skill's procedure and its `references/` files live there.
+
+`.claude/skills/` exists only because Claude Code does not read `.agents/skills/`. Those files are **derived compatibility stubs: frontmatter plus a pointer to the canon, and nothing else.** Never edit them, and never treat one as the source of a procedure. Adding or changing a skill always starts in `.agents/skills/` (→ `CONTRIBUTING.md`).
+
+## Rider MCP
+
+Where JetBrains Rider is installed and its MCP server is available in the session, **prefer it for analysing and changing C#/.NET code**. Use it especially for:
+
+- symbol declaration / usages
+- inheritance / implementations
+- type and member relationships
+- semantic rename
+- structural refactoring
+- IDE / compiler diagnostics
+- solution / project structure
+
+**For operations where C# symbol resolution matters, prefer a semantic IDE operation over plain text search.** For namespace moves and renames, prefer Rider's semantic refactoring over string replacement — text replacement silently misses generic constraints, XML doc `cref`s, and `nameof`, and silently hits comments and strings it should not.
+
+If Rider is not installed, **suggest installing it to the user before starting substantial C#/.NET work**. Rider is free for non-commercial use under JetBrains' current licensing.
+
+**None of this is a hard dependency.** If the user does not want Rider, or the MCP server is unavailable, fall back to the `dotnet` CLI, repository search, and source inspection, and carry on. **Never install software on your own initiative** — propose it and let the user decide.
+
 ## Project Overview
 
 FloatSoda is a SteamVR Overlay UI framework for .NET 10 / C# 14 that brings Flutter-like declarative UI to VR overlays. It renders via SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR overlay texture.
@@ -67,6 +108,8 @@ public void BorderSide_Widthが負_ArgumentOutOfRangeExceptionを投げる() { .
 ```
 
 Do not use `[Fact(DisplayName = "…")]` — it duplicates the intent and drifts. Do not bulk-rename existing tests; apply this to new tests only. Full rules: `CONTRIBUTING.md`.
+
+**What to test** — normal behavior, boundary/degenerate and invalid inputs, state transitions, tree lifecycle, incremental behavior, and a regression test for every bug fix — is a separate convention, also in `CONTRIBUTING.md`. For Flutter-derived widgets it requires checking Flutter's own branches and tests, not just imagining cases.
 
 ## Project Structure
 

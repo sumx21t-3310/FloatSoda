@@ -68,6 +68,83 @@ Flutter を参考にする範囲と、C# の慣習を優先する範囲を次の
 
 この原則は「依存を増やさない」という意味ではありません。標準機構を使うために依存が一つ増えることも、標準機構で足りるために既存の依存を落とせることも、どちらも正しい結果です。判断の対象は依存の数ではなく、**同じものを二度実装していないか** です。
 
+### 判断原則: Flutter 由来の observable behavior に差異を作らない
+
+最初の原則の前半（語彙は Flutter に従う）を、**挙動**まで広げたものです。
+
+**Flutter 由来の Widget / RenderObject は、明示された FloatSoda 固有の理由がない限り、Flutter との observable behavior の差異を作りません。**
+
+FloatSoda の docs は Flutter の語彙で概念を教えます。読者（とコード生成 AI）は Flutter の挙動を期待して来るため、**差異がバグでも意図的な設計判断でも、利用者が払うコストは同じ**です。
+
+少なくとも次は parity の対象です。
+
+- property semantics
+- default values
+- layout
+- paint / clipping
+- hit testing
+- child handling
+- Widget update behavior
+- invalid / degenerate input handling
+- dirty layout / paint conditions
+- Element / state lifecycle semantics
+
+#### 理由にならないもの
+
+**「実装しやすい」「こちらの方が安全」「こちらの方が自然」といった理由だけで独自仕様にしないでください。** これらは差異を正当化しません。Flutter がその挙動を選んだ背景（多くは実際のアプリで踏まれた事故）を、FloatSoda が再発見する必要はありません。
+
+#### behavioral difference とみなさないもの
+
+C#/.NET として自然な表現への置換は、差異ではありません。
+
+- `event`
+- `init` / `required`
+- `record` / `record struct`
+- .NET 標準機構の利用
+
+これは一つ前の2つの原則（表現手段は C# に従う／標準機構を再実装しない）の裏返しです。判断に迷ったら、**利用者から見た挙動が変わるか**で切り分けてください。`addListener` を `event` に置き換えても、購読と解除という観測可能な挙動は同じです。
+
+#### 既に決めた非移植方針を壊さない
+
+FloatSoda のランタイムや対象ユーザーに存在しない機能について、**既に明示された非移植方針を parity を理由に持ち込まないでください。** 特に Semantics（次節）との整合性を確認してください。「Flutter にあるから」は、次節の判断を覆す理由になりません。
+
+#### 差異が必要な場合の記録義務
+
+差異が必要と判断した場合は、**次の5点を恒久的に記録します**。
+
+1. **Flutter の挙動**
+2. **FloatSoda の挙動**
+3. **差異が必要な理由**
+4. **差異を固定するテスト**（ファイルとテストメソッド名）
+5. **利用者に影響する場合のドキュメント**
+
+記録先は [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) です。ここが **FloatSoda ↔ Flutter の確認済み差異の台帳の正典**で、本ドキュメントは判断原則だけを持ちます。
+
+5 について、利用者から見える差異は台帳だけでは足りません。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](../CONTRIBUTING.md)）にも書いてください。台帳はコントリビュータ向け、docs とサンプルは利用者向けです。
+
+4 が無い差異は、次の移植で気づかずに戻されます。**テストで固定されていない差異は、記録されていないのと同じ**と考えてください。
+
+#### 参照の追跡可能性
+
+Flutter を参照して移植・修正する場合、可能な範囲で次を **PR から追跡可能にしてください**（推奨）。PR テンプレートの `## Flutter reference` 欄がこれにあたります。
+
+- Flutter version または commit
+- 参照した Flutter source
+- 参照した Flutter tests
+- 関連する Flutter API documentation
+
+ローカル参照クローンは `~/code_reading/flutter_reference` です。対応する Widget / Element / RenderObject の特定には `flutter-widget-source` skill が使えます。
+
+#### 仕様が食い違ったときの優先順位
+
+既存実装を無条件に正しいものとして扱わないでください。**上から順に**確認します。
+
+1. **FloatSoda で明示的に定義された差異・設計判断** — 本ドキュメント、台帳、`docs/` の明記
+2. **Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無ければ、Flutter が正典
+3. **既存の FloatSoda 実装は根拠になりません** — そう実装されていることは、それが正しいことを意味しません
+
+**古い Issue や既存実装だけを根拠に、新しい挙動を決めないでください。** Issue が書かれた時点の前提が今も成り立つかを確認します。
+
 ### 判断原則: 対象ユーザー・ランタイムに不要な Flutter API は移植しない
 
 Flutter の API がすべて FloatSoda に必要なわけではありません。対象ユーザー(→ [TargetUsers](TargetUsers.md))の需要がなく、かつ FloatSoda のランタイム(Skia → OpenGL → OpenVR オーバーレイテクスチャ)に受け皿がない機能は、Flutter 由来のコードを移植する際にフックだけ先に置くことをせず、削除します。
@@ -762,3 +839,5 @@ public static class OVRApplications
 
 - [WidgetSystem](WidgetSystem.md) — この規約で実装された組み込みウィジェット
 - [Home](Home.md) — ドキュメント一覧
+- [CONTRIBUTING.md](../CONTRIBUTING.md) — 開発・コントリビューション規約(ブランチ命名、namespace、テスト観点、PR運用)
+- [REVIEW.md](../REVIEW.md) — コードレビューの判断基準。本ドキュメントの原則をレビュー基準として参照する

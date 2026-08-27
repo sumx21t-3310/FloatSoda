@@ -4,7 +4,7 @@ FloatSoda のリリースは **`v*` タグの push** をトリガーに [`.githu
 
 FloatSoda は **Alpha 段階**(API は予告なく破壊的変更あり)ですが、公開パッケージが起動即クラッシュするような事故を防ぐため、下記のゲートを必ず通してください。
 
-> この手順を実行するスキルが [`floatsoda-release`](.claude/skills/floatsoda-release/SKILL.md) にあります。**方針の正本はこのドキュメント**で、スキルはその実行役です。手順やゲートの方針を変えるときは必ずこちら側を直してください(スキル側に「今はこうする」という分岐を持たせない)。
+> この手順を実行するスキルが [`floatsoda-release`](.agents/skills/floatsoda-release/SKILL.md) にあります。**方針の正本はこのドキュメント**で、スキルはその実行役です。手順やゲートの方針を変えるときは必ずこちら側を直してください(スキル側に「今はこうする」という分岐を持たせない)。
 
 ---
 
@@ -144,7 +144,7 @@ gh release create vX.Y.Z --title "vX.Y.Z — <一言見出し>" --notes-file <�
 
 FloatSoda の第一利用者は「コードを LLM に書かせる VRChatter」です。xunit テストは**内部動作**の回帰を守りますが、それとは別に **「docs だけを読んだ LLM が FloatSoda で物を作れるか」= LLM 体験** の回帰を守るのがこのゲートです。実際にこの手法は、公開前のコードから「全オーバーレイをクラッシュさせる docs 推奨API」と「子の動的削除で無限再帰するレンダーツリーのバグ」を釣り上げた実績があります。
 
-**リリース対象のコミット上で**、スキル [`floatsoda-junior-coder-test`](.claude/skills/floatsoda-junior-coder-test/SKILL.md) を実行します。
+**リリース対象のコミット上で**、スキル [`floatsoda-junior-coder-test`](.agents/skills/floatsoda-junior-coder-test/SKILL.md) を実行します。
 
 - **お題**: `main`(状態を持つ動的UI)を基本とし、レンダーツリーや OVR 層に変更が入ったリリースでは `hard` も追加。
 - **テーマは毎リリース持ち回り**(トースト通知 / 写真アルバム / FaceEmo 切替 …)。1つのお題に過学習させないため。
@@ -167,4 +167,4 @@ FloatSoda の第一利用者は「コードを LLM に書かせる VRChatter」�
 
 - [CONTRIBUTING.md](CONTRIBUTING.md) — PR フローと、**新 public API の受け入れ条件**(こちらも同じジュニアコーダーテストを、新APIを狙い撃つお題で使う)
 - [.github/workflows/release.yml](.github/workflows/release.yml) — タグ push 後の自動リリースパイプライン
-- [.claude/skills/floatsoda-release/SKILL.md](.claude/skills/floatsoda-release/SKILL.md) — この手順を実行するエージェント用スキル
+- [.agents/skills/floatsoda-release/SKILL.md](.agents/skills/floatsoda-release/SKILL.md) — この手順を実行するエージェント用スキル

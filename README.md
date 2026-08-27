@@ -201,6 +201,15 @@ sequenceDiagram
 | [docs/DocumentationComments.md](docs/DocumentationComments.md) | ドキュメントコメント規約 |
 | [docs/Localization.md](docs/Localization.md) | ローカライゼーション方針(日本語デフォルト) |
 
+コントリビュータ向けの規約はリポジトリルートにあります(Wiki には同期されません)。
+
+| ドキュメント | 内容 |
+|---|---|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | 開発・コントリビューション規約(ブランチ命名・namespace・テスト観点・PR運用) |
+| [REVIEW.md](REVIEW.md) | コードレビューの判断基準 |
+| [RELEASING.md](RELEASING.md) | リリース手順 |
+| [AGENTS.md](AGENTS.md) | コーディングエージェント向けの入口 |
+
 ## 開発ステータス
 
 本プロジェクトは現在 **Alpha 段階・Phase 1(入力基盤)と Phase 2(表示系ウィジェット)が並行して進行中** です。簡単なアプリケーションは動作しますが、API は予告なく変更されます。

@@ -132,7 +132,6 @@ FloatSoda のドキュメントコメントは、ソースコードに埋め込�
 - Layout Dirty
 - Paint Dirty
 - Compositing Dirty
-- Semantics Dirty
 - Widget または Element の再構築を要求する状態
 - FloatSoda 固有のパイプライン Dirty 状態
 

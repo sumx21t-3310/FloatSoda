@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
+#
+# CodeRabbit は PR 入口の自動レビュー層(→ REVIEW.md 9章「レビューの層と分担」)。
+# 判断基準の正典は REVIEW.md。ここに書く instructions はその要約なので、
+# REVIEW.md を変更したらこのファイルとの同期を確認すること。
+
+language: "ja-JP"
+
+tone_instructions: >-
+  レビューコメントは日本語で書く。コード・識別子・型名・ファイルパスは原文のまま。
+  REVIEW.mdの基準に従い、concrete failure modeを説明できる指摘を優先する。
+  仮説的な問題の過剰報告、好みだけの指摘、スコープ外のリファクタリング要求はしない。
+  style・保守性の指摘は非ブロッキングの提案として書く。
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - "REVIEW.md"
+      - "CONTRIBUTING.md"
+      - "docs/APIDesign.md"
+
+reviews:
+  # REVIEW.md 2章: 少数・高確度の指摘を優先し、nitpick ノイズを絞る
+  profile: "chill"
+  # blocking 判断は入口(判断)層とオーナーが行う(REVIEW.md 9章)
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  auto_review:
+    enabled: true
+    # このリポジトリでは Draft PR = レビュー待ち(Codex が Draft PR で配送する運用)
+    drafts: true
+  path_filters:
+    # OpenVR 生バインディング(vendored)。レビュー対象外
+    - "!src/FloatSoda.OVR/openvr_api.cs"
+  path_instructions:
+    - path: "src/**/*.cs"
+      instructions: |
+        REVIEW.md が判断基準の正典。特に:
+        - 指摘は REVIEW.md 1章の重要度順。style / 具体的影響のない performance は非ブロッキングの提案とする
+        - Flutter 由来の挙動は REVIEW.md 3章の優先順位で判断する
+          (FloatSoda の明示的設計判断 > Flutter 本家 > 既存実装は根拠にならない)
+        - .agents/skills/floatsoda-device-test/references/known-divergences.md に記録済みの差異は指摘しない
+        - XML ドキュメントコメント・例外メッセージは日本語が正(docs/Localization.md)。英語化を提案しない
+        - public API に Skia 型(SK*)を露出させない
+        - namespace と物理ディレクトリの不一致を指摘する(CONTRIBUTING.md)
+    - path: "tests/**/*.cs"
+      instructions: |
+        - テストメソッド名は `対象メンバー名_条件_期待結果`(条件・期待結果は日本語)。
+          新規テストのみ適用し、既存テストの一括リネームは要求しない
+        - `[Fact(DisplayName = "…")]` は使わない
+        - テストが observable behavior / invariant ではなく実装詳細
+          (private 状態・呼び出し回数)をミラーしていたら指摘する
+        - バグ修正 PR に regression test が無ければ指摘する
+    - path: "docs/**/*.md"
+      instructions: |
+        - 日本語がニュートラル言語という設計判断(docs/Localization.md)。英語化を提案しない
+        - docs/ は GitHub Wiki に自動同期される一次情報。Wiki 側の編集を提案しない
+    - path: ".claude/skills/**"
+      instructions: |
+        このディレクトリは .agents/skills/ の派生スタブ(frontmatter + 正典へのポインタのみ)。
+        手順本文が書かれていたら指摘する。frontmatter が正典側と食い違っていたら指摘する。

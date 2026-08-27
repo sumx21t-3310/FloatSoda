@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: コントリビューションガイド
+    url: https://github.com/sumx21t-3310/FloatSoda/blob/main/CONTRIBUTING.md
+    about: ブランチ命名・テスト観点・PR の出し方・受け入れ範囲はこちらを参照してください。
+  - name: ドキュメント (Wiki)
+    url: https://github.com/sumx21t-3310/FloatSoda/wiki
+    about: 使い方・ウィジェット一覧・アーキテクチャの解説はこちらです。
