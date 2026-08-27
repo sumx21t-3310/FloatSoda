@@ -56,13 +56,23 @@ public sealed record AlignDemo : StatelessWidget
                         new SizedBox { Width = 24 },
 
                         // WidthFactor / HeightFactor を指定すると、Align 自身が
-                        // 「子の寸法 x 係数」まで収縮する。領域いっぱいには広がらない。
-                        Cell("係数 2.0 で収縮", new AlignWidget
+                        // 「子の寸法 x 係数」まで収縮する。
+                        // ただし収縮できるのは親の制約が緩いときだけで、tight な制約の下では
+                        // Constrain によって親の寸法へ戻される。ここでは Center を挟んで
+                        // 緩い制約を作り、ColoredBox で Align 自身の範囲を可視化している。
+                        Cell("係数 2.0 で収縮", new Center
                         {
-                            Alignment = Alignment.Center,
-                            WidthFactor = 2.0,
-                            HeightFactor = 2.0,
-                            Child = Marker(new Color(255, 209, 102))
+                            Child = new ColoredBox
+                            {
+                                Color = new Color(92, 76, 44),
+                                Child = new AlignWidget
+                                {
+                                    Alignment = Alignment.Center,
+                                    WidthFactor = 2.0,
+                                    HeightFactor = 2.0,
+                                    Child = Marker(new Color(255, 209, 102))
+                                }
+                            }
                         })
                     }
                 }

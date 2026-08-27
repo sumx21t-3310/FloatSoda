@@ -41,6 +41,12 @@ new SizedBoxWidget
     Child = new ColoredBox
     {
         Color = new Color(40, 47, 64),
+        Child = new Center
+        {
+            Child = Label("Height = 70 のみ指定")
+        }
+    }
+}
 ```
 
 高さだけを決めて幅は親いっぱいに広げたい、という場合に使います。
