@@ -36,7 +36,7 @@ public class PostTaskRunnerTest
     }
 
     [Fact]
-    public void DrainPendingTasks_ThrowingTask_DoesNotStopSubsequentTasks()
+    public void DrainPendingTasks_タスクが例外を投げる_後続タスクは実行される()
     {
         var logger = new CountingLogger();
         var runner = new TestPostTaskRunner(logger);
@@ -54,7 +54,7 @@ public class PostTaskRunnerTest
     }
 
     [Fact]
-    public void DrainPendingTasks_ExecutesTasksInFifoOrder()
+    public void DrainPendingTasks_複数タスクを投稿_FIFO順に実行される()
     {
         var runner = new TestPostTaskRunner(logger: null);
 

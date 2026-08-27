@@ -1,0 +1,124 @@
+name: Bug report
+description: FloatSoda の不具合を報告する
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ご報告ありがとうございます。**必須の欄だけ埋めれば十分です。**
+        描画に関する欄と Flutter に関する欄は、該当する場合のみ記入してください。
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: バグの概要
+      description: 何が起きているかを簡潔に書いてください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: 最小再現コード / 再現手順
+      description: |
+        再現する最小のウィジェットツリーを貼ってください。コードで再現できない場合は手順を書いてください。
+      render: csharp
+      placeholder: |
+        app.CreateWindow(new DashboardWindow
+        {
+            Title = "Repro",
+            Child = new Padding
+            {
+                Padding = EdgeInsets.All(8),
+                Child = new Text("hello"),
+            },
+        });
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: 期待した挙動 (expected behavior)
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 実際の挙動 (actual behavior)
+    validations:
+      required: true
+
+  - type: textarea
+    id: exception
+    attributes:
+      label: 例外 / スタックトレース
+      description: 例外が出た場合に貼ってください。
+      render: text
+    validations:
+      required: false
+
+  - type: input
+    id: floatsoda-version
+    attributes:
+      label: FloatSoda のバージョン
+      description: NuGet パッケージのバージョン、または試したコミットの SHA。
+      placeholder: "0.4.0 / 9185278"
+    validations:
+      required: true
+
+  - type: input
+    id: dotnet-version
+    attributes:
+      label: .NET SDK のバージョン
+      description: "`dotnet --version` の出力。"
+      placeholder: "10.0.100"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: "Windows 11 26200"
+    validations:
+      required: true
+
+  - type: textarea
+    id: render-env
+    attributes:
+      label: 描画・VR 環境（表示や描画の問題の場合のみ）
+      description: |
+        描画が崩れる、テクスチャが出ない、オーバーレイが表示されない等の場合に記入してください。
+        それ以外のバグでは空欄で構いません。
+      value: |
+        - GPU / ドライバ:
+        - HMD:
+        - SteamVR バージョン:
+        - OpenGL / OpenVR で気づいた点:
+    validations:
+      required: false
+
+  - type: textarea
+    id: flutter-parity
+    attributes:
+      label: Flutter との対応（Flutter 由来の Widget / RenderObject に関係する場合のみ）
+      description: |
+        FloatSoda は Flutter のウィジェットを移植しています。この欄は
+        「FloatSoda のバグ」「意図された Flutter の仕様」「FloatSoda 固有の意図的な差異」
+        を切り分けるための**任意**の欄です。分かる範囲で構いませんし、空欄でも構いません。
+      value: |
+        - 対応する Flutter の挙動:
+        - Flutter version / commit:
+        - Flutter でも同じことが起きるか:
+    validations:
+      required: false
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: スクリーンショット / ログ
+      description: あると助かる場合のみ。
+    validations:
+      required: false

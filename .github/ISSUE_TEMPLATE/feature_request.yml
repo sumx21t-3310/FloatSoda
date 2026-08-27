@@ -1,0 +1,67 @@
+name: Feature request
+description: 新しい機能や API を提案する
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        提案ありがとうございます。
+        FloatSoda は Flutter のウィジェットモデルを踏襲しています。**Flutter に対応する API がある場合は、
+        新しい API を発明するより、既存の Flutter の概念に合わせることを優先します**
+        (判断基準は [docs/APIDesign.md](https://github.com/sumx21t-3310/FloatSoda/blob/main/docs/APIDesign.md))。
+        そのため、下の「対応する Flutter API」を先に確認していただけると議論が早く進みます。
+
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 欲しい挙動 / API
+      description: どう書けて、どう動いてほしいか。想定するコードがあれば貼ってください。
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: 動機 / ユースケース
+      description: どんなオーバーレイを作りたくて、いま何ができずに困っているか。
+    validations:
+      required: true
+
+  - type: dropdown
+    id: origin
+    attributes:
+      label: Flutter に対応する API はありますか
+      options:
+        - Flutter に対応する API がある
+        - FloatSoda 独自の機能（Flutter に相当するものが無い）
+        - わからない
+    validations:
+      required: true
+
+  - type: textarea
+    id: flutter-api
+    attributes:
+      label: 対応する Flutter API（存在する場合）
+      description: |
+        ウィジェット名や `api.flutter.dev` へのリンクを書いてください。
+        挙動の一部だけが欲しい場合は、その範囲も書いてください。
+    validations:
+      required: false
+
+  - type: textarea
+    id: why-original
+    attributes:
+      label: なぜ FloatSoda に必要か（独自機能の場合）
+      description: |
+        Flutter に相当するものが無い機能の場合、なぜ FloatSoda に必要かを書いてください。
+        VR オーバーレイ固有の事情（OpenVR、HMD、ダッシュボード等）があれば具体的に。
+    validations:
+      required: false
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: 検討した代替案
+      description: 既存の API で回避を試したなら、その結果も書いてください。
+    validations:
+      required: false

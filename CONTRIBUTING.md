@@ -2,6 +2,17 @@
 
 FloatSoda は現在 **Alpha 段階** です。API は予告なく破壊的に変更されることがあります。この点をご理解の上でコントリビューションをお願いします。
 
+このドキュメントは**開発・コントリビューション規約の正典**です。人間のコントリビュータと、作業を行うコーディングエージェントの両方に等しく適用します。本文中の **必須** は MUST、**推奨** は SHOULD の強さで読んでください。
+
+隣接する正典は次のとおりです。同じ規約を二重に書かず、参照してください。
+
+| 目的 | 正典 |
+|---|---|
+| コードレビューの判断基準 | [REVIEW.md](REVIEW.md) |
+| API 設計原則・Flutter parity | [docs/APIDesign.md](docs/APIDesign.md) |
+| エージェントの入口・実行方針 | [AGENTS.md](AGENTS.md) |
+| リリース手順 | [RELEASING.md](RELEASING.md) |
+
 ---
 
 ## 開発環境のセットアップ
@@ -24,9 +35,8 @@ dotnet run --project samples/FloatSoda.Samples.OverlayApp
 
 ## ブランチ・PRフロー
 
-- `main` へは直接pushせず、必ずPR経由でマージしてください。
-- ブランチ名は `feature/xxx`、`fix/xxx` のように用途が分かる名前を付けてください。
-- PRを出す前に、CI(`.github/workflows/ci.yml`)と同じ手順をローカルで実行し、パスすることを確認してください。
+- `main` へは直接pushせず、必ずPR経由でマージしてください(必須)。
+- PRを出す前に、CI(`.github/workflows/ci.yml`)と同じ手順をローカルで実行し、パスすることを確認してください(必須)。
 
 ```bash
 dotnet build --configuration Release
@@ -34,7 +44,46 @@ dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 dotnet test tests/FloatSoda.Test --configuration Release --no-build
 ```
 
-バグ報告・機能要望は `.github/ISSUE_TEMPLATE/` のテンプレートを使って Issue を立ててください。
+バグ報告・機能要望は `.github/ISSUE_TEMPLATE/` のテンプレートを使って Issue を立ててください。PR の本文は [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) に沿って記入してください。
+
+### ブランチ名
+
+人間が切る場合もエージェントが切る場合も、同じ規則を使います(必須)。
+
+```text
+<type>/<issue-number>-<short-slug>   Issue がある場合
+<type>/<short-slug>                  Issue が無い場合
+```
+
+`<type>` は次のいずれかを基本とします。
+
+`feat` / `fix` / `docs` / `test` / `refactor` / `chore` / `perf` / `build` / `ci`
+
+`<short-slug>` は **lowercase ASCII + ハイフン**で書きます。
+
+例:
+
+- `feat/157-fractionally-sized-overflow-box`
+- `fix/182-world-space-pointer-coordinates`
+- `docs/review-guidelines`
+- `test/layer-clone-independence`
+
+**作業した AI エージェントやツールの名前をブランチ名に含めないでください**(必須)。`codex/`、`claude/`、`agent/` のようなプレフィックスは使いません。**ブランチ名は「誰が変更したか」ではなく「何を変更するか」を表すもの**です。同じ理由で、`feature/` は使わず `feat/` に統一します。
+
+この規則は**これから切るブランチに適用します**。既に存在するブランチを遡って改名する必要はありません。
+
+### PR のスコープ
+
+**Issue や PR の目的に不要な変更を混ぜないでください**(必須)。作業中に関連箇所を見つけても、次を同じ PR へ勝手に含めません。
+
+- 無関係なリファクタリング
+- 無関係なリネーム
+- 無関係なクリーンアップ
+- 無関係な依存関係の追加・削除
+
+必要なものは別 Issue / PR として扱います。レビュー範囲が膨らむと、本来の変更の正しさを判断できなくなるためです。
+
+**public API または observable behavior を変更する場合は、breaking change の有無を明示的に判断し、PR 本文に書いてください**(必須)。「無い」と判断した場合も、その旨を書きます。判断基準は [docs/APIDesign.md](docs/APIDesign.md) のセクション6(バージョニングと後方互換性)にあります。
 
 ---
 
@@ -81,6 +130,69 @@ public void Preset_各プリセット_XYが仕様どおり(Alignment alignment, 
 - 既存テストの一括リネームはしません。新規テストから適用し、既存は別の理由で触るついでに寄せてください。
 - この方針は「ニュートラル = 日本語」という設計判断([docs/Localization.md](docs/Localization.md))の一部です。
 
+### テスト観点
+
+命名とは別に、**何を検証するか**の規約です。実装を変更するときも、レビューするときも、この観点で漏れを確認します。
+
+実装変更では、次のうち**その変更に該当するものをすべて考慮してください**(必須)。該当しない観点まで機械的に埋める必要はありません。
+
+| 観点 | 内容 |
+|---|---|
+| representative normal behavior | 代表的な正常系。そのAPIが「普通に使われる形」 |
+| boundary / degenerate inputs | 境界値と退化ケース。ゼロサイズ、空リスト、子が1つ、無限大の制約など |
+| invalid inputs | 不正入力。負数・非有限値・null が、握り潰されず契約どおり例外になるか |
+| state transitions | 状態遷移。プロパティ変更の前後、アニメーションの開始・停止、ジェスチャの成立・失敗 |
+| tree lifecycle | ツリーのライフサイクル。mount / update / 差し替え / dispose、attach / detach |
+| incremental behavior | 差分更新。dirty 化の条件、再構築・再レイアウト・再描画の範囲 |
+| regression test | 再発防止。下記参照 |
+
+原則として、**テストは実装詳細をミラーせず、observable behavior・behavioral contract・invariant を検証します**(必須)。private な内部状態や呼び出し回数をなぞるテストは、リファクタリングで壊れる一方で挙動の誤りを捕まえないため、避けてください。
+
+**バグ修正では regression test を原則必須とします**(必須)。元のバグを再現するテストを書き、**修正前に失敗し、修正後に成功する**ことを確認してください。修正を戻すと落ちるか、が判定基準です。
+
+Flutter 由来の Widget / RenderObject では、**FloatSoda 独自にテストケースを想像するだけで済ませないでください**(必須)。Flutter 本体の実装分岐・公式テスト・API contract を確認し、**対応する重要ケースを FloatSoda 側でも検証**します。Flutter が明示的にテストしている退化ケースは、FloatSoda でも壊れます。
+
+- ローカル参照クローン: `~/code_reading/flutter_reference`
+- 対応する Widget / Element / RenderObject の特定: `flutter-widget-source` skill
+
+サンプル(`samples/`)は結合テストのシナリオを兼ねます。ウィジェットを追加した場合の扱いは[サンプルを追加する場合の規約](#サンプルを追加する場合の規約)を参照してください。
+
+---
+
+## namespace とディレクトリ
+
+**C# の namespace と、プロジェクトルート以下の物理ディレクトリ構造を一致させます**(必須)。
+
+```
+src/FloatSoda/Widgets/Layout/Stack.cs   →   namespace FloatSoda.Widgets.Layout;
+tests/FloatSoda.Test/RenderObjects/…    →   namespace FloatSoda.Test.RenderObjects;
+```
+
+- **namespace を移動する場合は、対応するディレクトリへファイルも同じ変更で移動してください**(必須)。
+- **ディレクトリだけ、または namespace だけを変更して不一致を作らないでください**(必須)。
+- 例外が必要な場合は、その理由を明示してください。
+
+現在 `src/` と `tests/` の全ファイルがこの規則を満たしています。**不一致ゼロが維持すべき状態**です。
+
+`samples/` はこの規則の適用例で、加えてディレクトリ名・プロジェクト名も一致させます(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))。
+
+ファイルスコープ namespace(`namespace X;`)は `.editorconfig` の `IDE0161` でビルド時に強制されます。**namespace の移動やリネームでは、文字列置換よりも IDE の semantic refactoring を優先してください**(推奨。→ [AGENTS.md](AGENTS.md) の Rider MCP)。
+
+---
+
+## エージェント向け skill を追加・変更する場合
+
+リポジトリが提供する agent skill の**唯一の正典は [`.agents/skills/`](.agents/skills/) です**(必須)。
+
+- **skill の追加・変更は必ず `.agents/skills/` 側から行ってください**(必須)。
+- `.claude/skills/` は、`.agents/skills/` を直接サポートしない Claude Code のための **compatibility fallback** です。frontmatter と正典へのポインタしか持たない **derived artifact であり、直接編集してはいけません**(必須)。
+- 特定のエージェント(Claude / Codex / Cursor 等)向けに、**同一 skill の独立したコピーを正典として管理しないでください**(必須)。
+
+新しい skill を追加する手順:
+
+1. `.agents/skills/<name>/SKILL.md` に本体を書く。参照ファイルは `.agents/skills/<name>/references/` に置く
+2. `.claude/skills/<name>/SKILL.md` に、正典と同じ frontmatter + 正典へのポインタだけのスタブを置く(既存のスタブを雛形にしてください)
+
 ---
 
 ## コーディング規約
@@ -112,7 +224,7 @@ API設計の詳細な規約は **[docs/APIDesign.md](docs/APIDesign.md)** を参
 
 FloatSoda の第一の利用者は「コードを自分では書かず LLM に書かせる VRChatter」です(→ [docs/TargetUsers.md](docs/TargetUsers.md))。そのため public API の合否基準は **「更新後の docs だけを読んだ LLM が、そのAPIを正しく使えるか」** です。単に動くだけ・XMLコメントが付いているだけでは不十分で、**LLM から見て発見でき、誤用しにくい**ことまで求めます。
 
-新しい public API(ウィジェット、ビルダーメソッド、オーバーレイ種別、`*Style`、使い方が変わる public プロパティ等)を追加・変更する PR は、マージ前に **ジュニアコーダーテスト**を通してください。手順はスキル [`floatsoda-junior-coder-test`](.claude/skills/floatsoda-junior-coder-test/SKILL.md) にあります。要点:
+新しい public API(ウィジェット、ビルダーメソッド、オーバーレイ種別、`*Style`、使い方が変わる public プロパティ等)を追加・変更する PR は、マージ前に **ジュニアコーダーテスト**を通してください。手順はスキル [`floatsoda-junior-coder-test`](.agents/skills/floatsoda-junior-coder-test/SKILL.md) にあります。要点:
 
 1. PR ブランチで **docs を先に更新**する(このAPIを説明するページ。`docs/*.md` は Wiki に同期される一次情報)。
 2. **その新APIを使わないと解けないお題**を書き、低〜中エフォートのモデルに、更新後の **docs だけ**を渡して実装させる(ソース `src/` は見せない=ブラックボックス)。
@@ -218,7 +330,9 @@ HMD が要るかどうかは**節の見出しで区別**します(`★` のよ�
 
 FloatSoda は RenderObject ツリー / Layer ツリー / Widget-Element ツリーの三層構造を持ちます。コードを読み始める前に **[docs/Home.md](docs/Home.md)** から目を通すことを推奨します。
 
-Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element、`BuildOwner` による差分ビルド、`MultiChildRenderObjectElement` のキー付き二端リスト差分まで実装済みです。一方で、多くの便利ウィジェット(`Padding`, `Container`, `ListView`, `GridView`, `Opacity`, `GestureDetector`, `Listener` 等)は未実装(`NotImplementedException`)のスタブで、ジェスチャ・ヒットテストも未実装です。これらの領域に貢献する場合は、事前に設計方針を Issue 等ですり合わせることを推奨します。
+Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` とそれぞれの Element、`BuildOwner` による差分ビルド、`MultiChildRenderObjectElement` のキー付き二端リスト差分まで実装済みです。レイアウト・描画・入力のウィジェット(`Padding`, `Container`, `Stack`, `Wrap`, `Opacity`, `Transform`, `GestureDetector`, `Listener` 等)とジェスチャ・ヒットテストも実装済みです。
+
+未実装の領域は、スクロール系ウィジェット(`ListView`, `GridView`, `SingleChildScrollView`)です。また、ポインタ座標がダッシュボードオーバーレイにしか届かないため、`WorldSpaceWindow` / `DeviceTrackedWindow` では `GestureDetector` のコールバックが発火しません(issue #182)。これらの領域に貢献する場合は、事前に設計方針を Issue 等ですり合わせることを推奨します。
 
 ---
 
@@ -237,4 +351,4 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 - [ ] Wiki同期対象の `docs/*.md` を直接編集した(Wiki側は編集していない)
 - [ ] プリミティブ層(basic.dart相当)を超える複合ウィジェットを追加していない
 - [ ] **新しいウィジェットを追加した場合**、サンプル(README + checklist.md)を追加した(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))
-- [ ] **新しい public API を追加した場合**、docs を更新し、ジュニアコーダーテスト([`floatsoda-junior-coder-test`](.claude/skills/floatsoda-junior-coder-test/SKILL.md))を通した
+- [ ] **新しい public API を追加した場合**、docs を更新し、ジュニアコーダーテスト([`floatsoda-junior-coder-test`](.agents/skills/floatsoda-junior-coder-test/SKILL.md))を通した
