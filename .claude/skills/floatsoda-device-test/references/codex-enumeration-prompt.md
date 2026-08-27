@@ -105,8 +105,9 @@ FloatSoda(.NET 10 / C# 14 の SteamVR オーバーレイUIフレームワーク)
 
 なお `src/FloatSoda/FloatSodaApp.cs` の `FloatSodaApp.MainLoop` は、タスク処理・イベント処理・描画の
 3つの `catch (Exception)` ブロックそれぞれで `break` するため、例外が出るとアプリごと終了する。
-これは調査済みの事実として使ってよい。**ただしこの文書に書かれた行番号を再利用しないこと。**
-`file:line` を挙げるときは、実行時に現物を読んで現在の行番号を確認する。
+**ただし、これも他の `file:line` と同じ扱いにする。** 現物を読んで実装が今もそうなっていることを
+確認できた場合にだけ事実として使い、確認できなければ「未確認」と明記する。この文書に書かれた
+行番号は再利用せず、実行時に現在の行番号を確認すること。
 ```
 
 ---
@@ -116,3 +117,7 @@ FloatSoda(.NET 10 / C# 14 の SteamVR オーバーレイUIフレームワーク)
 Do not relay the list as-is. Spot-check the cited `file:line` first — a scenario built on a misread
 line costs an HMD session. Then route per `SKILL.md` step 2, and tell the owner which citations you
 verified and which you did not.
+
+**A scenario whose citation you could not verify does not enter routing, and never reaches the HMD.**
+Hold it in a separate "unverified" list until the citation and the behaviour are confirmed. The point
+of the enumeration is to spend the headset on things that are real.

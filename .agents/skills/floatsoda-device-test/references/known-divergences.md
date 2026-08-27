@@ -7,6 +7,9 @@ rather than rediscovers, and append newly confirmed entries after each run.
 Flutter clone for cross-reference: `~/code_reading/flutter_reference`. The `flutter-widget-source`
 skill resolves a widget to its Widget / Element / RenderObject implementations.
 
+Entries are source-verified unless a **Status** line says otherwise; an unconfirmed entry is a lead
+for the enumeration, not a finding.
+
 Each entry carries a label once decided: **deliberate** (a design call — then it is a `docs/` gap if
 undocumented) / **not ported** (missing, file an issue) / **port mistake** (implemented but wrong —
 the highest-value category).
@@ -85,10 +88,13 @@ the highest-value category).
   events within one frame and asserting they are dispatched together.
 - **Label**: unlabelled
 
-## 8. Input loss under a degraded frame rate
+## 8. Input delay or loss under a degraded frame rate — **unconfirmed**
 
-- The user-visible consequence of #7. Whether events are dropped or merely delayed once frame pacing
-  slips depends on the real event source and the actual frame budget.
+- **Status**: not source-verified. Unlike every other entry here, this one is *derived* from #7
+  rather than read off the implementation, and it is listed so the enumeration picks it up — not as
+  an established divergence. Do not cite it as confirmed.
+- The user-visible consequence of #7. **Whether events are actually dropped, or merely delayed, is
+  the open question**; it depends on the real event source and the actual frame budget.
 - **Observation**: **`VR`** — needs SteamVR event delivery and a real frame rate; not reproducible
   from a synthetic event queue.
 - **Label**: unlabelled — resolve #7 first; if the headless verdict already explains the behaviour,
