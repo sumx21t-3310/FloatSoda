@@ -24,5 +24,6 @@ dotnet run --project samples/FloatSoda.Samples.PointerRegion
 
 1. SteamVR ダッシュボードに `PointerRegion` タブが現れ、開くとオーバーレイが表示される。
 2. レーザーの出し入れとトリガーで、デスクトップの2〜5番と同じ結果になる。
-3. **トリガーを引いたままレーザーを的の外へ出す**と、的が赤(「CANCELED」)になり、Cancel が 1 増え、**Tap は増えない**(Status は `CANCEL / TAP SUPPRESSED` を経由する)。
+3. **トリガーを引いたままレーザーを的を越えてオーバーレイそのものの外へ出す**と、的が赤(「CANCELED」)になり、Cancel が 1 増え、**Tap は増えない**(Status は `CANCEL / TAP SUPPRESSED` を経由する)。
+   的の外(オーバーレイ内)へ出しただけでは Cancel は増えず、Exit だけが増える。
 4. Cancel の後にもう一度的へ入って普通にタップすると、4番と同様に Tap が成立する(Cancel 状態を引きずらない)。

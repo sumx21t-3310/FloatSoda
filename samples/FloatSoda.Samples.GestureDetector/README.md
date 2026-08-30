@@ -38,23 +38,30 @@ new GestureDetectorWidget
 
 このサンプルは名前空間が `FloatSoda.Samples.GestureDetector` で型名と衝突するため、`GestureDetectorWidget` というエイリアスを使っています。名前空間が衝突しないアプリでは `new GestureDetector { ... }` と書けます。
 
-### ドラッグで動かす(Pan)
+### ドラッグで動かす(Pan)とタップの同居
 
 `OnPanUpdate` には**前回位置からの移動量(デルタ)**が届きます。累積した値を `Positioned` の座標へ反映すると、箱がポインターに追従します。
 
+このサンプルの箱は、**同じ検出器**へ `OnTap` と Pan 系の両方を設定しています。タップとドラッグの判定は排他で、押して動かさずに離せば `OnTap` だけ、動かせば Pan 系だけが呼ばれます(ジェスチャアリーナが裁定します)。
+
 ```csharp
-new GestureDetectorWidget
+new Listener
 {
-    Behaviour = HitTestBehaviour.Opaque,
-    OnPanStart = _ => SetState(() => _dragging = true),
-    OnPanUpdate = HandlePanUpdate,
-    OnPanEnd = () => SetState(() => _dragging = false),
-    Child = new ColoredBox
+    OnPointerCancel = _ => SetState(() => _dragging = false),
+    Child = new GestureDetectorWidget
     {
-        Color = _dragging
-            ? new Color(255, 209, 102)
-            : new Color(255, 111, 97),
-        Child = new SizedBox { Width = BoxSize, Height = BoxSize }
+        Behaviour = HitTestBehaviour.Opaque,
+        OnTap = HandleBoxTap,
+        OnPanStart = _ => SetState(() => _dragging = true),
+        OnPanUpdate = HandlePanUpdate,
+        OnPanEnd = () => SetState(() => _dragging = false),
+        Child = new ColoredBox
+        {
+            Color = _dragging
+                ? new Color(255, 209, 102)
+                : new Color(255, 111, 97),
+            Child = new SizedBox { Width = BoxSize, Height = BoxSize }
+        }
     }
 }
 ```
@@ -67,7 +74,9 @@ private void HandlePanUpdate(Offset delta) => SetState(() =>
 });
 ```
 
-タップとドラッグの判定は排他です。押してすぐ離せば `OnTap`、動かせば Pan 系だけが呼ばれます。
+### Cancel に備える
+
+ドラッグ中にポインターがウィンドウやオーバーレイの外へ出ると、ポインター列は `Cancel` で中断されます。**`PanGestureRecognizer` は Cancel のとき `OnPanEnd` を呼びません。**「ドラッグ中」のような状態を持つ場合は、上のコードのように外側へ `Listener` を重ねて生の `OnPointerCancel` でも解除してください。
 
 ### 入力が届くウィンドウ種別
 

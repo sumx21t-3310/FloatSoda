@@ -26,6 +26,7 @@ public sealed class GestureDetectorDemoState : State<GestureDetectorDemo>
     private const double BoxSize = 64;
 
     private int _tapCount;
+    private int _boxTapCount;
     private bool _dragging;
     private double _boxX = (FieldWidth - BoxSize) / 2;
     private double _boxY = (FieldHeight - BoxSize) / 2;
@@ -72,10 +73,13 @@ public sealed class GestureDetectorDemoState : State<GestureDetectorDemo>
                         },
                         new SizedBox { Height = 28 },
 
-                        Label("OnPan — ドラッグで箱を動かす"),
+                        Label("OnTap と OnPan の同居 — ドラッグで箱を動かす"),
                         new SizedBox { Height = 10 },
                         // OnPanUpdate は前回位置からの移動量(デルタ)で届く。
                         // 累積して Positioned の座標へ反映し、フィールド内へ収める。
+                        // 同じ検出器へ OnTap も設定し、タップとドラッグの排他をアリーナに裁定させる。
+                        // PanGestureRecognizer は Cancel 時に OnPanEnd を呼ばないため、
+                        // 外側の Listener で生の Cancel を受けてドラッグ状態を解除する。
                         new ColoredBox
                         {
                             Color = new Color(40, 47, 64),
@@ -91,18 +95,23 @@ public sealed class GestureDetectorDemoState : State<GestureDetectorDemo>
                                         {
                                             Left = _boxX,
                                             Top = _boxY,
-                                            Child = new GestureDetectorWidget
+                                            Child = new Listener
                                             {
-                                                Behaviour = HitTestBehaviour.Opaque,
-                                                OnPanStart = _ => SetState(() => _dragging = true),
-                                                OnPanUpdate = HandlePanUpdate,
-                                                OnPanEnd = () => SetState(() => _dragging = false),
-                                                Child = new ColoredBox
+                                                OnPointerCancel = _ => SetState(() => _dragging = false),
+                                                Child = new GestureDetectorWidget
                                                 {
-                                                    Color = _dragging
-                                                        ? new Color(255, 209, 102)
-                                                        : new Color(255, 111, 97),
-                                                    Child = new SizedBox { Width = BoxSize, Height = BoxSize }
+                                                    Behaviour = HitTestBehaviour.Opaque,
+                                                    OnTap = HandleBoxTap,
+                                                    OnPanStart = _ => SetState(() => _dragging = true),
+                                                    OnPanUpdate = HandlePanUpdate,
+                                                    OnPanEnd = () => SetState(() => _dragging = false),
+                                                    Child = new ColoredBox
+                                                    {
+                                                        Color = _dragging
+                                                            ? new Color(255, 209, 102)
+                                                            : new Color(255, 111, 97),
+                                                        Child = new SizedBox { Width = BoxSize, Height = BoxSize }
+                                                    }
                                                 }
                                             }
                                         }
@@ -111,7 +120,7 @@ public sealed class GestureDetectorDemoState : State<GestureDetectorDemo>
                             }
                         },
                         new SizedBox { Height = 16 },
-                        Label($"箱の位置: ({_boxX:F0}, {_boxY:F0})  ドラッグ中: {(_dragging ? "はい" : "いいえ")}")
+                        Label($"箱の位置: ({_boxX:F0}, {_boxY:F0})  ドラッグ中: {(_dragging ? "はい" : "いいえ")}  箱のタップ {_boxTapCount} 回")
                     }
                 }
             }
@@ -119,6 +128,8 @@ public sealed class GestureDetectorDemoState : State<GestureDetectorDemo>
     };
 
     private void HandleTap() => SetState(() => _tapCount++);
+
+    private void HandleBoxTap() => SetState(() => _boxTapCount++);
 
     private void HandlePanUpdate(Offset delta) => SetState(() =>
     {
