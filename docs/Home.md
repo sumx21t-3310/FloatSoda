@@ -90,7 +90,7 @@ graph LR
 | Phase | 残件 |
 |---|---|
 | Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
-| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`DefaultTextStyle`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
+| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`DefaultTextStyle`、`ViewMetrics`(`MediaQuery` 相当) |
 
 ## 実装状況サマリ
 
