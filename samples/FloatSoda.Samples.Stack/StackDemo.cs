@@ -129,9 +129,15 @@ public sealed record StackDemo : StatelessWidget
                 }
             },
             new SizedBox { Height = 10 },
-            new Text(label)
+            // ラベルを枠と同じ幅へ制約する。制約しないと長いラベルがセル幅を広げ、
+            // フォント次第で5枠が画面へ収まらなくなる(長いラベルは折り返す)。
+            new SizedBox
             {
-                Style = new TextStyle { FontSize = 18, Color = new Color(169, 180, 204) }
+                Width = 150,
+                Child = new Text(label)
+                {
+                    Style = new TextStyle { FontSize = 18, Color = new Color(169, 180, 204) }
+                }
             }
         }
     };

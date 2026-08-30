@@ -92,8 +92,9 @@ new Row
 |---|---|---|
 | `Flex` に指定できる値 | 1以上。0以下は `ArgumentOutOfRangeException` | `Flexible` は `flex: 0`(固定寸法の子として扱う)も指定できる |
 | 型の関係 | `Expanded` と `Flexible` は独立した型 | `Expanded` は `Flexible` の派生クラス |
+| 主軸が unbounded な場所の flex 子 | 常に `InvalidOperationException` | `MainAxisSize.min` かつ子が `FlexFit.loose` の組み合わせは許容される(それ以外は debug ビルドの assert で失敗) |
 
-余剰領域の分配、`FlexFit.Tight` / `Loose` の意味、`Spacer` が `Expanded` + 空の `SizedBox` である点は Flutter と同等です。主軸が無限に伸びる場所(スクロール領域など)へ flex を持つ子を置くとエラーになる点も同じです。
+余剰領域の分配、`FlexFit.Tight` / `Loose` の意味、`Spacer` が `Expanded` + 空の `SizedBox` である点は Flutter と同等です。
 
 ## 実行
 
@@ -116,4 +117,4 @@ dotnet run --project samples/FloatSoda.Samples.Expanded
 
 - 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [FloatSoda.Samples.Flex](../FloatSoda.Samples.Flex) — 主軸・交差軸の揃え方
+- [FloatSoda.Samples.Wrap](../FloatSoda.Samples.Wrap) — 収まらない子を折り返す場合

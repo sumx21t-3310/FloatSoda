@@ -78,7 +78,7 @@ new Positioned
 | 項目 | FloatSoda | Flutter |
 |---|---|---|
 | はみ出しの扱い | クリップしない。`Stack` の範囲を超えた子もそのまま描かれる | 既定(`clipBehavior: Clip.hardEdge`)でクリップする。`clipBehavior` プロパティ自体が FloatSoda には無い |
-| `Alignment` の指定 | プリセットの静的フィールド9種。既定は `TopLeft` | `AlignmentDirectional.topStart` が既定で、`textDirection` の影響を受ける |
+| `Alignment` の指定 | プリセット9種のほか `new Alignment(x, y)` で任意の位置を指定できる。既定は `TopLeft` で、`textDirection` による方向依存の解決は無い | `AlignmentDirectional.topStart` が既定で、`textDirection` の影響を受ける |
 | `Positioned` の補助コンストラクタ | 無し | `Positioned.fill` / `Positioned.fromRect` / `Positioned.directional` がある |
 | 同一軸に3つ指定した場合 | レイアウト時に `InvalidOperationException` | コンストラクタの `assert` で即座に失敗する(debug ビルド) |
 
@@ -107,5 +107,4 @@ dotnet run --project samples/FloatSoda.Samples.Stack
 
 - 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [FloatSoda.Samples.Align](../FloatSoda.Samples.Align) — 単一の子の配置位置
-- [FloatSoda.Samples.Clip](../FloatSoda.Samples.Clip) — はみ出しを切り取る場合
+- [FloatSoda.Samples.Padding](../FloatSoda.Samples.Padding) — 重ねずに余白で位置を作る場合

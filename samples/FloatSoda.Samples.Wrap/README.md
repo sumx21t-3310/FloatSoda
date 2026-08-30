@@ -112,4 +112,4 @@ dotnet run --project samples/FloatSoda.Samples.Wrap
 
 - 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [FloatSoda.Samples.Flex](../FloatSoda.Samples.Flex) — 折り返さずに一列へ並べる場合
+- [FloatSoda.Samples.Expanded](../FloatSoda.Samples.Expanded) — 一列のまま余剰領域を比率で分配する場合
