@@ -26,4 +26,3 @@ dotnet run --project samples/FloatSoda.Samples.Transform
 
 1. SteamVR ダッシュボードに `Transform` タブが現れ、開くとオーバーレイが表示される。
 2. 表示内容がデスクトップ実行時と一致する(4枠の傾き・縮小・ずれ)。
-3. 回転した四角の斜辺にアンチエイリアスがかかっており、ギザギザが目立たない。

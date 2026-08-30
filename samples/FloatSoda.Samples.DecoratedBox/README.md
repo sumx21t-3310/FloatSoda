@@ -13,6 +13,8 @@
 `BoxDecoration.Color` が塗り、`BorderRadius` が四隅の丸めです。`BorderRadius.Circular` で四隅へ同じ半径を指定できます。
 
 ```csharp
+using DecoratedBoxWidget = FloatSoda.Widgets.Paint.DecoratedBox;
+
 new DecoratedBoxWidget
 {
     Decoration = new BoxDecoration
@@ -99,5 +101,5 @@ dotnet run --project samples/FloatSoda.Samples.DecoratedBox
 
 - 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [FloatSoda.Samples.ColoredBox](../FloatSoda.Samples.ColoredBox) — 単色の塗りだけで足りる場合
-- [FloatSoda.Samples.Clip](../FloatSoda.Samples.Clip) — 子の描画自体を角丸で切り取る場合
+- [FloatSoda.Samples.Opacity](../FloatSoda.Samples.Opacity) — サブツリー全体を半透明にする場合
+- [FloatSoda.Samples.Transform](../FloatSoda.Samples.Transform) — 描画へ変換を適用する場合

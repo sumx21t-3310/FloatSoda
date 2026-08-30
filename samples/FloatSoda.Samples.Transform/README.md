@@ -13,6 +13,8 @@
 `Matrix` に `System.Numerics.Matrix3x2` を渡します。Flutter の `Transform.rotate` / `scale` / `translate` に相当するものは、`Matrix3x2` の静的メソッド(`CreateRotation` / `CreateScale` / `CreateTranslation`)で行列を作って渡します。
 
 ```csharp
+using TransformWidget = FloatSoda.Widgets.Paint.Transform;
+
 new TransformWidget
 {
     Matrix = Matrix3x2.CreateRotation((float)(15 * Math.PI / 180)),
@@ -39,7 +41,7 @@ new TransformWidget
 
 ### レイアウトは動かない
 
-平行移動しても、子のレイアウト領域は元の位置のままです。ヒットテストは既定(`TransformHitTests = true`)で描画に追従するため、見えている位置でポインタが当たります。
+平行移動しても、子のレイアウト領域は元の位置のままです。ヒットテストは既定(`TransformHitTests = true`)でポインタ座標を逆変換して子と照合しますが、**判定が行われるのは変換前のレイアウト領域の内側だけ**です。ポインタが当たるのは「変換後の描画」と「レイアウト領域」が重なっている部分で、レイアウト領域の外へ描かれた部分は見えていても当たりません。`GestureDetector` などを重ねる場合は、この範囲を前提にしてください。
 
 ```csharp
 new TransformWidget
@@ -81,4 +83,4 @@ dotnet run --project samples/FloatSoda.Samples.Transform
 - 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [docs/Animation.md](../../docs/Animation.md) — 変換をアニメーションさせる場合
-- [FloatSoda.Samples.FittedBox](../FloatSoda.Samples.FittedBox) — 領域へ収まるように自動で拡大縮小する場合
+- [FloatSoda.Samples.Opacity](../FloatSoda.Samples.Opacity) — 同じく描画だけに効く不透明度の合成
