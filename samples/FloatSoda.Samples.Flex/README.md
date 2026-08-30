@@ -31,6 +31,8 @@ new FlexWidget
 
 `Children` は `List<Widget>` で、オブジェクト初期化子の中に直接並べられます。
 
+このサンプルは名前空間が `FloatSoda.Samples.Flex` で型名 `Flex` と衝突するため、`FlexWidget` というエイリアスを使っています。名前空間が衝突しないアプリでは `new Flex { ... }` と書けます。
+
 ### 主軸方向の余りを配る
 
 `MainAxisAlignment` は、子を並べた後に残った主軸方向の余白をどう配るかを決めます。
