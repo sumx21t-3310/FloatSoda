@@ -23,21 +23,20 @@
 new ClipRect { Child = Overflowing() }
 ```
 
-切り抜きの効果を見るには、領域より大きい子を置く必要があります。
+切り抜きの効果を見るには、領域より大きい子を置く必要があります。**`SizedBox` を入れ子にするだけでは足りません。**`RenderConstrainedBox` が `AdditionalConstraints.Enforce(Constraints)` を使うため親の制約が優先され、`150` を超えられないからです。親より大きい制約を子へ渡すには `OverflowBox` を使います。
 
 ```csharp
-/// <summary>切り抜き対象。領域より大きい子を置いてはみ出させる。</summary>
 private static Widget Overflowing() => new SizedBox
 {
     Width = 150,
     Height = 150,
-    Child = new Center
+    Child = new OverflowBox
     {
-        Child = new ColoredBox
-        {
-            Color = new Color(124, 205, 255),
-            Child = new SizedBox { Width = 190, Height = 110 }
-        }
+        MinWidth = 190,
+        MaxWidth = 190,
+        MinHeight = 110,
+        MaxHeight = 110,
+        Child = new ColoredBox { Color = new Color(124, 205, 255) }
     }
 };
 ```
@@ -54,7 +53,9 @@ new ClipRoundRect
 }
 ```
 
-**`BorderRadius` は `init` プロパティではなくフィールドとして宣言されています。** 他のウィジェットのプロパティと違い、生成後も書き換えられます。オブジェクト初期化子での指定方法は同じです。
+**`BorderRadius` は `init` プロパティではなくフィールドとして宣言されています。** これは宣言上の差で、オブジェクト初期化子での書き方は他のウィジェットと同じです。
+
+**マウント済みのウィジェットのフィールドへ代入して見た目を変えることはできません。** 再ビルドも再描画も走らないためです。値を変えるときは、他のウィジェットと同じく新しい `ClipRoundRect` を構築してツリーを更新してください。
 
 ### 楕円で切り抜く
 

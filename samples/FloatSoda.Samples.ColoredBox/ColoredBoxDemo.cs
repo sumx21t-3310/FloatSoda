@@ -36,6 +36,16 @@ public sealed record ColoredBoxDemo : StatelessWidget
                         },
                         new SizedBox { Width = 32 },
 
+                        // 子を持たない ColoredBox は、親から与えられた制約の最大まで広がる。
+                        // ここでは SizedBox が tight な 120 x 160 を与えるので、その全面が塗られる。
+                        new SizedBox
+                        {
+                            Width = 120,
+                            Height = 160,
+                            Child = new ColoredBoxWidget { Color = new Color(126, 217, 160) }
+                        },
+                        new SizedBox { Width = 32 },
+
                         // 入れ子にすると、内側が外側の上に描かれる。
                         // Padding を挟んだぶんだけ外側の色が縁として残る。
                         new ColoredBoxWidget

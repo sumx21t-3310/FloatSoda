@@ -61,18 +61,25 @@ public sealed record ClipDemo : StatelessWidget
         }
     };
 
-    /// <summary>切り抜き対象。領域より大きい子を置いてはみ出させる。</summary>
+    /// <summary>
+    /// 切り抜き対象。領域より大きい子を置いてはみ出させる。
+    /// </summary>
+    /// <remarks>
+    /// SizedBox だけでは親の制約が優先される(RenderConstrainedBox が
+    /// AdditionalConstraints.Enforce(Constraints) を使う)ため、150 を超えられない。
+    /// OverflowBox で親より大きい制約を子へ渡し、実際にはみ出させている。
+    /// </remarks>
     private static Widget Overflowing() => new SizedBox
     {
         Width = 150,
         Height = 150,
-        Child = new Center
+        Child = new OverflowBox
         {
-            Child = new ColoredBox
-            {
-                Color = new Color(124, 205, 255),
-                Child = new SizedBox { Width = 190, Height = 110 }
-            }
+            MinWidth = 190,
+            MaxWidth = 190,
+            MinHeight = 110,
+            MaxHeight = 110,
+            Child = new ColoredBox { Color = new Color(124, 205, 255) }
         }
     };
 

@@ -4,7 +4,9 @@
 
 `Flex` は複数の子を1方向に並べるウィジェットです。Flutter の `Flex` に対応します。
 
-`Row` は `Flex` に `Axis.Horizontal` を、`Column` は `Axis.Vertical` を固定した薄いラッパーです。方向が固定でよければ `Row` / `Column` のほうが読みやすくなります。
+`Row` は `Flex` に `Axis.Horizontal` を、`Column` は `Axis.Vertical` を固定したラッパーです。方向が固定でよければ `Row` / `Column` のほうが読みやすくなります。
+
+**ただし既定値が違います。** 揃え方を省略したとき、`Flex` は主軸・交差軸とも `Center`、`Row` / `Column` は両方とも `Start` になります。`new Row { ... }` と `new Flex { Direction = Axis.Horizontal, ... }` は**同じ結果になりません**。置き換えるときは揃え方を明示してください。
 
 並べる方向を**主軸(main axis)**、それと直交する方向を**交差軸(cross axis)**と呼びます。`Row` なら主軸が水平、交差軸が垂直です。
 
@@ -82,6 +84,10 @@ new FlexWidget
 | はみ出し時の切り抜き | `clipBehavior` に相当するものがない | `clipBehavior` で指定できる |
 | ベースライン揃え | `textBaseline` が無いため、`CrossAxisAlignment.Baseline` 相当は使えない | `textBaseline` と組み合わせて使える |
 | 子の指定 | `Children` は `List<Widget>` の `init` プロパティ | `children` は位置指定引数 |
+| 既定の `MainAxisAlignment` | `Flex` は `Center`、`Row` / `Column` は `Start` | `Flex` / `Row` / `Column` とも `start` |
+| 既定の `CrossAxisAlignment` | `Flex` は `Center`、`Row` / `Column` は `Start` | `Flex` / `Row` / `Column` とも `center` |
+
+既定値の2行は、Flutter と違ううえに FloatSoda 内部でも `Flex` と `Row` / `Column` で食い違っています([Issue #224](https://github.com/sumx21t-3310/FloatSoda/issues/224))。
 
 ## 実行
 

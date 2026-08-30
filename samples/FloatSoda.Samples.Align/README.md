@@ -64,11 +64,12 @@ new Center
 
 | 項目 | FloatSoda | Flutter |
 |---|---|---|
-| `Alignment` の指定 | プリセットの静的フィールド9種 | プリセットに加えて `Alignment(x, y)` で任意の位置を指定できる |
 | 係数の型 | `WidthFactor` / `HeightFactor` は `double?` | `widthFactor` / `heightFactor` は `double?`（同等） |
 | 文字方向の影響 | 受けない | `AlignmentDirectional` を使うと `textDirection` の影響を受ける |
 
 配置と収縮の振る舞いは同等です。係数が親の制約に収められる点も Flutter と同じです。
+
+`Alignment` は `readonly record struct Alignment(float X = 0, float Y = 0)` なので、プリセット以外に `new Alignment(0.5f, -0.25f)` のような任意位置も指定できます。Flutter の `Alignment(x, y)` と同等です。
 
 ## 実行
 

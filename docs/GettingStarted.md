@@ -25,7 +25,7 @@ SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動�
 
 ### 用途別のサンプル一覧
 
-`samples/` には目的の異なる5つのプロジェクトがあります。
+`samples/` には目的の異なる12のプロジェクトがあります。**総合デモと低レベル API のサンプル**、および**ウィジェット1つ(または1グループ)の使い方を示すカタログ型サンプル**に分かれます。
 
 | プロジェクト | 内容 | SteamVR |
 |---|---|---|
@@ -34,6 +34,22 @@ SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動�
 | `FloatSoda.Samples.PointerRegion` | ホバー・押下・取り消しの状態を画面に出す入力デモ。`PointerRegion` と `Listener` の挙動を目で確かめられる | 必要 |
 | `FloatSoda.Samples.PrimitiveOverlay` | ウィジェット層を使わず、`FloatSoda.OVR` の低レベル API だけでオーバーレイを出す | 必要 |
 | `FloatSoda.Samples.PaintingSample` | Widget / RenderObject / Layer の各ツリーを PNG へ書き出す | **不要** |
+
+### ウィジェットカタログ
+
+ウィジェットごとの使い方を示すサンプルです。各ディレクトリの `README.md` がそのままチュートリアルで、`checklist.md` に目視確認の手順があります。`--desktop` を付けるとデスクトップウィンドウへ表示できます。
+
+| プロジェクト | 扱うウィジェット |
+|---|---|
+| `FloatSoda.Samples.Text` | `Text` / `RichText` / `TextSpan` / `TextStyle` |
+| `FloatSoda.Samples.ColoredBox` | `ColoredBox` |
+| `FloatSoda.Samples.Align` | `Align` / `Center` |
+| `FloatSoda.Samples.SizedBox` | `SizedBox` |
+| `FloatSoda.Samples.Flex` | `Flex` / `Row` / `Column` |
+| `FloatSoda.Samples.Clip` | `ClipRect` / `ClipRoundRect` / `ClipOval` / `ClipCustomPath` |
+| `FloatSoda.Samples.Image` | `Image` / `FileImageProvider` / `BoxFit` |
+
+いずれも SteamVR の起動が必要です(`--desktop` でも OpenVR を初期化するため)。
 
 **`PaintingSample` だけは SteamVR も HMD もいりません。** `FloatSoda.Testing` のヘッドレスレンダラーで
 ツリーを画像化し、デスクトップへ `widget_tree_output.png` などを保存します。

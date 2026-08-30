@@ -28,8 +28,17 @@ public sealed record TextDemo : StatelessWidget
                     CrossAxisAlignment = CrossAxisAlignment.Start,
                     Children =
                     {
-                        // Style を省略すると段落の既定書式で描画される。
-                        new TextWidget("Style を指定しない既定の表示"),
+                        // Style を省略すると段落の既定書式(FontSize 30・黒)で描画される。
+                        // 既定色が黒なので、この行だけ明るい背景の上へ置かないと読めない。
+                        new ColoredBox
+                        {
+                            Color = new Color(226, 232, 240),
+                            Child = new Padding
+                            {
+                                Spacing = EdgeInsets.All(8),
+                                Child = new TextWidget("Style を指定しない既定の表示")
+                            }
+                        },
                         new SizedBox { Height = 28 },
 
                         // FontSize と Color だけを変える。
@@ -73,7 +82,7 @@ public sealed record TextDemo : StatelessWidget
                             {
                                 Style = new TextStyle
                                 {
-                                    FontSize = 28,
+                                    FontSize = 34,
                                     Color = new Color(169, 180, 204)
                                 }
                             }

@@ -68,7 +68,7 @@ new RichText
     {
         Style = new TextStyle
         {
-            FontSize = 28,
+            FontSize = 34,
             Color = new Color(169, 180, 204)
         }
     }

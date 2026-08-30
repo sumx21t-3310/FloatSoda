@@ -26,22 +26,18 @@ new ColoredBoxWidget
 
 `ColoredBox` 自身は寸法を持ちません。**子があれば子のサイズに従い、その背後を塗ります。** つまり「どこまで塗られるか」は子が決めます。
 
-背景を全面に敷きたい場合は、外側で領域を確定させてから包みます。このサンプルの外枠を、中身を1つだけにして縮めると次の形です。
+子を持たない場合は、親から与えられた制約の最大まで広がります。塗る範囲を決めたいなら、外側で領域を確定させてから包みます。
 
 ```csharp
 new SizedBox
 {
-    Width = 900,
-    Height = 420,
-    Child = new ColoredBoxWidget
-    {
-        Color = new Color(16, 20, 31),
-        Child = new SizedBox { Width = 200, Height = 160 }
-    }
+    Width = 120,
+    Height = 160,
+    Child = new ColoredBoxWidget { Color = new Color(126, 217, 160) }
 }
 ```
 
-外側の `SizedBox` が `900 x 420` を与えるので、その全面が塗られます。
+背景を全面に敷く場合も同じで、このサンプルは最も外側の `SizedBox` が `900 x 420` を与え、その中の `ColoredBoxWidget` が全面を塗っています。
 
 ### 重ねる
 
