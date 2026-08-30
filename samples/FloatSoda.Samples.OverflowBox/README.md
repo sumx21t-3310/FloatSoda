@@ -57,7 +57,7 @@ new SizedOverflowBox
 
 | 項目 | FloatSoda | Flutter |
 |---|---|---|
-| `Alignment` の指定 | プリセットの静的フィールド9種 | `AlignmentGeometry` を取り、`textDirection` の影響を受ける |
+| `Alignment` の指定 | プリセット9種のほか `new Alignment(x, y)` で任意の位置を指定できるが、`textDirection` による方向依存の解決は無い | `AlignmentGeometry` を取り、`AlignmentDirectional` なら `textDirection` で解決される |
 
 制約の受け渡し、`OverflowBoxFit.Max` / `DeferToChild` の意味、はみ出しがクリップされない点は Flutter と同等です。
 

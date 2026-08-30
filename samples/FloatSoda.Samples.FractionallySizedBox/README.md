@@ -51,7 +51,11 @@ new FractionallySizedBoxWidget
 
 ## Flutterとの違い
 
-同等です。係数未指定の軸に親の制約がそのまま渡る点、1 超の係数によるはみ出しがクリップされない点、既定の配置が中央である点は Flutter と同じです。
+| 項目 | FloatSoda | Flutter |
+|---|---|---|
+| `Alignment` の指定 | プリセット9種のほか `new Alignment(x, y)` で任意の位置を指定できるが、`textDirection` による方向依存の解決は無い | `AlignmentGeometry` を取り、`AlignmentDirectional`(`centerStart` 等)なら `textDirection` で解決される |
+
+係数未指定の軸に親の制約がそのまま渡る点、1 超の係数によるはみ出しがクリップされない点、既定の配置が中央である点は Flutter と同じです。
 
 ## 実行
 
@@ -74,5 +78,4 @@ dotnet run --project samples/FloatSoda.Samples.FractionallySizedBox
 
 - 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [FloatSoda.Samples.SizedBox](../FloatSoda.Samples.SizedBox) — 絶対値で寸法を決める場合
 - [FloatSoda.Samples.OverflowBox](../FloatSoda.Samples.OverflowBox) — 親と無関係な制約を渡す場合
