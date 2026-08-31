@@ -1,186 +1,190 @@
 ---
 name: floatsoda-device-test
 description: >-
-  Run FloatSoda's device test — enumerate, with Codex, every scenario that can only break with
-  SteamVR actually running plus every behavioural divergence from the Flutter port it mirrors,
-  route each one to headless xunit or to the on-HMD harness, build that harness, have the owner
-  run it in VR, and triage what falls out. Use whenever the user wants to test FloatSoda on real
-  hardware, mentions "実機テスト", "実機で確認", "デバイステスト", "HMDで動かして確認",
-  "シナリオを洗い出したい", "Flutterとの挙動差", "移植差異", "device test", or asks what could
-  break that the current unit tests would never catch. Also use when adding scenarios to an
-  existing harness. Enumeration is delegated to Codex; the VR run itself is owner-only.
+  FloatSoda のデバイステストを実行する — SteamVR が実際に稼働しているときにしか壊れえないシナリオと、
+  鏡写しにしている Flutter 移植からの挙動差異を Codex に網羅的に列挙させ、1件ずつヘッドレス
+  xunit か HMD 実機ハーネスへ振り分け、そのハーネスを構築し、オーナーに VR で実行してもらい、
+  落ちたものをトリアージする。FloatSoda を実機でテストしたいとき、「実機テスト」「実機で確認」
+  「デバイステスト」「HMDで動かして確認」「シナリオを洗い出したい」「Flutterとの挙動差」
+  「移植差異」「device test」に言及されたとき、いまの単体テストでは決して捕まえられない
+  壊れ方を尋ねられたときに使う。既存ハーネスへのシナリオ追加にも使う。
+  列挙は Codex に委任する。VR での実行はオーナーのみが行う。
 ---
 
-# FloatSoda Device Test
+# FloatSoda デバイステスト
 
-## Why this exists
+## このスキルが存在する理由
 
-FloatSoda has 84 test files, but only **two** of them (`tests/FloatSoda.Test/Core/PointerInputIntegrationTest.cs`
-and `tests/FloatSoda.Test/Core/WidgetBindingTest.cs`) drive `WidgetBinding` end to end. `src/FloatSoda.OVR`
-and `src/FloatSoda.Engine` are effectively untested. Everything that only exists when SteamVR is
-running — overlay handles, controller ray coordinates, the GL context on the render thread, dashboard
-open/close events — has no coverage at all and no way to get any from `dotnet test`.
+FloatSoda には 84 のテストファイルがあるが、`WidgetBinding` を一気通貫で駆動しているのは
+そのうち **2つ**(`tests/FloatSoda.Test/Core/PointerInputIntegrationTest.cs` と
+`tests/FloatSoda.Test/Core/WidgetBindingTest.cs`)だけ。`src/FloatSoda.OVR` と
+`src/FloatSoda.Engine` は事実上テストされていない。SteamVR が稼働しているときにしか存在しない
+もの — オーバーレイハンドル、コントローラーレイの座標、レンダースレッド上の GL コンテキスト、
+ダッシュボードの開閉イベント — にはカバレッジが一切なく、`dotnet test` から得る手段もない。
 
-Separately, FloatSoda mirrors Flutter's three-tree model and the docs teach it in Flutter vocabulary.
-So users (and the LLMs writing for them) arrive expecting Flutter's behaviour. **Where the port
-diverges, the user pays the same cost whether the divergence is a bug or a deliberate design call.**
-That makes divergence its own defect class, worth enumerating alongside the VR-only one.
+それとは別に、FloatSoda は Flutter の三層ツリーモデルを鏡写しにしており、docs も Flutter の
+語彙で概念を教えている。そのため利用者(と、利用者のために書く LLM)は Flutter の挙動を期待して
+やって来る。**移植が乖離している箇所では、乖離がバグでも意図的な設計判断でも、利用者が払う
+コストは同じ。** だから移植差異は、VR 専用の欠陥クラスと並べて列挙する価値のある、それ自体
+独立した欠陥クラスになる。
 
-This skill turns both into a repeatable process instead of an ad-hoc VR session.
+このスキルは、この両方を場当たりな VR セッションではなく反復可能なプロセスにする。
 
-## The economics that shape everything below
+## 以下のすべてを規定する経済性
 
-A device run is the most expensive test in this project: put on the HMD, start SteamVR, operate by
-hand, judge by eye. So:
+デバイス実行はこのプロジェクトで最も高価なテスト。HMD を被り、SteamVR を起動し、手で操作し、
+目で判定する。だから:
 
-> **Exhaustiveness is achieved during enumeration. Execution is deliberately narrow.**
+> **網羅性は列挙の段階で達成する。実行は意図的に絞る。**
 
-Never let the two be the same size. A 40-scenario enumeration that routes 34 to headless xunit and
-6 to the HMD is a success, not a shortfall.
+この2つを同じサイズにしないこと。40 シナリオを列挙して 34 をヘッドレス xunit に、6 を HMD に
+振り分けられたら、それは不足ではなく成功。
 
-## Orchestration and hard stops
+## オーケストレーションとハードストップ
 
-Claude Code drives: writing the Codex brief, **verifying what Codex reports**, routing, building the
-harness, triaging failures, filing issues.
+Claude Code が主導する: Codex への brief の作成、**Codex の報告内容の検証**、振り分け、
+ハーネスの構築、失敗のトリアージ、Issue の起票。
 
-Three things are the owner's alone:
+次の3つはオーナーだけのもの:
 
-1. **The VR run** — physically not delegable.
-2. **Final design calls** — whether a divergence is accepted or fixed.
-3. **Commit / push / tag** — always ask.
+1. **VR での実行** — 物理的に委任できない。
+2. **最終的な設計判断** — 差異を受け入れるか修正するか。
+3. **コミット / push / タグ** — 必ず確認を取る。
 
-Issue filing needs no confirmation (existing repo practice). But this is a **public repository**, so before pasting a device-test log or stack trace into an issue, strip the local environment out of it — absolute paths, machine and user names — as the repo's own rule requires.
+Issue の起票に確認は不要(リポジトリの既存慣行)。ただしここは**公開リポジトリ**なので、
+デバイステストのログやスタックトレースを Issue に貼る前に、リポジトリ自身の規約が求めるとおり、
+ローカル環境の情報 — 絶対パス、マシン名、ユーザー名 — を取り除くこと。
 
-## Workflow
+## ワークフロー
 
-### 1. Enumerate — delegate to Codex, two axes
+### 1. 列挙する — Codex に委任、2つの軸で
 
-Use `references/codex-enumeration-prompt.md` as the brief. Launch via the `task-codex-subagent` skill
-(`subagent_type: "codex-runner"`), background, **read-only intent**: Codex writes exactly one file
-(the scenario list in the scratchpad) and touches nothing in the repo. It must not write code or tests.
+brief には `references/codex-enumeration-prompt.md` を使う。`task-codex-subagent` スキル
+(`subagent_type: "codex-runner"`)でバックグラウンド起動し、**読み取り専用の意図**で実行する:
+Codex が書くのはちょうど1ファイル(スクラッチパッド内のシナリオリスト)だけで、リポジトリには
+何も触れない。コードもテストも書かせない。
 
-The brief must always carry:
+brief には必ず次を含める:
 
-- **Axis A — VR-only**: overlay lifecycle, controller pointer coordinates, device tracking, SteamVR
-  events, action manifests, GL context / render thread / frame pacing.
-- **Axis B — Flutter divergence**: `Elements/`, `RenderObjects/RenderObject.cs`, `Core/WidgetBinding.cs`,
-  `Gesture/`, cross-referenced against the Flutter clone at `~/code_reading/flutter_reference`.
-  Hand it `references/known-divergences.md` so it extends the list instead of rediscovering it.
-- **The known-issue exclusion list** (see below) so enumeration effort doesn't go into re-finding
-  filed bugs.
-- **Per-scenario required fields**: identifier (usable as `--scenario` argument) / hypothesis for why
-  it breaks / `file:line` / `HEADLESS` or `VR` + why / repro steps / expected result. Axis B entries
-  also carry the corresponding Flutter source path.
-- **An anti-hallucination clause**: every `file:line` must come from actually reading the file;
-  anything unconfirmed must be marked as such.
+- **軸A — VR 専用**: オーバーレイのライフサイクル、コントローラーポインタの座標、デバイス
+  トラッキング、SteamVR イベント、アクションマニフェスト、GL コンテキスト / レンダースレッド /
+  フレームペーシング。
+- **軸B — Flutter 移植差異**: `Elements/`、`RenderObjects/RenderObject.cs`、`Core/WidgetBinding.cs`、
+  `Gesture/` を、`~/code_reading/flutter_reference` の Flutter クローンと突き合わせる。
+  `references/known-divergences.md` を渡し、再発見ではなくリストの拡張をさせる。
+- **既知 Issue の除外リスト**(後述)。起票済みバグの再発見に列挙の労力を使わせないため。
+- **シナリオごとの必須フィールド**: 識別子(`--scenario` 引数に使える形)/ 壊れる理由の仮説 /
+  `file:line` / `HEADLESS` か `VR` かとその根拠 / 再現手順 / 期待結果。軸B のエントリには
+  対応する Flutter 本家実装のファイルパスも併記する。
+- **ハルシネーション対策の条項**: すべての `file:line` は実際にファイルを読んだ結果であること。
+  未確認のものはその旨を明記させる。
 
-### 2. Verify, then route
+### 2. 検証し、それから振り分ける
 
-**Do not trust the enumeration as delivered.** Spot-check the cited `file:line` — confirm the symbol
-exists and behaves as claimed. A scenario built on a misread line wastes an HMD session.
+**列挙結果を渡されたまま信用しない。** 引用された `file:line` を抜き取り検査し、シンボルが実在して
+主張どおりに振る舞うことを確認する。行の読み違いの上に組まれたシナリオは HMD セッションを浪費する。
 
-Then route every scenario:
+そのうえで全シナリオを振り分ける:
 
-| Verdict | Goes to | Test |
+| 判定 | 行き先 | テスト |
 |---|---|---|
-| `HEADLESS` | `tests/FloatSoda.Test` (xunit) | Reproducible within Widget / Element / RenderObject / Layer, observable via xunit or `src/FloatSoda.Testing`'s bitmap renderers |
-| `VR` | `tests/FloatSoda.DeviceTest` | Needs the OpenVR runtime, a GL context, real device tracking, or SteamVR event delivery |
+| `HEADLESS` | `tests/FloatSoda.Test`(xunit) | Widget / Element / RenderObject / Layer の範囲で再現でき、xunit または `src/FloatSoda.Testing` のビットマップレンダラで観測できる |
+| `VR` | `tests/FloatSoda.DeviceTest` | OpenVR ランタイム、GL コンテキスト、実デバイスのトラッキング、SteamVR のイベント配送のいずれかが必要 |
 
-When it's ambiguous, route to `HEADLESS`. Discovering that a supposedly VR-only bug reproduces
-headlessly is a win — so any scenario that does fail in VR should get a headless reproduction attempt
-before the root cause is called final.
+迷ったら `HEADLESS` へ。VR 専用と思われていたバグがヘッドレスで再現すると分かるのは勝ち — なので
+VR で実際に落ちたシナリオも、根本原因を確定と呼ぶ前にヘッドレス再現を試みること。
 
-Axis B scenarios additionally get a provisional label: **deliberate design call / not yet ported /
-port mistake**. Nothing can be acted on until it carries one. A divergence that settles as "deliberate"
-is not closed — it becomes a `docs/` gap, because the user still pays for the surprise.
+軸B のシナリオにはさらに暫定ラベルを付ける: **deliberate(意図的な設計判断)/ not yet ported
+(未移植)/ port mistake(移植ミス)**。ラベルが付くまでは何もアクションできない。「deliberate」で
+確定した差異も閉じではない — 利用者は依然その驚きの代金を払うので、`docs/` のギャップになる。
 
-### 3. Build the harness
+### 3. ハーネスを構築する
 
-Location: **`tests/FloatSoda.DeviceTest/`**, one project.
+場所: **`tests/FloatSoda.DeviceTest/`**、1プロジェクト。
 
-Why that path, concretely:
+このパスである具体的な理由:
 
-- `tests/Directory.Build.props` supplies `IsPackable=false` and `GenerateDocumentationFile=false`.
-  This matters: the root `Directory.Build.props` sets **no** `IsPackable=false`, and `release.yml`
-  pushes **every** `artifacts/*.nupkg` to NuGet. A harness in a new top-level directory without its
-  own `Directory.Build.props` gets published to NuGet.org on the next tag.
-- CI names test projects by explicit path (`dotnet test tests/FloatSoda.Rendering.Test`,
-  `dotnet test tests/FloatSoda.Test`), so nothing here is swept into CI. Keep the harness a console
-  exe that does not reference xunit and root-level `dotnet test` skips it too.
+- `tests/Directory.Build.props` が `IsPackable=false` と `GenerateDocumentationFile=false` を
+  供給する。これが効く: ルートの `Directory.Build.props` は `IsPackable=false` を**設定しておらず**、
+  `release.yml` は `artifacts/*.nupkg` を**すべて** NuGet に push する。独自の
+  `Directory.Build.props` を持たない新しいトップレベルディレクトリにハーネスを置くと、次のタグで
+  NuGet.org に公開されてしまう。
+- CI はテストプロジェクトを明示パスで指名している(`dotnet test tests/FloatSoda.Rendering.Test`、
+  `dotnet test tests/FloatSoda.Test`)ので、ここにあるものは CI に巻き込まれない。ハーネスを
+  xunit を参照しないコンソール exe にしておけば、ルートでの `dotnet test` もこれをスキップする。
 
-**One scenario = one process, but not one project.**
+**1シナリオ = 1プロセス。ただし1プロジェクトではない。**
 
-Process isolation is forced by the current design, for two reasons worth re-checking each run in case
-they've been fixed:
+プロセス分離は現在の設計上強制される。理由は2つで、修正されている可能性があるため実行のたびに
+再確認する価値がある:
 
-- There is no window teardown API — `FloatSodaApp._bindings` is add-only, `WidgetBinding` is not
-  `IDisposable`, and a created overlay lives until app exit (issue #218). In-process scenario
-  switching would leave the previous overlay on screen.
-- `FloatSodaApp.MainLoop` `break`s out of the loop in each of its `catch` blocks, so one scenario's
-  exception ends the whole app.
+- ウィンドウを破棄する API がない — `FloatSodaApp._bindings` は追加専用で、`WidgetBinding` は
+  `IDisposable` ではなく、作られたオーバーレイはアプリ終了まで生き続ける(issue #218)。
+  プロセス内でシナリオを切り替えると、前のシナリオのオーバーレイが画面に残る。
+- `FloatSodaApp.MainLoop` は各 `catch` ブロックでループを `break` するため、1つのシナリオの例外が
+  アプリ全体を終了させる。
 
-But a single project with a `--scenario <name>` argument gets that isolation by relaunching the exe,
-while keeping one home for the shared harness (scenario list, expected-result display, PASS/FAIL
-capture, logging). Splitting into per-scenario projects forces either a shared library or copy-paste,
-and grows `FloatSoda.slnx` without buying anything.
+だが `--scenario <name>` 引数を持つ単一プロジェクトなら、exe の再起動でその分離を得つつ、共有
+ハーネス(シナリオ一覧、期待結果の表示、PASS/FAIL の記録、ロギング)の置き場所を1つに保てる。
+シナリオごとのプロジェクト分割は共有ライブラリかコピペを強制し、何の得もなく `FloatSoda.slnx` を
+太らせる。
 
-Split into a separate project **only** when project configuration itself differs: a different `AppKey`
-or action manifest, or verification of the startup sequence (no-DI, SteamVR absent).
+別プロジェクトに分割するのは、**プロジェクト構成そのものが異なる場合だけ**: 別の `AppKey` や
+アクションマニフェスト、起動シーケンスの検証(DI なし、SteamVR 不在)など。
 
-Each scenario is one class carrying: `Name` / purpose / operating steps / expected result / `Build()`.
+各シナリオは1クラスとし、`Name` / 目的 / 操作手順 / 期待結果 / `Build()` を持たせる。
 
-### 4. Make the run judgeable from inside the headset
+### 4. ヘッドセットの中から判定できる実行にする
 
-A device failure loses its value the moment the operator forgets what "pass" looked like.
+デバイスでの失敗は、操作者が「合格」の姿を忘れた瞬間に価値を失う。
 
-- **Show the expected result on the overlay, in Japanese.** The console is invisible with the HMD on.
-- **Let PASS/FAIL be recorded from inside VR.** Removing the headset to record a verdict undoes the
-  point.
-- **Append results and logs to a file** — scenario, timestamp, verdict, stack trace.
-- **Record crashes as data too**: which scenario, how far it got.
+- **期待結果をオーバーレイ上に日本語で表示する。** HMD を被っているとコンソールは見えない。
+- **PASS/FAIL を VR の中から記録できるようにする。** 判定のためにヘッドセットを外すのでは本末転倒。
+- **結果とログをファイルに追記する** — シナリオ、タイムスタンプ、判定、スタックトレース。
+- **クラッシュもデータとして記録する**: どのシナリオが、どこまで進んだか。
 
-### 5. Owner runs it; then triage
+### 5. オーナーが実行し、トリアージする
 
-Ask the owner to run with SteamVR up and hand back the log. For each failure: attempt headless
-reproduction, then **propose** a classification — library bug / docs gap / intended behaviour.
+SteamVR を起動した状態での実行と、ログの引き渡しをオーナーに依頼する。失敗ごとに: ヘッドレス
+再現を試み、そのうえで分類を**提案**する — ライブラリバグ / docs ギャップ / 意図どおりの挙動。
 
-File the library-bug and docs-gap issues without waiting (existing repo practice). But **"intended
-behaviour", and every axis B label, is a design call and stays provisional until the owner confirms
-it** (hard stop 2). Do not record a divergence as accepted, and do not open the "document this
-deliberate divergence" issue, before that confirmation.
+ライブラリバグと docs ギャップの Issue は待たずに起票する(リポジトリの既存慣行)。ただし
+**「意図どおりの挙動」と、軸B のすべてのラベルは設計判断であり、オーナーが確定するまで暫定の
+まま**(ハードストップ 2)。その確定より前に、差異を「受け入れ済み」として記録したり、「この
+意図的差異を文書化する」Issue を開いたりしないこと。
 
-Append newly confirmed divergences to `references/known-divergences.md` so the next enumeration
-starts further along.
+新たに確定した差異は `references/known-divergences.md` に追記し、次回の列挙がより先から
+始められるようにする。
 
-## Known-issue exclusion list
+## 既知 Issue の除外リスト
 
-Pass these to Codex as already-filed so they aren't re-enumerated. **Re-check on each run** — they get
-fixed. Referencing them as context is fine; a harness scenario that reproduces one is still valuable.
+起票済みとして Codex に渡し、再列挙させない。**実行のたびに再確認すること** — 直っていくものだから。
+文脈として参照するのは構わないし、既知 Issue を再現するハーネスシナリオには依然価値がある。
 
-- **#218** no window teardown API (`FloatSodaApp._bindings` is add-only)
-- **#216** `PostTaskRunner.Stop` logs an error on a clean stop
-- **#191** `FocusEnter` hover hit-test uses stale coordinates
-- **#182** `ControllerPointerSystem` not wired to non-dashboard overlays — `GestureDetector` never
-  fires on `WorldSpaceWindow` / `DeviceTrackedWindow`
-- **#151** overlay physical size (metres) has poor discoverability
-- **#150** `SetState` from a background thread is unhandled
-- **#147** `OVRApplication.Identify()` failure handling
-- **#140** SteamVR-absent startup, late connect, reconnect
-- **#90** runtime overlay-kind swap not implemented
+- **#218** ウィンドウを破棄する API がない(`FloatSodaApp._bindings` が追加専用)
+- **#216** `PostTaskRunner.Stop` が正常停止でもエラーログを出す
+- **#191** `FocusEnter` の hover hit-test が古い座標を使う
+- **#182** `ControllerPointerSystem` が非ダッシュボードオーバーレイに接続されていない —
+  `WorldSpaceWindow` / `DeviceTrackedWindow` では `GestureDetector` が発火しない
+- **#151** オーバーレイの物理サイズ(メートル)の発見性が低い
+- **#150** バックグラウンドスレッドからの `SetState` が未対応
+- **#147** `OVRApplication.Identify()` の失敗時ハンドリング
+- **#140** SteamVR 不在起動・遅延接続・再接続
+- **#90** オーバーレイ種別の実行時切り替えが未実装
 
-Refresh with `gh issue list --state open` rather than trusting this list wholesale.
+このリストを丸ごと信用せず、`gh issue list --state open` で最新化すること。
 
-## Related
+## 関連
 
-- **#141** (desktop Storybook / OverlayViewer) would move part of what's `VR` today into `HEADLESS`.
-  Keep harness scenarios at a granularity that survives that migration.
-- `floatsoda-junior-coder-test` measures docs/API quality black-box. This skill is white-box and
-  measures implementation correctness. Don't merge them: feeding a junior model a bug-scenario list
-  destroys what that test measures.
+- **#141**(デスクトップ Storybook / OverlayViewer)が実現すると、いま `VR` のものの一部が
+  `HEADLESS` へ移る。ハーネスのシナリオは、その移行を生き延びる粒度に保つこと。
+- `floatsoda-junior-coder-test` は docs/API の品質をブラックボックスで測る。このスキルは
+  ホワイトボックスで実装の正しさを測る。混ぜないこと: ジュニアモデルにバグシナリオのリストを
+  渡すと、あちらのテストが測っているものが壊れる。
 
-## Report format
+## 報告形式
 
-Lead with the routing split (how many `HEADLESS` vs `VR`, out of how many enumerated) — that's the
-headline, because it says how much of the work avoids the headset. Then the `VR` scenarios in
-execution order, then axis B divergences grouped by their label, each with a `file:line` link into
-the real source. Say plainly which `file:line` citations you verified yourself and which you did not.
+振り分けの内訳(列挙総数のうち `HEADLESS` と `VR` が何件か)を最初に置く — どれだけの作業が
+ヘッドセットを回避できたかを示す、これが見出しになる数字。続いて `VR` シナリオを実行順に、
+その後に軸B の差異をラベル別にまとめ、それぞれ実ソースへの `file:line` リンクを添える。
+どの `file:line` を自分で検証し、どれを検証していないかを率直に述べること。

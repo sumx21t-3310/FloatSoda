@@ -1,14 +1,14 @@
 ---
 name: floatsoda-device-test
 description: >-
-  Run FloatSoda's device test — enumerate, with Codex, every scenario that can only break with
-  SteamVR actually running plus every behavioural divergence from the Flutter port it mirrors,
-  route each one to headless xunit or to the on-HMD harness, build that harness, have the owner
-  run it in VR, and triage what falls out. Use whenever the user wants to test FloatSoda on real
-  hardware, mentions "実機テスト", "実機で確認", "デバイステスト", "HMDで動かして確認",
-  "シナリオを洗い出したい", "Flutterとの挙動差", "移植差異", "device test", or asks what could
-  break that the current unit tests would never catch. Also use when adding scenarios to an
-  existing harness. Enumeration is delegated to Codex; the VR run itself is owner-only.
+  FloatSoda のデバイステストを実行する — SteamVR が実際に稼働しているときにしか壊れえないシナリオと、
+  鏡写しにしている Flutter 移植からの挙動差異を Codex に網羅的に列挙させ、1件ずつヘッドレス
+  xunit か HMD 実機ハーネスへ振り分け、そのハーネスを構築し、オーナーに VR で実行してもらい、
+  落ちたものをトリアージする。FloatSoda を実機でテストしたいとき、「実機テスト」「実機で確認」
+  「デバイステスト」「HMDで動かして確認」「シナリオを洗い出したい」「Flutterとの挙動差」
+  「移植差異」「device test」に言及されたとき、いまの単体テストでは決して捕まえられない
+  壊れ方を尋ねられたときに使う。既存ハーネスへのシナリオ追加にも使う。
+  列挙は Codex に委任する。VR での実行はオーナーのみが行う。
 ---
 
 <!-- Derived compatibility stub — DO NOT EDIT. Canon: .agents/skills/floatsoda-device-test/ -->
