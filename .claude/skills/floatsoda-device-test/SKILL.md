@@ -11,8 +11,8 @@ description: >-
   列挙は Codex に委任する。VR での実行はオーナーのみが行う。
 ---
 
-<!-- Derived compatibility stub — DO NOT EDIT. Canon: .agents/skills/floatsoda-device-test/ -->
+<!-- 派生互換スタブ — 直接編集禁止。正典: .agents/skills/floatsoda-device-test/ -->
 
-**The canon for this skill is [`.agents/skills/floatsoda-device-test/SKILL.md`](../../../.agents/skills/floatsoda-device-test/SKILL.md). Read that file and follow the procedure there.** Its `references/` files live beside it, in `.agents/skills/floatsoda-device-test/references/`.
+**このスキルの正典は [`.agents/skills/floatsoda-device-test/SKILL.md`](../../../.agents/skills/floatsoda-device-test/SKILL.md)。そのファイルを読み、そこにある手順に従うこと。** `references/` ファイルは正典の隣、`.agents/skills/floatsoda-device-test/references/` にある。
 
-This stub exists only because Claude Code reads `.claude/skills/` and not `.agents/skills/`. It is generated from the canon and holds no procedure of its own. To change how this skill works, edit the canon — never this file.
+このスタブは、Claude Code が `.agents/skills/` を読まず `.claude/skills/` を読むためだけに存在する。正典から生成された派生物で、固有の手順は持たない。このスキルの動きを変えるときは正典を編集すること — このファイルは決して編集しない。
