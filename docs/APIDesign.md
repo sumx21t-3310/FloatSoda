@@ -489,6 +489,9 @@ public record AspectRatio : Widget
 - プロパティの削除・リネーム
 - プロパティの型変更
 - `required` の追加
+- **observable behavior の変更** — 既存の正しい利用コードから観測できる挙動が変わるもの。layout、paint / clipping、hit testing、Widget update behavior、invalid / degenerate input handling、Element / state lifecycle semantics など、セクション1の parity 対象リストに挙げた挙動が判定の観点
+
+observable behavior については、**互換性の基準は文書化された契約**(本ドキュメント、docs、Flutter parity)です。契約から逸脱していた挙動を契約へ戻す修正は、挙動が変わっても破壊的変更ではなくバグ修正として扱います。逆に、契約どおりに動いていた挙動を変える場合は破壊的変更です。
 
 ### 6.3 廃止予定プロパティの扱い
 
