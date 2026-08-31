@@ -12,12 +12,16 @@
         <Project Path="src/FloatSoda/FloatSoda.csproj" />
     </Folder>
     <Folder Name="/samples/">
+        <Project Path="samples/FloatSoda.Samples.Expanded/FloatSoda.Samples.Expanded.csproj" />
         <Project Path="samples/FloatSoda.Samples.GettingStarted/FloatSoda.Samples.GettingStarted.csproj" />
         <Project Path="samples/FloatSoda.Samples.Image/FloatSoda.Samples.Image.csproj" />
         <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
+        <Project Path="samples/FloatSoda.Samples.Padding/FloatSoda.Samples.Padding.csproj" />
         <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
         <Project Path="samples/FloatSoda.Samples.PointerRegion/FloatSoda.Samples.PointerRegion.csproj" />
         <Project Path="samples/FloatSoda.Samples.PrimitiveOverlay/FloatSoda.Samples.PrimitiveOverlay.csproj" />
+        <Project Path="samples/FloatSoda.Samples.Stack/FloatSoda.Samples.Stack.csproj" />
+        <Project Path="samples/FloatSoda.Samples.Wrap/FloatSoda.Samples.Wrap.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/FloatSoda.Rendering.Test/FloatSoda.Rendering.Test.csproj" />
