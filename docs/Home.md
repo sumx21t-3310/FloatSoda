@@ -90,7 +90,7 @@ graph LR
 | Phase | 残件 |
 |---|---|
 | Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
-| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
+| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当) |
 
 ## 実装状況サマリ
 
@@ -128,7 +128,7 @@ graph LR
 | ヒットテスト(座標 → RenderObject の特定) | ✓ 実装済み |
 | ジェスチャ認識(`GestureDetector` / `Listener` / タップ・パン) | ✓ 実装済み |
 | ポインタ入力源(SteamVR レーザーポインターの接続) | △ 部分実装(ダッシュボードオーバーレイのみ) |
-| `Container` | △ 部分実装(`Padding` の合成が未対応) |
+| `Container` | ✓ 実装済み(`Padding` の合成を含む) |
 | UI3層構成(`FloatSoda.UI` ヘッドレス / `Cream` / `FizzyPop`) | 予定(Phase 5)。NuGet 未配布・骨組みのみ(→ [UILayering](UILayering.md#実装状況)) |
 | Hooks(`FloatSoda.Hooks` / R3 ベースの `UseState`) | △ 部分実装(フレームワーク未統合) |
 | スクロール(`ListView` / `GridView` / `SingleChildScrollView`) | ✗ 未実装(`internal`) |

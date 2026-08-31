@@ -6,7 +6,7 @@
 > - **✓** Widget / Element / State の基盤(`StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>`、`BuildOwner` による差分ビルド、`Key` 対応の子リスト差分)
 > - **✓** ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` / `ListenableBuilder`
 > - **✓** レイアウト系・描画系・入力系のウィジェット。**下の[一覧](#組み込みウィジェット一覧)で `✓` が付いているものが使えます**
-> - **△** `Container`(`Padding` の合成が未対応)、`FloatSoda.Hooks`(ビルドループと未統合)
+> - **△** `FloatSoda.Hooks`(ビルドループと未統合)
 > - **✗** スクロール系の `ListView` / `GridView` / `SingleChildScrollView`
 > - **予定** `Button` / `Icon` を担う UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 の予定で、まだ提供していません。ボタンは `GestureDetector` で組み立ててください(→ [押せるボタンを作る](#押せるボタンを作る))
 
@@ -330,16 +330,15 @@ public override Widget Build(IBuildContext context)
 | `FractionallySizedBox` | ✓ | 親の最大寸法に対する割合を子へtight制約として適用し、子を配置 | `WidthFactor`, `HeightFactor`, `Alignment`, `Child` |
 | `OverflowBox` | ✓ | 親とは異なる制約を子へ渡し、自身の領域外への描画を許可 | `MinWidth`, `MaxWidth`, `MinHeight`, `MaxHeight`, `Fit`, `Alignment`, `Child` |
 | `SizedOverflowBox` | ✓ | 自身は指定サイズを採り、子へ親の元の制約を渡して配置 | `Size` (`Size`, 必須), `Alignment`, `Child` |
-| `Container` | △ 部分実装 | 配置・装飾・寸法・変換を1つのウィジェットで合成。`Padding` の合成は未対応 | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
+| `Container` | ✓ | 配置・余白・装飾・寸法・変換を1つのウィジェットで合成 | `Alignment`, `Padding`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
 | `ListView` | ✗ 未実装(`internal`) | スクロール可能なリスト | — |
 | `GridView` | ✗ 未実装(`internal`) | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ 未実装(`internal`) | 単一子をスクロール | — |
 
-`Container` は、`Align` / `DecoratedBox` / `SizedBox` / `Transform` の組み合わせを1つのウィジェットにまとめた合成ウィジェットです。
-指定したプロパティに対応するウィジェットだけを、内側から配置・装飾・寸法・変換の順で重ねます。
+`Container` は、`Align` / `Padding` / `DecoratedBox` / `SizedBox` / `Transform` の組み合わせを1つのウィジェットにまとめた合成ウィジェットです。
+指定したプロパティに対応するウィジェットだけを、内側から配置・余白・装飾・寸法・変換の順で重ねます。
+`Padding` は装飾の内側に入るため、余白の分だけ子が装飾より小さくなります。
 `Color` と `Decoration` を同時に指定すると `InvalidOperationException` になります。背景色と角丸を両方使う場合は `BoxDecoration.Color` へまとめてください。
-
-**`Container` にはまだ `Padding` プロパティがありません。** 内側に余白を入れる場合は `Padding` を明示的に入れ子にします。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -350,17 +349,13 @@ using FloatSoda.Widgets.Layout;
 Widget card = new Container
 {
     Width = 320,
+    Padding = EdgeInsets.All(16),
     Decoration = new BoxDecoration
     {
         Color = new Color(32, 32, 40),
         BorderRadius = BorderRadius.Circular(12)
     },
-    // Container 自身は Padding を合成しないため、余白は明示的に入れ子にする。
-    Child = new Padding
-    {
-        Spacing = EdgeInsets.All(16),
-        Child = new Text("VRChat: Online")
-    }
+    Child = new Text("VRChat: Online")
 };
 ```
 
