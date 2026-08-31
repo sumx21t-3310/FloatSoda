@@ -33,6 +33,45 @@ dotnet run --project samples/FloatSoda.Samples.OverlayApp
 
 ---
 
+## Issue とラベル
+
+### Issue が必須な変更
+
+次の変更は、着手前に対応する Issue を立ててください(必須)。
+
+- public API の追加・変更・削除
+- observable behavior の変更
+- アーキテクチャ・依存関係・プロジェクト構成に関する設計判断
+- Flutter parity / divergence に関する判断
+- breaking change を伴う変更
+
+typo の修正、明白なドキュメント修正、CI・管理ファイルの局所的な保守のような、設計判断を伴わない小変更のみ Issue を省略できます。迷ったら Issue を立ててください。
+
+### タイトルとラベル
+
+Issue のタイトルは「何をする Issue か」の記述に集中させ、種別・領域などの分類は GitHub Labels で表現します(必須)。`feat(Widget):` のような Conventional Commit 風の prefix はタイトルに付けません。
+
+ラベルは3つの軸で構成します。ラベルの一覧と説明は[リポジトリの Labels ページ](https://github.com/sumx21t-3310/FloatSoda/labels)が正典です。
+
+| 軸 | ラベル | 付け方 |
+|---|---|---|
+| 種別 | `feature` / `bug` / `design` / `refactor` / `performance` / `documentation` / `tracking` / `release` / `maintenance` | 原則1つ付ける(必須) |
+| 領域 | `area:*` | 該当するものを複数付けてよい |
+| 補助属性 | `breaking-change` / `flutter-divergence` / `needs-device-test` / `good-first-issue` / `help-wanted` | 必要なものだけ付ける |
+
+**種別ラベルは、実装手段ではなく Issue の主目的で1つ選びます**(必須)。
+
+- Flutter との差異を修正して既存契約へ戻す → `bug`
+- 新しい利用者向け機能のために内部構造も変える → `feature`
+- observable behavior を変えずに内部構造だけを整理する → `refactor`
+- 性能改善が主目的で API 変更を伴う → `performance`
+
+**領域ラベルはプロジェクト単位ではなくドメイン単位で選びます。** たとえば RenderObject 関連は、コードが物理的に `src/FloatSoda` にあっても `area:rendering` です。
+
+優先度ラベル(`priority:*`)は導入しません。実施時期は Milestone、作業順序は Issue の依存関係で管理し、同じ意味を持つ管理軸を複数作りません。
+
+---
+
 ## ブランチ・PRフロー
 
 - `main` へは直接pushせず、必ずPR経由でマージしてください(必須)。
@@ -51,24 +90,24 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 人間が切る場合もエージェントが切る場合も、同じ規則を使います(必須)。
 
 ```text
-<type>/<issue-number>-<short-slug>   Issue がある場合
-<type>/<short-slug>                  Issue が無い場合
+<issue-number>-<primary-area>-<slug>   基本形
+<issue-number>-<slug>                  領域を1つに定めにくいリポジトリ横断・管理系 Issue
+<slug>                                 Issue を省略できる小変更(→ Issue が必須な変更)
 ```
 
-`<type>` は次のいずれかを基本とします。
-
-`feat` / `fix` / `docs` / `test` / `refactor` / `chore` / `perf` / `build` / `ci`
-
-`<short-slug>` は **lowercase ASCII + ハイフン**で書きます。
+- Issue 番号を先頭に置きます。「Issue #216 の作業ブランチを探す」が前方一致検索で済むようにするためです
+- `<primary-area>` は Issue の `area:*` ラベルのうち主要な領域1つです。Issue 側に領域ラベルが複数あっても、ブランチ名には1つだけ選びます
+- `<slug>` は **lowercase ASCII + ハイフン**で書きます
+- `feature` / `bug` などの種別と、`breaking-change` などの補助属性はブランチ名に入れません。分類の正典は Issue の Labels です
 
 例:
 
-- `feat/157-fractionally-sized-overflow-box`
-- `fix/182-world-space-pointer-coordinates`
-- `docs/review-guidelines`
-- `test/layer-clone-independence`
+- `224-widget-fix-flutter-divergences`
+- `216-engine-post-task-runner-stop`
+- `231-issue-label-migration`(管理系 Issue のため領域を省略)
+- `fix-readme-typo`(Issue を省略できる小変更)
 
-**作業した AI エージェントやツールの名前をブランチ名に含めないでください**(必須)。`codex/`、`claude/`、`agent/` のようなプレフィックスは使いません。**ブランチ名は「誰が変更したか」ではなく「何を変更するか」を表すもの**です。同じ理由で、`feature/` は使わず `feat/` に統一します。
+**作業した AI エージェントやツールの名前をブランチ名に含めないでください**(必須)。`codex/`、`claude/`、`agent/` のようなプレフィックスは使いません。**ブランチ名は「誰が変更したか」ではなく「何を変更するか」を表すもの**です。
 
 この規則は**これから切るブランチに適用します**。既に存在するブランチを遡って改名する必要はありません。
 
@@ -83,7 +122,15 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 
 必要なものは別 Issue / PR として扱います。レビュー範囲が膨らむと、本来の変更の正しさを判断できなくなるためです。
 
-**public API または observable behavior を変更する場合は、breaking change の有無を明示的に判断し、PR 本文に書いてください**(必須)。「無い」と判断した場合も、その旨を書きます。判断基準は [docs/APIDesign.md](docs/APIDesign.md) のセクション6(バージョニングと後方互換性)にあります。
+Issue の目的を成立させるために不可避な前提変更(prerequisite change)は、次を**すべて**満たす場合に限り同じ PR に含めてかまいません。
+
+- その Issue の完了に直接必要である
+- 単独では別の利用者価値・設計目的を持たない
+- 変更範囲と理由を PR 本文から追跡できる
+
+独立した設計判断や別の利用者価値を持つ変更は、同じ箇所を触る場合でも別 Issue / PR にします。
+
+**public API または observable behavior を変更する場合は、breaking change の有無を明示的に判断し、PR 本文に書いてください**(必須)。「無い」と判断した場合も、その旨を書きます。判断基準は [docs/APIDesign.md](docs/APIDesign.md) のセクション6(バージョニングと後方互換性)にあります。**Alpha であることは判定を省略する理由になりません。** breaking と判定したうえで、いま受け入れるかを別に判断します(→ 同セクション 6.4)。breaking change を伴う Issue には `breaking-change` ラベルを付けてください。
 
 ---
 

@@ -89,6 +89,14 @@ FloatSoda の docs は Flutter の語彙で概念を教えます。読者（と�
 - dirty layout / paint conditions
 - Element / state lifecycle semantics
 
+#### Flutter-derived の判定
+
+この原則の適用開始点、つまり「何が Flutter 由来か」の判定基準です。
+
+- Flutter に対応する public concept / Widget / RenderObject / lifecycle semantics が存在し、それを FloatSoda へ持ち込むものは **Flutter-derived** として扱い、この原則を適用します。
+- Flutter の型やアルゴリズムを内部実装として利用していても、FloatSoda 独自の利用者向け概念・API であれば、その API 自体は **FloatSoda 固有**として扱います(例: オーバーレイ種別)。
+- Flutter-derived かどうか判断が割れる場合は、実装開始前に Issue 上で正典(対応する Flutter API か、FloatSoda 固有か)を明示します。
+
 #### 理由にならないもの
 
 **「実装しやすい」「こちらの方が安全」「こちらの方が自然」といった理由だけで独自仕様にしないでください。** これらは差異を正当化しません。Flutter がその挙動を選んだ背景（多くは実際のアプリで踏まれた事故）を、FloatSoda が再発見する必要はありません。
@@ -489,6 +497,15 @@ public record AspectRatio : Widget
 [Obsolete("TextStyle.Color を使用してください。v3.0 で削除予定です。")]
 public Color? TextColor { get; init; }
 ```
+
+### 6.4 Alpha 段階での判定と許容の分離
+
+Alpha であることは、breaking change の**判定**を省略する理由にしません。判定と許容は分けて行います。
+
+1. まず public API / observable behavior に対して、6.1 / 6.2 の基準で breaking change かを通常どおり判定する
+2. そのうえで、Alpha 段階としていまその変更を受け入れるかを別に判断する
+
+「Alpha だから breaking ではない」という扱いはしません。判定の結果は PR 本文に書き(→ [CONTRIBUTING.md](../CONTRIBUTING.md))、breaking change を伴う Issue には `breaking-change` ラベルを付けます。
 
 ## 7. ファクトリメソッドの方針
 
