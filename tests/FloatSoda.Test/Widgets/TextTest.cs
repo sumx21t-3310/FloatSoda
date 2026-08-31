@@ -33,6 +33,15 @@ public class TextTest
         return (pipeline, view, root);
     }
 
+    /// <summary>祖先にInheritedWidgetを持たない状態を模したBuildContext。</summary>
+    private sealed class EmptyBuildContext : IBuildContext
+    {
+        public Widget Widget => new FloatSoda.Widgets.Layout.SizedBox();
+        public BuildOwner? Owner => null;
+        public T? DependOnInheritedWidgetOfExactType<T>() where T : InheritedWidget => null;
+        public InheritedElement? GetElementForInheritedWidgetOfExactType<T>() where T : InheritedWidget => null;
+    }
+
     [Fact]
     public void Build_DataとStyleを指定_RichTextとTextSpanへ委譲する()
     {
@@ -45,19 +54,19 @@ public class TextTest
             IsItalic = true
         };
 
-        var richText = Assert.IsType<RichText>(new Text("FloatSoda") { Style = style }.Build(null!));
+        var richText = Assert.IsType<RichText>(new Text("FloatSoda") { Style = style }.Build(new EmptyBuildContext()));
 
         Assert.Equal("FloatSoda", richText.Text.Text);
-        Assert.Same(style, richText.Text.Style);
+        Assert.Equal(style, richText.Text.Style);
     }
 
     [Fact]
     public void Build_空文字列を指定_空のTextSpanへ委譲する()
     {
-        var richText = Assert.IsType<RichText>(new Text(string.Empty).Build(null!));
+        var richText = Assert.IsType<RichText>(new Text(string.Empty).Build(new EmptyBuildContext()));
 
         Assert.Empty(richText.Text.Text);
-        Assert.Null(richText.Text.Style);
+        Assert.Equal(new TextStyle(), richText.Text.Style);
     }
 
     [Fact]
@@ -77,12 +86,6 @@ public class TextTest
     public void TextStyle_FontSizeが0以下または非有限値_ArgumentOutOfRangeExceptionを投げる(double value)
     {
         Assert.Throws<ArgumentOutOfRangeException>(() => new TextStyle { FontSize = value });
-    }
-
-    [Fact]
-    public void TextStyle_Fontがnull_ArgumentNullExceptionを投げる()
-    {
-        Assert.Throws<ArgumentNullException>(() => new TextStyle { Font = null! });
     }
 
     [Theory]
@@ -115,6 +118,59 @@ public class TextTest
     }
 
     [Fact]
+    public void ToRichTextKitStyle_全プロパティ未指定_既定値で描画書式を生成する()
+    {
+        var renderingStyle = new TextStyle().ToRichTextKitStyle();
+
+        Assert.Equal(30, renderingStyle.FontSize);
+        Assert.Equal(new SkiaSharp.SKColor(0, 0, 0, 255), renderingStyle.TextColor);
+        Assert.StartsWith("$FloatSoda.Font.", renderingStyle.FontFamily);
+        Assert.Equal(400, renderingStyle.FontWeight);
+        Assert.False(renderingStyle.FontItalic);
+    }
+
+    [Fact]
+    public void Merge_nullを渡す_自身を返す()
+    {
+        var style = new TextStyle { FontSize = 24 };
+
+        Assert.Same(style, style.Merge(null));
+    }
+
+    [Fact]
+    public void Merge_一部プロパティのみ明示_明示値を優先し残りは基底値を保つ()
+    {
+        var baseStyle = new TextStyle
+        {
+            FontSize = 48,
+            Color = new Color(255, 0, 0),
+            FontWeight = 700
+        };
+        var overriding = new TextStyle
+        {
+            Color = new Color(0, 0, 255),
+            IsItalic = true
+        };
+
+        var merged = baseStyle.Merge(overriding);
+
+        Assert.Equal(48, merged.FontSize);
+        Assert.Equal(new Color(0, 0, 255), merged.Color);
+        Assert.Equal(700, merged.FontWeight);
+        Assert.True(merged.IsItalic);
+        Assert.Null(merged.Font);
+    }
+
+    [Fact]
+    public void Merge_otherのInheritがfalse_otherをそのまま返す()
+    {
+        var baseStyle = new TextStyle { FontSize = 48 };
+        var standalone = new TextStyle { Inherit = false, Color = new Color(0, 0, 255) };
+
+        Assert.Same(standalone, baseStyle.Merge(standalone));
+    }
+
+    [Fact]
     public void WidgetUpdate_DataとStyleを変更_同じRenderParagraphへ反映する()
     {
         var initial = new Text("before");
@@ -132,7 +188,7 @@ public class TextTest
 
         Assert.Same(renderParagraph, view.Child);
         Assert.Equal("after", renderParagraph.Text.Text);
-        Assert.Same(updatedStyle, renderParagraph.Text.Style);
+        Assert.Equal(updatedStyle, renderParagraph.Text.Style);
         Assert.True(renderParagraph.NeedsLayout);
     }
 
