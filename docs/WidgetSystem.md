@@ -586,6 +586,7 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 |---|---|---|---|
 | `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
 | `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
+| `DefaultTextStyle` | ✓ | 配下の `Text` へ既定のテキスト書式を伝播する `InheritedWidget` | `Style` (`TextStyle`), `Child` |
 | `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Fit`, `Alignment`, `Child`, `OnError` |
 | `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
 
@@ -594,7 +595,9 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 `FittedBox` が `ClipBehavior` を持つのに `Paint.Image` が持たないのは、この違いによるものです。`FittedBox` は描画元を切り取れない子ウィジェットを拡大縮小するため切り抜きが要りますが、`Paint.Image` は描画元の矩形自体を狭められます。
 
 
-`Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。`Style` を省略すると、フォントサイズ30、Arial、黒、ウェイト400の既定書式を使用します。空文字列は有効です。
+`Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。空文字列は有効です。
+
+書式は Flutter と同じ優先順位で解決します: **明示指定 > 祖先の `DefaultTextStyle` > フレームワークの既定値**(フォントサイズ30、Arial、黒、ウェイト400)。`TextStyle` の各プロパティは `null` を「未指定」として扱い、未指定のプロパティだけが継承で埋まります。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -614,6 +617,25 @@ new Text("Hello, VR!")
     }
 }
 ```
+
+複数の `Text` へ同じ書式を適用するときは、`DefaultTextStyle` で祖先から伝播させます。配下の `Text` は明示したプロパティだけを上書きし、残りを継承します。`DefaultTextStyle` の `Style` を変更すると、依存する `Text` は自動で再ビルドされます。
+
+```csharp
+new DefaultTextStyle
+{
+    Style = new TextStyle { FontSize = 36, Color = new Color(255, 255, 255) },
+    Child = new Column
+    {
+        Children =
+        [
+            new Text("タイトル"),                                                  // 36px・白
+            new Text("強調") { Style = new TextStyle { Color = new Color(255, 200, 0) } } // 36px・黄
+        ]
+    }
+}
+```
+
+継承させたくない `Text` には、`Inherit = false` の `TextStyle` を指定します。この場合、未指定のプロパティにはフレームワークの既定値が適用されます。
 
 システムにないフォントは `FileFontProvider` で指定します。同じ値のProviderは内部で共有され、複数の `Text` / `Icon` から使ってもフォントリソースは一度だけ読み込まれます。
 
