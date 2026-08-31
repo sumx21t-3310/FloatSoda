@@ -141,8 +141,8 @@ public class DefaultTextStyleTest
         });
 
         var renderParagraph = Assert.IsType<RenderParagraph>(view.Child);
-        Assert.Same(standalone, renderParagraph.Text.Style);
-        Assert.Null(renderParagraph.Text.Style!.FontSize);
+        Assert.Equal(new Color(0, 0, 255), renderParagraph.Text.Style!.Color);
+        Assert.Null(renderParagraph.Text.Style.FontSize);
     }
 
     [Fact]
