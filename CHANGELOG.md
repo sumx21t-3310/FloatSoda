@@ -7,6 +7,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- `DefaultTextStyle` を追加。配下の `Text` が明示しなかった書式プロパティを祖先から継承する(明示指定 > `DefaultTextStyle` > 既定値)。`Style` の変更は `InheritedWidget` の依存追跡で配下の `Text` を再ビルドする
+- `TextStyle.Merge` と `TextStyle.Inherit` を追加(Flutter の `TextStyle.merge` / `inherit` 相当)
+
+### Changed (Breaking)
+
+- `TextStyle` の各プロパティ(`FontSize` / `Color` / `Font` / `FontWeight` / `IsItalic`)を nullable 化し、`null` を「未指定(継承対象)」として扱うように変更。既定値(30 / 黒 / Arial / 400 / 非斜体)は描画時に適用されるため、書式を明示的に構築・描画するだけのコードの表示結果は変わらない
+
 ## [0.3.1] - 2026-07-24
 
 ### Added

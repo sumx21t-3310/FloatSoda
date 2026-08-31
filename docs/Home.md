@@ -90,7 +90,7 @@ graph LR
 | Phase | 残件 |
 |---|---|
 | Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
-| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`DefaultTextStyle`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
+| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
 
 ## 実装状況サマリ
 
@@ -119,7 +119,7 @@ graph LR
 | `ParentDataWidget<T>`(`Expanded` / `Flexible` / `Positioned` の基盤) | ✓ 実装済み |
 | `Key` による Element 再利用(`Widget.CanUpdate` = 型 + Key) | ✓ 実装済み |
 | アニメーション(`AnimationController` / `Ticker` / `Curve`・`Curves` / `FadeTransition`) | ✓ 実装済み |
-| テキスト表示(`Text` / `RichText` / `TextSpan` / `TextStyle`) | ✓ 実装済み |
+| テキスト表示(`Text` / `RichText` / `TextSpan` / `TextStyle` / `DefaultTextStyle`) | ✓ 実装済み |
 | 画像表示(描画系の `Paint.Image` + `FileImageProvider`) | ✓ 実装済み |
 | アイコン表示(描画系の `Paint.Icon` + `IconData` / `FontProvider`) | ✓ 実装済み |
 | レイアウト系ウィジェット(`Padding` / `Stack` / `Wrap` / `Expanded` / `AspectRatio` ほか) | ✓ 実装済み(→ [WidgetSystem](WidgetSystem.md#組み込みウィジェット一覧)) |
