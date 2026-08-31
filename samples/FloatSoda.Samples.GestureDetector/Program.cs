@@ -1,7 +1,7 @@
 using FloatSoda;
 using FloatSoda.Abstractions.Geometries;
 using FloatSoda.OVR;
-using FloatSoda.Samples.PointerRegion;
+using FloatSoda.Samples.GestureDetector;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,16 +15,16 @@ var hostArgs = args.Where(argument => argument != "--desktop").ToArray();
 var builder = Host.CreateApplicationBuilder(hostArgs);
 builder.Services.AddFloatSoda(new FloatSodaOptions
 {
-    AppKey = new AppKey("FloatSoda.Samples.PointerRegion"),
+    AppKey = new AppKey("FloatSoda.Samples.GestureDetector"),
 });
 
 using var host = builder.Build();
 var app = host.Services.GetRequiredService<FloatSodaApp>();
 
-var demo = new PointerRegionDemo();
+var demo = new GestureDetectorDemo();
 
 app.CreateWindow(useDesktop
-    ? new DesktopWindow { Title = "PointerRegion", Child = demo }
-    : new DashboardWindow { Dpm = new Dpm(1000), Title = "PointerRegion", Child = demo });
+    ? new DesktopWindow { Title = "GestureDetector", Child = demo }
+    : new DashboardWindow { Dpm = new Dpm(1000), Title = "GestureDetector", Child = demo });
 
 await host.RunAsync();

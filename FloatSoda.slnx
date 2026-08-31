@@ -18,9 +18,11 @@
         <Project Path="samples/FloatSoda.Samples.Expanded/FloatSoda.Samples.Expanded.csproj" />
         <Project Path="samples/FloatSoda.Samples.FittedBox/FloatSoda.Samples.FittedBox.csproj" />
         <Project Path="samples/FloatSoda.Samples.FractionallySizedBox/FloatSoda.Samples.FractionallySizedBox.csproj" />
+        <Project Path="samples/FloatSoda.Samples.GestureDetector/FloatSoda.Samples.GestureDetector.csproj" />
         <Project Path="samples/FloatSoda.Samples.GettingStarted/FloatSoda.Samples.GettingStarted.csproj" />
         <Project Path="samples/FloatSoda.Samples.Image/FloatSoda.Samples.Image.csproj" />
         <Project Path="samples/FloatSoda.Samples.LimitedBox/FloatSoda.Samples.LimitedBox.csproj" />
+        <Project Path="samples/FloatSoda.Samples.Listener/FloatSoda.Samples.Listener.csproj" />
         <Project Path="samples/FloatSoda.Samples.Opacity/FloatSoda.Samples.Opacity.csproj" />
         <Project Path="samples/FloatSoda.Samples.OverflowBox/FloatSoda.Samples.OverflowBox.csproj" />
         <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
