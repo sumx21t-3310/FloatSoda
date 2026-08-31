@@ -145,3 +145,21 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   からは再現できない。
 - **Label**: unlabelled — まず #7 を解決する。ヘッドレスの判定で挙動の説明が付くなら、この
   エントリはそちらへ吸収される。
+
+## 9. 既定フォントサイズが 14 ではなく 30
+
+- **FloatSoda**: `FontSize` 未指定時は描画時に 30 へ解決される
+  (`src/FloatSoda/Painting/TextStyle.cs` — `DefaultFontSize`。`ToRichTextKitStyle` で適用)。
+  4299340「Textのスタイル指定を完成させる」で意図的に導入され、以来 `TextStyle` の既定値と
+  `TextPainter` のフォールバックの両方が一貫して 30(現在は `TextStyle` へ一本化済み)。
+- **Flutter**: 祖先がサイズを与えない場合のエンジン既定は 14.0
+  (`DefaultTextStyle.fallback` の `TextStyle` は `fontSize: null`)。
+- **Why**: 14 は HMD のレンズ越しでは小さすぎて読めないため、VR オーバーレイ向けに 30 へ引き上げた。
+  **30 は暫定値** — 目視で決めたもので計測に基づかない。確定扱いにする前に、実機の可読性検証
+  (device test)で再調整すること。
+- **Test**: `tests/FloatSoda.Test/Widgets/TextTest.cs` —
+  `ToRichTextKitStyle_全プロパティ未指定_既定値で描画書式を生成する`
+- **Docs**: `docs/WidgetSystem.md`(`Text` の既定書式の記載)
+- **Observation**: 値の差異そのものは `HEADLESS`。30 が適切な値かどうかの判定は `VR`
+  (レンズ越しの可読性)。
+- **Label**: deliberate

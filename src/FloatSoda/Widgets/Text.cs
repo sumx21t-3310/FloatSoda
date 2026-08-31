@@ -63,21 +63,32 @@ public sealed record Text : StatelessWidget
     }
 
     /// <summary>文字列に適用する書式を取得します。</summary>
-    /// <remarks><see langword="null"/>の場合は段落の既定書式を使用します。</remarks>
+    /// <remarks>
+    /// 明示しなかったプロパティ(および<see langword="null"/>の場合の全プロパティ)は、
+    /// 最も近い祖先の<see cref="DefaultTextStyle"/>から継承します。
+    /// 継承元にも無いプロパティにはフレームワークの既定値が適用されます。
+    /// <see cref="TextStyle.Inherit"/>が<see langword="false"/>の場合は継承せず、この書式のみを使用します。
+    /// </remarks>
     public TextStyle? Style { get; init; }
 
     /// <summary>
     /// 文字列を段落として描画する子ウィジェットを構築します。
     /// </summary>
     /// <param name="context">このウィジェットが配置されている構築コンテキスト。</param>
-    /// <returns><see cref="Data"/>を表示する<see cref="RichText"/>。</returns>
+    /// <returns>
+    /// <see cref="Data"/>を表示する<see cref="RichText"/>。
+    /// 書式は<see cref="Style"/>と祖先の<see cref="DefaultTextStyle"/>をマージして解決します。
+    /// </returns>
     public override Widget Build(IBuildContext context)
     {
-        var text = new TextSpan(Data) { Style = Style };
+        var defaultTextStyle = DefaultTextStyle.Of(context);
+        var effectiveStyle = Style is { Inherit: false }
+            ? Style
+            : defaultTextStyle.Style.Merge(Style);
 
         return new RichText
         {
-            Text = text
+            Text = new TextSpan(Data) { Style = effectiveStyle }
         };
     }
 }
