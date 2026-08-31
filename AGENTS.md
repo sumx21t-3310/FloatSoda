@@ -33,7 +33,7 @@ Conventions have one canonical home each. **Read the canon before acting on a co
 
 Three that catch agents out most often:
 
-- **Branch names must not carry the name of the agent or tool that did the work.** No `codex/`, `claude/`, `agent/` prefixes. Use `<type>/<issue-number>-<short-slug>` — full rules in `CONTRIBUTING.md`.
+- **Branch names must not carry the name of the agent or tool that did the work.** No `codex/`, `claude/`, `agent/` prefixes. Use `<issue-number>-<primary-area>-<slug>`, where `<primary-area>` comes from the issue's `area:*` labels — full rules in `CONTRIBUTING.md`. Issue classification (type / area / auxiliary attributes) lives in GitHub Labels, not in title prefixes.
 - **A C# namespace and its physical directory must match**, and must be changed together. Full rules in `CONTRIBUTING.md`.
 - **Do not mix unrelated refactoring, renames, cleanup, or dependency changes into a PR.** Full rules in `CONTRIBUTING.md`.
 
