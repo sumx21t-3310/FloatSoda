@@ -235,6 +235,12 @@ tests/FloatSoda.Test/RenderObjects/…    →   namespace FloatSoda.Test.RenderO
 - `.claude/skills/` は、`.agents/skills/` を直接サポートしない Claude Code のための **compatibility fallback** です。frontmatter と正典へのポインタしか持たない **derived artifact であり、直接編集してはいけません**(必須)。
 - 特定のエージェント(Claude / Codex / Cursor 等)向けに、**同一 skill の独立したコピーを正典として管理しないでください**(必須)。
 
+### エージェント向けファイルの言語
+
+- **[AGENTS.md](AGENTS.md) は英語で書きます**(必須)。全エージェントが毎セッション読む入口ファイルであり、英語の方が指示追従性とトークン量の節約が効くためです。
+- **それ以外のエージェント向けファイル(`.agents/skills/` 配下のスキル本文・`references/` 等)は日本語で書きます**(必須)。オーナー自身も読み書きするファイルであり、主要なコーディングエージェントは日本語を問題なく読むため、英語で書く実利がありません。識別子・型名・ファイルパス・コマンド・コードは英語のままにします。
+- SKILL.md の frontmatter の `description` は、エージェントがスキルの発火を判定する材料です。日本語で書きつつ、**トリガーとなるキーフレーズは日本語・英語の両方を含めます**(例: 「実機テスト」と "device test")。
+
 新しい skill を追加する手順:
 
 1. `.agents/skills/<name>/SKILL.md` に本体を書く。参照ファイルは `.agents/skills/<name>/references/` に置く

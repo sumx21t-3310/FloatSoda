@@ -1,150 +1,150 @@
-# Confirmed Flutter port divergences
+# 確認済みの Flutter 移植差異
 
-**This ledger is the canonical record of confirmed FloatSoda ↔ Flutter divergences.** The design
-principle that governs when a divergence is allowed at all lives in
-[`docs/APIDesign.md`](../../../../docs/APIDesign.md) ("判断原則: Flutter 由来の observable behavior に
-差異を作らない"); this file holds the individual entries. Recording a divergence anywhere else instead
-of here splits the record — append it here.
+**この台帳が、確認済みの FloatSoda ↔ Flutter 差異の正典。** そもそも差異がいつ許されるかを
+定める設計原則は [`docs/APIDesign.md`](../../../../docs/APIDesign.md)(「判断原則: Flutter 由来の
+observable behavior に差異を作らない」)にあり、このファイルは個別のエントリを保持する。
+差異をここ以外の場所に記録すると記録が分裂する — 必ずここに追記すること。
 
-It doubles as the **starting point** for axis B enumeration, not a complete list — hand it to Codex so
-it extends rather than rediscovers, and append newly confirmed entries after each run.
+このファイルは軸B 列挙の**出発点**も兼ねる。完全なリストではない — Codex に渡して再発見ではなく
+拡張をさせ、実行のたびに新たに確定したエントリを追記する。
 
-Flutter clone for cross-reference: `~/code_reading/flutter_reference`. The `flutter-widget-source`
-skill resolves a widget to its Widget / Element / RenderObject implementations.
+突き合わせ用の Flutter クローン: `~/code_reading/flutter_reference`。`flutter-widget-source`
+スキルで、ウィジェットから Widget / Element / RenderObject の実装を特定できる。
 
-Entries are source-verified unless a **Status** line says otherwise; an unconfirmed entry is a lead
-for the enumeration, not a finding.
+エントリは、**Status** 行に断りがない限りソース検証済み。未確認のエントリは列挙のための
+手がかりであって、確定した知見ではない。
 
-Each entry carries a label once decided: **deliberate** (a design call — then it is a `docs/` gap if
-undocumented) / **not ported** (missing, file an issue) / **port mistake** (implemented but wrong —
-the highest-value category).
+各エントリには、判断が下り次第ラベルが付く: **deliberate**(設計判断 — 未文書なら `docs/` の
+ギャップになる)/ **not ported**(未移植。Issue を立てる)/ **port mistake**(実装されているが
+誤り — 最も価値の高いカテゴリ)。
 
-## Entry template
+## エントリのテンプレート
 
-The first five fields are the ones `docs/APIDesign.md` requires for every deliberate divergence
-(Flutter behaviour / FloatSoda behaviour / why / the test that pins it / user-facing docs).
-**A divergence with no `Test` will be silently reverted by the next port** — treat an unset `Test` on
-a `deliberate` entry as an open task, not a finished record.
+最初の5フィールドは、`docs/APIDesign.md` がすべての意図的差異に要求するもの(Flutter の挙動 /
+FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け docs)。
+**`Test` の無い差異は、次の移植で静かに巻き戻される** — `deliberate` エントリの未設定の `Test` は、
+完了した記録ではなく未処理のタスクとして扱うこと。
 
 ```markdown
-## N. <one-line statement of the divergence>
+## N. <差異の一行要約>
 
-- **FloatSoda**: what it does, with `src/…:line` evidence.
-- **Flutter**: what Flutter does, with the mirrored file.
-- **Why**: why the divergence is necessary. Required once the label is `deliberate`.
-- **Test**: file + test method name that fails if the divergence is undone. `— (not set)` if none yet.
-- **Docs**: `docs/` page and/or the sample's `## Flutterとの違い` section, when users can observe it.
-  `— (not set)` if it is invisible to users.
-- **Observation**: `HEADLESS` or `VR` — where the difference can actually be seen.
-- **Label**: deliberate / not ported / port mistake / unlabelled.
+- **FloatSoda**: 何をするか。`src/…:line` の根拠つき。
+- **Flutter**: Flutter が何をするか。対応するファイルつき。
+- **Why**: なぜ差異が必要か。ラベルが `deliberate` になったら必須。
+- **Test**: 差異を戻すと失敗するテストのファイル + テストメソッド名。未設定なら `— (not set)`。
+- **Docs**: 利用者から観測できる場合、`docs/` のページやサンプルの `## Flutterとの違い` 節。
+  利用者から見えないなら `— (not set)`。
+- **Observation**: `HEADLESS` か `VR` — 差異が実際に観測できる場所。
+- **Label**: deliberate / not ported / port mistake / unlabelled。
 ```
 
-`Why` is omitted below wherever the label is still `unlabelled`: an entry that has not been judged yet
-has no agreed reason to record.
+以下でラベルが `unlabelled` のままのエントリには `Why` を書いていない: まだ判断されていない
+エントリには、記録すべき合意された理由が存在しないため。
 
 ---
 
-## 1. Widget equality is structural, not identity
+## 1. Widget の等価性が同一性ではなく構造的
 
-- **FloatSoda**: `child.Widget == newWidget` at `src/FloatSoda/Elements/Element.cs:173`. `Widget` is an
-  `abstract record`, so `==` is **value equality**. A structurally identical new widget short-circuits
-  the whole update — `Update()` never runs, so no `didUpdateWidget` equivalent fires and the subtree
-  is not rebuilt.
-- **Flutter**: the same-shaped check compares by identity (`Widget` does not override `==`), so a fresh
-  instance always reaches `canUpdate` → `child.update(newWidget)` → `didUpdateWidget`.
+- **FloatSoda**: `src/FloatSoda/Elements/Element.cs:173` の `child.Widget == newWidget`。`Widget` は
+  `abstract record` なので `==` は**値の等価性**。構造的に同一の新しいウィジェットは更新全体を
+  短絡させる — `Update()` が走らないため、`didUpdateWidget` 相当は発火せず、サブツリーは
+  再構築されない。
+- **Flutter**: 同じ位置のチェックは同一性比較(`Widget` は `==` をオーバーライドしない)。
+  そのため新しいインスタンスは必ず `canUpdate` → `child.update(newWidget)` → `didUpdateWidget`
+  に到達する。
 - **Test**: — (not set)
 - **Docs**: — (not set)
 - **Observation**: `HEADLESS`
-- **Label**: unlabelled — `AGENTS.md` describes it as an intentional fast path, but the
-  `didUpdateWidget` consequence is not documented anywhere.
+- **Label**: unlabelled — `AGENTS.md` は意図的な fast path として説明しているが、
+  `didUpdateWidget` への帰結はどこにも文書化されていない。
 
-## 2. No inactive-element pool
+## 2. inactive-element プールが無い
 
-- **FloatSoda**: `src/FloatSoda/Elements/ComponentElement.cs:164` states it outright — with no
-  reactivation pool, `Deactivate` is terminal (equivalent to unmount). Moving a keyed subtree to a
-  different parent destroys its `State`.
-- **Flutter**: `BuildOwner._inactiveElements` holds deactivated elements so they can be reactivated
-  within the same frame; `finalizeTree()` unmounts whatever wasn't.
+- **FloatSoda**: `src/FloatSoda/Elements/ComponentElement.cs:164` に明記されている — 再活性化
+  プールが無いため `Deactivate` は終端(unmount と等価)。キー付きサブツリーを別の親へ移動すると
+  `State` が破棄される。
+- **Flutter**: `BuildOwner._inactiveElements` が deactivate された要素を保持し、同一フレーム内で
+  再活性化できる。`finalizeTree()` が残りを unmount する。
 - **Test**: — (not set)
 - **Docs**: — (not set)
 - **Observation**: `HEADLESS`
 - **Label**: unlabelled
 
-## 3. `GlobalKey` is not implemented
+## 3. `GlobalKey` が未実装
 
-- **FloatSoda**: no occurrences anywhere under `src/`.
-- **Flutter**: cross-tree `State` access and reparenting depend on it.
+- **FloatSoda**: `src/` 配下のどこにも出現しない。
+- **Flutter**: ツリーをまたぐ `State` アクセスと reparenting がこれに依存する。
 - **Test**: — (not set)
 - **Docs**: — (not set)
 - **Observation**: `HEADLESS`
-- **Label**: not ported (pairs with #2 — reactivation is its prerequisite)
+- **Label**: not ported(#2 と対 — 再活性化がその前提)
 
-## 4. InheritedWidget registration key is `ScopeType`, not the runtime type
+## 4. InheritedWidget の登録キーが実行時型ではなく `ScopeType`
 
-- **FloatSoda**: `src/FloatSoda/Widgets/InheritedWidget.cs:20` defines `ScopeType` (defaults to
-  `GetType()`, overridable). `src/FloatSoda/Widgets/WindowWidget.cs:32` overrides it to
-  `typeof(WindowWidget)` so all three concrete window kinds register under the base type and
-  descendants keep their dependency when the concrete type changes.
-- **Flutter**: keyed by `runtimeType`; `dependOnInheritedWidgetOfExactType<T>()` is an exact match.
-- **Why**: descendants must keep their `WindowWidget` dependency when the concrete window type is
-  swapped, so all three window kinds register under the base type (issue #90 relies on this).
+- **FloatSoda**: `src/FloatSoda/Widgets/InheritedWidget.cs:20` が `ScopeType` を定義(既定は
+  `GetType()`、オーバーライド可)。`src/FloatSoda/Widgets/WindowWidget.cs:32` がこれを
+  `typeof(WindowWidget)` にオーバーライドし、3つの具象ウィンドウ種別すべてが基底型で登録され、
+  具象型が変わっても子孫が依存を保てるようにしている。
+- **Flutter**: `runtimeType` がキー。`dependOnInheritedWidgetOfExactType<T>()` は完全一致。
+- **Why**: 具象ウィンドウ型が差し替えられても子孫は `WindowWidget` への依存を保つ必要があるため、
+  3つのウィンドウ種別すべてを基底型で登録する(issue #90 がこれに依存)。
 - **Test**: — (not set)
 - **Docs**: — (not set)
 - **Observation**: `HEADLESS`
-- **Label**: deliberate (issue #90 relies on it) — so it needs documenting.
+- **Label**: deliberate(issue #90 が依存)— よって文書化が必要。
 
-## 5. Layout early-return does not cover a boundary-only change
+## 5. レイアウトの early-return が boundary のみの変更をカバーしない
 
-- **FloatSoda**: `src/FloatSoda/RenderObjects/RenderObject.cs:91-107`. The early return requires
-  `RelayoutBoundary == relayoutBoundary`, so when only the relayout boundary changed, control falls
-  through and **`PerformLayout()` runs**.
-- **Flutter**: with unchanged constraints it reassigns the boundary, cleans children, and returns —
-  `performLayout` does not run.
+- **FloatSoda**: `src/FloatSoda/RenderObjects/RenderObject.cs:91-107`。early return は
+  `RelayoutBoundary == relayoutBoundary` を要求するため、relayout boundary だけが変わった場合は
+  素通りして **`PerformLayout()` が走る**。
+- **Flutter**: 制約が不変なら boundary を付け替え、子を掃除して return — `performLayout` は
+  走らない。
 - **Test**: — (not set)
 - **Docs**: — (not set)
-- **Observation**: `HEADLESS` (may also surface as extra layout cost on device)
-- **Label**: unlabelled — likely port mistake, worth confirming first.
+- **Observation**: `HEADLESS`(実機では余分なレイアウトコストとしても現れうる)
+- **Label**: unlabelled — port mistake の可能性が高いが、先に確認する価値がある。
 
-## 6. Frame phases are missing several Flutter stages
+## 6. フレームフェーズに Flutter の複数ステージが欠けている
 
-- **FloatSoda**: `src/FloatSoda/Core/WidgetBinding.cs:186-245` — transient callbacks → build → layout
-  → paint → `PostRender`. No post-frame callbacks (`PostFrame` has no occurrences under `src/`), no
-  `finalizeTree`, no compositing-bits flush, no semantics.
-- **Flutter**: transient → persistent (build / layout / compositing bits / paint / composite /
-  semantics) → `finalizeTree` → post-frame callbacks.
+- **FloatSoda**: `src/FloatSoda/Core/WidgetBinding.cs:186-245` — transient コールバック → build →
+  layout → paint → `PostRender`。post-frame コールバックが無く(`PostFrame` は `src/` 配下に
+  出現しない)、`finalizeTree` も、compositing-bits の flush も、semantics も無い。
+- **Flutter**: transient → persistent(build / layout / compositing bits / paint / composite /
+  semantics)→ `finalizeTree` → post-frame コールバック。
 - **Test**: — (not set)
 - **Docs**: — (not set)
-- **Observation**: `HEADLESS` — every missing phase listed above is observable without a headset.
-- **Label**: unlabelled. The missing `addPostFrameCallback` equivalent is the one that bites porters
-  most often; semantics is plausibly out of scope for VR overlays.
-- **When enumerating**: one scenario carries exactly one verdict. If a derived scenario depends on
-  render-thread timing rather than on the missing phase itself, enumerate it separately as `VR`.
+- **Observation**: `HEADLESS` — 上に挙げた欠落フェーズはすべてヘッドセット無しで観測できる。
+- **Label**: unlabelled。移植者が最も頻繁に噛まれるのは `addPostFrameCallback` 相当の欠落。
+  semantics は VR オーバーレイではスコープ外というのがありそうな線。
+- **列挙時の注意**: 1シナリオが持つ判定は1つ。派生シナリオが、欠落フェーズそのものではなく
+  レンダースレッドのタイミングに依存するなら、`VR` として別に列挙する。
 
-## 7. Pointer input is quantised to the frame boundary
+## 7. ポインタ入力がフレーム境界に量子化されている
 
-- **FloatSoda**: `FlushPointerEvents()` runs at the top of `BeginFrame`
-  (`src/FloatSoda/Core/WidgetBinding.cs:234`, implementation at `:277`), so input is processed once
-  per frame.
-- **Flutter**: `GestureBinding.handlePointerEvent` dispatches independently of the frame.
+- **FloatSoda**: `FlushPointerEvents()` が `BeginFrame` の先頭で走る
+  (`src/FloatSoda/Core/WidgetBinding.cs:234`、実装は `:277`)ため、入力はフレームごとに1回
+  処理される。
+- **Flutter**: `GestureBinding.handlePointerEvent` はフレームとは独立にディスパッチする。
 - **Test**: — (not set)
 - **Docs**: — (not set)
-- **Observation**: `HEADLESS` — the quantisation itself is verifiable by feeding several pointer
-  events within one frame and asserting they are dispatched together.
+- **Observation**: `HEADLESS` — 量子化そのものは、1フレーム内に複数のポインタイベントを流し込み、
+  まとめてディスパッチされることをアサートすれば検証できる。
 - **Label**: unlabelled
 
-## 8. Input delay or loss under a degraded frame rate — **unconfirmed**
+## 8. フレームレート低下時の入力遅延または喪失 — **未確認**
 
-- **Status**: not source-verified. Unlike every other entry here, this one is *derived* from #7
-  rather than read off the implementation, and it is listed so the enumeration picks it up — not as
-  an established divergence. Do not cite it as confirmed.
-- The user-visible consequence of #7. **Whether events are actually dropped, or merely delayed, is
-  the open question**; it depends on the real event source and the actual frame budget.
+- **Status**: ソース未検証。ここにある他のすべてのエントリと違い、これは実装を読んで得たものでは
+  なく #7 からの*派生*で、列挙に拾わせるために載せている — 確立した差異としてではない。
+  確定済みとして引用しないこと。
+- #7 の利用者から見える帰結。**イベントが実際に落ちるのか、単に遅れるだけなのかが未解決の問い**で、
+  実際のイベントソースと実際のフレームバジェットに依存する。
 - **Test**: — (not set)
 - **Docs**: — (not set)
-- **Observation**: **`VR`** — needs SteamVR event delivery and a real frame rate; not reproducible
-  from a synthetic event queue.
-- **Label**: unlabelled — resolve #7 first; if the headless verdict already explains the behaviour,
-  this entry collapses into it.
+- **Observation**: **`VR`** — SteamVR のイベント配送と実フレームレートが必要。合成イベントキュー
+  からは再現できない。
+- **Label**: unlabelled — まず #7 を解決する。ヘッドレスの判定で挙動の説明が付くなら、この
+  エントリはそちらへ吸収される。
 
 ## 9. 既定フォントサイズが 14 ではなく 30
 

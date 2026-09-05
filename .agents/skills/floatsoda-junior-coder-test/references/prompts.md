@@ -1,34 +1,34 @@
-# Junior-coder task prompts
+# ジュニアコーダー用タスクプロンプト
 
-These are the task prompts handed to the junior subagent. Voice = FloatSoda persona #1: a VRChatter
-who vibe-codes personal tools and barely writes code themselves. Keep the voice casual and goal-first,
-never framework-jargon-y — that realism is part of the test.
+ジュニアサブエージェントに渡すタスクプロンプト集。声 = FloatSoda ペルソナ①: 個人ツールを
+バイブコーディングする、ほとんど自分ではコードを書かない VRChatter。口調はカジュアルで
+ゴールファーストに保ち、フレームワーク用語っぽくしないこと — そのリアリズムがテストの一部。
 
-Every prompt must carry the same three guardrails (fill in the docs URL and scratch path):
+すべてのプロンプトに同じ3つのガードレールを載せる(docs の URL とスクラッチパスは埋める):
 
-- **Read docs first**: `https://github.com/sumx21t-3310/FloatSoda/wiki` — read `Home / GettingStarted /
-  WidgetSystem / OVRIntegration` before writing anything.
-- **Black box**: use ONLY the docs; do not open/read/grep anything under `src/`; if the docs don't cover
-  it, say so instead of guessing.
-- **Constraints**: C# only; no Unity scenes or prefabs; use the exact API/NuGet names from the docs, never
-  invented ones; report which docs pages you actually used and anywhere you were unsure.
+- **docs を先に読む**: `https://github.com/sumx21t-3310/FloatSoda/wiki` — 何か書く前に
+  `Home / GettingStarted / WidgetSystem / OVRIntegration` を読む。
+- **ブラックボックス**: docs だけを使う。`src/` 配下は開かない・読まない・grep しない。
+  docs がカバーしていなければ、推測せずそう言う。
+- **制約**: C# のみ。Unity のシーンや prefab は禁止。docs にある正確な API/NuGet 名だけを使い、
+  発明しない。実際に使った docs ページと、確信が持てなかった箇所を報告する。
 
-Pick difficulty by what you want to measure. Swap the theme freely (the three canonical persona wants are:
-FaceEmo expression switcher over OSC, a VRChat photo album, a friend-online toast notifier).
+難易度は測りたいもので選ぶ。テーマは自由に差し替えてよい(ペルソナの正典的な欲しいもの3つ:
+OSC 経由の FaceEmo 表情切り替え、VRChat フォトアルバム、フレンドオンライン通知トースト)。
 
 ---
 
-## 🟢 easy — does the getting-started path work at all
+## 🟢 easy — getting-started の経路がそもそも機能するか
 
 > FloatSodaで、SteamVRの視界にカードを1枚だけ出すツールを作って。
 > カードには好きな絵文字っぽいタイトルとテキストを表示。
 > まずdocsを読んでから、C#だけで完結させて（Unityのシーン/prefab禁止）。
 
-Measures: init → one overlay on screen. If this stumbles, `GettingStarted` has a hole.
+測るもの: 初期化 → オーバーレイ1枚の表示。ここでつまずくなら `GettingStarted` に穴がある。
 
 ---
 
-## 🎯 main — stateful, dynamic UI on implemented widgets (the sweet spot)
+## 🎯 main — 実装済みウィジェット上の、状態を持つ動的 UI(スイートスポット)
 
 > FloatSodaを使って、VRChatの友達がオンラインになったら、オーバーレイの隅に
 > 「〇〇 がオンラインになりました」というトーストを数秒間ふわっと出すツールを作って。
@@ -37,110 +37,117 @@ Measures: init → one overlay on screen. If this stumbles, `GettingStarted` has
 > ・トーストは自動で消える。複数来たら縦に積む
 > ・見た目は角丸・半透明でいい感じに
 
-Measures: `StatefulWidget`/`SetState`, keyed list diffing, animation, and — critically — **dynamic child
-add/remove**, which is where real render-tree bugs live. This is the run that found the two known bugs.
+測るもの: `StatefulWidget`/`SetState`、キー付きリスト差分、アニメーション、そして決定的に —
+**動的な子の追加/削除**。実在のレンダーツリーのバグが棲んでいる場所。既知のバグ2件を見つけたのは
+この実行。
 
 ---
 
-## 🔴 hard — pushes into known gaps on purpose
+## 🔴 hard — 既知のギャップへ意図的に踏み込む
 
 > FloatSodaで、VRChatのアバター表情をワンタップで切り替えるオーバーレイパネルを作って。
 > ボタンを3〜4個並べて、押したらOSCで表情パラメータを送る（OSC送信はConsole出力のダミーでいい）。
 > ダッシュボードオーバーレイで、ボタンは押した見た目のフィードバックが欲しい。
 
-Measures: multi-button layout + interaction + **tap/hit-testing (currently unimplemented)**. The point is
-to watch the failure *mode*: does the model hallucinate a `GestureDetector`/`Button` API, correctly report
-that the docs don't cover input, or invent a workaround? Each outcome says something different about the docs.
+測るもの: 複数ボタンのレイアウト + インタラクション + **タップ/hit-testing(現在未実装)**。
+狙いは失敗の*モード*を観察すること: モデルは `GestureDetector`/`Button` API をハルシネーション
+するか、docs が入力をカバーしていないと正しく報告するか、回避策を発明するか。どの結果も docs に
+ついて異なることを語る。
 
 ---
 
-## 🎯 targeted — new-API PR gate
+## 🎯 targeted — 新 API PR ゲート
 
-For the new-API PR gate, don't reuse a canned task — **write one that cannot be completed without the new
-API**, so the junior is forced to discover and use it. The whole point is to measure whether the *new*
-surface is usable from the *updated* docs alone, so the black-box rule and the "docs only" pointer matter
-even more here. Hand it the **PR branch's** docs.
+新 API PR ゲートでは、出来合いのタスクを再利用せず、**その新 API を使わないと完了できないタスクを
+書く**。ジュニアが強制的にその API を発見して使うことになるように。要点は、*新しい*サーフェスが
+*更新後の* docs だけから使えるかを測ることなので、ブラックボックスルールと「docs のみ」の
+ポインタがここでは一層重要になる。渡すのは **PR ブランチの** docs。
 
-Keep the task realistic (still the VRChatter voice) but shaped so the new API is on the critical path — not
-mentioned by name (that would leak the answer), but unavoidable by function.
+タスクは現実的に保ちつつ(依然 VRChatter の声で)、新 API がクリティカルパスに乗る形にする —
+名前は出さない(答えのリークになる)が、機能的に避けて通れないようにする。
 
-> **Phase 2 exception — read this first.** While Phase 2 is running, every gate PR ports one named Flutter
-> widget, and the task for those runs is **required** to come from that widget's Flutter documentation, not
-> from an invented persona scenario. See "🧩 Phase 2" at the bottom of this file; the template below applies
-> to non-Phase-2 API additions.
+> **Phase 2 の例外 — 先にこれを読むこと。** Phase 2 の進行中は、ゲート対象の PR はすべて特定の
+> Flutter ウィジェット1つを移植するもので、その実行のタスクは発明したペルソナシナリオではなく、
+> そのウィジェットの Flutter ドキュメントから導出することが**必須**。このファイル末尾の
+> 「🧩 Phase 2」を見ること。下のテンプレートは Phase 2 以外の API 追加に適用する。
 
-**Template:**
+**テンプレート:**
 
 > FloatSodaで、〔新APIを使わないと自然には解けない、ペルソナ①らしい小道具〕を作って。
 > ・〔新APIの機能を必要とする具体的な要件を1〜2個〕
 > （残りは固定枠：docs必読 / ブラックボックス / C#のみ・prefab禁止 / 推測API禁止 / 自己報告）
 
-**Worked example** — PR adds a `Padding` widget:
+**具体例** — PR が `Padding` ウィジェットを追加する場合:
 
 > FloatSodaで、SteamVRの視界にメッセージカードを出すツールを作って。
 > カードの中のテキストは、フチから均等に少し内側に余白を空けて配置したい
 > （テキストが縁にべったり付かないように）。余白は上下左右で個別に変えられるとなお良い。
 
-Here "余白" forces the model to find `Padding`/`EdgeInsets`. If it instead reaches for a hardcoded
-`SizedBox` dance, hallucinates a `Margin` property, or asks "does the docs have a padding widget?", that's
-the finding — the new API wasn't discoverable, or its shape wasn't the intuitive one.
+ここでは「余白」がモデルに `Padding`/`EdgeInsets` を見つけさせる力になる。代わりにハードコードの
+`SizedBox` の小細工に走ったり、`Margin` プロパティをハルシネーションしたり、「docs に padding の
+ウィジェットはある?」と聞いてきたりしたら、それが所見 — 新 API が発見できなかったか、その形状が
+直感的な方ではなかった。
 
-When picking the requirement, target the *function* of the new API, then check the failure against the
-four-category triage in `SKILL.md`. A "hallucination" of a cleaner shape than what the PR built is the most
-valuable outcome — it's a direct argument to reshape the API before merge.
+要件を選ぶときは新 API の*機能*を狙い、失敗は `SKILL.md` の4カテゴリトリアージに照らして
+確認する。PR が作ったものよりきれいな形状の「ハルシネーション」は最も価値の高い結果 — マージ前に
+API をその形へ寄せ直す直接の論拠になる。
 
 ---
 
-## 🧩 Phase 2 — per-widget gate runs must be derived from Flutter's own docs
+## 🧩 Phase 2 — ウィジェット単位のゲート実行は Flutter 自身の docs から導出すること
 
-**Applies to: the new-API PR gate during Phase 2** — i.e. a run testing a single ported widget (`Wrap`,
-`FittedBox`, `CustomPaint`, …), which is every Phase 2 widget PR. For those runs the task is **not** invented:
-it **must be derived from that widget's own Flutter documentation**, using `api.flutter.dev`, the widget
-catalog sample, or the `flutter-widget-source` skill's pointer to the canonical implementation. Writing a
-VRChatter-voice pretext that happens to require the widget is not an accepted substitute here.
+**適用対象: Phase 2 期間中の新 API PR ゲート** — つまり移植された単一ウィジェット(`Wrap`、
+`FittedBox`、`CustomPaint`、…)をテストする実行で、Phase 2 のウィジェット PR はすべてこれに
+該当する。その実行のタスクは発明**しない**: `api.flutter.dev`、ウィジェットカタログのサンプル、
+または `flutter-widget-source` スキルが指す正典実装を使って、**そのウィジェット自身の Flutter
+ドキュメントから導出しなければならない**。そのウィジェットをたまたま必要とする VRChatter 声の
+口実を書くことは、ここでは代用として認めない。
 
-The reason it's mandatory rather than merely allowed: Phase 2 ports are 1:1, so Flutter's own description is
-the authoritative statement of what the widget must produce. Grounding the task there makes the run a
-comparison against a fixed reference instead of against the test author's improvised idea of the widget —
-which is what lets results be compared across widgets and across releases.
+任意ではなく必須である理由: Phase 2 の移植は 1:1 なので、そのウィジェットが何を生み出すべきかの
+権威ある記述は Flutter 自身の説明。タスクをそこに接地させると、テスト作成者が即興で思い描いた
+ウィジェット像ではなく、固定された参照との比較になる — それが、結果をウィジェット間・リリース間で
+比較可能にする。
 
-(Release-gate runs are unaffected — those stay app-shaped and in the persona voice. See the top of this file.)
+(リリースゲートの実行には影響しない — あちらはアプリの形とペルソナの声のまま。このファイルの
+冒頭を参照。)
 
-### How to reshape a sample description into a prompt
+### サンプルの説明文をプロンプトへ変形する方法
 
-The best raw material is the one-sentence prose intro Flutter puts above each `{@tool snippet}` — it states
-the intended outcome authoritatively, in one sentence, for every widget. `Wrap`'s reads:
+最良の素材は、Flutter が各 `{@tool snippet}` の上に置いている1文の散文イントロ — すべての
+ウィジェットについて、意図された結果を1文で権威をもって述べている。`Wrap` のものはこう:
 
 > This example renders some `[Chip]`s representing four contacts in a `[Wrap]` so that they flow across
 > lines as necessary.
 
-It cannot be used verbatim: it names the answer (`[Wrap]`) and depends on a Material widget FloatSoda
-doesn't have (`[Chip]`, which would surface as a bogus category-ⓐ "hallucinated API" finding). Reshape it:
+逐語では使えない: 答えを名指ししている(`[Wrap]`)し、FloatSoda に無い Material ウィジェット
+(`[Chip]`。カテゴリ ⓐ「ハルシネーション API」の偽の所見として浮上してしまう)に依存している。
+こう変形する:
 
-1. **Drop the meta-frame.** "This example renders…" → a request ("〜を作って").
-2. **Delete the bracketed widget name, keep the behavior clause after it.** `[Wrap]` goes; "so that they
-   flow across lines as necessary" stays — that clause *is* the spec.
-3. **Restate Flutter-only widgets by appearance.** `[Chip]` → 「小さい角丸のラベル」.
-4. **Keep concrete counts and data.** "four contacts" → 「4人」. Concrete output is checkable by eye.
+1. **メタ枠を落とす。** 「This example renders…」 → 依頼文(「〜を作って」)。
+2. **角括弧のウィジェット名を消し、その後ろの挙動節を残す。** `[Wrap]` は消す。「so that they
+   flow across lines as necessary」は残す — その節こそが仕様。
+3. **Flutter 専用ウィジェットは見た目で言い換える。** `[Chip]` → 「小さい角丸のラベル」。
+4. **具体的な数とデータは保つ。** 「four contacts」 → 「4人」。具体的な出力は目視で照合できる。
 
-Then **top it up from the class doc prose above the sample**, because the one sentence usually only forces
-the widget's headline behavior. `Wrap`'s sample sentence forces wrapping but never `Spacing` / `RunSpacing` /
-`Alignment`; those come from the paragraphs describing `alignment` / `runSpacing` / `runAlignment`. Cover the
-surface the PR under test actually adds.
+そのうえで、**サンプル上部のクラス doc 散文から補う**。1文はたいていウィジェットの見出し的な
+挙動しか強制しないため。`Wrap` のサンプル文は折り返しを強制するが、`Spacing` / `RunSpacing` /
+`Alignment` は強制しない。それらは `alignment` / `runSpacing` / `runAlignment` を説明する段落から
+来る。テスト対象の PR が実際に追加するサーフェスをカバーすること。
 
-Worked result for `Wrap`:
+`Wrap` での完成例:
 
 > FloatSodaで、連絡先4人の名前を小さい角丸ラベルにして横に並べるパネルを作って。
 > 幅に入りきらなくなったら次の行に折り返してほしい。
 > ラベル同士の間隔と、行と行の間隔は別々に調整できるようにして。
 
-### The rule that keeps it valid
+### 有効性を保つルール
 
-- **Do not point the junior at Flutter's docs.** The Flutter source is the *test author's* input, not the
-  junior's. FloatSoda mirrors Flutter's naming, so a junior reading `api.flutter.dev` would "discover"
-  `RunSpacing` from Flutter rather than from FloatSoda's `WidgetSystem.md` — which is exactly the signal
-  this gate exists to measure. The black-box docs pointer stays FloatSoda-only.
+- **ジュニアに Flutter の docs を指し示さない。** Flutter のソースは*テスト作成者の*入力で
+  あって、ジュニアのものではない。FloatSoda は Flutter の命名を鏡写しにしているため、
+  `api.flutter.dev` を読んだジュニアは `RunSpacing` を FloatSoda の `WidgetSystem.md` からでは
+  なく Flutter から「発見」してしまう — それこそ、このゲートが測るために存在するシグナル。
+  ブラックボックスの docs ポインタは FloatSoda のみに保つ。
 
-The VRChatter voice is dropped here; a bare layout request is what you want. What that costs is the realism
-of persona #1's phrasing, which is why the **release gate** keeps the persona voice — that's the run
-measuring whether a real user's fuzzy request survives the docs, and this one isn't trying to.
+ここでは VRChatter の声を落とす。欲しいのは素のレイアウト依頼。その代償はペルソナ①の言い回しの
+リアリズムで、だからこそ**リリースゲート**はペルソナの声を保っている — あちらは実在ユーザーの
+曖昧な依頼が docs を生き延びるかを測る実行で、こちらはそれを測ろうとしていない。
