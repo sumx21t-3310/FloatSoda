@@ -1,0 +1,72 @@
+name: Docs Site
+
+# docs/ と website/ の変更でドキュメントサイトをビルド・検査し、main では GitHub Pages へデプロイする。
+# 初回のみ Settings → Pages → Source を "GitHub Actions" にする必要がある(website/README.md)。
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "website/**"
+      - ".github/workflows/docs-site.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "website/**"
+      - ".github/workflows/docs-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs-site-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 各ページの lastUpdated に docs/ 側の最終コミット日時を使うため、履歴を全部取る
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build (docs/ → Starlight → dist/)
+        run: npm run build
+
+      - name: Verify dist (pages, llms.txt, internal links and anchors)
+        run: npm run verify
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

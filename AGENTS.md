@@ -128,7 +128,8 @@ Do not use `[Fact(DisplayName = "…")]` — it duplicates the intent and drifts
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
 | `tests/FloatSoda.Rendering.Test` | xunit tests for the Layer tree |
-| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, Input, APIDesign, DocumentationComments, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` — every `.md` under `docs/` becomes a wiki page, so do not put scratch files there |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, Input, APIDesign, DocumentationComments, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` and built into the docs site by `.github/workflows/docs-site.yml` — every `.md` under `docs/` becomes a wiki page and a site page, so do not put scratch files there |
+| `website/` | Docs site (Astro Starlight) published at `https://floatsoda.sumx21t.com` with `llms.txt` / `llms-full.txt` for LLM readers. Has no content of its own: `scripts/sync-docs.mjs` generates every page from `docs/` at build time, so edit `docs/`, never `website/src/content/docs/`. See `website/README.md` |
 
 ### UI Layering Rules (see `docs/UILayering.md`)
 
