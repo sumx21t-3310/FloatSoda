@@ -7,6 +7,8 @@
  * - src/content/docs/<slug>.md … Starlight が読むページ
  * - public/<slug>.md           … LLM 向けの素の Markdown(https://<site>/<slug>.md で配信)
  *
+ * ランディング(website/content/index.mdx)はこのスクリプトの対象外で、src/pages/index.astro が描画する。
+ *
  * 変換内容:
  * - 先頭の H1 を frontmatter の title にし、本文からは除く(Starlight がタイトルを描画する)
  * - 「← [Home](Home.md)」のナビ行と、その直前の水平線を除く(サイドバーが担う)

@@ -1,0 +1,71 @@
+---
+title: FloatSoda
+description: SteamVR Overlay を Flutter のような宣言的 UI で作る .NET 10 / C# 14 向けフレームワーク。UI はすべて C# コード
+template: splash
+hero:
+  tagline: SteamVR Overlay を、Flutter のような宣言的 UI で。UI はすべて C# コードで書き、シーンもプレハブも持ちません。
+  actions:
+    - text: はじめる
+      link: /gettingstarted/
+      icon: right-arrow
+    - text: ドキュメント一覧
+      link: /home/
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/sumx21t-3310/FloatSoda
+      icon: external
+      variant: minimal
+---
+
+{/*
+  サイト専用の入口(ランディング)。src/pages/index.astro が StarlightPage で描画する。
+  docs コレクションの外にあるので、サイドバーにも llms-*.txt にも入らない。
+  事実情報は docs/ が正典なので、ここには案内と導線だけを書く。
+*/}
+
+import { Card, CardGrid, Code, LinkCard } from "@astrojs/starlight/components";
+import program from "../../samples/FloatSoda.Samples.GettingStarted/Program.cs?raw";
+
+## 最小構成のコード
+
+SteamVR のダッシュボードに 100×100 の青い箱を出すオーバーレイです。`samples/FloatSoda.Samples.GettingStarted` の `Program.cs` そのもので、ビルドのたびにここへ読み込まれます。
+
+{/* Program.cs は BOM 付き UTF-8 なので、先頭の BOM(U+FEFF)を落としてから表示する */}
+<Code code={program.charCodeAt(0) === 0xfeff ? program.slice(1) : program} lang="csharp" title="Program.cs" />
+
+## 誰のためのフレームワークか
+
+3 タイプの作り手を想定しています。自分に近いものから読み始めてください。詳しくは [Target Users](/targetusers/) にあります。
+
+<CardGrid>
+  <Card title="AI と一緒に自分用のツールを作りたい VRChatter" icon="rocket">
+    コードが書けなくても構いません。AI にコードを書いてもらう「バイブコーディング」で完結できることが設計目標です。
+
+    読む順: [GettingStarted](/gettingstarted/) のサンプルを動かし、あとは AI に「これを改造して◯◯を作って」と頼む。AI には下の `llms-full.txt` を渡してください。
+  </Card>
+  <Card title="Booth でオーバーレイ作品を売りたいクリエイター" icon="pencil">
+    Unity でワールドやギミックを作れるなら十分です。新しく覚えるのは「宣言的 UI」という考え方だけ。シーンもプレハブも `.meta` もありません。
+
+    読む順: [GettingStarted](/gettingstarted/) → [WidgetSystem](/widgetsystem/)
+  </Card>
+  <Card title="uGUI を使いたくないエンジニア" icon="laptop">
+    UI が 100% C# コードです。diff が読め、PR レビューができ、grep が効きます。Flutter の三ツリーモデルを .NET 上に実装しています。
+
+    読む順: [Architecture](/architecture/) → [APIDesign](/apidesign/)
+  </Card>
+</CardGrid>
+
+## AI に読ませる
+
+このサイトは、コーディングエージェントがそのまま読めるように作ってあります。
+
+<CardGrid>
+  <LinkCard title="llms.txt" href="/llms.txt" description="サイトの索引。エージェントにはまずこれを渡す" />
+  <LinkCard title="llms-full.txt" href="/llms-full.txt" description="全ページを 1 ファイルにまとめた全文" />
+</CardGrid>
+
+各ページは URL の末尾を `.md` にすると素の Markdown で取得できます(例: `/widgetsystem/` のページは `/widgetsystem.md`)。
+
+## いまの状況
+
+Alpha 段階です。ユーザー操作(タップ・パン)が動くのはダッシュボードオーバーレイだけで、ワールド座標固定とデバイス追従のオーバーレイは表示専用です。Phase ごとの到達点と残件は [ロードマップ](/home/#ロードマップphase) にあります。

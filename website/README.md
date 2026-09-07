@@ -2,13 +2,15 @@
 
 `https://floatsoda.sumx21t.com` で公開するドキュメントサイトです。[Astro Starlight](https://starlight.astro.build/) で組み、LLM 向けに `llms.txt` / `llms-full.txt` と各ページの素の Markdown も配信します(Issue #219)。
 
-## ソースは `docs/` だけ
+## ソースは `docs/` と、ランディングだけ
 
-サイトのページは、リポジトリ直下の `docs/*.md` から**ビルドのたびに生成**します。このディレクトリに本文はありません。
+ドキュメントのページは、リポジトリ直下の `docs/*.md` から**ビルドのたびに生成**します。このディレクトリが持つ本文は、サイト専用の入口(ランディング)だけです。
 
 | 場所 | 役割 | Git 管理 |
 |---|---|---|
-| `../docs/*.md` | 唯一のソース。ページを直すときはここを編集する | あり |
+| `../docs/*.md` | ドキュメントの唯一のソース。ページを直すときはここを編集する | あり |
+| `content/index.mdx` | ランディング(`/`)の本文と hero。案内と導線だけを書き、事実情報は `docs/` へリンクする | あり |
+| `src/pages/index.astro` | ランディングを Starlight の `StarlightPage` で描画する。docs コレクションの外なので、サイドバーと `llms-*.txt` には入らない | あり |
 | `scripts/sync-docs.mjs` | `docs/` → Starlight 形式への変換(`npm run build` / `npm run dev` の前に自動実行) | あり |
 | `src/content/docs/` | 変換結果。Starlight が読む | **なし(生成物)** |
 | `public/<slug>.md` | 変換結果。LLM 向けの素の Markdown(`https://floatsoda.sumx21t.com/<slug>.md`) | **なし(生成物)** |
@@ -17,10 +19,12 @@
 変換で行うこと(詳細はスクリプト冒頭のコメント):
 
 - 先頭の H1 を frontmatter の `title` に移す
-- `docs/Home.md` の「ページ一覧」表を、サイドバーの並び順と各ページの `description` の正典として使う
+- `docs/Home.md` の「ページ一覧」表を正典にする。「対象読者」列でサイドバーをグループ化し(`利用者向け` / `コントリビュータ向け`)、表の行順を各グループ内の読む順に、「内容」列を各ページの `description` にする
 - `← [Home](Home.md)` のナビ行を除く
 - `Foo.md#anchor` 形式のリンクをサイト内パスへ、`../CONTRIBUTING.md` のように `docs/` の外を指すリンクを GitHub の URL へ書き換える
 - `editUrl`(GitHub の編集ページ)と `lastUpdated`(`docs/` 側の最終コミット日時)を付ける
+
+ランディングの「最小構成のコード」は、`samples/FloatSoda.Samples.GettingStarted/Program.cs` をビルド時に読み込んで表示します。サンプルを直せばランディングも追従します。
 
 同じ「`docs/` を読み取り専用ソースにする」型は、GitHub Wiki 同期(`scripts/sync-docs-to-wiki.js`)と共通です。Wiki 同期は移行期間中そのまま残します。
 
@@ -53,6 +57,7 @@ npm run verify    # dist/ の検査。ページ・llms.txt の網羅、サイト
 | 変えたいこと | 場所 |
 |---|---|
 | サイト URL、リポジトリ URL | `scripts/docs-source.mjs`(1 箇所で定義し、Astro 設定と変換スクリプトの両方が参照する) |
-| サイドバーの並び | `docs/Home.md` の「ページ一覧」表の行順 |
+| サイドバーのグループと並び | `docs/Home.md` の「ページ一覧」表の「対象読者」列と行順 |
 | ページの一行説明 | 同じ表の「内容」列 |
-| サイト名、`llms.txt` のプロジェクト説明、mermaid | `astro.config.mjs` |
+| ランディングの文言と導線 | `content/index.mdx` |
+| サイト名、`llms.txt` のプロジェクト説明、mermaid、配色 | `astro.config.mjs` |

@@ -3,7 +3,7 @@ import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
 import mermaid from "astro-mermaid";
 import starlightLlmsTxt from "starlight-llms-txt";
-import { orderedDocNames, repositoryUrl, siteUrl, slugOf } from "./scripts/docs-source.mjs";
+import { repoRoot, repositoryUrl, sidebarGroups, siteUrl, slugOf } from "./scripts/docs-source.mjs";
 
 export default defineConfig({
   site: siteUrl,
@@ -37,12 +37,25 @@ export default defineConfig({
               description: "ソースコード・サンプル・Issue",
             },
           ],
+          // docs/Home.md を llms-full.txt の先頭に置く(ランディングは docs コレクションの外なので含まれない)
+          promote: ["home"],
           // HTML を経由せず、docs/ から変換した Markdown 本文をそのまま llms-*.txt に入れる
           rawContent: true,
         }),
       ],
-      // サイドバーの並びは docs/Home.md の「ページ一覧」表の順に従う
-      sidebar: [{ slug: "index" }, ...orderedDocNames().map((name) => ({ slug: slugOf(name) }))],
+      // サイドバーは docs/Home.md の「ページ一覧」表を正典にする。
+      // 「対象読者」列でグループ化し、表の行順を各グループ内の読む順にする
+      sidebar: [
+        { slug: "home" },
+        ...sidebarGroups().map((group) => ({
+          label: group.label,
+          items: group.names.map((name) => ({ slug: slugOf(name) })),
+        })),
+      ],
     }),
   ],
+  vite: {
+    // ランディングがリポジトリ側のサンプルコード(samples/)を ?raw で読み込むため、dev サーバーの参照範囲を広げる
+    server: { fs: { allow: [repoRoot] } },
+  },
 });

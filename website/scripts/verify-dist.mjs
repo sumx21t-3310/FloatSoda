@@ -3,6 +3,7 @@
  * ビルド生成物(dist/)を検査する。`npm run build` の後に実行する(CI では必須)。
  *
  * 検査内容:
+ * 0. ランディング(サイト専用ページ)が生成されている
  * 1. docs/ の全ページが HTML と素の Markdown の両方で生成されている
  * 2. llms.txt / llms-full.txt が存在し、llms-full.txt に全ページのタイトルが含まれる
  * 3. HTML 内のサイト内リンク(href="/…")の遷移先ページとアンカー(#…)が実在する
@@ -15,7 +16,7 @@ const distDir = path.join(websiteDir, "dist");
 const failures = [];
 
 function pageFile(slug) {
-  return slug === "index" ? path.join(distDir, "index.html") : path.join(distDir, slug, "index.html");
+  return path.join(distDir, slug, "index.html");
 }
 
 /** サイト内パス(/foo/ や /foo.md)を dist 上のファイルへ解決する。無ければ undefined */
@@ -44,6 +45,9 @@ function* htmlFiles(dir) {
     else if (entry.name.endsWith(".html")) yield full;
   }
 }
+
+// 0. ランディング(website/content/index.mdx 由来)
+if (!fs.existsSync(path.join(distDir, "index.html"))) failures.push("landing page missing: index.html");
 
 // 1. ページの存在
 const names = listDocNames();

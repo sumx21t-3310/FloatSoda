@@ -1,0 +1,10 @@
+---
+// サイトのトップ(ランディング)。本文と hero は website/content/index.mdx にある。
+// docs コレクション(docs/ から生成)の外に置くことで、サイドバーと llms-*.txt に混ざらないようにしている。
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import Landing, { frontmatter } from "../../content/index.mdx";
+---
+
+<StarlightPage frontmatter={frontmatter}>
+  <Landing />
+</StarlightPage>
