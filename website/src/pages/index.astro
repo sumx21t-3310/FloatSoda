@@ -1,0 +1,26 @@
+---
+// サイトのトップ(ランディング)。本文は website/content/index.mdx にある。
+// docs コレクション(docs/ から生成)の外に置くことで、サイドバーと llms-*.txt に混ざらないようにしている。
+//
+// 導線(3 系統の入口と主要ページへのリンク先)は scripts/sync-docs.mjs が docs/ の実在から計算して
+// src/generated/landing.json に書き出す。#188 の再編で系統ディレクトリ(docs/user/ など)が現れると
+// 3 入口は自動で切り替わり、ページが消えたり改名されたりすれば sync の時点で例外になる。
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import Landing, { frontmatter } from "../../content/index.mdx";
+import landing from "../generated/landing.json";
+
+const { tracks, links } = landing;
+
+const hero = {
+  ...frontmatter.hero,
+  actions: [
+    { text: "はじめる", link: links.gettingStarted, icon: "right-arrow" },
+    { text: "ドキュメント一覧", link: links.home, variant: "secondary" },
+    { text: "GitHub", link: "https://github.com/sumx21t-3310/FloatSoda", icon: "external", variant: "minimal" },
+  ],
+};
+---
+
+<StarlightPage frontmatter={{ ...frontmatter, hero }}>
+  <Landing tracks={tracks} links={links} />
+</StarlightPage>
