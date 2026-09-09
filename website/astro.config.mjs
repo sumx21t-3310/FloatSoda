@@ -22,8 +22,11 @@ export default defineConfig({
       editLink: { baseUrl: `${repositoryUrl}/edit/main/` },
       lastUpdated: true,
       plugins: [
-        // 配色テーマ。既定はダーク mocha / ライト latte(flavor と accent で変更できる)
-        catppuccin(),
+        // 配色テーマ(Catppuccin)。ライトは latte / sapphire、ダークは frappe / blue
+        catppuccin({
+          light: { flavor: "latte", accent: "sapphire" },
+          dark: { flavor: "frappe", accent: "blue" },
+        }),
         starlightLlmsTxt({
           projectName: "FloatSoda",
           description:
