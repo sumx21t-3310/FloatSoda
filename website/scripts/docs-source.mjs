@@ -1,6 +1,6 @@
 /**
  * docs/ をサイトのソースとして読むための共有モジュール。
- * astro.config.mjs(サイト URL・サイドバー)、scripts/sync-docs.mjs(ページ生成)、
+ * astro.config.mjs(サイト URL・サイドバー・LLM 向け出力)、scripts/sync-docs.mjs(ページ生成)、
  * scripts/verify-dist.mjs(検査)、src/pages/index.astro(ランディングの導線)が使う。
  * サイト URL とリポジトリ URL の定義はここ 1 箇所に置く。
  *
@@ -8,7 +8,7 @@
  *   docs/Home.md            → /home/        ドキュメント全体の入口
  *   docs/user/Home.md       → /user/        系統(User Guide)の入口
  *   docs/user/Concepts.md   → /user/concepts/
- * 系統ディレクトリが 1 つのサイドバーグループになる。
+ * 系統ディレクトリが 1 つのサイドバーグループになり、LLM 向けの分割ファイル(_llms-txt/<key>.txt)の単位にもなる。
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -23,6 +23,12 @@ export const repositoryUrl = "https://github.com/sumx21t-3310/FloatSoda";
 
 /** 各階層の入口ページ。docs/Home.md はドキュメント全体、docs/<dir>/Home.md はその系統の入口 */
 export const HOME = "Home";
+
+/**
+ * docs/ 直下のページを「対象読者」列でグループ化するときの ASCII キー(#188 の再編までの暫定)。
+ * 系統ディレクトリ(user / contributor / api)と同じ語にして、_llms-txt/<key>.txt のファイル名を再編の前後で揃える
+ */
+const AUDIENCE_KEYS = { 利用者: "user", コントリビュータ: "contributor" };
 
 /**
  * docs/ 配下の .md を再帰的に列挙する。要素は次の形:
@@ -105,6 +111,11 @@ function readDoc(rel) {
   return fs.readFileSync(path.join(docsDir, `${rel}.md`), "utf8");
 }
 
+/** ページのタイトル(先頭の H1)。無ければファイル名 */
+export function titleOf(rel) {
+  return firstHeading(readDoc(rel)) ?? rel.split("/").pop();
+}
+
 /** Home.md 本文からリンク先(docs/ からの相対パス、拡張子なし)を出現順に返す。重複なし */
 function linkedRels(homeRel, homeDir) {
   if (!fs.existsSync(path.join(docsDir, `${homeRel}.md`))) return [];
@@ -143,7 +154,7 @@ export function homeSummaries() {
 }
 
 /**
- * サイドバーのグループを返す(`[{ label, rels }]`)。
+ * サイドバーのグループを返す(`[{ key, label, rels }]`)。key は ASCII で、_llms-txt/<key>.txt のファイル名にも使う。
  *
  * 1. docs/ 直下のページ: Home.md の表の「対象読者」列でグループ化し、表の行順を読む順にする。
  *    #188 の再編で全ページが系統ディレクトリへ移るまでの暫定で、移り終わったらこの分岐は消す
@@ -153,10 +164,10 @@ export function homeSummaries() {
 export function sidebarGroups() {
   const docs = listDocs();
   const groups = [];
-  const push = (label, rel) => {
-    let group = groups.find((g) => g.label === label);
+  const push = (key, label, rel) => {
+    let group = groups.find((g) => g.key === key);
     if (!group) {
-      group = { label, rels: [] };
+      group = { key, label, rels: [] };
       groups.push(group);
     }
     if (!group.rels.includes(rel)) group.rels.push(rel);
@@ -168,10 +179,11 @@ export function sidebarGroups() {
     for (const row of rows) {
       // 「利用者 / コントリビュータ」は先頭の読者。Markdown 装飾は落とし、空セルは「その他」へ
       const audience = row.audience.split("/")[0].replace(/[*_`]/g, "").trim();
-      push(audience ? `${audience}向け` : "その他", row.name);
+      if (audience) push(AUDIENCE_KEYS[audience] ?? "other", `${audience}向け`, row.name);
+      else push("other", "その他", row.name);
     }
     for (const doc of topLevel) {
-      if (!rows.some((row) => row.name === doc.name)) push("その他", doc.rel);
+      if (!rows.some((row) => row.name === doc.name)) push("other", "その他", doc.rel);
     }
   }
 
@@ -191,12 +203,40 @@ export function sidebarGroups() {
     const homeRel = `${dir}/${HOME}`;
     const home = pages.find((doc) => doc.rel === homeRel);
     const label = (home && firstHeading(readDoc(homeRel))) || dir;
-    if (home) push(label, homeRel);
+    const key = dir.toLowerCase();
+    if (home) push(key, label, homeRel);
     for (const rel of linkedRels(homeRel, dir)) {
-      if (pages.some((doc) => doc.rel === rel)) push(label, rel);
+      if (pages.some((doc) => doc.rel === rel)) push(key, label, rel);
     }
-    for (const doc of pages) push(label, doc.rel);
+    for (const doc of pages) push(key, label, doc.rel);
   }
 
   return groups;
+}
+
+/**
+ * starlight-llms-txt の customSets。サイドバーのグループ(系統)ごとに _llms-txt/<key>.txt を出す。
+ * llms-full.txt(約 13 万文字)を読み切れない取得経路でも、系統単位なら 1 回で読める(各 7 万文字以下)。
+ * label がそのままファイル名になるので ASCII の key を使い、人間向けの名前は description に書く
+ */
+export function llmsCustomSets() {
+  return sidebarGroups().map((group) => ({
+    label: group.key,
+    description: `${group.label}のページ(${group.rels.map((rel) => rel.split("/").pop()).join(" / ")})`,
+    paths: group.rels.map(slugOf),
+  }));
+}
+
+/**
+ * llms.txt に載せる全ページの索引。各ページの素の Markdown(/<slug>.md)へのリンクと一行説明。
+ * 取得上限が小さい経路でも、必要なページだけを取りに行けるようにする。並びはサイドバーと同じ
+ */
+export function llmsPageLinks() {
+  const summaries = homeSummaries();
+  const rels = [HOME, ...sidebarGroups().flatMap((group) => group.rels)];
+  return rels.map((rel) => ({
+    label: titleOf(rel),
+    url: `${siteUrl}/${slugOf(rel)}.md`,
+    description: summaries.get(rel),
+  }));
 }

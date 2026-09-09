@@ -3,7 +3,15 @@ import starlight from "@astrojs/starlight";
 import catppuccin from "@catppuccin/starlight";
 import mermaid from "astro-mermaid";
 import starlightLlmsTxt from "starlight-llms-txt";
-import { repoRoot, repositoryUrl, sidebarGroups, siteUrl, slugOf } from "./scripts/docs-source.mjs";
+import {
+  llmsCustomSets,
+  llmsPageLinks,
+  repoRoot,
+  repositoryUrl,
+  sidebarGroups,
+  siteUrl,
+  slugOf,
+} from "./scripts/docs-source.mjs";
 
 export default defineConfig({
   site: siteUrl,
@@ -32,8 +40,12 @@ export default defineConfig({
           description:
             "SteamVR Overlay を Flutter のような宣言的 UI で作る .NET 10 / C# 14 向けフレームワーク。UI はすべて C# コードで書き、シーンや外部アセットを持たない",
           details:
-            "ドキュメントは日本語で書かれている。各ページの素の Markdown は https://floatsoda.sumx21t.com/<page>.md で取得できる。ソースは GitHub リポジトリの docs/ で、XML ドキュメントコメントと合わせて事実情報の正典になる",
+            "ドキュメントは日本語で書かれている。全文は llms-full.txt、系統ごとの分割は Documentation Sets に列挙した _llms-txt/<系統>.txt、各ページの素の Markdown は Optional の一覧(https://floatsoda.sumx21t.com/<page>.md)から取得できる。取得できる文字数に上限がある場合は、系統ごとのファイルかページ単位を使う。ソースは GitHub リポジトリの docs/ で、XML ドキュメントコメントと合わせて事実情報の正典になる",
+          // 系統ごとの分割ファイル(/_llms-txt/user.txt など。パスはプラグインの仕様)。取得上限のある LLM でも 1 回で読める大きさにする
+          customSets: llmsCustomSets(),
+          // 全ページの索引。ページ単位で /<slug>.md を取りに行けるようにする
           optionalLinks: [
+            ...llmsPageLinks(),
             {
               label: "GitHub リポジトリ",
               url: repositoryUrl,

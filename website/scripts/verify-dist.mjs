@@ -13,7 +13,15 @@
  */
 import fs from "node:fs";
 import path from "node:path";
-import { docsDir, firstHeading, listDocs, slugOf, websiteDir } from "./docs-source.mjs";
+import {
+  docsDir,
+  firstHeading,
+  listDocs,
+  llmsCustomSets,
+  llmsPageLinks,
+  slugOf,
+  websiteDir,
+} from "./docs-source.mjs";
 
 const distDir = path.join(websiteDir, "dist");
 const failures = [];
@@ -74,6 +82,31 @@ if (fs.existsSync(llmsFullPath)) {
   }
 }
 
+// 2b. 系統ごとの分割ファイル(_llms-txt/<key>.txt。starlight-llms-txt の customSets の出力先)に、その系統の全ページが入っている
+for (const set of llmsCustomSets()) {
+  const relPath = `_llms-txt/${set.label}.txt`;
+  const file = path.join(distDir, relPath);
+  if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
+    failures.push(`${relPath} missing or empty`);
+    continue;
+  }
+  const body = fs.readFileSync(file, "utf8");
+  for (const slug of set.paths) {
+    const doc = docs.find((d) => slugOf(d.rel) === slug);
+    const title = doc && firstHeading(fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8"));
+    if (title && !body.includes(title)) failures.push(`${relPath} lacks page: ${slug} ("${title}")`);
+  }
+}
+
+// 2c. llms.txt(索引)に全ページの素の Markdown へのリンクがある
+const llmsIndexPath = path.join(distDir, "llms.txt");
+if (fs.existsSync(llmsIndexPath)) {
+  const llmsIndex = fs.readFileSync(llmsIndexPath, "utf8");
+  for (const link of llmsPageLinks()) {
+    if (!llmsIndex.includes(link.url)) failures.push(`llms.txt lacks page link: ${link.url}`);
+  }
+}
+
 // 3. サイト内リンクとアンカー
 const idCache = new Map();
 function idsOf(file) {
@@ -109,7 +142,11 @@ function* textFiles(dir) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       if (!["_astro", "pagefind"].includes(entry.name)) yield* textFiles(full);
-    } else if (/^llms.*\.txt$/.test(entry.name) || entry.name.endsWith(".md")) {
+    } else if (
+      /^llms.*\.txt$/.test(entry.name) ||
+      entry.name.endsWith(".md") ||
+      (path.basename(dir) === "_llms-txt" && entry.name.endsWith(".txt"))
+    ) {
       yield full;
     }
   }
