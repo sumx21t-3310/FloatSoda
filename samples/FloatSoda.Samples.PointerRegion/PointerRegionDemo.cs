@@ -9,8 +9,9 @@ using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
+using PointerRegionWidget = FloatSoda.Widgets.Gesture.PointerRegion;
 
-namespace FloatSoda.Samples.PointerRegionSample;
+namespace FloatSoda.Samples.PointerRegion;
 
 /// <summary>
 /// Dashboardレーザー入力のEnter、Exit、Cancel、およびTapを目視確認するサンプルです。
@@ -70,7 +71,7 @@ public sealed class PointerRegionDemoState : State<PointerRegionDemo>
 
     private Widget BuildInteractiveRegion()
     {
-        return new PointerRegion
+        return new PointerRegionWidget
         {
             OnPointerEnter = HandleEnter,
             OnPointerExit = HandleExit,
@@ -84,22 +85,28 @@ public sealed class PointerRegionDemoState : State<PointerRegionDemo>
                 {
                     Behaviour = HitTestBehaviour.Opaque,
                     OnTap = HandleTap,
-                    Child = new ClipRoundRect
+                    Child = BuildTarget()
+                }
+            }
+        };
+    }
+
+    /// <summary>状態に応じて色とラベルが変わる的(まと)を構築します。</summary>
+    private Widget BuildTarget()
+    {
+        return new ClipRoundRect
+        {
+            BorderRadius = BorderRadius.All(Radius.Circular(28)),
+            Child = new SizedBox
+            {
+                Width = 520,
+                Height = 300,
+                Child = new ColoredBox
+                {
+                    Color = RegionColor,
+                    Child = new Center
                     {
-                        BorderRadius = BorderRadius.All(Radius.Circular(28)),
-                        Child = new SizedBox
-                        {
-                            Width = 520,
-                            Height = 300,
-                            Child = new ColoredBox
-                            {
-                                Color = RegionColor,
-                                Child = new Center
-                                {
-                                    Child = BuildText(RegionLabel, 52, SKColors.White, 700)
-                                }
-                            }
-                        }
+                        Child = BuildText(RegionLabel, 52, SKColors.White, 700)
                     }
                 }
             }
