@@ -94,7 +94,7 @@ User docs は、公開 API と API Reference と合わせて、**#188 の層3(�
 | ウィジェットの最小の使用例 | サンプルの README(構成は [CONTRIBUTING.md](../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
 | 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | Contributor Architecture |
 | 設計理由と採用しなかった選択肢 | Contributor Design |
-| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | Contributor Requirements |
+| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | Contributor Requirements。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の正典は [REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../AGENTS.md) の規約表) |
 | API 設計の原則と Flutter parity / divergence の判断基準 | [APIDesign](APIDesign.md) |
 | 確認済みの Flutter との差異 | [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) |
 | 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) |
@@ -258,12 +258,12 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 
 実装を変えても**維持する条件**を書きます。読者は、変更が何を壊しうるかを確認するコントリビュータとレビュアーです。
 
-Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算しています。再編で Requirements のページを作るときは、REVIEW.md の 4 章を出発点にし、REVIEW.md 側はそのページへのリンクにします。
+Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算しています。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の正典は REVIEW.md の 4 章のままです([AGENTS.md](../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずリンクし、4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)を Requirements 側に書きます。
 
 書くもの:
 
 - **適用範囲** — どのツリー、型、操作に効くか
-- **必須条件と不変条件** — 「常に成り立つ」形で書きます(例: REVIEW.md の「adopt / drop は代入のたびに対称に走るか」「drop 後に `Parent` が `null` に戻るか」を、確認の問いではなく条件の文にしたもの)
+- **必須条件と不変条件** — 「常に成り立つ」条件の文で書きます。REVIEW.md の 4 章にある確認の問い(「drop 後に `Parent` が `null` に戻るか」)の裏返しの形です。4 章にある条件は複製せずリンクします
 - **Observable behavior** — 利用者とテストから観測できる契約(例: BuildPipeline の「Widget にも RenderObject にも変更がないフレームでは、レイアウト・ペイント・合成のすべてがスキップされます」は、Requirements へ移せる observable behavior)
 - **破ったときの failure mode** — どの入力・状態で、何が壊れるか。REVIEW.md の finding の基準(concrete failure mode)と同じ粒度で書きます(例: REVIEW.md の「Layer の clone 後に可変オブジェクトを共有するとデータレースになり、テストではまず落ちない」)
 - **検証方法** — 条件を固定しているテストのファイルとメソッド名。無ければ「未設定」と明示します。台帳の `Test: — (not set)` と同じで、未設定は完了した記録ではなく未処理のタスクです
@@ -322,7 +322,7 @@ Requirements の独立したページはまだありません。いちばん近�
 - [APIDesign](APIDesign.md) — API 設計の原則と Flutter parity
 - [TargetUsers](TargetUsers.md) — 想定する3タイプの作り手
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — 開発・PR・テスト・サンプルの規約
-- [REVIEW.md](../REVIEW.md) — レビューの判断基準。「4. FloatSoda 固有の不変条件」は Requirements の実物に最も近い
+- [REVIEW.md](../REVIEW.md) — レビューの判断基準と、ツリーの不変条件の正典(「4. FloatSoda 固有の不変条件」)
 - [TestStrategy](TestStrategy.md) — テストの置き場所を決める地図
 - [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) — ドキュメント・サンプルの情報設計
 - [Issue #219](https://github.com/sumx21t-3310/FloatSoda/issues/219) — 公開サイト(`docs/` の構造がそのままサイトの構造になります)
