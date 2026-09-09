@@ -391,7 +391,7 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 
 ## ドキュメントを更新する場合の注意
 
-`docs/*.md` は `.github/workflows/sync-wiki.yml` によって GitHub Wiki に自動同期されます。**Wiki側を直接編集しても同期時に上書きされる**ため、ドキュメントの変更は必ず `docs/` 配下のファイルに対して行ってください。
+`docs/*.md` は `.github/workflows/sync-wiki.yml` によって GitHub Wiki に自動同期されます。同じ `docs/` から公開サイト(`website/`)もビルドされます(`.github/workflows/docs-site.yml`)。**Wiki側を直接編集しても同期時に上書きされる**ため、ドキュメントの変更は必ず `docs/` 配下のファイルに対して行ってください。
 
 ---
 
