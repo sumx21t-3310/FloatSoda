@@ -43,13 +43,13 @@ export default defineConfig({
           rawContent: true,
         }),
       ],
-      // サイドバーは docs/Home.md の「ページ一覧」表を正典にする。
-      // 「対象読者」列でグループ化し、表の行順を各グループ内の読む順にする
+      // サイドバーは docs/ の構造を正典にする(#188)。系統ディレクトリ(docs/user/ など)が 1 グループ。
+      // docs/ 直下のページは再編が済むまで、docs/Home.md の表の「対象読者」列でグループ化する。詳細は scripts/docs-source.mjs
       sidebar: [
         { slug: "home" },
         ...sidebarGroups().map((group) => ({
           label: group.label,
-          items: group.names.map((name) => ({ slug: slugOf(name) })),
+          items: group.rels.map((rel) => ({ slug: slugOf(rel) })),
         })),
       ],
     }),

@@ -4,4 +4,5 @@ dist/
 
 # scripts/sync-docs.mjs が ../docs から生成する。ソースは docs/ 側を編集する
 src/content/docs/
-public/*.md
+public/**/*.md
+src/generated/

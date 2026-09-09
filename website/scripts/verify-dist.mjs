@@ -4,13 +4,13 @@
  *
  * 検査内容:
  * 0. ランディング(サイト専用ページ)が生成されている
- * 1. docs/ の全ページが HTML と素の Markdown の両方で生成されている
+ * 1. docs/ の全ページ(サブディレクトリ込み)が HTML と素の Markdown の両方で生成されている
  * 2. llms.txt / llms-full.txt が存在し、llms-full.txt に全ページのタイトルが含まれる
  * 3. HTML 内のサイト内リンク(href="/…")の遷移先ページとアンカー(#…)が実在する
  */
 import fs from "node:fs";
 import path from "node:path";
-import { docsDir, listDocNames, slugOf, websiteDir } from "./docs-source.mjs";
+import { docsDir, firstHeading, listDocs, slugOf, websiteDir } from "./docs-source.mjs";
 
 const distDir = path.join(websiteDir, "dist");
 const failures = [];
@@ -50,11 +50,11 @@ function* htmlFiles(dir) {
 if (!fs.existsSync(path.join(distDir, "index.html"))) failures.push("landing page missing: index.html");
 
 // 1. ページの存在
-const names = listDocNames();
-for (const name of names) {
-  const slug = slugOf(name);
-  if (!fs.existsSync(pageFile(slug))) failures.push(`page missing: ${slug} (docs/${name}.md)`);
-  if (!fs.existsSync(path.join(distDir, `${slug}.md`))) failures.push(`raw markdown missing: ${slug}.md`);
+const docs = listDocs();
+for (const doc of docs) {
+  const slug = slugOf(doc.rel);
+  if (!fs.existsSync(pageFile(slug))) failures.push(`page missing: /${slug}/ (docs/${doc.rel}.md)`);
+  if (!fs.existsSync(path.join(distDir, `${slug}.md`))) failures.push(`raw markdown missing: /${slug}.md`);
 }
 
 // 2. llms.txt
@@ -65,10 +65,9 @@ for (const file of ["llms.txt", "llms-full.txt"]) {
 const llmsFullPath = path.join(distDir, "llms-full.txt");
 if (fs.existsSync(llmsFullPath)) {
   const llmsFull = fs.readFileSync(llmsFullPath, "utf8");
-  for (const name of names) {
-    const source = fs.readFileSync(path.join(docsDir, `${name}.md`), "utf8");
-    const title = source.match(/^#\s+(.+)$/m)?.[1]?.trim();
-    if (title && !llmsFull.includes(title)) failures.push(`llms-full.txt lacks page: ${name} ("${title}")`);
+  for (const doc of docs) {
+    const title = firstHeading(fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8"));
+    if (title && !llmsFull.includes(title)) failures.push(`llms-full.txt lacks page: ${doc.rel} ("${title}")`);
   }
 }
 
@@ -106,4 +105,4 @@ if (failures.length > 0) {
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exit(1);
 }
-console.log(`verify-dist: OK (${names.length} pages, ${linkCount} internal links checked)`);
+console.log(`verify-dist: OK (${docs.length} pages, ${linkCount} internal links checked)`);
