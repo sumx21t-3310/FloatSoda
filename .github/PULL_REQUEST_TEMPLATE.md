@@ -34,7 +34,10 @@ Flutter 由来でなければ N/A と書いてください。
 
 ## Documentation
 
-<!-- ドキュメント更新の有無。更新が不要と判断した場合、その判断が必要な変更であればなぜ不要かを書いてください。 -->
+<!--
+変更種別(public API / observable behavior / 公開制約 / 内部実装 / 設計判断 / invariant / Flutter divergence / 代表ユースケース / サンプル)と、更新した正典(XML ドキュメントコメント / User docs / Contributor docs / サンプル)を書いてください。
+更新が不要と判断した場合は、その理由を書いてください。判断基準は docs/WritingDocumentation.md の Documentation Impact Matrix です。
+-->
 
 ## Scope / follow-up
 
