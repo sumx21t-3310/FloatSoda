@@ -20,14 +20,16 @@
 | [Input](Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) | 利用者 |
 | [APIDesign](APIDesign.md) | API 設計規約(コンポーネント設計・命名・イミュータビリティ) | コントリビュータ |
 | [DocumentationComments](DocumentationComments.md) | ドキュメントコメント規約(適用範囲・契約・副作用の明記) | コントリビュータ |
+| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・正典の対応表・変更時に更新する文書) | コントリビュータ |
 | [Localization](Localization.md) | ローカライゼーション方針(日本語デフォルト・resx・サテライトXML) | コントリビュータ |
+| [TestStrategy](TestStrategy.md) | テスト戦略(範囲 × 目的 × オラクルの3軸・現在の配置・既知の穴) | コントリビュータ |
 
 ## どこから読むか
 
 自分がどのタイプの作り手かを [TargetUsers](TargetUsers.md) で確認すると、最短の読み進め方がわかります。
 
 - **FloatSoda でオーバーレイを作りたい** → [GettingStarted](GettingStarted.md) → [WidgetSystem](WidgetSystem.md) → [OVRIntegration](OVRIntegration.md)
-- **フレームワークの内部を理解したい / コントリビュートしたい** → [Architecture](Architecture.md) → [BuildPipeline](BuildPipeline.md) → [RenderObjects](RenderObjects.md) → [APIDesign](APIDesign.md) → [DocumentationComments](DocumentationComments.md)
+- **フレームワークの内部を理解したい / コントリビュートしたい** → [Architecture](Architecture.md) → [BuildPipeline](BuildPipeline.md) → [RenderObjects](RenderObjects.md) → [APIDesign](APIDesign.md) → [DocumentationComments](DocumentationComments.md) → [WritingDocumentation](WritingDocumentation.md)
 
 ## 全体像: 三つのツリー
 
@@ -90,7 +92,7 @@ graph LR
 | Phase | 残件 |
 |---|---|
 | Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
-| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`DefaultTextStyle`、`ViewMetrics`(`MediaQuery` 相当)、`Container` への `Padding` 合成 |
+| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当) |
 
 ## 実装状況サマリ
 
@@ -119,7 +121,7 @@ graph LR
 | `ParentDataWidget<T>`(`Expanded` / `Flexible` / `Positioned` の基盤) | ✓ 実装済み |
 | `Key` による Element 再利用(`Widget.CanUpdate` = 型 + Key) | ✓ 実装済み |
 | アニメーション(`AnimationController` / `Ticker` / `Curve`・`Curves` / `FadeTransition`) | ✓ 実装済み |
-| テキスト表示(`Text` / `RichText` / `TextSpan` / `TextStyle`) | ✓ 実装済み |
+| テキスト表示(`Text` / `RichText` / `TextSpan` / `TextStyle` / `DefaultTextStyle`) | ✓ 実装済み |
 | 画像表示(描画系の `Paint.Image` + `FileImageProvider`) | ✓ 実装済み |
 | アイコン表示(描画系の `Paint.Icon` + `IconData` / `FontProvider`) | ✓ 実装済み |
 | レイアウト系ウィジェット(`Padding` / `Stack` / `Wrap` / `Expanded` / `AspectRatio` ほか) | ✓ 実装済み(→ [WidgetSystem](WidgetSystem.md#組み込みウィジェット一覧)) |
@@ -128,7 +130,7 @@ graph LR
 | ヒットテスト(座標 → RenderObject の特定) | ✓ 実装済み |
 | ジェスチャ認識(`GestureDetector` / `Listener` / タップ・パン) | ✓ 実装済み |
 | ポインタ入力源(SteamVR レーザーポインターの接続) | △ 部分実装(ダッシュボードオーバーレイのみ) |
-| `Container` | △ 部分実装(`Padding` の合成が未対応) |
+| `Container` | ✓ 実装済み(`Padding` の合成を含む) |
 | UI3層構成(`FloatSoda.UI` ヘッドレス / `Cream` / `FizzyPop`) | 予定(Phase 5)。NuGet 未配布・骨組みのみ(→ [UILayering](UILayering.md#実装状況)) |
 | Hooks(`FloatSoda.Hooks` / R3 ベースの `UseState`) | △ 部分実装(フレームワーク未統合) |
 | スクロール(`ListView` / `GridView` / `SingleChildScrollView`) | ✗ 未実装(`internal`) |

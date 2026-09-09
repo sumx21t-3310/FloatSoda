@@ -6,7 +6,7 @@
 > - **✓** Widget / Element / State の基盤(`StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>`、`BuildOwner` による差分ビルド、`Key` 対応の子リスト差分)
 > - **✓** ツリー補助の `Builder` / `KeyedSubtree` / `RepaintBoundary` / `ListenableBuilder`
 > - **✓** レイアウト系・描画系・入力系のウィジェット。**下の[一覧](#組み込みウィジェット一覧)で `✓` が付いているものが使えます**
-> - **△** `Container`(`Padding` の合成が未対応)、`FloatSoda.Hooks`(ビルドループと未統合)
+> - **△** `FloatSoda.Hooks`(ビルドループと未統合)
 > - **✗** スクロール系の `ListView` / `GridView` / `SingleChildScrollView`
 > - **予定** `Button` / `Icon` を担う UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 の予定で、まだ提供していません。ボタンは `GestureDetector` で組み立ててください(→ [押せるボタンを作る](#押せるボタンを作る))
 
@@ -330,16 +330,15 @@ public override Widget Build(IBuildContext context)
 | `FractionallySizedBox` | ✓ | 親の最大寸法に対する割合を子へtight制約として適用し、子を配置 | `WidthFactor`, `HeightFactor`, `Alignment`, `Child` |
 | `OverflowBox` | ✓ | 親とは異なる制約を子へ渡し、自身の領域外への描画を許可 | `MinWidth`, `MaxWidth`, `MinHeight`, `MaxHeight`, `Fit`, `Alignment`, `Child` |
 | `SizedOverflowBox` | ✓ | 自身は指定サイズを採り、子へ親の元の制約を渡して配置 | `Size` (`Size`, 必須), `Alignment`, `Child` |
-| `Container` | △ 部分実装 | 配置・装飾・寸法・変換を1つのウィジェットで合成。`Padding` の合成は未対応 | `Alignment`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
+| `Container` | ✓ | 配置・余白・装飾・寸法・変換を1つのウィジェットで合成 | `Alignment`, `Padding`, `Color`, `Decoration`, `Width`, `Height`, `Transform`, `TransformAlignment`, `Child` |
 | `ListView` | ✗ 未実装(`internal`) | スクロール可能なリスト | — |
 | `GridView` | ✗ 未実装(`internal`) | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ 未実装(`internal`) | 単一子をスクロール | — |
 
-`Container` は、`Align` / `DecoratedBox` / `SizedBox` / `Transform` の組み合わせを1つのウィジェットにまとめた合成ウィジェットです。
-指定したプロパティに対応するウィジェットだけを、内側から配置・装飾・寸法・変換の順で重ねます。
+`Container` は、`Align` / `Padding` / `DecoratedBox` / `SizedBox` / `Transform` の組み合わせを1つのウィジェットにまとめた合成ウィジェットです。
+指定したプロパティに対応するウィジェットだけを、内側から配置・余白・装飾・寸法・変換の順で重ねます。
+`Padding` は装飾の内側に入るため、余白の分だけ子が装飾より小さくなります。
 `Color` と `Decoration` を同時に指定すると `InvalidOperationException` になります。背景色と角丸を両方使う場合は `BoxDecoration.Color` へまとめてください。
-
-**`Container` にはまだ `Padding` プロパティがありません。** 内側に余白を入れる場合は `Padding` を明示的に入れ子にします。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -350,17 +349,13 @@ using FloatSoda.Widgets.Layout;
 Widget card = new Container
 {
     Width = 320,
+    Padding = EdgeInsets.All(16),
     Decoration = new BoxDecoration
     {
         Color = new Color(32, 32, 40),
         BorderRadius = BorderRadius.Circular(12)
     },
-    // Container 自身は Padding を合成しないため、余白は明示的に入れ子にする。
-    Child = new Padding
-    {
-        Spacing = EdgeInsets.All(16),
-        Child = new Text("VRChat: Online")
-    }
+    Child = new Text("VRChat: Online")
 };
 ```
 
@@ -591,6 +586,7 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 |---|---|---|---|
 | `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
 | `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
+| `DefaultTextStyle` | ✓ | 配下の `Text` へ既定のテキスト書式を伝播する `InheritedWidget` | `Style` (`TextStyle`), `Child` |
 | `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Fit`, `Alignment`, `Child`, `OnError` |
 | `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
 
@@ -599,7 +595,9 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 `FittedBox` が `ClipBehavior` を持つのに `Paint.Image` が持たないのは、この違いによるものです。`FittedBox` は描画元を切り取れない子ウィジェットを拡大縮小するため切り抜きが要りますが、`Paint.Image` は描画元の矩形自体を狭められます。
 
 
-`Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。`Style` を省略すると、フォントサイズ30、Arial、黒、ウェイト400の既定書式を使用します。空文字列は有効です。
+`Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。空文字列は有効です。
+
+書式は Flutter と同じ優先順位で解決します: **明示指定 > 祖先の `DefaultTextStyle` > フレームワークの既定値**(フォントサイズ30、Arial、黒、ウェイト400)。`TextStyle` の各プロパティは `null` を「未指定」として扱い、未指定のプロパティだけが継承で埋まります。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -619,6 +617,25 @@ new Text("Hello, VR!")
     }
 }
 ```
+
+複数の `Text` へ同じ書式を適用するときは、`DefaultTextStyle` で祖先から伝播させます。配下の `Text` は明示したプロパティだけを上書きし、残りを継承します。`DefaultTextStyle` の `Style` を変更すると、依存する `Text` は自動で再ビルドされます。
+
+```csharp
+new DefaultTextStyle
+{
+    Style = new TextStyle { FontSize = 36, Color = new Color(255, 255, 255) },
+    Child = new Column
+    {
+        Children =
+        [
+            new Text("タイトル"),                                                  // 36px・白
+            new Text("強調") { Style = new TextStyle { Color = new Color(255, 200, 0) } } // 36px・黄
+        ]
+    }
+}
+```
+
+継承させたくない `Text` には、`Inherit = false` の `TextStyle` を指定します。この場合、未指定のプロパティにはフレームワークの既定値が適用されます。
 
 システムにないフォントは `FileFontProvider` で指定します。同じ値のProviderは内部で共有され、複数の `Text` / `Icon` から使ってもフォントリソースは一度だけ読み込まれます。
 

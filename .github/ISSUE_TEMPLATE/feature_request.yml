@@ -1,6 +1,6 @@
 name: Feature request
 description: 新しい機能や API を提案する
-labels: ["enhancement"]
+labels: ["feature"]
 body:
   - type: markdown
     attributes:

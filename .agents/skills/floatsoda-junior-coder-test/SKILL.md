@@ -1,151 +1,159 @@
 ---
 name: floatsoda-junior-coder-test
 description: >-
-  Run FloatSoda's junior-coder test — hand a lower-effort LLM (default Sonnet 5, effort
-  medium) only the public docs and a realistic VRChatter feature request, have it vibe-code
-  the tool in an isolated scratch project as a black box, then triage every failure against
-  the real FloatSoda source to surface docs bugs, library bugs, and API-discoverability gaps.
-  Use whenever the user wants to dogfood or stress-test FloatSoda's docs or public API, mentions
-  a "junior coder test", "vibe coding test", "ジュニアコーダーテスト", "バイブコーディングテスト",
-  wants to check whether an LLM can build something from FloatSoda's docs alone, or wants to find
-  where the docs/API mislead an LLM. Reach for this even if the user just describes the workflow
-  ("let a junior model try to build X with FloatSoda and see what breaks") without naming it.
+  FloatSoda のジュニアコーダーテストを実行する — 低エフォートの LLM(既定は Sonnet 5、effort
+  medium)に公開 docs と現実的な VRChatter の機能要望だけを渡し、隔離されたスクラッチ
+  プロジェクトでツールをブラックボックスとしてバイブコーディングさせ、すべての失敗を
+  FloatSoda の実ソースと突き合わせてトリアージし、docs のバグ・ライブラリのバグ・API の
+  発見性ギャップを炙り出す。FloatSoda の docs や public API をドッグフーディング/ストレス
+  テストしたいとき、「junior coder test」「vibe coding test」「ジュニアコーダーテスト」
+  「バイブコーディングテスト」に言及されたとき、LLM が FloatSoda の docs だけから何かを
+  作れるか確かめたいとき、docs/API が LLM をどこで惑わすかを探したいときに使う。
+  名前を出さずにワークフローだけ説明された場合(「ジュニアなモデルに FloatSoda で X を
+  作らせて何が壊れるか見て」)でもこのスキルに手を伸ばすこと。
 ---
 
-# FloatSoda Junior-Coder Test
+# FloatSoda ジュニアコーダーテスト
 
-## Why this exists
+## このスキルが存在する理由
 
-FloatSoda's #1 persona is a VRChatter who barely writes code — an LLM writes it for them. So the
-real reader of the docs and the API surface is an LLM, and the design goal is "an LLM cannot misuse
-this API." This skill operationalizes that goal: it uses a **lower-effort model as a stand-in for
-that junior coder**, gives it nothing but the public docs and a realistic task, and then rigorously
-triages where it stumbled. Every stumble is a signal — either the docs led it astray, the library
-has a bug, or the API is easy to misuse.
+FloatSoda のペルソナ①は、ほとんどコードを書かない VRChatter — 代わりに LLM が書く。つまり
+docs と API サーフェスの本当の読者は LLM で、設計ゴールは「LLM がこの API を誤用できないこと」。
+このスキルはそのゴールを運用に落とす: **低エフォートのモデルをそのジュニアコーダーの代役**に
+立て、公開 docs と現実的なタスクだけを渡し、つまずいた箇所を厳密にトリアージする。つまずきは
+すべてシグナル — docs が迷わせたか、ライブラリにバグがあるか、API が誤用しやすいかのいずれか。
 
-This is a proven test: a first run (Sonnet 5, medium) surfaced two real library bugs — a docs-recommended
-frame limiter that crashed every overlay, and an infinite recursion on dynamic child removal. See the
-running log in memory: `vibe-coding-test-sonnet5-result`.
+これは実証済みのテスト: 初回の実行(Sonnet 5、medium)で実在のライブラリバグを2つ炙り出した —
+docs が推奨するフレームリミッターが全オーバーレイをクラッシュさせる件と、動的な子の削除での
+無限再帰。実行ログは memory の `vibe-coding-test-sonnet5-result` にある。
 
-## The one rule that makes the test valid: black box
+## テストを成立させる唯一のルール: ブラックボックス
 
-The junior model must experience FloatSoda **exactly as a NuGet consumer would** — through the docs
-only. It must never read `src/`. If it can peek at the implementation, the test no longer measures
-docs/API quality, which is the whole point. Enforce this in the subagent prompt (below) and by keeping
-its working directory outside the FloatSoda repo tree.
+ジュニアモデルは FloatSoda を **NuGet の利用者とまったく同じように** — docs だけを通して —
+体験しなければならない。`src/` は決して読ませない。実装を覗けてしまったら、テストはもはや
+docs/API の品質を測っておらず、それが目的のすべてだったはず。これはサブエージェントのプロンプト
+(後述)で強制し、作業ディレクトリを FloatSoda のリポジトリツリーの外に置くことでも強制する。
 
-## Two ways this runs as a gate
+## ゲートとしての2つの使われ方
 
-This test is not just ad-hoc — it backs two process gates. The workflow below is the same; only how you
-pick the task (step 1) differs.
+このテストは場当たりな実行だけのものではない — 2つのプロセスゲートを支えている。ワークフローは
+同じで、タスクの選び方(手順1)だけが異なる。
 
-- **Release gate** (see `RELEASING.md`): run before tagging a release, on the release commit. Use a **main**
-  or **hard** task and **rotate the theme** each release (toast / photo album / FaceEmo) so the surface isn't
-  overfit to one scenario. Blocks the release if a docs bug (ⓑ) or library bug (ⓒ) surfaces.
-- **New-API PR gate** (see `CONTRIBUTING.md`): run on a PR that adds or changes **public, documented API**.
-  Write a **targeted task that cannot be completed without the new API**, and hand the junior the PR branch's
-  **updated docs only**. **During Phase 2** every such PR ports one named Flutter widget, and the task must be
-  **derived from that widget's Flutter documentation** rather than invented — see the "🧩 Phase 2" section of
-  `references/prompts.md` for the required reshaping steps. This is the higher-leverage use: it catches a misuse-prone API while it can still be
-  changed, before it's public and locked in. Read the failure as a design signal:
-  - *can't find it* → discoverability / docs gap (not in WidgetSystem, non-intuitive name)
-  - *uses it wrong* → the API isn't misuse-proof, or the docs are ambiguous
-  - *hallucinates a different shape* → the model wrote a more natural API than the one built; strongly consider
-    reshaping the real API to match that intuition. This is the project's "an LLM cannot misuse this API" goal
-    made concrete, and PR-review time is when it's cheapest to act on.
+- **リリースゲート**(`RELEASING.md` 参照): リリースのタグ付け前に、リリースコミット上で実行する。
+  **main** か **hard** のタスクを使い、リリースごとに**テーマをローテーション**する(トースト /
+  フォトアルバム / FaceEmo)。サーフェスが1つのシナリオに過適合しないようにするため。docs バグ(ⓑ)
+  かライブラリバグ(ⓒ)が出たらリリースをブロックする。
+- **新 API PR ゲート**(`CONTRIBUTING.md` 参照): **public で文書化される API** を追加・変更する
+  PR で実行する。**新 API を使わないと完了できないタスク**を書き、ジュニアには PR ブランチの
+  **更新後 docs だけ**を渡す。**Phase 2 の間**は、該当 PR はすべて特定の Flutter ウィジェット
+  1つを移植するものなので、タスクは発明せず**そのウィジェットの Flutter ドキュメントから導出
+  しなければならない** — 必要な変形手順は `references/prompts.md` の「🧩 Phase 2」節を見る。
+  こちらの方がレバレッジが高い: 誤用されやすい API を、まだ変えられるうちに、public になって
+  固定される前に捕まえる。失敗は設計シグナルとして読む:
+  - *見つけられない* → 発見性 / docs のギャップ(WidgetSystem に無い、直感的でない名前)
+  - *誤って使う* → API が misuse-proof でないか、docs が曖昧
+  - *別の形をハルシネーションする* → モデルは実装より自然な API を書いた。実 API をその直感へ
+    寄せることを強く検討する。これはプロジェクトの「LLM がこの API を誤用できないこと」という
+    ゴールの具体化であり、PR レビュー時が最も安く動ける時期。
 
-## Workflow
+## ワークフロー
 
-### 1. Pick the task
+### 1. タスクを選ぶ
 
-Choose a task from `references/prompts.md` (easy / main / hard, in the VRChatter voice) or write a new
-one in the same spirit. Match difficulty to what you want to measure:
-- **easy** — does the getting-started path work at all (one overlay on screen)
-- **main** — a stateful, dynamic UI using only implemented widgets (the sweet spot)
-- **hard** — deliberately pushes into known gaps (hit-testing, unimplemented stub widgets) to see whether
-  the model hallucinates an API, correctly gives up, or finds a workaround
+`references/prompts.md` から選ぶ(easy / main / hard、VRChatter の声で書かれている)か、同じ
+精神で新しく書く。測りたいものに難易度を合わせる:
+- **easy** — getting-started の経路がそもそも機能するか(オーバーレイが1枚出るか)
+- **main** — 実装済みウィジェットだけを使う、状態を持つ動的な UI(スイートスポット)
+- **hard** — 既知のギャップ(hit-testing、未実装のスタブウィジェット)へ意図的に踏み込ませ、
+  モデルが API をハルシネーションするか、正しく諦めるか、回避策を見つけるかを観察する
 
-Confirm the chosen task with the user before spending a subagent on it.
+サブエージェントを費やす前に、選んだタスクをユーザーに確認する。
 
-### 2. Set up an isolated scratch project
+### 2. 隔離されたスクラッチプロジェクトを用意する
 
-Create (or reuse) a .NET console project at **`%USERPROFILE%\projects\test\FloatSodaJuniorTest\`**
-(resolve `%USERPROFILE%` yourself; it is written that way to keep an absolute local path out of this public
-repo). This exact location is required: do **not** use the session scratchpad under `AppData\Local\Temp`, and
-do not create it inside the repo. It has to persist across sessions — step 5 (the VR run) is manual, so the
-owner needs a stable path to launch the exe from, and "wipe prior `*.cs`" below assumes the same directory is
-reused every run.
+.NET コンソールプロジェクトを **`%USERPROFILE%\projects\test\FloatSodaJuniorTest\`** に作る
+(または再利用する。`%USERPROFILE%` は自分で解決する。公開リポジトリに絶対ローカルパスを
+持ち込まないためにこう書いてある)。この場所であることは必須: `AppData\Local\Temp` 配下の
+セッションスクラッチパッドは**使わない**し、リポジトリ内にも作らない。セッションをまたいで
+永続する必要がある — 手順5(VR 実行)は手動なので、オーナーが exe を起動できる安定したパスが
+要るし、後述の「以前の `*.cs` を消す」は毎回同じディレクトリを再利用する前提だから。
 
-It should reference the **local** FloatSoda projects (so current source, including uncommitted fixes on
-the working branch, is what gets tested) via `ProjectReference` to the checkout — from that directory,
-`..\..\libs\FloatSoda\src\FloatSoda\FloatSoda.csproj` (and any other needed projects). Referencing local source — not the published NuGet — is deliberate:
-it lets the test catch bugs in the code you're actively changing. The black-box rule keeps the model
-honest even though the source is reachable on disk.
+**ローカルの** FloatSoda プロジェクトを `ProjectReference` で参照させる(現在のソース、つまり
+作業ブランチ上の未コミットの修正までがテスト対象になるように)。そのディレクトリからは
+`..\..\libs\FloatSoda\src\FloatSoda\FloatSoda.csproj`(と必要な他プロジェクト)。公開済み NuGet
+ではなくローカルソースを参照するのは意図的: いままさに変更しているコードのバグをテストで
+捕まえられるようにするため。ソースがディスク上で到達可能でも、ブラックボックスルールがモデルを
+正直に保つ。
 
-Wipe any prior `*.cs` the junior wrote so each run starts clean.
+ジュニアが以前書いた `*.cs` は消して、毎回の実行をクリーンに始める。
 
-### 3. Spawn the junior subagent
+### 3. ジュニアサブエージェントを起動する
 
-Spawn one subagent (default `model: sonnet`, medium effort — the realistic persona-class model, not the
-flagship). Its prompt must contain, verbatim in spirit:
+サブエージェントを1体起動する(既定 `model: sonnet`、medium エフォート — ペルソナ級の現実的な
+モデルであって、フラッグシップではない)。プロンプトには、趣旨として逐語的に次を含めること:
 
-- The task, in the VRChatter voice.
-- **Docs pointer only**: the GitHub Wiki (`https://github.com/sumx21t-3310/FloatSoda/wiki`, entry `Home`)
-  or the repo's `docs/` folder. Tell it to read `Home / GettingStarted / WidgetSystem / OVRIntegration`
-  first.
-- **Black-box instruction**: "Treat FloatSoda as a black box. Use ONLY the docs above. Do NOT open, read,
-  grep, or infer from anything under `src/`. If the docs don't cover something, say so rather than guessing."
-- **Constraints**: C# only; no Unity scenes/prefabs; use the exact NuGet/API names from the docs, never
-  invented ones; write the code into the scratch project.
-- The scratch project path to write into.
+- タスク。VRChatter の声で。
+- **docs へのポインタのみ**: GitHub Wiki(`https://github.com/sumx21t-3310/FloatSoda/wiki`、
+  入口は `Home`)またはリポジトリの `docs/` フォルダ。まず `Home / GettingStarted / WidgetSystem /
+  OVRIntegration` を読むよう指示する。
+- **ブラックボックス指示**: 「FloatSoda をブラックボックスとして扱うこと。上記 docs だけを使う。
+  `src/` 配下は開かない・読まない・grep しない・推測の材料にしない。docs がカバーしていなければ、
+  推測せずそう言うこと。」
+- **制約**: C# のみ。Unity のシーン/prefab 禁止。docs にある正確な NuGet/API 名だけを使い、
+  発明しない。コードはスクラッチプロジェクトに書く。
+- 書き込み先のスクラッチプロジェクトのパス。
 
-Have it report which docs pages it actually consulted and any point where it was unsure — that self-report
-is gold for the triage.
+実際に参照した docs ページと、確信が持てなかった箇所を報告させる — この自己報告がトリアージの
+金脈になる。
 
-### 4. Build (headless triage)
+### 4. ビルド(ヘッドレスのトリアージ)
 
-Run `dotnet build` on the scratch project. Compile errors are the cheapest, clearest signal:
-- Unresolved types/members → **hallucinated API** (category ⓐ) or **discoverability gap** (the real API
-  exists but the model couldn't find it in the docs).
-- Everything compiles → move to runtime.
+スクラッチプロジェクトで `dotnet build` を実行する。コンパイルエラーは最も安価で明瞭なシグナル:
+- 未解決の型/メンバー → **ハルシネーションした API**(カテゴリ ⓐ)か、**発見性ギャップ**
+  (API は実在するがモデルが docs から見つけられなかった)。
+- すべてコンパイルが通る → ランタイムへ進む。
 
-### 5. VR run (owner-driven, manual)
+### 5. VR 実行(オーナー主導、手動)
 
-Runtime bugs (like the two found so far) usually need SteamVR running — the skill can't automate this.
-Ask the owner to run the built exe with SteamVR up and paste the console output / stack trace. Treat
-whatever they paste as the runtime evidence for triage. (If a headless/desktop host exists later — see
-memory `desktop-storybook-direction` — this step can be automated.)
+ランタイムのバグ(これまでに見つかった2件のような)はたいてい SteamVR の稼働が必要 — スキルには
+自動化できない。SteamVR を起動した状態でビルド済み exe を実行し、コンソール出力 / スタック
+トレースを貼ってもらうようオーナーに依頼する。貼られたものをトリアージのランタイム証拠として
+扱う。(ヘッドレス/デスクトップのホストが後で実現したら — memory `desktop-storybook-direction`
+参照 — この手順は自動化できる。)
 
-### 6. Triage every failure into four categories
+### 6. すべての失敗を4カテゴリへトリアージする
 
-For each thing that went wrong, classify it — and **verify against the real source** before concluding.
-The verification step is what makes findings trustworthy: grep `src/` for every API the junior used and
-confirm it exists and behaves as the docs implied.
+問題が起きたものを1件ずつ分類する — そして結論を出す前に**実ソースと突き合わせて検証する**。
+この検証手順こそが所見を信頼できるものにする: ジュニアが使ったすべての API を `src/` で grep し、
+実在して docs の示唆どおりに振る舞うことを確認する。
 
-| Cat | Name | What it means | How to confirm |
+| Cat | 名前 | 意味 | 確認方法 |
 |---|---|---|---|
-| ⓐ | **Hallucination** | Model invented an API/name that doesn't exist | Grep `src/` — no such type/member. Then ask: should this API plausibly exist? If yes → discoverability/API-shape gap, not just model error |
-| ⓑ | **Docs bug** | Docs told the model to do something wrong/broken | Reproduce from the doc snippet; find the contradicting source or sample. (e.g. GettingStarted recommended `WithOpenVRFrameLimiter()`, which always crashes overlays) |
-| ⓒ | **Library bug** | The API exists and was used per docs, but the library is broken | Read the implementation; confirm the defect and the trigger path (e.g. `CleanChildRelayoutBoundary` recursing on `this`) |
-| ⓓ | **Spec deviation** | Model ignored/reinterpreted the task | Compare output to the prompt. Note whether the deviation was *worse* or actually *better judgment* (e.g. choosing HMD-follow over world-space for a toast) |
+| ⓐ | **ハルシネーション** | 実在しない API/名前をモデルが発明した | `src/` を grep — 該当の型/メンバーが無い。そのうえで問う: この API は本来あってしかるべきか? Yes なら発見性/API 形状のギャップであって、単なるモデルの誤りではない |
+| ⓑ | **docs バグ** | docs が誤った/壊れた手順をモデルに指示した | doc の断片から再現し、矛盾するソースやサンプルを見つける。(例: GettingStarted が推奨していた `WithOpenVRFrameLimiter()` はオーバーレイを必ずクラッシュさせる) |
+| ⓒ | **ライブラリバグ** | API は実在し docs どおりに使われたが、ライブラリが壊れている | 実装を読み、欠陥とトリガー経路を確認する(例: `CleanChildRelayoutBoundary` が `this` に再帰) |
+| ⓓ | **仕様逸脱** | モデルがタスクを無視/再解釈した | 出力をプロンプトと比較する。逸脱が*悪化*だったか、実は*より良い判断*だったか(例: トーストに world-space ではなく HMD 追従を選んだ)も記録する |
 
-Also note the **positives**: which non-obvious APIs the model got right first try, and whether it correctly
-refused to hallucinate on hard tasks. Those validate the docs.
+**ポジティブ**も記録すること: どの非自明な API を一発で正しく使えたか、hard タスクで
+ハルシネーションを正しく拒否できたか。それらは docs の妥当性の証拠になる。
 
-### 7. Remediate and record
+### 7. 修正と記録
 
-- **ⓑ docs bug / ⓒ library bug** → fix on a branch. Keep commits separated by nature (a core library fix and
-  a docs/API removal are different release-note lines). Run `dotnet test` before considering it done.
-- **ⓐ hallucination that *should* be a real API, or a discoverability gap** → this is docs/API feedback, not
-  a code fix. Per the repo's out-of-scope workflow, ask the user whether to file a GitHub issue, leave a TODO,
-  or nothing — don't silently act. (Issue filing itself needs no confirmation; see memory `feedback-github-issue-no-confirmation`.)
-- **ⓓ deviation** → record as a judgment-call data point; may indicate the docs communicate intent well or poorly.
-- **Always** append the run's conditions (model, effort, task, docs-delivery mode) and findings to the memory
-  log `vibe-coding-test-sonnet5-result` (or a new dated memory if the conditions differ a lot), so results
-  accumulate into a trend rather than evaporating.
+- **ⓑ docs バグ / ⓒ ライブラリバグ** → ブランチで修正する。コミットは性質ごとに分ける(コア
+  ライブラリの修正と docs/API の削除はリリースノートの別の行になる)。完了と見なす前に
+  `dotnet test` を実行する。
+- **ⓐ のうち本来実在すべき API、あるいは発見性ギャップ** → これは docs/API へのフィードバックで
+  あって、コード修正ではない。リポジトリのスコープ外ワークフローに従い、GitHub Issue を立てるか、
+  TODO を残すか、何もしないかをユーザーに尋ねる — 黙って動かない。(Issue の起票そのものに確認は
+  不要。memory `feedback-github-issue-no-confirmation` 参照。)
+- **ⓓ 逸脱** → 判断のデータポイントとして記録する。docs が意図をうまく伝えているか否かの指標に
+  なりうる。
+- **常に**、実行条件(モデル、エフォート、タスク、docs の渡し方)と所見を memory ログ
+  `vibe-coding-test-sonnet5-result`(条件が大きく違うなら日付つきの新しい memory)へ追記する。
+  結果を蒸発させず、傾向として蓄積するため。
 
-## Report format
+## 報告形式
 
-Give the user a compact verdict, then the findings ranked by severity, each tagged ⓐ/ⓑ/ⓒ/ⓓ with a
-`file:line` link into the real source. Lead with whether the docs/API held up overall (the headline the
-test is designed to answer), then the bugs it shook loose.
+コンパクトな評決をユーザーに示し、続いて所見を深刻度順に、それぞれ ⓐ/ⓑ/ⓒ/ⓓ のタグと実ソースへの
+`file:line` リンクつきで並べる。最初に置くのは docs/API が全体として持ちこたえたか(このテストが
+答えるべく設計された見出しの問い)、その後に振るい落とされたバグ。

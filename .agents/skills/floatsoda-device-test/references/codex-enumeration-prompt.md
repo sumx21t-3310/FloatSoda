@@ -1,15 +1,16 @@
-# Codex enumeration brief
+# Codex 列挙 brief
 
-The goal definition handed to `codex-runner` for step 1. Fill the bracketed slots, refresh the
-known-issue list from `gh issue list --state open`, and paste the contents of
-`known-divergences.md` into the axis B section so Codex extends the list instead of rediscovering it.
+手順1で `codex-runner` に渡すゴール定義。角括弧のスロットを埋め、既知 Issue リストを
+`gh issue list --state open` で最新化し、軸B のセクションに `known-divergences.md` の内容を
+貼り込んで、Codex が再発見ではなくリストの拡張をするようにする。
 
-**Before handing the filled brief to Codex, grep it for `[` and confirm no bracketed slot survives.**
-A brief still carrying `[PASTE …]` makes Codex re-enumerate what is already known, which silently
-inflates both the scenario count and the HMD run.
+**埋めた brief を Codex に渡す前に、`[` で grep して埋め残しのスロットが無いことを確認すること。**
+`[PASTE …]` が残ったままの brief は、既知の内容を Codex に再列挙させ、シナリオ数と HMD 実行の
+両方を静かに膨らませる。
 
-Keep the two hard rules intact when editing: **enumeration only, no code**, and **every `file:line`
-must come from reading the file**. Both exist because they've been the failure modes.
+編集の際も2つのハードルールは崩さないこと: **列挙のみ、コードは書かせない**。そして
+**すべての `file:line` は実際にファイルを読んだ結果であること**。どちらも、実際に起きた
+失敗モードだから存在するルール。
 
 ---
 
@@ -112,12 +113,12 @@ FloatSoda(.NET 10 / C# 14 の SteamVR オーバーレイUIフレームワーク)
 
 ---
 
-## After Codex reports
+## Codex の報告を受けたら
 
-Do not relay the list as-is. Spot-check the cited `file:line` first — a scenario built on a misread
-line costs an HMD session. Then route per `SKILL.md` step 2, and tell the owner which citations you
-verified and which you did not.
+リストをそのまま横流ししない。まず引用された `file:line` を抜き取り検査する — 行の読み違いの上に
+組まれたシナリオは HMD セッションを1回分浪費する。そのうえで `SKILL.md` の手順2に従って振り分け、
+どの引用を自分で検証し、どれを検証していないかをオーナーに伝える。
 
-**A scenario whose citation you could not verify does not enter routing, and never reaches the HMD.**
-Hold it in a separate "unverified" list until the citation and the behaviour are confirmed. The point
-of the enumeration is to spend the headset on things that are real.
+**引用を検証できなかったシナリオは振り分けに入れず、HMD にも決して到達させない。**
+引用と挙動が確認できるまで、別の「未検証」リストに留めておく。列挙の目的は、実在するものにだけ
+ヘッドセットを使うことにある。

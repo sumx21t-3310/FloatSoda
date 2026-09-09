@@ -67,6 +67,63 @@ public class ContainerTest
     }
 
     [Fact]
+    public void Container_PaddingとDecorationを指定_装飾の内側へ余白が入る()
+    {
+        var widget = new Align
+        {
+            Alignment = Alignment.TopLeft,
+            Child = new Container
+            {
+                Width = 60,
+                Height = 60,
+                Decoration = new BoxDecoration { Color = new Color(0, 0, 255) },
+                Padding = EdgeInsets.All(10),
+                Child = new ColoredBox { Color = new Color(255, 0, 0) }
+            }
+        };
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        // 余白領域(各辺10)は装飾の青で塗られ、子の赤は余白の内側だけを占める。
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(5, 5));
+        Assert.Equal(SKColors.Red, bitmap.GetPixel(15, 15));
+        Assert.Equal(SKColors.Red, bitmap.GetPixel(45, 45));
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(55, 55));
+        Assert.Equal(0, bitmap.GetPixel(65, 65).Alpha);
+    }
+
+    [Fact]
+    public void Container_Paddingがnull_余白なしで子が全域へ描画される()
+    {
+        var widget = new Align
+        {
+            Alignment = Alignment.TopLeft,
+            Child = new Container
+            {
+                Width = 60,
+                Height = 60,
+                Color = new Color(0, 0, 255),
+                Child = new ColoredBox { Color = new Color(255, 0, 0) }
+            }
+        };
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        // 余白ウィジェットが合成されないため、子の赤が背景の青を端まで覆う。
+        Assert.Equal(SKColors.Red, bitmap.GetPixel(1, 1));
+        Assert.Equal(SKColors.Red, bitmap.GetPixel(58, 58));
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void Container_Paddingが負数または非有限値_ArgumentOutOfRangeExceptionを投げる(double value)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Container { Padding = EdgeInsets.All(value) });
+    }
+
+    [Fact]
     public void Container_ColorとDecorationを同時に指定_InvalidOperationExceptionを投げる()
     {
         var container = new Container

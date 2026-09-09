@@ -13,15 +13,5 @@
     <ProjectReference Include="..\..\src\FloatSoda.Testing\FloatSoda.Testing.csproj" />
     <ProjectReference Include="..\..\src\FloatSoda\FloatSoda.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="openvr_api">
-      <HintPath>libs\openvr_api.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Content Update="libs\openvr_api.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
 
 </Project>

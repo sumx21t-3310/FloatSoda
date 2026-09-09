@@ -33,7 +33,7 @@ Conventions have one canonical home each. **Read the canon before acting on a co
 
 Three that catch agents out most often:
 
-- **Branch names must not carry the name of the agent or tool that did the work.** No `codex/`, `claude/`, `agent/` prefixes. Use `<type>/<issue-number>-<short-slug>` — full rules in `CONTRIBUTING.md`.
+- **Branch names must not carry the name of the agent or tool that did the work.** No `codex/`, `claude/`, `agent/` prefixes. Use `<issue-number>-<primary-area>-<slug>`, where `<primary-area>` comes from the issue's `area:*` labels — full rules in `CONTRIBUTING.md`. Issue classification (type / area / auxiliary attributes) lives in GitHub Labels, not in title prefixes.
 - **A C# namespace and its physical directory must match**, and must be changed together. Full rules in `CONTRIBUTING.md`.
 - **Do not mix unrelated refactoring, renames, cleanup, or dependency changes into a PR.** Full rules in `CONTRIBUTING.md`.
 
@@ -128,7 +128,8 @@ Do not use `[Fact(DisplayName = "…")]` — it duplicates the intent and drifts
 | `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
 | `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
 | `tests/FloatSoda.Rendering.Test` | xunit tests for the Layer tree |
-| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, Input, APIDesign, DocumentationComments, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` — every `.md` under `docs/` becomes a wiki page, so do not put scratch files there |
+| `docs/` | Developer documentation, wiki-style with `Home.md` as the entry point (Home, TargetUsers, GettingStarted, Architecture, WidgetSystem, UILayering, Animation, BuildPipeline, RenderObjects, OVRIntegration, Input, APIDesign, DocumentationComments, Localization). Synced to the GitHub Wiki by `.github/workflows/sync-wiki.yml` and built into the docs site by `.github/workflows/docs-site.yml` — every `.md` under `docs/` becomes a wiki page and a site page, so do not put scratch files there |
+| `website/` | Docs site (Astro Starlight) published at `https://floatsoda.sumx21t.com` with `llms.txt` / `llms-full.txt` for LLM readers. Every docs page is generated from `docs/` at build time by `scripts/sync-docs.mjs`, so edit `docs/`, never `website/src/content/docs/`. The site's structure follows the `docs/` directory tree: each track directory from #188 (`docs/user/`, `docs/contributor/`, `docs/api/`) becomes one sidebar group and one landing entry. The only site-authored content is the landing page `website/content/index.mdx`, which carries navigation only and links to `docs/` for facts. See `website/README.md` |
 
 ### UI Layering Rules (see `docs/UILayering.md`)
 
