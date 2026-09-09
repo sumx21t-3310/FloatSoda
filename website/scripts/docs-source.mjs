@@ -165,7 +165,11 @@ export function sidebarGroups() {
   const topLevel = docs.filter((doc) => doc.dir === "" && doc.name !== HOME);
   if (topLevel.length > 0) {
     const rows = homeTableRows();
-    for (const row of rows) push(`${row.audience.split("/")[0].trim()}向け`, row.name);
+    for (const row of rows) {
+      // 「利用者 / コントリビュータ」は先頭の読者。Markdown 装飾は落とし、空セルは「その他」へ
+      const audience = row.audience.split("/")[0].replace(/[*_`]/g, "").trim();
+      push(audience ? `${audience}向け` : "その他", row.name);
+    }
     for (const doc of topLevel) {
       if (!rows.some((row) => row.name === doc.name)) push("その他", doc.rel);
     }
