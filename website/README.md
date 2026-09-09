@@ -60,13 +60,14 @@ npm run verify    # dist/ の検査。ページ・llms.txt の網羅、サイト
 
 ## デプロイ
 
-`main` への push(`docs/**` または `website/**` の変更)で `.github/workflows/docs-site.yml` がビルド・検査し、GitHub Pages へデプロイします。Pull Request では同じビルドと検査だけを行います。
+公開面は **NuGet の最新リリースと同じコミット**の `docs/` を映します。リリースタグ(`v*`)の push で `.github/workflows/docs-site.yml` がそのコミットをビルド・検査し、GitHub Pages へデプロイします。`main` への push と Pull Request では、同じビルドと検査だけを行い、公開はしません。`main` にしか無い API を利用者(と `llms-full.txt` を読む LLM)に見せないためです。docs の修正は次のリリースで公開されます。
 
-初回だけ、リポジトリのオーナーによる設定が必要です。
+初回だけ、リポジトリのオーナーによる設定と手動デプロイが必要です。
 
 1. GitHub の Settings → Pages → Source を **GitHub Actions** にする
 2. Cloudflare DNS に `floatsoda` の CNAME レコード(値 `sumx21t-3310.github.io`)を追加する
 3. Settings → Pages → Custom domain に `floatsoda.sumx21t.com` を入れ、Enforce HTTPS を有効にする
+4. Actions → Docs Site → Run workflow を `main` で実行する(過去のタグにはこの workflow が無いので、最初の1回だけ `main` から公開する。次のリリースからはタグで自動)
 
 カスタムドメイン名は `public/CNAME` にもあり、ビルド出力に含めてデプロイのたびに GitHub Pages へ渡します。
 
