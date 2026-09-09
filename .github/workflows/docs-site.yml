@@ -17,10 +17,9 @@ on:
       - ".github/workflows/docs-site.yml"
   workflow_dispatch:
 
+# ビルドはリポジトリの読み取りだけで足りる。Pages への書き込み権限は deploy ジョブにだけ付ける
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: docs-site-${{ github.ref }}
@@ -37,6 +36,8 @@ jobs:
         with:
           # 各ページの lastUpdated に docs/ 側の最終コミット日時を使うため、履歴を全部取る
           fetch-depth: 0
+          # ビルドは git log を読むだけで push しないので、トークンをローカルの Git 設定に残さない
+          persist-credentials: false
 
       - uses: actions/setup-node@v7
         with:
@@ -53,16 +54,20 @@ jobs:
       - name: Verify dist (pages, llms.txt, internal links and anchors)
         run: npm run verify
 
+      # 公開するのは main だけ。workflow_dispatch を feature ブランチで実行しても、ビルドと検査に留める
       - name: Upload Pages artifact
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v5
         with:
           path: website/dist
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
