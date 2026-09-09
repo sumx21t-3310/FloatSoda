@@ -14,6 +14,12 @@
     <Folder Name="/samples/">
         <Project Path="samples/FloatSoda.Samples.GettingStarted/FloatSoda.Samples.GettingStarted.csproj" />
         <Project Path="samples/FloatSoda.Samples.Image/FloatSoda.Samples.Image.csproj" />
+    <Project Path="samples/FloatSoda.Samples.Align/FloatSoda.Samples.Align.csproj" />
+    <Project Path="samples/FloatSoda.Samples.Clip/FloatSoda.Samples.Clip.csproj" />
+    <Project Path="samples/FloatSoda.Samples.ColoredBox/FloatSoda.Samples.ColoredBox.csproj" />
+    <Project Path="samples/FloatSoda.Samples.Flex/FloatSoda.Samples.Flex.csproj" />
+    <Project Path="samples/FloatSoda.Samples.SizedBox/FloatSoda.Samples.SizedBox.csproj" />
+    <Project Path="samples/FloatSoda.Samples.Text/FloatSoda.Samples.Text.csproj" />
         <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
         <Project Path="samples/FloatSoda.Samples.PaintingSample/FloatSoda.Samples.PaintingSample.csproj" />
         <Project Path="samples/FloatSoda.Samples.PointerRegion/FloatSoda.Samples.PointerRegion.csproj" />
