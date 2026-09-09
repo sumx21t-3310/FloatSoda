@@ -10,7 +10,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 | Contributor docs | FloatSoda 本体を変える・レビューする人 | **How it works / Why / Must** — どう動き、なぜそう設計され、何を守るか |
 | API Reference | 利用者・コントリビュータ・Coding Agent の全員 | **Exactly what exists** — 公開 API の正確な契約 |
 
-> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は #188 の手順4で進めます。それまでは、[現行ページとの対応](#現行ページとの対応)で該当ページを選んでください。このガイド自体も、再編後は `docs/contributor/Documentation.md` へ移ります。各ページ種別の「書くもの / 書かないもの」と推奨テンプレートは、再編で実際に分割したページから逆算して [Issue #245](https://github.com/sumx21t-3310/FloatSoda/issues/245) で追加します。
+> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は #188 の手順4で進めます。現行の `docs/` はほぼ Contributor 向けの密なリファレンスなので、再編では **現行ページを `contributor/` へ移し、User docs は新しく書きます**。それまでは [再編の地図](#再編の地図) で該当ページを選んでください。このガイド自体も、再編後は `docs/contributor/Documentation.md` へ移ります。Contributor 側の「書くもの / 書かないもの」とテンプレートは、再編で移した実物のページから逆算して [Issue #245](https://github.com/sumx21t-3310/FloatSoda/issues/245) で追加します。
 
 ## 1. どこに書くか
 
@@ -39,26 +39,46 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 - **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも書きます(記録ルールは [APIDesign](APIDesign.md))
 - **同じテーマは1つの系統で詳述**し、ほかの系統からはリンクします。概念を Guide で説明し直したり、シグネチャを Concept に並べたりしません
 
-### 現行ページとの対応
+### User docs の範囲
 
-再編(#188 手順4)までの間、系統はこの表で読み替えます。「分割」は、利用者向けとコントリビュータ向けの内容が同居しているページで、再編時に2つに分ける候補です(出発点の案であり、再編時に確定します)。
+User docs は、公開 API と API Reference と合わせて、**#188 の層3(統合ミニアプリ型)のサンプルをジュニアコーダーテストで書ける範囲**を扱います。これが「どこまで書くか」の合格ラインです。テストで足りないと分かった概念や制約は、User docs か API Reference の不足として回収します(手順は #188)。内部実装を知らないと書けない箇所が見つかったら、それは User docs の穴です。
 
-| 現行ページ | 系統 / 種別 | 再編時の扱い |
+### 再編の地図
+
+再編(#188 手順4)の出発点です。現行ページは内部の仕組みの説明が中心なので、User 向けの部分だけを抜き出して新しいページに書き、本体は `contributor/` へ移します。種別は再編時に実物で確定します。
+
+**現行ページの行き先**
+
+| 現行ページ | 行き先 | 備考 |
 |---|---|---|
-| [TargetUsers](TargetUsers.md) | User / Concept(読者の自己判定と読み進め方) | `user/` へ |
-| [GettingStarted](GettingStarted.md) | User / Tutorial | `user/` へ |
-| [WidgetSystem](WidgetSystem.md) | User / Concept + Guide(組み込みウィジェット一覧、押せるボタン) | `user/` へ |
-| [Animation](Animation.md) | User / Concept | 分割(内部の動作原理は `contributor/` へ) |
-| [OVRIntegration](OVRIntegration.md) | User / Concept + Guide | 分割(ラッパーの内部構造は `contributor/` へ) |
-| [Input](Input.md) | User / Concept + Guide | `user/` へ |
-| [Architecture](Architecture.md) | Contributor / Architecture | 分割(利用者向けの全体像は `user/` の Concept へ) |
-| [BuildPipeline](BuildPipeline.md) | Contributor / Architecture | `contributor/` へ |
-| [RenderObjects](RenderObjects.md) | Contributor / Architecture | `contributor/` へ |
-| [UILayering](UILayering.md) | Contributor / Design(設計方針、未提供) | `contributor/` へ |
-| [APIDesign](APIDesign.md) | Contributor / Design + Requirements(API 規約、Flutter parity の判断) | `contributor/` へ |
-| [DocumentationComments](DocumentationComments.md) | Contributor / Development(XML ドキュメントコメントの規約) | `contributor/` へ |
-| [Localization](Localization.md) | Contributor / Design + Development | `contributor/` へ |
-| このページ | Contributor / Development | `contributor/Documentation.md` へ |
+| [Architecture](Architecture.md) | Contributor / Architecture | 利用者向けの全体像は User の「Widget」へ書き下ろす |
+| [BuildPipeline](BuildPipeline.md) | Contributor / Architecture | |
+| [RenderObjects](RenderObjects.md) | Contributor / Architecture | 制約モデルの利用者向け説明は User の「Layout」へ |
+| [WidgetSystem](WidgetSystem.md) | Contributor / Architecture | 組み込みウィジェット一覧と「押せるボタンを作る」は User 側へ |
+| [Animation](Animation.md) | Contributor / Architecture | 使い方は User の「Animation」へ |
+| [OVRIntegration](OVRIntegration.md) | Contributor / Architecture | オーバーレイ種別と制約は User の「Window / Overlay」へ |
+| [UILayering](UILayering.md) | Contributor / Design | 設計方針(未提供) |
+| [APIDesign](APIDesign.md) | Contributor / Design + Requirements | |
+| [DocumentationComments](DocumentationComments.md) | Contributor / Development | |
+| [Localization](Localization.md) | Contributor / Design + Development | |
+| このページ | Contributor / Development | `contributor/Documentation.md` |
+| [TargetUsers](TargetUsers.md) | User(入口) | 利用者向けに書かれているので、ほぼそのまま `user/` へ |
+| [GettingStarted](GettingStarted.md) | User / Tutorial | 利用者向けに書き直す |
+| [Input](Input.md) | User / Concept + Guide | 利用者向けに書き直す。実装の説明は Contributor 側へ |
+
+**新しい User ページと元ネタ**(#188 の Concept の列挙に沿う)
+
+| User ページ | 種別 | 元ネタ(利用者が観測できる制約と使い方を抜き出す) |
+|---|---|---|
+| Widget(宣言的 UI と Widget ツリー) | Concept | WidgetSystem の組み込み一覧と「押せるボタンを作る」、Architecture の全体像、層1サンプル |
+| State(`SetState`、`InheritedWidget`) | Concept | WidgetSystem、BuildPipeline のうち利用者から観測できる再ビルドの挙動 |
+| Layout(制約・サイズ・配置) | Concept | RenderObjects の制約モデル、層1サンプル(レイアウト基本・制約変換系) |
+| Input(ポインタ・ジェスチャ・アクション入力) | Concept + Guide | Input、WidgetSystem の「ジェスチャとヒットテスト」、層1サンプル(入力系)。ダッシュボード限定の制約を明記する |
+| Animation | Concept | Animation |
+| Window / Overlay(ダッシュボード・ワールド座標・デバイス追従) | Concept + Guide | OVRIntegration、Home の実装状況(表示専用の制約)、[Issue #151](https://github.com/sumx21t-3310/FloatSoda/issues/151)(物理サイズの発見性) |
+| 〜するには(各種) | Guide | 層2(Cookbook 型)サンプル |
+| GettingStarted | Tutorial | 現行 GettingStarted、`samples/FloatSoda.Samples.GettingStarted` |
+| ミニアプリを作る | Tutorial | 層3(統合ミニアプリ型)サンプル(Phase 2 完了後) |
 
 ## 2. 正典の対応表
 
@@ -68,7 +88,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 |---|---|
 | API のシグネチャ・引数・戻り値・例外・nullability・副作用・スレッド制約 | XML ドキュメントコメント(規約は [DocumentationComments](DocumentationComments.md)) |
 | API の具体的な使い方 | User Guide |
-| 概念モデル(Widget、State、Layout、Input、Overlay など) | User Concept |
+| 概念モデル(Widget、State、Layout、Input、Animation、Window / Overlay) | User Concept |
 | 完成物を作る手順 | User Tutorial とサンプル(`samples/`) |
 | ウィジェットの最小の使用例 | サンプルの README(構成は [CONTRIBUTING.md](../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
 | 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | Contributor Architecture |
@@ -101,12 +121,57 @@ XML ドキュメントコメントは `internal` / `private` にも書きます(
 
 PR では、テンプレートの `## Documentation` 節に、変更種別と更新した正典(更新が不要と判断した場合はその理由)を書きます。レビューでは、その判断がこの表と一致しているかを見ます。
 
+## 4. User docs のテンプレート
+
+User docs は新しく書くページが多いので、骨格を先に決めておきます。節はページの目的に不要なら省きます。Contributor 側のテンプレートは、再編で移した実物のページから逆算して #245 で足します。
+
+読者は [TargetUsers](TargetUsers.md) の3タイプです。**コードを書くのは LLM で、読むのも LLM** という前提を忘れずに、「LLM がこの API を誤用しない」書き方を優先します。Unity しか知らない読者(Booth クリエイター)には、Unity / uGUI の語彙からの読み替えを添えます。
+
+### Concept
+
+```text
+# 名前
+## 概要                        — 何であり、何を解決するか
+## いつ使うか
+## 基本モデル                  — 利用者から見た仕組み。内部実装は書かない
+## 最小例                      — 対応する層1(カタログ型)サンプルへのリンクと、必要なら最小の断片
+## Unity / uGUI からの読み替え — 対応する概念と、違う点
+## 制約と未実装                — 利用者から観測できる制限。使えるようになる Phase を添える
+## 関連ページ
+```
+
+### Guide
+
+```text
+# 〜する
+## 前提
+## 手順
+## 完成形          — 対応する層2(Cookbook 型)サンプルへのリンク
+## 注意点
+## 関連 API / サンプル
+```
+
+### Tutorial
+
+```text
+# 〜を作る
+## 作るもの
+## 前提
+## Step 1 …
+## Step 2 …
+## 完成            — 対応する層3(統合ミニアプリ型)サンプルへのリンク
+## 次に読むもの
+```
+
+サンプルコードは `samples/` を正典にし、本文には必要な最小の断片だけを載せます。完全な実装をドキュメント用に別に書きません。
+
 ## 関連
 
 - [DocumentationComments](DocumentationComments.md) — XML ドキュメントコメントの規約
 - [APIDesign](APIDesign.md) — API 設計の原則と Flutter parity
+- [TargetUsers](TargetUsers.md) — 想定する3タイプの作り手
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — 開発・PR・テスト・サンプルの規約
 - [REVIEW.md](../REVIEW.md) — レビューの判断基準
 - [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) — ドキュメント・サンプルの情報設計
-- [Issue #245](https://github.com/sumx21t-3310/FloatSoda/issues/245) — このガイドの残りの節(書くもの / 書かないもの、テンプレート)
+- [Issue #245](https://github.com/sumx21t-3310/FloatSoda/issues/245) — このガイドの残りの節(Contributor 側の「書くもの / 書かないもの」とテンプレート)
 - [Issue #219](https://github.com/sumx21t-3310/FloatSoda/issues/219) — 公開サイト(`docs/` の構造がそのままサイトの構造になります)
