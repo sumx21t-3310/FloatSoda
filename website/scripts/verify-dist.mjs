@@ -7,6 +7,9 @@
  * 1. docs/ の全ページ(サブディレクトリ込み)が HTML と素の Markdown の両方で生成されている
  * 2. llms.txt / llms-full.txt が存在し、llms-full.txt に全ページのタイトルが含まれる
  * 3. HTML 内のサイト内リンク(href="/…")の遷移先ページとアンカー(#…)が実在する
+ * 4. LLM 向けのテキスト(llms-*.txt と素の Markdown)が BOM なしの正しい UTF-8 である
+ *    (astro preview は charset を付けずに配信するのでブラウザでは化けて見える。本番の GitHub Pages は
+ *    charset=utf-8 を付ける。ここでバイト列を機械的に確かめ、目視に頼らない)
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -100,9 +103,35 @@ for (const file of htmlFiles(distDir)) {
   }
 }
 
+// 4. LLM 向けテキストの文字コード
+function* textFiles(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!["_astro", "pagefind"].includes(entry.name)) yield* textFiles(full);
+    } else if (/^llms.*\.txt$/.test(entry.name) || entry.name.endsWith(".md")) {
+      yield full;
+    }
+  }
+}
+
+const utf8 = new TextDecoder("utf-8", { fatal: true });
+let textCount = 0;
+for (const file of textFiles(distDir)) {
+  const bytes = fs.readFileSync(file);
+  const relPath = path.relative(distDir, file);
+  textCount++;
+  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) failures.push(`BOM found in ${relPath}`);
+  try {
+    utf8.decode(bytes);
+  } catch {
+    failures.push(`invalid UTF-8 in ${relPath}`);
+  }
+}
+
 if (failures.length > 0) {
   console.error(`verify-dist: ${failures.length} problem(s)`);
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exit(1);
 }
-console.log(`verify-dist: OK (${docs.length} pages, ${linkCount} internal links checked)`);
+console.log(`verify-dist: OK (${docs.length} pages, ${linkCount} internal links, ${textCount} UTF-8 text files checked)`);

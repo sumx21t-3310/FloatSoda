@@ -56,6 +56,8 @@ npm run verify    # dist/ の検査。ページ・llms.txt の網羅、サイト
 
 `npm run verify` は CI(`.github/workflows/docs-site.yml`)でも必須にしています。`docs/` のリンク先やアンカーを壊すと、ここで落ちます。
 
+`npm run preview`(`astro preview`)は `llms.txt` や `/<slug>.md` を charset なしの `text/plain` で返すため、ブラウザで開くと日本語が化けて見えます。ファイル自体は UTF-8 で、本番の GitHub Pages は `text/plain; charset=utf-8` を付けて配信します。ローカルで中身を確かめるときは `npm run verify`(UTF-8 の検査を含む)か、`curl http://localhost:4321/llms.txt` を使ってください。
+
 ## デプロイ
 
 `main` への push(`docs/**` または `website/**` の変更)で `.github/workflows/docs-site.yml` がビルド・検査し、GitHub Pages へデプロイします。Pull Request では同じビルドと検査だけを行います。
