@@ -78,13 +78,14 @@ description: >-
 順序: まずカタログサンプル(チェックリスト末尾のとおり、レイアウト → 制約 → 描画 → 入力系は最後)、
 次にハーネスシナリオを列挙時の順で。対象ごとに:
 
-1. サンプルなら `references/run-sample.ps1 <Name>`、ハーネスシナリオなら
-   `references/run-sample.ps1 -Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って
+1. リポジトリルートから、サンプルなら
+   `./.agents/skills/floatsoda-device-test-run/references/run-sample.ps1 <Name>`、ハーネスシナリオなら
+   同じスクリプトに `-Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って
    生きているかを報告する。すぐ終了していたら、ログの末尾を判定(`CRASH`)として記録して次へ。
 2. 対象名を言い、最初の読み上げ行を言う(シナリオなら: 期待結果を yes/no の質問1つに言い換える)。
 3. OK / NG を待つ。NG なら、何がおかしいかを一言だけ聞く。それ以上は聞かない。
 4. 項目ごとに `results.md` へ1行をすぐ追記する — まとめて書かない。
-5. 残りの項目を繰り返し、`run-sample.ps1 stop`。
+5. 残りの項目を繰り返し、同じスクリプトに `stop` を渡して止める。
 
 入力系サンプル3つ(Listener、GestureDetector、PointerRegion)では、項目の前に操作手順を言う
 (「左の箱にコントローラーのレイを当てて、トリガーを引いて」)。ポインタ入力はダッシュボード
@@ -104,8 +105,11 @@ NG / CRASH の行ごとに:
 3. 確定したライブラリ / サンプル / docs の Issue を起票する。貼るものからローカルパス、マシン名、
    ユーザー名を取り除く(公開リポジトリ)。
 4. オーナーが確定した差異はすべて
-   `.agents/skills/floatsoda-device-test-gen/references/known-divergences.md` へ追記し、次回の
-   列挙がより先から始められるようにする。「deliberate」で確定した差異は、文書化されるまで
+   `.agents/skills/floatsoda-device-test-gen/references/known-divergences.md` へ、同ファイル冒頭の
+   エントリテンプレートどおりに追記する(`FloatSoda` / `Flutter` / `Why` / `Test` / `Docs` /
+   `Observation` / `Label` の 7 フィールド。`docs/APIDesign.md` の記録必須 5 項目を含む)。
+   `deliberate` の差異で `Test` が未設定なら、その回帰テストを書くまでエントリは未完了として扱う。
+   これで次回の列挙がより先から始められる。「deliberate」で確定した差異は、文書化されるまで
    `docs/` のギャップ。
 5. NG がチェックリスト側の誤り(サンプルが変わった、項目が間違っていた)と分かったら、
    `references/checklist.md` を、それ以外を何も変えない PR で直す。

@@ -134,5 +134,5 @@ RenderObject / Element / Widget / Layer に触れる変更では、次を確認�
 
 隣接する検証との住み分け:
 
-- SteamVR 実行時にしか観測できない挙動 → `floatsoda-device-test-gen`
+- SteamVR 実行時にしか観測できない挙動 → シナリオの列挙とテスト生成は `floatsoda-device-test-gen`、実機での起動・判定・記録・トリアージは `floatsoda-device-test-run`
 - docs / API の発見性・誤誘導 → `floatsoda-junior-coder-test`
