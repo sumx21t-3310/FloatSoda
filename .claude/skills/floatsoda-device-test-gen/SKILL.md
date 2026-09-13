@@ -1,19 +1,18 @@
 ---
 name: floatsoda-device-test-gen
 description: >-
-  Run FloatSoda's device test — enumerate, with Codex, every scenario that can only break with
-  SteamVR actually running plus every behavioural divergence from the Flutter port it mirrors,
-  route each one to headless xunit or to the on-HMD harness, and write those tests and harness
-  scenarios. This skill produces tests; it never puts a headset on — the on-device run and its
-  triage belong to floatsoda-device-test-run. Use whenever the user wants device-only or
-  divergence scenarios enumerated or turned into tests, mentions "デバイステスト", "シナリオを
-  洗い出したい", "Flutterとの挙動差", "移植差異", "device test", "ハーネスにシナリオを足して",
-  or asks what could break that the current unit tests would never catch. Enumeration is
-  delegated to Codex.
+  FloatSoda のデバイステストを生成する — SteamVR が実際に稼働しているときにしか壊れえないシナリオと、
+  鏡写しにしている Flutter 移植からの挙動差異を Codex に網羅的に列挙させ、1件ずつヘッドレス
+  xunit か HMD 実機ハーネスへ振り分け、そのテストとハーネスのシナリオを書く。このスキルはテストを
+  作る側で、HMD は被らない — 実機での実行とトリアージは floatsoda-device-test-run が担う。
+  VR 専用や移植差異のシナリオを洗い出したい・テストにしたいとき、「デバイステスト」
+  「シナリオを洗い出したい」「Flutterとの挙動差」「移植差異」「device test」「ハーネスに
+  シナリオを足して」に言及されたとき、いまの単体テストでは決して捕まえられない壊れ方を
+  尋ねられたときに使う。列挙は Codex に委任する。
 ---
 
-<!-- Derived compatibility stub — DO NOT EDIT. Canon: .agents/skills/floatsoda-device-test-gen/ -->
+<!-- 派生互換スタブ — 直接編集禁止。正典: .agents/skills/floatsoda-device-test-gen/ -->
 
-**The canon for this skill is [`.agents/skills/floatsoda-device-test-gen/SKILL.md`](../../../.agents/skills/floatsoda-device-test-gen/SKILL.md). Read that file and follow the procedure there.** Its `references/` files live beside it, in `.agents/skills/floatsoda-device-test-gen/references/`.
+**このスキルの正典は [`.agents/skills/floatsoda-device-test-gen/SKILL.md`](../../../.agents/skills/floatsoda-device-test-gen/SKILL.md)。そのファイルを読み、そこにある手順に従うこと。** `references/` ファイルは正典の隣、`.agents/skills/floatsoda-device-test-gen/references/` にある。
 
-This stub exists only because Claude Code reads `.claude/skills/` and not `.agents/skills/`. It is generated from the canon and holds no procedure of its own. To change how this skill works, edit the canon — never this file.
+このスタブは、Claude Code が `.agents/skills/` を読まず `.claude/skills/` を読むためだけに存在する。正典から生成された派生物で、固有の手順は持たない。このスキルの動きを変えるときは正典を編集すること — このファイルは決して編集しない。

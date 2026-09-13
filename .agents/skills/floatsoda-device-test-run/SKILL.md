@@ -1,121 +1,117 @@
 ---
 name: floatsoda-device-test-run
 description: >-
-  The driver for every on-device run of FloatSoda: launch one target at a time on the real HMD —
-  a catalog sample (samples/FloatSoda.Samples.*) or a harness scenario built by
-  floatsoda-device-test-gen — tell the owner what to look at, take a yes/no verdict per item, record
-  it, stop, next, then triage what failed. Designed for a voice session (the owner is wearing
-  the headset and answers by speaking), but works over text too. Use whenever the user wants to
-  run anything on real hardware, mentions "実機テスト", "実機で確認", "HMDで動かして確認",
-  "サンプルを実機で見る", "目視テスト", "音声でテスト", "サンプル一巡", "sample walkthrough",
-  "#188 のテスト", or asks whether the samples or harness scenarios pass in VR. Verdicts are the
-  owner's alone; the agent drives, records, and triages afterwards.
+  FloatSoda の実機実行すべてを運転する — カタログサンプル(samples/FloatSoda.Samples.*)か
+  floatsoda-device-test-gen が作ったハーネスシナリオを、実 HMD 上で1つずつ起動し、オーナーに
+  見るべき点を伝え、項目ごとに yes/no の判定を取り、記録し、止め、次へ進み、最後に落ちたものを
+  トリアージする。音声セッション(オーナーは HMD を被ったまま声で答える)を前提に設計しているが、
+  テキストでも動く。実機で何かを動かしたいとき、「実機テスト」「実機で確認」「HMDで動かして確認」
+  「サンプルを実機で見る」「目視テスト」「音声でテスト」「サンプル一巡」「device test を回して」
+  「#188 のテスト」に言及されたとき、サンプルやハーネスシナリオが VR で通るか尋ねられたときに使う。
+  判定はオーナーだけのもの。エージェントは運転・記録・事後のトリアージを担う。
 ---
 
-# FloatSoda Device Test — Run
+# FloatSoda デバイステスト — 実行(run)
 
-## What this is, and what it is not
+## これは何で、何ではないか
 
-This skill is the **driver for every on-device run**: one target at a time, a few yes/no items,
-a verdict, next. It runs two kinds of target with the same loop:
+このスキルは**実機実行すべての運転手**: 対象を1つずつ、数個の yes/no 項目、判定、次へ。
+2種類の対象を同じループで回す:
 
-| Target | Where it comes from | Items |
+| 対象 | 出どころ | 判定項目 |
 |---|---|---|
-| Catalog sample `samples/FloatSoda.Samples.<Name>` | Issue #188, layer 1. Each is also an integration scenario: "if you write what the docs say, does it actually look like that?" (`CONTRIBUTING.md`, サンプルを追加する場合の規約) | `references/checklist.md`, 1–3 per sample |
-| Harness scenario `tests/FloatSoda.DeviceTest --scenario <Id>` | Produced by `floatsoda-device-test-gen` (enumerate → route → build). Each scenario carries its own expected result | 1 per scenario: the scenario's expected result, spoken as a yes/no question |
+| カタログサンプル `samples/FloatSoda.Samples.<Name>` | Issue #188 の層1。各サンプルは結合テストのシナリオも兼ねる: 「docs に書いてあるとおりに書いたら、実際にそう表示されるか」(`CONTRIBUTING.md` サンプルを追加する場合の規約) | `references/checklist.md`、サンプルごとに 1〜3 項目 |
+| ハーネスシナリオ `tests/FloatSoda.DeviceTest --scenario <Id>` | `floatsoda-device-test-gen` が作る(列挙 → 振り分け → 構築)。各シナリオは自分の期待結果を持つ | シナリオごとに1項目: 期待結果を yes/no の質問に言い換えたもの |
 
-The split with `floatsoda-device-test-gen` is producer / runner: that skill decides *what* could
-break and writes the tests (xunit for anything headless, harness scenarios for the rest); this
-skill is the only one that puts a headset on. Triage of what falls out lives here, because the
-results do.
+`floatsoda-device-test-gen` との分担は producer / runner。あちらは**何が**壊れうるかを決めて
+テストを書く(ヘッドレスなものは xunit、残りはハーネスシナリオ)。こちらはヘッドセットを被る
+唯一のスキル。落ちたもののトリアージもここで行う。結果を持っているのがこちらだから。
 
-## Roles
+## 役割
 
-| Who | Does |
+| 誰 | 何をする |
 |---|---|
-| Owner (in the HMD) | Opens the SteamVR dashboard, looks, answers each item with OK / NG (+ one phrase on NG) |
-| Agent (this skill) | Builds, launches one sample at a time, reads out the instruction, records verdicts, stops the process, triages afterwards |
+| オーナー(HMD の中) | SteamVR ダッシュボードを開き、見て、各項目に OK / NG で答える(NG なら一言添える) |
+| エージェント(このスキル) | ビルドし、1つずつ起動し、指示を読み上げ、判定を記録し、プロセスを止め、事後にトリアージする |
 
-The owner never leaves the headset to type. If the session has a voice channel, speak the
-instruction. If not, print it as one short line — the owner reads it through the desktop mirror.
+オーナーはタイプするためにヘッドセットを外さない。セッションに音声チャネルがあれば指示を話す。
+なければ短い1行で出す — オーナーはデスクトップミラー越しに読む。
 
-**Voice sessions (e.g. Codex Voice mode):** start the chat in voice mode *before* loading this
-skill — a chat started in text mode only gets dictation, not a conversational thread. Keep the walk
-(step 1) in the voice thread itself: it needs turn-taking and interruption. Triage (step 2) may be
-delegated to a separate task; hand it the path of `results.md`, which is the shared state.
+**音声セッション(Codex Voice モードなど):** このスキルを読み込む*前に*音声モードでチャットを
+始めること — テキストモードで始めたチャットは音声ディクテーションになるだけで、会話スレッドに
+ならない。巡回(手順1)は音声スレッド本体で回す: ターンテイキングと割り込みが要る。
+トリアージ(手順2)は別タスクへ委任してよい。共有状態である `results.md` のパスを渡す。
 
-## Ground rules
+## 地上ルール
 
-- **One sample process at a time.** Every sample registers its own `AppKey`; two processes of the
-  same sample fight over the overlay, and a leftover process from the previous sample stays on
-  screen (there is no window teardown API, issue #218). Stop before launching the next.
-- **Verdicts are the owner's.** Do not infer a verdict from a screenshot or from the absence of a
-  crash. Record exactly what the owner said.
-- **Do not fix code during the walk.** An NG is a note, not a work order. Triage comes after the
-  last sample, when the headset is off.
-- **Keep the instruction short.** One sentence, one thing to look at. The read-aloud lines in the
-  checklist are sized for this (roughly 20–40 characters).
-- **Launch only the samples.** Never start VRChat as part of this loop — on the owner's machine
-  VRChat start is the known GPU-hang trigger (see `Memory/environment.md` in the shared vault).
+- **サンプルのプロセスは同時に1つ。** 各サンプルは自分の `AppKey` を登録するので、同じサンプルの
+  2プロセスはオーバーレイを奪い合い、前のサンプルの残骸は画面に残り続ける(ウィンドウを破棄する
+  API がない、issue #218)。次を起動する前に止める。
+- **判定はオーナーのもの。** スクリーンショットや「クラッシュしなかった」から判定を推測しない。
+  オーナーが言ったとおりに記録する。
+- **巡回中にコードを直さない。** NG はメモであって作業指示ではない。トリアージは最後の対象の
+  あと、ヘッドセットを外してから。
+- **指示は短く。** 1文で、見るものは1つ。チェックリストの読み上げ行はそのサイズ
+  (20〜40 文字程度)で書いてある。
+- **起動するのは対象だけ。** このループの一部として VRChat を起動しない — オーナーのマシンでは
+  VRChat の起動が既知の GPU ハングの引き金(共有 Vault の `Memory/environment.md`)。
 
-## Procedure
+## 手順
 
-### 0. Prepare (headset off)
+### 0. 準備(ヘッドセットを外した状態)
 
-1. `dotnet build FloatSoda.slnx` — 0 errors. Samples are built as
-   `samples/FloatSoda.Samples.<Name>/bin/Debug/net10.0/FloatSoda.Samples.<Name>.exe`.
-2. Confirm SteamVR is running (`vrserver` / `vrmonitor` processes). Do not start it yourself; the
-   owner does.
-3. Create the results file from `references/results-template.md` at
-   `$HOME/tmp/floatsoda-walkthrough/<yyyy-MM-dd>/results.md` (outside the repository — it carries
-   local paths and is never committed).
-4. Optionally start the read-only stack monitor beside you (`vr-stack-watch -Watch`, a user-level
-   skill on the owner's machine) so a GPU hang during the walk gets a timestamp.
-5. Read `references/checklist.md`. It was source-verified on 2026-09-13 against the samples on
-   branch `test/188-all-samples`; **spot-check the `Demo.cs` line references for the samples you
-   are about to run** — samples change, the checklist does not follow automatically.
+1. `dotnet build FloatSoda.slnx` — 0 エラー。サンプルは
+   `samples/FloatSoda.Samples.<Name>/bin/Debug/net10.0/FloatSoda.Samples.<Name>.exe` にビルドされる。
+2. SteamVR が動いていることを確認する(`vrserver` / `vrmonitor` プロセス)。自分では起動しない。
+   オーナーが起動する。
+3. `references/results-template.md` から結果ファイルを
+   `$HOME/tmp/floatsoda-walkthrough/<yyyy-MM-dd>/results.md` に作る(リポジトリの外 — ローカル
+   パスを含むので、決してコミットしない)。
+4. 任意で、読み取り専用のスタック監視を横で回す(`vr-stack-watch -Watch`、オーナーのマシンに
+   あるユーザーレベルのスキル)。巡回中の GPU ハングにタイムスタンプが付く。
+5. `references/checklist.md` を読む。2026-09-13 にブランチ `test/188-all-samples` のサンプルと
+   照合済み。**これから回すサンプルの `Demo.cs` 引用行を抜き取り確認する** — サンプルは変わるが、
+   チェックリストは自動では追従しない。
 
-### 1. Walk (headset on)
+### 1. 巡回(ヘッドセットを被った状態)
 
-Order: catalog samples first (layout → constraints → painting → input last, as listed at the end
-of the checklist), then harness scenarios in the order the enumeration gave them. For each target:
+順序: まずカタログサンプル(チェックリスト末尾のとおり、レイアウト → 制約 → 描画 → 入力系は最後)、
+次にハーネスシナリオを列挙時の順で。対象ごとに:
 
-1. `references/run-sample.ps1 <Name>` for a sample, or `references/run-sample.ps1 -Scenario <Id>`
-   for a harness scenario — stops the previous process, launches this one, waits a few seconds,
-   and reports whether it is still alive. If it exited early, record the last log lines as the
-   verdict (`CRASH`) and move on.
-2. Say the target name, then the first read-aloud line (for a scenario: its expected result,
-   rephrased as one yes/no question).
-3. Wait for OK / NG. On NG, ask for one phrase describing what is wrong, nothing more.
-4. Append one row per item to `results.md` immediately — do not batch.
-5. Repeat for the remaining items, then `run-sample.ps1 stop`.
+1. サンプルなら `references/run-sample.ps1 <Name>`、ハーネスシナリオなら
+   `references/run-sample.ps1 -Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って
+   生きているかを報告する。すぐ終了していたら、ログの末尾を判定(`CRASH`)として記録して次へ。
+2. 対象名を言い、最初の読み上げ行を言う(シナリオなら: 期待結果を yes/no の質問1つに言い換える)。
+3. OK / NG を待つ。NG なら、何がおかしいかを一言だけ聞く。それ以上は聞かない。
+4. 項目ごとに `results.md` へ1行をすぐ追記する — まとめて書かない。
+5. 残りの項目を繰り返し、`run-sample.ps1 stop`。
 
-For the three input samples (Listener, GestureDetector, PointerRegion), say the operating step
-before the item ("controller ray on the left box, pull the trigger"). Pointer input only reaches
-dashboard overlays (issue #182); these samples use `DashboardWindow`, so the dashboard must be
-open.
+入力系サンプル3つ(Listener、GestureDetector、PointerRegion)では、項目の前に操作手順を言う
+(「左の箱にコントローラーのレイを当てて、トリガーを引いて」)。ポインタ入力はダッシュボード
+オーバーレイにしか届かない(issue #182)。これらは `DashboardWindow` を使うので、ダッシュボードを
+開いておく必要がある。
 
-### 2. Triage (headset off)
+### 2. トリアージ(ヘッドセットを外した状態)
 
-For every NG / CRASH row:
+NG / CRASH の行ごとに:
 
-1. Try to reproduce headlessly first (`src/FloatSoda.Testing` bitmap renderers or an xunit test).
-   A visual NG that reproduces headlessly is a regression test waiting to be written.
-2. Propose a classification — library bug / sample bug / docs gap / intended (the sample's
-   `## Flutterとの違い` already says so) — and **let the owner confirm** before filing. For a
-   harness scenario from axis B (Flutter divergence) the label is deliberate / not ported / port
-   mistake, and it stays provisional until the owner confirms it.
-3. File confirmed library / sample / docs issues. Strip local paths, machine and user names from
-   anything pasted (public repository).
-4. Append every owner-confirmed divergence to
-   `.agents/skills/floatsoda-device-test-gen/references/known-divergences.md`, so the next
-   enumeration starts further along. A divergence settled as "deliberate" is a `docs/` gap until
-   documented.
-5. If an NG turns out to be a checklist error (the sample changed, the item was wrong), fix
-   `references/checklist.md` in a PR that changes nothing else.
+1. まずヘッドレス再現を試みる(`src/FloatSoda.Testing` のビットマップレンダラか xunit テスト)。
+   ヘッドレスで再現する見た目の NG は、書かれるのを待っている回帰テスト。
+2. 分類を提案する — ライブラリバグ / サンプルのバグ / docs ギャップ / 意図どおり(サンプルの
+   `## Flutterとの違い` にすでに書いてある) — そして**起票前にオーナーに確定してもらう**。
+   軸B(Flutter 移植差異)のハーネスシナリオのラベルは deliberate / not ported / port mistake で、
+   オーナーが確定するまで暫定のまま。
+3. 確定したライブラリ / サンプル / docs の Issue を起票する。貼るものからローカルパス、マシン名、
+   ユーザー名を取り除く(公開リポジトリ)。
+4. オーナーが確定した差異はすべて
+   `.agents/skills/floatsoda-device-test-gen/references/known-divergences.md` へ追記し、次回の
+   列挙がより先から始められるようにする。「deliberate」で確定した差異は、文書化されるまで
+   `docs/` のギャップ。
+5. NG がチェックリスト側の誤り(サンプルが変わった、項目が間違っていた)と分かったら、
+   `references/checklist.md` を、それ以外を何も変えない PR で直す。
 
-## Report format
+## 報告形式
 
-Lead with the tally: samples walked / items answered / NG / CRASH. Then the NG rows verbatim with
-the owner's phrase, each with the sample and item number. Then the proposed classification per NG,
-clearly marked as proposed. Say which checklist line references you spot-checked before the walk.
+集計を最初に: 回したサンプル数 / 答えた項目数 / NG / CRASH。続いて NG の行をオーナーの言葉
+そのままに、サンプルと項目番号つきで。次に NG ごとの分類提案を、提案であると明示して。
+巡回前にどのチェックリスト引用行を抜き取り確認したかを述べること。
