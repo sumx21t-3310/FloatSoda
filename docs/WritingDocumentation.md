@@ -2,7 +2,7 @@
 
 # ドキュメント執筆ガイド
 
-FloatSoda のドキュメントは、読者ごとに **User docs / Contributor docs / API Reference** の3系統に分かれています(情報設計の正典は [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。このページは、新しい情報を書くときに「どの系統のどのページに書くか」「何が正典か」「変更したとき何を更新するか」を決めるための入口です。書き方の規約そのものは、それぞれの正典に置いてあり、ここには再掲しません。
+FloatSoda のドキュメントは、読者ごとに **User docs / Contributor docs / API Reference** の3系統に分かれています(情報設計の正典は [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。本ページは、新しい情報を書くときに「どの系統のどのページに書くか」「何が正典か」「変更時に何を更新するか」を決めるための入口です。書き方の規約はそれぞれの正典に置いているため、ここには再掲しません。
 
 | 系統 | 読者 | 答える問い |
 |---|---|---|
@@ -10,7 +10,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 | Contributor docs | FloatSoda 本体を変える・レビューする人 | **How it works / Why / Must** — どう動き、なぜそう設計され、何を守るか |
 | API Reference | 利用者・コントリビュータ・Coding Agent の全員 | **Exactly what exists** — 公開 API の正確な契約 |
 
-> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は #188 の手順4で進めます。現行の `docs/` はほぼ Contributor 向けの密なリファレンスなので、再編では **現行ページを `contributor/` へ移し、User docs は新しく書きます**。それまでは [再編の地図](#再編の地図) で該当ページを選んでください。このガイド自体も、再編後は `docs/contributor/Documentation.md` へ移ります。Contributor 側の「書くもの / 書かないもの」とテンプレートは、再編で移した実物のページから逆算して [Issue #245](https://github.com/sumx21t-3310/FloatSoda/issues/245) で追加します。
+> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は、#188 の手順4で進めます。現行の `docs/` は Contributor 向けの詳細なリファレンスが中心です。そのため、再編では **現行ページを `contributor/` へ移し、User docs は新しく書きます**。それまでは [再編の地図](#再編の地図) で該当ページを選んでください。このガイド自体も、再編後は `docs/contributor/Documentation.md` へ移ります。Contributor 側の「書くもの / 書かないもの」とテンプレートは、移管した実物のページから逆算し、[Issue #245](https://github.com/sumx21t-3310/FloatSoda/issues/245) で追加します。
 
 ## 1. どこに書くか
 
@@ -33,19 +33,19 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
  → XML ドキュメントコメント(API Reference の原稿)
 ```
 
-境界で迷いやすいものは、次のように分けます。
+境界で迷いやすい情報は、次のように分類します。
 
-- **利用者から観測できる制約**は User docs に書き、**その制約を成立させている内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力経路を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
-- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも書きます(記録ルールは [APIDesign](APIDesign.md))
+- **利用者から観測できる制約**は User docs に書き、**その制約を成立させる内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力経路を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
+- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
 - **同じテーマは1つの系統で詳述**し、ほかの系統からはリンクします。概念を Guide で説明し直したり、シグネチャを Concept に並べたりしません
 
 ### User docs の範囲
 
-User docs は、公開 API と API Reference と合わせて、**#188 の層3(統合ミニアプリ型)のサンプルをジュニアコーダーテストで書ける範囲**を扱います。これが「どこまで書くか」の合格ラインです。テストで足りないと分かった概念や制約は、User docs か API Reference の不足として回収します(手順は #188)。内部実装を知らないと書けない箇所が見つかったら、それは User docs の穴です。
+User docs は、公開 API および API Reference と合わせて、**#188 の層3(統合ミニアプリ型)のサンプルをジュニアコーダーテストで書ける範囲**を扱います。これが「どこまで書くか」の合格ラインです。テストで不足が判明した概念や制約は、User docs または API Reference の不足として回収します(手順は #188)。内部実装を知らないとコードを書けない箇所が見つかった場合、それは User docs の不足を意味します。
 
 ### 再編の地図
 
-再編(#188 手順4)の出発点です。現行ページは内部の仕組みの説明が中心なので、User 向けの部分だけを抜き出して新しいページに書き、本体は `contributor/` へ移します。種別は再編時に実物で確定します。
+再編(#188 手順4)の出発点です。現行ページは内部の仕組みの説明が中心です。そのため、User 向けの部分だけを抜き出して新しいページに書き、本体は `contributor/` へ移します。種別は再編時に実物で確定します。
 
 **現行ページの行き先**
 
@@ -82,7 +82,7 @@ User docs は、公開 API と API Reference と合わせて、**#188 の層3(�
 
 ## 2. 正典の対応表
 
-同じ情報は1箇所にだけ書き、ほかからはリンクします。
+同じ情報は1箇所のみに書き、ほかの場所からはリンクします。
 
 | 情報 | 正典 |
 |---|---|
@@ -99,11 +99,11 @@ User docs は、公開 API と API Reference と合わせて、**#188 の層3(�
 | 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) |
 | ドキュメントの分類とサンプルの3層構成 | [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) |
 
-XML ドキュメントコメントは `internal` / `private` にも書きます([DocumentationComments](DocumentationComments.md) の適用範囲)。公開サイトの API Reference に載せるのは `public` API だけで、`internal` 側のコメントはコントリビュータ向けの内部資料として扱います。
+XML ドキュメントコメントは `internal` や `private` にも書きます([DocumentationComments](DocumentationComments.md) の適用範囲)。公開サイトの API Reference に載せるのは `public` API のみであり、`internal` 側のコメントはコントリビュータ向けの内部資料として扱います。
 
 ## 3. Documentation Impact Matrix
 
-変更の種別ごとに、更新を検討する文書です。**その変更によって正典の説明が変わる場合だけ更新します。** 全項目を機械的に触る必要はありません。
+変更の種別ごとに、更新を検討すべき文書の一覧です。**変更によって正典の説明が変わる場合のみ更新します。** 全項目を機械的に更新する必要はありません。
 
 | 変更 | 更新対象 |
 |---|---|
@@ -119,13 +119,13 @@ XML ドキュメントコメントは `internal` / `private` にも書きます(
 | サンプルを追加・変更する | サンプルの README と `checklist.md`([CONTRIBUTING.md](../CONTRIBUTING.md) の規約) |
 | ドキュメントのページを移動・改名する | リンク元のページと [Home](Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
 
-PR では、テンプレートの `## Documentation` 節に、変更種別と更新した正典(更新が不要と判断した場合はその理由)を書きます。レビューでは、その判断がこの表と一致しているかを見ます。
+PR では、テンプレートの `## Documentation` 節に、変更種別と更新した正典(更新が不要と判断した場合はその理由)を記載します。レビューでは、その判断がこの表と一致しているかを確認します。
 
 ## 4. User docs のテンプレート
 
-User docs は新しく書くページが多いので、骨格を先に決めておきます。節はページの目的に不要なら省きます。Contributor 側のテンプレートは、再編で移した実物のページから逆算して #245 で足します。
+User docs は新しく書くページが多いため、先に骨格を定めます。ページの目的に不要な節は省きます。Contributor 側のテンプレートは、再編で移管した実物のページから逆算し、#245 で追加します。
 
-読者は [TargetUsers](TargetUsers.md) の3タイプです。**コードを書くのは LLM で、読むのも LLM** という前提を忘れずに、「LLM がこの API を誤用しない」書き方を優先します。Unity しか知らない読者(Booth クリエイター)には、Unity / uGUI の語彙からの読み替えを添えます。
+読者は [TargetUsers](TargetUsers.md) で定義する3タイプです。**コードを書くのも読むのも LLM である**という前提を忘れず、「LLM がこの API を誤用しない」書き方を優先します。Unity の知識のみを持つ読者(Booth クリエイター)には、Unity や uGUI の語彙による読み替えを添えます。
 
 ### Concept
 
@@ -163,7 +163,7 @@ User docs は新しく書くページが多いので、骨格を先に決めて�
 ## 次に読むもの
 ```
 
-サンプルコードは `samples/` を正典にし、本文には必要な最小の断片だけを載せます。完全な実装をドキュメント用に別に書きません。
+サンプルコードは `samples/` を正典とし、本文には必要最小限の断片のみを載せます。ドキュメント用に完全な実装を別途記述することはしません。
 
 ## 関連
 
