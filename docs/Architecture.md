@@ -2,7 +2,7 @@
 
 # Architecture
 
-FloatSoda は Flutter のアーキテクチャを参考に設計された VR オーバーレイ UI フレームワークです。SkiaSharp で描画コマンドを記録し、OpenGL テクスチャに焼き付けて OpenVR Compositor に提出することで SteamVR オーバーレイを表示します。
+FloatSoda は Flutter のアーキテクチャを参考に設計された VR オーバーレイ UI フレームワークです。SkiaSharp で描画コマンドを記録し、OpenGL テクスチャに書き込んで OpenVR Compositor に提出することで、SteamVR オーバーレイを表示します。
 
 ## アセンブリ構成
 
@@ -40,14 +40,14 @@ graph TD
 | `FloatSoda.OVR` | OpenVR 初期化（`Application`）、オーバーレイ型（`DashboardOverlay` / `WorldSpaceOverlay` / `DeviceTrackedOverlay`）、イベントディスパッチャ、例外体系 |
 | `FloatSoda` | ウィジェット/エレメントツリー、RenderObject ツリー、`RenderPipeline`、`FloatSodaApp`、Generic Host統合 |
 | `FloatSoda.Testing` | Widget・RenderObjectツリーをBitmapへ描画するヘッドレステスト支援 |
-| `FloatSoda.UI` | ヘッドレスUI層。振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder に委譲。**Phase 5 の予定で未提供**(→ [UILayering](UILayering.md#実装状況)) |
+| `FloatSoda.UI` | ヘッドレスUI層。振る舞いと状態機械(`ButtonBase`, `InteractionState`)のみを提供し、見た目の構築は builder に委譲。**Phase 5 の予定で未提供**(→ [UILayering](UILayering.md#実装状況)) |
 | `FloatSoda.UI.Cream` | デザインシステム①: レトロでクリーミーな色使いのフラットデザイン(`Button`, `ButtonStyle`, `CreamTheme`)。**Phase 5 の予定で未提供** |
 | `FloatSoda.UI.FizzyPop` | デザインシステム②: 透明感・グラスモーフィズム(`Button`, `ButtonStyle`, `FizzyPopTheme`)。**Phase 5 の予定で未提供** |
 | `FloatSoda.Hooks` | R3 ベースの `HookWidget` / `HookElement`。フレームワークのビルドループとは未統合(部分実装) |
 
 ## ツリー構造
 
-FloatSoda は Flutter の三ツリーモデルをベースに、現在 **RenderObject ツリー** と **レイヤーツリー** が完全実装済みです。ウィジェット/エレメントツリーは `StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>` と、`BuildOwner` による差分ビルド(`Key` 対応の子リスト差分を含む)が実装済みです。レイアウト・描画・入力系のウィジェットは一巡し、残る未実装はスクロール系(`ListView` / `GridView` / `SingleChildScrollView`)です(詳細は [WidgetSystem](WidgetSystem.md) と [BuildPipeline](BuildPipeline.md))。
+FloatSoda は Flutter の三ツリーモデルをベースにしており、現在 **RenderObject ツリー** と **レイヤーツリー** は完全実装済みです。ウィジェット/エレメントツリーでは、`StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>` に加え、`BuildOwner` による差分ビルド(`Key` 対応の子リスト差分を含む)を実装済みです。レイアウト・描画・入力系のウィジェットは実装を一巡しており、残る未実装項目はスクロール系(`ListView` / `GridView` / `SingleChildScrollView`)です(詳細は [WidgetSystem](WidgetSystem.md) と [BuildPipeline](BuildPipeline.md))。
 
 ```mermaid
 graph LR
@@ -154,9 +154,9 @@ sequenceDiagram
 | **レンダースレッド** | OpenGL コンテキスト, `GLView`, `Renderer`, `OverlayWindow` | `ConcurrentQueue<Action>` を処理 |
 | **I/Oスレッド** | `ImageProvider` / `FontProvider` によるリソース読み込み | `IOTaskRunner.RunAsync(...)` に投入し、完了は `BuildOwner` の `TaskScheduler` 経由でメインスレッドへ戻る |
 
-OpenGL のコンテキストはレンダースレッドが独占します。ウィンドウ作成も `PostTask` 経由でレンダースレッド上で実行されます。
+OpenGL のコンテキストはレンダースレッドが独占します。ウィンドウの作成も `PostTask` を経由してレンダースレッド上で実行されます。
 
-I/O スレッドは `IOTaskRunner` が持つ単一のバックグラウンドスレッドで、投入順に1件ずつ処理します。`Image` の画像読み込みはこのスレッドで行われ、完了後の再ビルドはメインスレッドの `BuildScope` で実行されます。なお、テキストレイアウト中のフォント解決は同期 API から呼ばれるため、このキューを経由せず呼び出しスレッド上で読み込みます。
+I/O スレッドは `IOTaskRunner` が持つ単一のバックグラウンドスレッドであり、タスクを投入順に1件ずつ処理します。`Image` の画像読み込みはこのスレッドで行い、完了後の再ビルドはメインスレッドの `BuildScope` で実行します。ただし、テキストレイアウト中のフォント解決は同期 API から呼ばれるため、このキューを経由せず、呼び出し元のスレッド上で直接読み込みます。
 
 ```text
 メインスレッド

@@ -1,8 +1,8 @@
 # FloatSoda ドキュメント
 
-**FloatSoda** は、SteamVR Overlay を Flutter のような宣言的な書き心地で作成できる .NET 10 / C# 14 向け UI フレームワークです。SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR という経路でレンダリングします。
+**FloatSoda** は、SteamVR Overlay を Flutter のような宣言的な書き心地で作成できる .NET 10 / C# 14 向け UI フレームワークです。SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR という流れでレンダリングします。
 
-このページはドキュメント全体の入り口です。各ページは相互リンクでつながっています。
+このページはドキュメント全体の入り口です。各ページは相互にリンクしています。
 
 ## ページ一覧
 
@@ -20,20 +20,20 @@
 | [Input](Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) | 利用者 |
 | [APIDesign](APIDesign.md) | API 設計規約(コンポーネント設計・命名・イミュータビリティ) | コントリビュータ |
 | [DocumentationComments](DocumentationComments.md) | ドキュメントコメント規約(適用範囲・契約・副作用の明記) | コントリビュータ |
-| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・正典の対応表・変更時に更新する文書) | コントリビュータ |
+| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・情報ごとの置き場所・変更時に更新する文書) | コントリビュータ |
 | [Localization](Localization.md) | ローカライゼーション方針(日本語デフォルト・resx・サテライトXML) | コントリビュータ |
 | [TestStrategy](TestStrategy.md) | テスト戦略(範囲 × 目的 × オラクルの3軸・現在の配置・既知の穴) | コントリビュータ |
 
 ## どこから読むか
 
-自分がどのタイプの作り手かを [TargetUsers](TargetUsers.md) で確認すると、最短の読み進め方がわかります。
+[TargetUsers](TargetUsers.md) で自分がどのタイプの作り手かを確認すると、最短の読み進め方がわかります。
 
 - **FloatSoda でオーバーレイを作りたい** → [GettingStarted](GettingStarted.md) → [WidgetSystem](WidgetSystem.md) → [OVRIntegration](OVRIntegration.md)
 - **フレームワークの内部を理解したい / コントリビュートしたい** → [Architecture](Architecture.md) → [BuildPipeline](BuildPipeline.md) → [RenderObjects](RenderObjects.md) → [APIDesign](APIDesign.md) → [DocumentationComments](DocumentationComments.md) → [WritingDocumentation](WritingDocumentation.md)
 
 ## 全体像: 三つのツリー
 
-FloatSoda は Flutter の三ツリーモデルを踏襲しています。宣言的な Widget ツリーが Element ツリーを介して RenderObject ツリーを構築・更新し、RenderObject の描画結果がレイヤーツリーとしてレンダースレッドに渡ります。
+FloatSoda は Flutter の三ツリーモデルを踏襲しています。宣言的な Widget ツリーは Element ツリーを介して RenderObject ツリーを構築・更新します。RenderObject の描画結果は、レイヤーツリーとしてレンダースレッドへ渡されます。
 
 ```mermaid
 graph LR
@@ -59,14 +59,14 @@ graph LR
     RB -->|"Paint → PaintingContext"| CL
 ```
 
-- **Widget** — UI の設計図。`abstract record` で不変。フレームごとに再生成しても等値比較で差分検知できます。→ [WidgetSystem](WidgetSystem.md)
-- **Element** — Widget と RenderObject を橋渡しする永続ノード。`BuildOwner` が dirty な Element だけを再ビルドします。→ [BuildPipeline](BuildPipeline.md)
-- **RenderObject** — レイアウト(`PerformLayout`)と描画(`Paint`)を担い、dirty フラグで差分レイアウト・差分ペイントを行います。→ [RenderObjects](RenderObjects.md)
-- **Layer** — 描画結果の合成ツリー。`Clone()` してレンダースレッドへ渡します。→ [Architecture](Architecture.md)
+- **Widget** — UI の設計図です。`abstract record` の不変オブジェクトであり、フレームごとに再生成しても等値比較で差分を検知できます。→ [WidgetSystem](WidgetSystem.md)
+- **Element** — Widget と RenderObject を橋渡しする永続ノードです。`BuildOwner` が dirty な Element だけを再ビルドします。→ [BuildPipeline](BuildPipeline.md)
+- **RenderObject** — レイアウト(`PerformLayout`)と描画(`Paint`)を担います。dirty フラグを用いて、差分レイアウトと差分ペイントを行います。→ [RenderObjects](RenderObjects.md)
+- **Layer** — 描画結果を合成するツリーです。`Clone()` で複製し、レンダースレッドへ渡します。→ [Architecture](Architecture.md)
 
 ## ロードマップ(Phase)
 
-開発は Phase 単位で進めています。Phase は「フレームワークとして何ができる段階か」を表す機能上の到達点で、NuGet のバージョン番号とは対応しません。バージョンはリリースの通し番号として独立に上がり、同じ Phase 中に複数のバージョンが公開されることがあります(バージョン番号から Phase を推定することはできません。`1.0.0` のみ Phase 7 に対応)。各 Phase の詳細スコープは [GitHub マイルストーン](https://github.com/sumx21t-3310/FloatSoda/milestones) を参照してください。
+開発は Phase 単位で進めています。Phase は「フレームワークとして何ができる段階か」を表す機能上の到達点であり、NuGet のバージョン番号とは連動しません。バージョンはリリースの通し番号として独立して上がります。同じ Phase 中に複数のバージョンが公開されることもあるため、バージョン番号から Phase は推定できません(ただし、`1.0.0` のみ Phase 7 に対応します)。各 Phase の詳細スコープは [GitHub マイルストーン](https://github.com/sumx21t-3310/FloatSoda/milestones) を参照してください。
 
 | Phase | 内容 | 状況 |
 |---|---|---|
@@ -78,27 +78,27 @@ graph LR
 | Phase 6 | DX 向上(Storybook・manifest 自動生成・ライフサイクル) | 未着手 |
 | Phase 7 | 安定版リリース(1.0) | 未着手 |
 
-> ⚠️ **ユーザー操作が動くのは、いまのところダッシュボードオーバーレイだけです。**
-> ヒットテストとジェスチャ認識は実装済みで、`GestureDetector` でタップとパンを受け取れます。
-> ただしポインタ座標の供給元(SteamVR のレーザーポインター)がダッシュボードオーバーレイにしか
+> ⚠️ **現在、ユーザー操作が機能するのはダッシュボードオーバーレイのみです。**
+> ヒットテストとジェスチャ認識は実装済みであり、`GestureDetector` でタップとパンを受け取れます。
+> ただし、ポインタ座標の供給元(SteamVR のレーザーポインター)がダッシュボードオーバーレイにしか
 > 接続されていないため、`WorldSpaceWindow` と `DeviceTrackedWindow` は表示専用です。
-> また、**UI3層構成(`FloatSoda.UI` と `Cream` / `FizzyPop`)はまだ提供していません。**
-> 3プロジェクトとも NuGet 未配布で、`Button` は骨組みだけで押下に反応しません(Phase 5 の予定)。
-> ボタンは `GestureDetector` で組み立ててください
+> また、**UI3層構成(`FloatSoda.UI` と `Cream` / `FizzyPop`)は未提供です。**
+> 3プロジェクトとも NuGet では未配布であり、`Button` は骨組みのみで押下に反応しません(Phase 5 で提供予定)。
+> ボタンは `GestureDetector` を使って組み立ててください
 > (→ [WidgetSystem](WidgetSystem.md#押せるボタンを作る))。
 
-進行中の2つの Phase に残っている主な作業です。
+進行中の2つの Phase に残っている主な作業は次のとおりです。
 
 | Phase | 残件 |
 |---|---|
-| Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
+| Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイからの入力) |
 | Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当) |
 
 ## 実装状況サマリ
 
-現在 Alpha 段階(Phase 1 と Phase 2 が並行して進行中)です。主要コンポーネントの実装状況は以下のとおりです。詳細は各ページの実装状況欄を参照してください。
+現在は Alpha 段階(Phase 1 と Phase 2 が並行して進行中)です。主要コンポーネントの実装状況は以下のとおりです。詳細は各ページの実装状況欄を参照してください。
 
-状況欄の記号は次の意味で使っています。
+状況欄の記号は次の意味を表します。
 
 | 記号 | 意味 |
 |---|---|
