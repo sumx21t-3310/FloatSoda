@@ -198,16 +198,16 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 - **処理の流れ** — フレーム、イベント、データが通る順序。図を使ってよい(例: Architecture の「レンダリングライフサイクル」、[BuildPipeline](BuildPipeline.md) の「全体の流れ」)
 - **所有権とライフサイクル** — 誰が何を持ち、いつ作られ、いつ捨てられるか。スレッドごとの所有物と通信方法(例: Architecture の「スレッドモデル」表)
 - **現在の実装の要点** — ソースのパスと型・メソッド名を添える(例: BuildPipeline の「BuildOwner と dirty list」)
-- **実装状況と未実装の領域** — Alpha の間は冒頭に置きます。読者が「動かないのは未実装だからか、バグか」を切り分けるために要ります(例: BuildPipeline の冒頭ブロックと「未実装の領域」表)
+- **実装状況と未実装の領域** — Alpha の間は冒頭に置く。「動かないのは未実装だからか、バグか」を読者が切り分けるために必要となる(例: BuildPipeline の冒頭ブロックと「未実装の領域」表)
 - **テストでの駆動** — その仕組みを実時間や実機なしで動かす方法(例: [Animation](Animation.md) の「テストでの駆動」)
 - **Flutter との対応** — どこまで Flutter と同じ戦略か。差異は台帳のエントリ番号を指す
 
 書かないもの:
 
-- **なぜその設計にしたか** → Design。「Flutter と同じ戦略」と一言添えるのはよいですが、比較した選択肢と理由は Design に置きます(例: RenderObjects の Semantics の注記は、理由を書かずに APIDesign へリンクしている)
-- **変更後も守る条件の列挙** → Requirements。Architecture は「いまこうなっている」を書き、「こうでなければならない」は Requirements に書きます
-- **利用者向けの使い方と注意** → User docs。「intrinsic 測定はコストに注意」のような利用者向けの注意は、再編で User 側へ抜き出します
-- **API のシグネチャと引数の契約** → XML ドキュメントコメント。組み込みの一覧表は API Reference と重なるので、再編で整理します
+- **なぜその設計にしたか** → Design。「Flutter と同じ戦略」と一言添えるのはよいが、比較した選択肢と理由は Design に置く(例: RenderObjects の Semantics の注記は、理由を書かずに APIDesign へリンクしている)
+- **変更後も守る条件の列挙** → Requirements。Architecture には現在の仕組みを書き、満たすべき条件は Requirements に書く
+- **利用者向けの使い方と注意** → User docs。「intrinsic 測定はコストに注意」のような利用者向けの注意は、再編で User 側へ抜き出す
+- **API のシグネチャと引数の契約** → XML ドキュメントコメント。組み込みの一覧表は API Reference と重なるため、再編で整理する
 
 コントリビュータ向けサンプル(#188 の分類で `PaintingSample` / `PrimitiveOverlay`)は、Architecture の実例として本文からリンクできます。
 
@@ -231,18 +231,18 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 書くもの:
 
 - **判断対象と背景** — 何を決めたか、どんな問題があったか(例: [UILayering](UILayering.md) の「Material ロックイン」)
-- **採用した方針と、判定可能な手順** — 「〜が自然」のような主観に流れないよう、手順や Litmus test を添えます(例: [APIDesign](APIDesign.md) の「.NET が標準で提供する機構を再実装しない」の3ステップ、UILayering の「2つ目のデザインシステムが、1つ目のコードをコピーせずに同じコンポーネントを作れるか」)
-- **理由と、理由にならないもの** — FloatSoda 固有の事情(Flutter / .NET / VR オーバーレイ / [TargetUsers](TargetUsers.md))に根拠を置きます(例: APIDesign の「理由にならないもの」)
+- **採用した方針と、判定可能な手順** — 「〜が自然」のような主観に流れないよう、手順や Litmus test を添える(例: [APIDesign](APIDesign.md) の「.NET が標準で提供する機構を再実装しない」の3ステップ、UILayering の「2つ目のデザインシステムが、1つ目のコードをコピーせずに同じコンポーネントを作れるか」)
+- **理由と、理由にならないもの** — FloatSoda 固有の事情(Flutter / .NET / VR オーバーレイ / [TargetUsers](TargetUsers.md))に根拠を置く(例: APIDesign の「理由にならないもの」)
 - **採用しなかった選択肢と、その理由**(例: [Localization](Localization.md) の「ニュートラル = 英語が定石だが、主客層と Booth 流通を優先した」)
 - **影響範囲と変更手続き** — この判断が効く範囲と、覆すときの手続き(例: Localization の「変更する場合は必ず issue で議論」)
-- **「コントリビュータへ」の注意書き** — 知らないと直したくなる判断には、意図的であることを明記します(例: Localization の 1 章末尾)
+- **「コントリビュータへ」の注意書き** — 知らないと直したくなる判断には、意図的であることを明記する(例: Localization の 1 章末尾)
 
 書かないもの:
 
 - **現在の処理の流れの詳細** → Architecture
-- **Flutter との個別の差異** → [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md)。Design は判断原則だけを持ちます([APIDesign](APIDesign.md) と台帳の分担と同じ)
+- **Flutter との個別の差異** → [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md)。Design は判断原則だけを持つ([APIDesign](APIDesign.md) と台帳の分担と同じ)
 - **手順** → Development
-- **議論の経過** — 決めたことと理由だけを書きます。経過は Issue に残します
+- **議論の経過** — 決めたことと理由だけを書く。経過は Issue に残す
 
 ```text
 # 判断対象
@@ -258,22 +258,22 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 
 実装を変えても**維持する条件**を書きます。読者は、変更が何を壊しうるかを確認するコントリビュータとレビュアーです。
 
-Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算しています。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずリンクし、4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)を Requirements 側に書きます。
+Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
 
 書くもの:
 
 - **適用範囲** — どのツリー、型、操作に効くか
-- **必須条件と不変条件** — 「常に成り立つ」条件の文で書きます。REVIEW.md の 4 章にある確認の問い(「drop 後に `Parent` が `null` に戻るか」)の裏返しの形です。4 章にある条件は複製せずリンクします
+- **必須条件と不変条件** — 「常に成り立つ」条件の文で書く。REVIEW.md の 4 章にある確認の問い(「drop 後に `Parent` が `null` に戻るか」)を裏返した形にする。4 章にある条件は複製せずにリンクする
 - **Observable behavior** — 利用者とテストから観測できる契約(例: BuildPipeline の「Widget にも RenderObject にも変更がないフレームでは、レイアウト・ペイント・合成のすべてがスキップされます」は、Requirements へ移せる observable behavior)
-- **破ったときの failure mode** — どの入力・状態で、何が壊れるか。REVIEW.md の finding の基準(concrete failure mode)と同じ粒度で書きます(例: REVIEW.md の「Layer の clone 後に可変オブジェクトを共有するとデータレースになり、テストではまず落ちない」)
-- **検証方法** — 条件を固定しているテストのファイルとメソッド名。無ければ「未設定」と明示します。台帳の `Test: — (not set)` と同じで、未設定は完了した記録ではなく未処理のタスクです
+- **破ったときの failure mode** — どの入力・状態で、何が壊れるか。REVIEW.md の finding の基準(concrete failure mode)と同じ粒度で書く(例: REVIEW.md の「Layer の clone 後に可変オブジェクトを共有するとデータレースになり、テストではまず落ちない」)
+- **検証方法** — 条件を固定しているテストのファイルとメソッド名。無ければ「未設定」と明示する。台帳の `Test: — (not set)` と同じく、未設定は完了した記録ではなく未処理のタスクとして扱う
 - **Flutter との関係** — parity か、台帳のどのエントリか
 
 書かないもの:
 
-- **なぜその条件が要るか** → Design。一文の理由は添えてよいですが、比較と経緯は Design に置きます
-- **現在の実装がどう満たしているか** → Architecture。Requirements は実装が変わっても残る条件だけを書きます
-- **実装詳細に依存する条件** — `private` フィールドの状態や呼び出し回数。テストと同じく observable behavior で書きます([CONTRIBUTING.md](../CONTRIBUTING.md) の「テスト観点」)
+- **なぜその条件が要るか** → Design。一文の理由は添えてもよいが、比較と経緯は Design に置く
+- **現在の実装がどう満たしているか** → Architecture。Requirements は実装が変わっても残る条件だけを書く
+- **実装詳細に依存する条件** — `private` フィールドの状態や呼び出し回数。テストと同じく observable behavior で書く([CONTRIBUTING.md](../CONTRIBUTING.md) の「テスト観点」)
 - **手順** → Development
 
 ```text
@@ -292,20 +292,20 @@ Requirements の独立したページはまだありません。いちばん近�
 
 特定の作業の**手順と規約**を書きます。読者は、その作業にこれから取りかかるコントリビュータと Coding Agent です。
 
-開発・レビュー・リリースの規約は [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) に置いてあり、`docs/` 側の Development ページはそれを置き換えません。`docs/` に置くのは、特定の作業に絞った規約と手順です(例: [DocumentationComments](DocumentationComments.md)、[TestStrategy](TestStrategy.md)、このページ)。
+開発・レビュー・リリースの規約は [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) に定められており、`docs/` 側の Development ページはそれを置き換えません。`docs/` に置くのは、特定の作業に絞った規約と手順です(例: [DocumentationComments](DocumentationComments.md)、[TestStrategy](TestStrategy.md)、このページ)。
 
 書くもの:
 
-- **冒頭に、このページの責務と、隣接する規約の置き場所の表** — 読者が「この規約の置き場所はここか」を最初に確かめられるようにします(例: CONTRIBUTING.md と REVIEW.md の冒頭、TestStrategy の冒頭段落)
-- **規約の強度** — 必須(MUST)と推奨(SHOULD)を区別します
+- **冒頭に、このページの責務と、隣接する規約の置き場所の表** — 読者が「この規約の置き場所はここか」を最初に確かめられるようにする(例: CONTRIBUTING.md と REVIEW.md の冒頭、TestStrategy の冒頭段落)
+- **規約の強度** — 必須(MUST)と推奨(SHOULD)を区別する
 - **手順** — 順番どおりに実行できる形(例: [Localization](Localization.md) の「メッセージを追加する手順」)
-- **規約が守られる場所** — CI、PR テンプレート、lint、`npm run verify` など、破ると検出される仕組み。無ければ、レビューで見る項目として書きます(例: [3 章](#3-documentation-impact-matrix)の Impact Matrix と PR テンプレートの `## Documentation` 節)
-- **日付付きの現状** — 件数や配置のような変わる情報は、日付を添えて更新の責任を明示します(例: TestStrategy の「現在の配置(2026-09-09 時点)」)
+- **規約が守られる場所** — CI、PR テンプレート、lint、`npm run verify` など、破ると検出される仕組み。無ければ、レビューで確認する項目として書く(例: [3 章](#3-documentation-impact-matrix)の Impact Matrix と PR テンプレートの `## Documentation` 節)
+- **日付付きの現状** — 件数や配置のような変わる情報は、日付を添えて更新の責任を明示する(例: TestStrategy の「現在の配置(2026-09-09 時点)」)
 
 書かないもの:
 
-- **置き場所が別にある規約の再掲** — リンクします。二重に書くと片方だけ更新されて食い違います
-- **仕組みの説明** → Architecture、**理由** → Design。理由は一文で添え、詳細はリンクします
+- **置き場所が別にある規約の再掲** — リンクに留める。二重に書くと、片方だけが更新されて食い違うためである
+- **仕組みの説明** → Architecture、**理由** → Design。理由は一文で添え、詳細はリンクする
 
 ```text
 # 名前
