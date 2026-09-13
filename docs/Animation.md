@@ -142,7 +142,7 @@ new FadeTransition
 }
 ```
 
-ポイントは更新経路です。`RenderAnimatedOpacity` が `Changed` を購読し、値が変わったフレームのみ `MarkNeedsPaint()` を呼び出します([RenderObjects](RenderObjects.md) の差分更新参照)。つまり、次のようになります。
+ポイントは更新の流れです。`RenderAnimatedOpacity` が `Changed` を購読し、値が変わったフレームのみ `MarkNeedsPaint()` を呼び出します([RenderObjects](RenderObjects.md) の差分更新参照)。つまり、次のようになります。
 
 - **Widget のリビルドは発生しない** — `SetState()` は不要
 - **レイアウトも走らない** — 再ペイントのみ(`OpacityLayer` の差し替え)

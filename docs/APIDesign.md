@@ -95,7 +95,7 @@ FloatSoda の docs は、Flutter の語彙で概念を説明します。読者�
 
 - Flutter に対応する public concept / Widget / RenderObject / lifecycle semantics が存在し、それを FloatSoda へ持ち込むものは **Flutter-derived** として扱い、この原則を適用します。
 - Flutter の型やアルゴリズムを内部実装として利用していても、FloatSoda 独自の利用者向け概念や API であれば、その API 自体は **FloatSoda 固有**として扱います (例: オーバーレイ種別)。
-- Flutter-derived かどうかの判断が割れる場合は、実装開始前に Issue 上で正典 (対応する Flutter API か、FloatSoda 固有か) を明示します。
+- Flutter-derived かどうかの判断が割れる場合は、実装開始前に Issue 上で基準 (対応する Flutter API か、FloatSoda 固有か) を明示します。
 
 #### 理由にならないもの
 
@@ -126,7 +126,7 @@ FloatSoda のランタイムや対象ユーザーに存在しない機能につ�
 4. **差異を固定するテスト**（ファイルとテストメソッド名）
 5. **利用者に影響する場合のドキュメント**
 
-記録先は [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳の正典**であり、本ドキュメントは判断原則だけを持ちます。
+記録先は [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳のマスター**であり、本ドキュメントは判断原則だけを持ちます。
 
 5 について、利用者から見える差異は台帳に記録するだけでは不十分です。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](../CONTRIBUTING.md)）にも記載してください。台帳はコントリビュータ向け、docs とサンプルは利用者向けです。
 
@@ -148,7 +148,7 @@ Flutter を参照して移植や修正を行う場合、可能な範囲で次の
 既存実装を無条件に正しいものとして扱わないでください。**上から順に**確認します。
 
 1. **FloatSoda で明示的に定義された差異・設計判断** — 本ドキュメント、台帳、`docs/` の明記
-2. **Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無ければ、Flutter を正典とします。
+2. **Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無ければ、Flutter を基準とします。
 3. **既存の FloatSoda 実装は根拠になりません** — そう実装されていることは、それが正しいことを意味しません。
 
 **古い Issue や既存実装だけを根拠に、新しい挙動を決めないでください。** Issue が書かれた時点の前提が今も成り立つかを確認してください。
@@ -163,7 +163,7 @@ Flutter の `SemanticsNode` / `SemanticsConfiguration` / `PipelineOwner.semantic
 
 理由:
 
-- **出力先に経路がない** — VR オーバーレイテクスチャは、OS ネイティブのアクセシビリティ API (Windows Narrator / UI Automation / macOS VoiceOver など) に接続する自然なフックを持っていません。SteamVR / OpenVR にもスクリーンリーダー統合の仕組みは存在しません。
+- **出力先がない** — VR オーバーレイテクスチャは、OS ネイティブのアクセシビリティ API (Windows Narrator / UI Automation / macOS VoiceOver など) に接続する自然なフックを持っていません。SteamVR / OpenVR にもスクリーンリーダー統合の仕組みは存在しません。
 - **ターゲットユーザーに需要がない** — FloatSoda の3ペルソナ (バイブコーディング VRChatter / Booth 創作者 / uGUI 回避エンジニア) の要件に、アクセシビリティ需要は含まれていません。
 - **部分導入は無意味** — `markNeedsSemanticsUpdate()` だけ実装しても、`SemanticsNode` ツリーと `SemanticsOwner` が無ければ実質 no-op になります。本格的に導入する場合は Semantics ツリー全体の設計が必要になり、その時点で改めて設計し直す方が自然です。
 
@@ -174,7 +174,7 @@ Flutter の `SemanticsNode` / `SemanticsConfiguration` / `PipelineOwner.semantic
 - `SemanticsConfiguration` / `SemanticsNode` 系型
 - ウィジェット側の `ignoringSemantics` / `excludeSemantics` / `semanticContainer` などのフラグ
 
-将来、VR 空間内でアクセシビリティ情報を表現する自然な経路が見つかった時点で、個別に設計します。それまでは、Flutter 側コードの semantics 関連の呼び出しは移植せずに削除することを規約とします。
+将来、VR 空間内でアクセシビリティ情報を表現する自然な方法が見つかった時点で、個別に設計します。それまでは、Flutter 側コードの semantics 関連の呼び出しは移植せずに削除することを規約とします。
 
 ```csharp
 // 推奨: オブジェクト初期化子によるツリー構造

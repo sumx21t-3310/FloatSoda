@@ -2,7 +2,7 @@
 
 # ドキュメント執筆ガイド
 
-FloatSoda のドキュメントは、読者ごとに **User docs / Contributor docs / API Reference** の3系統に分かれています(情報設計の正典は [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。本ページは、新しい情報を書くときに「どの系統のどのページに書くか」「何が正典か」「変更時に何を更新するか」を決めるための入口です。書き方の規約はそれぞれの正典に置いているため、ここには再掲しません。
+FloatSoda のドキュメントは、読者ごとに **User docs / Contributor docs / API Reference** の3系統に分かれています(情報設計の一次情報は [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。本ページは、新しい情報を書くときに「どの系統のどのページに書くか」「どこが一次情報か」「変更時に何を更新するか」を決めるための入口です。書き方の規約はそれぞれの置き場所に置いているため、ここには再掲しません。
 
 | 系統 | 読者 | 答える問い |
 |---|---|---|
@@ -35,7 +35,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 
 境界で迷いやすい情報は、次のように分類します。
 
-- **利用者から観測できる制約**は User docs に書き、**その制約を成立させる内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力経路を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
+- **利用者から観測できる制約**は User docs に書き、**その制約を成立させる内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
 - **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
 - **同じテーマは1つの系統で詳述**し、ほかの系統からはリンクします。概念を Guide で説明し直したり、シグネチャを Concept に並べたりしません
 
@@ -80,11 +80,11 @@ User docs は、公開 API および API Reference と合わせて、**#188 の�
 | GettingStarted | Tutorial | 現行 GettingStarted、`samples/FloatSoda.Samples.GettingStarted` |
 | ミニアプリを作る | Tutorial | 層3(統合ミニアプリ型)サンプル(Phase 2 完了後) |
 
-## 2. 正典の対応表
+## 2. 情報ごとの置き場所
 
 同じ情報は1箇所のみに書き、ほかの場所からはリンクします。
 
-| 情報 | 正典 |
+| 情報 | 置き場所 |
 |---|---|
 | API のシグネチャ・引数・戻り値・例外・nullability・副作用・スレッド制約 | XML ドキュメントコメント(規約は [DocumentationComments](DocumentationComments.md)) |
 | API の具体的な使い方 | User Guide |
@@ -103,7 +103,7 @@ XML ドキュメントコメントは `internal` や `private` にも書きま�
 
 ## 3. Documentation Impact Matrix
 
-変更の種別ごとに、更新を検討すべき文書の一覧です。**変更によって正典の説明が変わる場合のみ更新します。** 全項目を機械的に更新する必要はありません。
+変更の種別ごとに、更新を検討すべき文書の一覧です。**変更によって置き場所の文書の説明が変わる場合のみ更新します。** 全項目を機械的に更新する必要はありません。
 
 | 変更 | 更新対象 |
 |---|---|
@@ -119,7 +119,7 @@ XML ドキュメントコメントは `internal` や `private` にも書きま�
 | サンプルを追加・変更する | サンプルの README と `checklist.md`([CONTRIBUTING.md](../CONTRIBUTING.md) の規約) |
 | ドキュメントのページを移動・改名する | リンク元のページと [Home](Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
 
-PR では、テンプレートの `## Documentation` 節に、変更種別と更新した正典(更新が不要と判断した場合はその理由)を記載します。レビューでは、その判断がこの表と一致しているかを確認します。
+PR では、テンプレートの `## Documentation` 節に、変更種別と更新した文書(更新が不要と判断した場合はその理由)を記載します。レビューでは、その判断がこの表と一致しているかを確認します。
 
 ## 4. User docs のテンプレート
 
@@ -163,7 +163,7 @@ User docs は新しく書くページが多いため、先に骨格を定めま�
 ## 次に読むもの
 ```
 
-サンプルコードは `samples/` を正典とし、本文には必要最小限の断片のみを載せます。ドキュメント用に完全な実装を別途記述することはしません。
+サンプルコードは `samples/` をマスターとし、本文には必要最小限の断片のみを載せます。ドキュメント用に完全な実装を別途記述することはしません。
 
 ## 関連
 

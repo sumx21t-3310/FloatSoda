@@ -150,7 +150,7 @@ public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositio
 | `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`、既定は前方1m・高さ1m） | ✗ 届かない |
 | `DeviceTrackedWindow { Title, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） | ✗ 届かない |
 
-**ポインタ入力が届くのはダッシュボードオーバーレイだけです。** SteamVR はダッシュボード上のレーザーポインターをマウスイベントとして送信するため、FloatSoda はそれをそのままヒットテストへ渡せます。ワールド座標固定とデバイス追従のオーバーレイには、コントローラーのレイからポインタ座標を生成する経路がまだありません。これらのウィンドウに `GestureDetector` を置くと、コンパイルは通り例外も出ませんが、コールバックは呼ばれません。
+**ポインタ入力が届くのはダッシュボードオーバーレイだけです。** SteamVR はダッシュボード上のレーザーポインターをマウスイベントとして送信するため、FloatSoda はそれをそのままヒットテストへ渡せます。ワールド座標固定とデバイス追従のオーバーレイには、コントローラーのレイからポインタ座標を生成する仕組みがまだありません。これらのウィンドウに `GestureDetector` を置くと、コンパイルは通り例外も出ませんが、コールバックは呼ばれません。
 
 `Title` は SteamVR 上の表示名（ダッシュボードタブ名など）です。OpenVR のオーバーレイキーは「エントリアセンブリ名 + `Title` のスネークケース」から自動生成されます（例: アセンブリ `MyOverlayApp` + `Title = "My Dashboard"` → `my_overlay_app.my_dashboard`）。
 

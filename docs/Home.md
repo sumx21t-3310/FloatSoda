@@ -1,6 +1,6 @@
 # FloatSoda ドキュメント
 
-**FloatSoda** は、SteamVR Overlay を Flutter のような宣言的な書き心地で作成できる .NET 10 / C# 14 向け UI フレームワークです。SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR という経路でレンダリングします。
+**FloatSoda** は、SteamVR Overlay を Flutter のような宣言的な書き心地で作成できる .NET 10 / C# 14 向け UI フレームワークです。SkiaSharp → OpenGL (GLFW/OpenTK) → OpenVR という流れでレンダリングします。
 
 このページはドキュメント全体の入り口です。各ページは相互にリンクしています。
 
@@ -20,7 +20,7 @@
 | [Input](Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) | 利用者 |
 | [APIDesign](APIDesign.md) | API 設計規約(コンポーネント設計・命名・イミュータビリティ) | コントリビュータ |
 | [DocumentationComments](DocumentationComments.md) | ドキュメントコメント規約(適用範囲・契約・副作用の明記) | コントリビュータ |
-| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・正典の対応表・変更時に更新する文書) | コントリビュータ |
+| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・情報ごとの置き場所・変更時に更新する文書) | コントリビュータ |
 | [Localization](Localization.md) | ローカライゼーション方針(日本語デフォルト・resx・サテライトXML) | コントリビュータ |
 | [TestStrategy](TestStrategy.md) | テスト戦略(範囲 × 目的 × オラクルの3軸・現在の配置・既知の穴) | コントリビュータ |
 
@@ -91,7 +91,7 @@ graph LR
 
 | Phase | 残件 |
 |---|---|
-| Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイ経路) |
+| Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイからの入力) |
 | Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当) |
 
 ## 実装状況サマリ

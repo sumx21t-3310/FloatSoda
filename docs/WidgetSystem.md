@@ -118,7 +118,7 @@ public class WatchState : State<WatchWidget>
 #### ServiceProvider — DI コンテナへ到達する
 
 `ServiceProvider` は `IServiceProvider` をウィジェットツリーへ公開します。
-`Widget` は `record` でコンストラクタ注入ができないため、**これがビルド中にサービスを解決する経路です。**
+`Widget` は `record` でコンストラクタ注入ができないため、**これがビルド中にサービスを解決する方法です。**
 
 ```csharp
 using FloatSoda.Elements;
@@ -671,7 +671,7 @@ Widget tappable = new GestureDetector
 **現時点でポインタ座標が届くのは、ダッシュボードオーバーレイ(`DashboardWindow`)だけです。**
 SteamVR がダッシュボード上のレーザーポインターをマウスイベントとして送信するため、
 FloatSoda はこれを `IRawPointerSource` として受け取っています。
-`WorldSpaceWindow` と `DeviceTrackedWindow` はコントローラーレイの経路が未接続です。
+`WorldSpaceWindow` と `DeviceTrackedWindow` はコントローラーレイからの入力が未接続です。
 ヒットテスト自体は機能しますが、判定用の座標が供給されません。この接続は Phase 1 の残件です。
 
 したがって、`WorldSpaceWindow` で `GestureDetector` を使用しても、
