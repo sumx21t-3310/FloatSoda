@@ -58,7 +58,7 @@ Enter / Exit で状態を切り替え、`SetState` で色やラベルを差し�
 
 トリガーを引いたままレーザーを**オーバーレイそのものの外**へ出すと、押下中のポインター列は `Cancel` で中断され、タップは成立しません。ボタンの「押しかけてやめる」操作に相当します。
 
-的の外へ出ただけ(オーバーレイ内)では Cancel にはなりません。届くのはホバーの `Exit` で、押下列は継続します。Cancel が合成されるのは、ポインターがウィンドウ / オーバーレイから退出したときです。この確認には実機のレーザー操作が必要です(手順は [checklist.md](checklist.md))。
+的の外へ出ただけ(オーバーレイ内)では Cancel にはなりません。届くのはホバーの `Exit` で、押下列は継続します。Cancel が合成されるのは、ポインターがウィンドウ / オーバーレイから退出したときです。この確認には実機のレーザー操作が必要です。
 
 ### 入力が届くウィンドウ種別
 
@@ -94,7 +94,6 @@ dotnet run --project samples/FloatSoda.Samples.PointerRegion
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/Input.md](../../docs/Input.md) — 入力イベントの流れ
 - [FloatSoda.Samples.Listener](../FloatSoda.Samples.Listener) — Down / Up / Move も扱う場合
 - [FloatSoda.Samples.GestureDetector](../FloatSoda.Samples.GestureDetector) — タップ・ドラッグの意味付け

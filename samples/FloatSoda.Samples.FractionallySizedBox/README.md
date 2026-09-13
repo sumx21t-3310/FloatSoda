@@ -76,6 +76,5 @@ dotnet run --project samples/FloatSoda.Samples.FractionallySizedBox
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.OverflowBox](../FloatSoda.Samples.OverflowBox) — 親と無関係な制約を渡す場合

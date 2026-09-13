@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FloatSoda checks/items.jsonl ビューワー</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9;
+    --panel: #ffffff;
+    --border: #d9dde3;
+    --text: #1b1f24;
+    --muted: #6b7280;
+    --accent: #3b6fd6;
+    --accent-weak: #e8eefb;
+    --mono-bg: #f0f2f5;
+    --row-hover: #f2f6fd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --panel: #1c1f24;
+      --border: #33383f;
+      --text: #e7e9ec;
+      --muted: #9aa2ad;
+      --accent: #7aa2f7;
+      --accent-weak: #23304a;
+      --mono-bg: #24272d;
+      --row-hover: #23262c;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+    font-size: 14px;
+  }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  h1 { font-size: 18px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 20px; font-size: 13px; }
+
+  #drop {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--muted);
+    background: var(--panel);
+    transition: border-color .15s, background .15s;
+    cursor: pointer;
+  }
+  #drop.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-weak);
+    color: var(--text);
+  }
+  #drop .hint { font-size: 12px; margin-top: 6px; }
+  #fileInput, #dirInput { display: none; }
+
+  .toolbar[hidden] { display: none; }
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin: 16px 0;
+  }
+  .toolbar input[type="search"] {
+    flex: 1 1 220px;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--text);
+    font-size: 13px;
+  }
+  .toolbar select {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--panel);
+    color: var(--text);
+    font-size: 13px;
+  }
+  .stat { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+  .sample-group {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .sample-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--accent-weak);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .sample-head .count { font-weight: 400; color: var(--muted); font-size: 12px; }
+  .sample-head .path { font-weight: 400; color: var(--muted); font-size: 11px; margin-left: auto; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 12px; border-top: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+  tr:hover td { background: var(--row-hover); }
+  .id-cell { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; color: var(--muted); white-space: nowrap; }
+  .read-aloud { font-weight: 600; }
+  .source-cell, .flutter-cell {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 12px;
+    background: var(--mono-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .flutter-cell.empty { color: var(--muted); background: none; padding: 0; }
+
+  .empty-state { text-align: center; color: var(--muted); padding: 40px 0; }
+  .error-box {
+    border: 1px solid #d66; background: #fdeeee; color: #900;
+    border-radius: 8px; padding: 10px 14px; margin: 10px 0; font-size: 13px;
+  }
+  @media (prefers-color-scheme: dark) {
+    .error-box { background: #3a1f1f; color: #ff9a9a; border-color: #7a3a3a; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>checks/items.jsonl ビューワー</h1>
+  <p class="sub">
+    <code>samples/</code> フォルダ、または個々の <code>items.jsonl</code> を選ぶ/ドロップすると、
+    サンプルごとに検証項目を一覧表示します。ファイルはこのブラウザの外へ送信されません。
+  </p>
+
+  <div id="drop">
+    <div>ここにフォルダ / <code>*.jsonl</code> をドラッグ&ドロップ、またはクリックして選択</div>
+    <div class="hint">フォルダを選ぶと配下の <code>checks/items.jsonl</code> だけを自動で拾います</div>
+    <input id="fileInput" type="file" accept=".jsonl" multiple />
+    <input id="dirInput" type="file" webkitdirectory directory multiple />
+  </div>
+
+  <div id="errors"></div>
+
+  <div class="toolbar" id="toolbar" hidden>
+    <input id="search" type="search" placeholder="question / read_aloud / id / source で検索…" />
+    <select id="sampleFilter"><option value="">全サンプル</option></select>
+    <span class="stat" id="stat"></span>
+  </div>
+
+  <div id="results"></div>
+</div>
+
+<script>
+(() => {
+  const drop = document.getElementById('drop');
+  const fileInput = document.getElementById('fileInput');
+  const dirInput = document.getElementById('dirInput');
+  const errorsBox = document.getElementById('errors');
+  const toolbar = document.getElementById('toolbar');
+  const resultsBox = document.getElementById('results');
+  const searchInput = document.getElementById('search');
+  const sampleFilter = document.getElementById('sampleFilter');
+  const stat = document.getElementById('stat');
+
+  /** @type {{sample:string, path:string, items:object[]}[]} */
+  let groups = [];
+
+  drop.addEventListener('click', () => fileInput.click());
+
+  drop.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    drop.classList.add('drag-over');
+  });
+  drop.addEventListener('dragleave', () => drop.classList.remove('drag-over'));
+  drop.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    drop.classList.remove('drag-over');
+    const items = e.dataTransfer.items;
+    const files = [];
+    const walkers = [];
+    for (const it of items) {
+      const entry = it.webkitGetAsEntry && it.webkitGetAsEntry();
+      if (entry) walkers.push(walkEntry(entry, files));
+      else {
+        const f = it.getAsFile();
+        if (f) files.push({ file: f, path: f.name });
+      }
+    }
+    await Promise.all(walkers);
+    loadFiles(files);
+  });
+
+  fileInput.addEventListener('change', () => {
+    const files = Array.from(fileInput.files).map((f) => ({ file: f, path: f.webkitRelativePath || f.name }));
+    loadFiles(files);
+  });
+  dirInput.addEventListener('change', () => {
+    const files = Array.from(dirInput.files).map((f) => ({ file: f, path: f.webkitRelativePath || f.name }));
+    loadFiles(files);
+  });
+
+  function walkEntry(entry, out) {
+    return new Promise((resolve) => {
+      if (entry.isFile) {
+        entry.file((file) => {
+          out.push({ file, path: entry.fullPath.replace(/^\//, '') });
+          resolve();
+        }, resolve);
+      } else if (entry.isDirectory) {
+        const reader = entry.createReader();
+        const readBatch = () => {
+          reader.readEntries(async (entries) => {
+            if (!entries.length) return resolve();
+            await Promise.all(entries.map((child) => walkEntry(child, out)));
+            readBatch();
+          }, resolve);
+        };
+        readBatch();
+      } else {
+        resolve();
+      }
+    });
+  }
+
+  async function loadFiles(files) {
+    errorsBox.innerHTML = '';
+    const jsonlFiles = files.filter((f) => /\.jsonl$/i.test(f.path));
+    if (!jsonlFiles.length) {
+      showError('*.jsonl ファイルが見つかりませんでした。samples/ フォルダか items.jsonl を選んでください。');
+      return;
+    }
+
+    // items.jsonl だけを対象にする(results/*.jsonl が混ざっていても無視)
+    const itemsFiles = jsonlFiles.filter((f) => /(^|\/)items\.jsonl$/i.test(f.path))
+      .concat(jsonlFiles.length === 1 ? jsonlFiles : []); // 単体選択時はファイル名を問わない
+
+    const targets = itemsFiles.length ? dedupe(itemsFiles) : jsonlFiles;
+    groups = [];
+
+    for (const f of targets) {
+      const text = await f.file.text();
+      const { rows, errors } = parseJsonl(text);
+      if (errors.length) {
+        showError(`${f.path}: ${errors.length} 行のパースに失敗しました(該当行は無視)`);
+      }
+      if (!rows.length) continue;
+      groups.push({
+        sample: guessSampleName(f.path),
+        path: f.path,
+        items: rows,
+      });
+    }
+
+    groups.sort((a, b) => a.sample.localeCompare(b.sample, 'ja'));
+    populateSampleFilter();
+    render();
+    toolbar.hidden = groups.length === 0;
+    if (!groups.length) {
+      showError('items.jsonl の中身を読み取れませんでした。');
+    }
+  }
+
+  function dedupe(files) {
+    const seen = new Set();
+    return files.filter((f) => {
+      if (seen.has(f.path)) return false;
+      seen.add(f.path);
+      return true;
+    });
+  }
+
+  function guessSampleName(path) {
+    const m = path.match(/FloatSoda\.Samples\.([^\/\\]+)/);
+    if (m) return m[1];
+    const parts = path.split(/[\/\\]/);
+    const idx = parts.indexOf('checks');
+    if (idx > 0) return parts[idx - 1];
+    return path;
+  }
+
+  function parseJsonl(text) {
+    const rows = [];
+    const errors = [];
+    text.split(/\r?\n/).forEach((line, i) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      try {
+        rows.push(JSON.parse(trimmed));
+      } catch (e) {
+        errors.push(i + 1);
+      }
+    });
+    return { rows, errors };
+  }
+
+  function showError(msg) {
+    const div = document.createElement('div');
+    div.className = 'error-box';
+    div.textContent = msg;
+    errorsBox.appendChild(div);
+  }
+
+  function populateSampleFilter() {
+    sampleFilter.innerHTML = '<option value="">全サンプル</option>';
+    for (const g of groups) {
+      const opt = document.createElement('option');
+      opt.value = g.sample;
+      opt.textContent = `${g.sample} (${g.items.length})`;
+      sampleFilter.appendChild(opt);
+    }
+  }
+
+  function render() {
+    const q = searchInput.value.trim().toLowerCase();
+    const sampleWanted = sampleFilter.value;
+    resultsBox.innerHTML = '';
+    let shownItems = 0;
+    let shownGroups = 0;
+
+    for (const g of groups) {
+      if (sampleWanted && g.sample !== sampleWanted) continue;
+      const filtered = q
+        ? g.items.filter((it) => matchesQuery(it, q))
+        : g.items;
+      if (!filtered.length) continue;
+
+      shownGroups++;
+      shownItems += filtered.length;
+
+      const box = document.createElement('div');
+      box.className = 'sample-group';
+
+      const head = document.createElement('div');
+      head.className = 'sample-head';
+      head.innerHTML = `<span>${escapeHtml(g.sample)}</span>` +
+        `<span class="count">${filtered.length} / ${g.items.length} 項目</span>` +
+        `<span class="path">${escapeHtml(g.path)}</span>`;
+      box.appendChild(head);
+
+      const table = document.createElement('table');
+      table.innerHTML = `
+        <thead><tr>
+          <th style="width:8%">id</th>
+          <th style="width:30%">question</th>
+          <th style="width:22%">read_aloud</th>
+          <th style="width:20%">source</th>
+          <th style="width:20%">flutter_ref</th>
+        </tr></thead>`;
+      const tbody = document.createElement('tbody');
+      for (const it of filtered) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="id-cell">${escapeHtml(it.id ?? '')}</td>
+          <td>${escapeHtml(it.question ?? '')}</td>
+          <td class="read-aloud">${escapeHtml(it.read_aloud ?? '')}</td>
+          <td><span class="source-cell">${escapeHtml(it.source ?? '')}</span></td>
+          <td>${it.flutter_ref
+            ? `<span class="flutter-cell">${escapeHtml(it.flutter_ref)}</span>`
+            : '<span class="flutter-cell empty">—</span>'}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+      table.appendChild(tbody);
+      box.appendChild(table);
+      resultsBox.appendChild(box);
+    }
+
+    if (!shownGroups) {
+      resultsBox.innerHTML = '<div class="empty-state">条件に一致する項目がありません</div>';
+    }
+
+    const totalItems = groups.reduce((n, g) => n + g.items.length, 0);
+    stat.textContent = `${groups.length} サンプル / ${totalItems} 項目中 ${shownItems} 件表示`;
+  }
+
+  function matchesQuery(it, q) {
+    return ['id', 'question', 'read_aloud', 'source', 'flutter_ref']
+      .some((k) => String(it[k] ?? '').toLowerCase().includes(q));
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  searchInput.addEventListener('input', render);
+  sampleFilter.addEventListener('change', render);
+})();
+</script>
+</body>
+</html>

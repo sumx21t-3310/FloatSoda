@@ -103,6 +103,5 @@ dotnet run --project samples/FloatSoda.Samples.Image
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [docs/RenderObjects.md](../../docs/RenderObjects.md) — `RenderImage` の契約
