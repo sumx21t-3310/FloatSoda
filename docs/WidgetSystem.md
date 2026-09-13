@@ -22,7 +22,7 @@ Element (mutable)          ← 状態・ライフサイクル管理、BuildOwner
 RenderObject               ← レイアウト・描画(dirty フラグで差分更新)
 ```
 
-- **Widget** — UI の設計図。`abstract record` で不変。フレームごとに再生成されても `==` で差分検知できる。
+- **Widget** — UI の設計図。`abstract record` で不変。フレームごとに再生成されても `==` で差分を検知できる。
 - **Element** — Widget と RenderObject を橋渡しする永続ノード。ウィジェットが更新されても Element は再利用される。再ビルドの仕組みは [BuildPipeline](BuildPipeline.md) を参照。
 - **RenderObject** — `PerformLayout` と `Paint` を実装する描画エンジン。詳細は [RenderObjects](RenderObjects.md) を参照。
 
@@ -44,15 +44,15 @@ RenderObject               ← レイアウト・描画(dirty フラグで差分
 ## ParentDataWidget
 
 `ParentDataWidget<T>` は、自身ではRenderObjectを作らず、子RenderObjectの `ParentData` を更新します。
-親RenderObjectは `SetupParentData` で `T` を用意し、派生Widgetは `ApplyParentData(T)` で値を比較・更新して、変更した場合だけ `true` を返します。
-変更時の `MarkNeedsLayout()` は基底クラスが親RenderObjectへ伝播します。
+親RenderObjectは `SetupParentData` で `T` を用意します。派生Widgetは `ApplyParentData(T)` で値を比較・更新し、変更した場合だけ `true` を返します。
+変更時の `MarkNeedsLayout()` は、基底クラスが親RenderObjectへ伝播させます。
 
 `Flexible` や `Positioned` のように「親レイアウトだけが解釈する子ごとの情報」を宣言的なWidget APIとして表現するための基盤です。
 対応するParentDataを用意しない親の下で使用すると `InvalidOperationException` になります。
 
 ## StatelessWidget
 
-状態を持たない純粋関数コンポーネント。`Build(IBuildContext)` でウィジェットツリーを返します。
+状態を持たない純粋関数コンポーネントです。`Build(IBuildContext)` でウィジェットツリーを返します。
 
 ```csharp
 using FloatSoda.Elements;
@@ -77,7 +77,7 @@ public record MyWidget : StatelessWidget
 
 ## StatefulWidget / State
 
-`StatefulWidget<T>` は Widget から `State<T>` を分離するパターンです。`State.SetState(Action)` は状態を書き換えたうえで `Element.MarkNeedsBuild()` を呼び、次フレームの `BuildScope()` で再ビルドされます。
+`StatefulWidget<T>` は Widget から `State<T>` を分離するパターンです。`State.SetState(Action)` は状態を書き換えたうえで `Element.MarkNeedsBuild()` を呼びます。これにより、次フレームの `BuildScope()` で再ビルドされます。
 
 ```csharp
 public record WatchWidget : StatefulWidget<WatchWidget>
@@ -112,13 +112,13 @@ public class WatchState : State<WatchWidget>
 
 ### 組み込みの `InheritedWidget`
 
-自分で `InheritedWidget` を定義しなくても、フレームワークが2つを用意しています。
+自分で `InheritedWidget` を定義しなくても、フレームワークが2つ提供しています。
 どちらも `Of(IBuildContext)` で最も近い祖先を取得し、同時に依存として登録します。
 
 #### ServiceProvider — DI コンテナへ到達する
 
 `ServiceProvider` は `IServiceProvider` をウィジェットツリーへ公開します。
-`Widget` は `record` でコンストラクタ注入ができないため、**ビルド中にサービスを解決する経路はこれです。**
+`Widget` は `record` でコンストラクタ注入ができないため、**これがビルド中にサービスを解決する経路です。**
 
 ```csharp
 using FloatSoda.Elements;
@@ -139,7 +139,7 @@ public record StatusLabel : StatelessWidget
 ```
 
 祖先に `ServiceProvider` が無い場合、`Of` は `InvalidOperationException` を投げます。
-ツリーの上位へ次のように挿しておきます。
+次のように、ツリーの上位へ配置してください。
 
 ```csharp
 Widget root = new ServiceProvider
@@ -151,17 +151,15 @@ Widget root = new ServiceProvider
 
 #### WindowWidget — 自分が載っているウィンドウを知る
 
-`WindowWidget`(と派生の `DashboardWindow` / `WorldSpaceWindow` / `DeviceTrackedWindow`)も
-`InheritedWidget` です。`app.CreateWindow(...)` に渡した時点でウィジェットツリーのルートになるため、
-どのウィジェットからでも `WindowWidget.Of(context)` で `Title` や `Size` を読めます。
+`WindowWidget`(と派生の `DashboardWindow` / `WorldSpaceWindow` / `DeviceTrackedWindow`)も `InheritedWidget` です。
+`app.CreateWindow(...)` に渡した時点でウィジェットツリーのルートになるため、どのウィジェットからでも `WindowWidget.Of(context)` で `Title` や `Size` を読めます。
 
 ```csharp
 var window = WindowWidget.Of(context);
 Widget caption = new Text(window.Title);
 ```
 
-`WindowWidget` は `ScopeType` を基底型に固定しているため、
-派生型で `CreateWindow` していても `WindowWidget.Of` で引けます。
+`WindowWidget` は `ScopeType` を基底型に固定しているため、派生型で `CreateWindow` していても `WindowWidget.Of` で取得できます。
 オーバーレイ種別で表示を変えたい場合は型で分岐してください。
 
 ```csharp
@@ -172,13 +170,10 @@ Widget hint = WindowWidget.Of(context) is DashboardWindow
 
 **種別の判定には、上のようにパターンマッチを使ってください。**
 `DashboardWindow.Of(context)` のような書き方は種別の検証になりません。
-`Of` を独自に持つのは `WindowWidget` / `OverlayWindow` / `DesktopWindow` の3つだけで、
-`DashboardWindow` / `WorldSpaceWindow` / `DeviceTrackedWindow` は自前の `Of` を持たないためです。
-`DashboardWindow.Of(context)` と書いても、実際に呼ばれるのは継承した `OverlayWindow.Of` で、
-戻り値の型も `OverlayWindow` になります。ルートが `WorldSpaceWindow` でも例外にはなりません。
+`Of` を独自に持つのは `WindowWidget` / `OverlayWindow` / `DesktopWindow` の3つだけで、`DashboardWindow` / `WorldSpaceWindow` / `DeviceTrackedWindow` は自前の `Of` を持たないためです。
+`DashboardWindow.Of(context)` と書いても、実際に呼ばれるのは継承した `OverlayWindow.Of` で、戻り値の型も `OverlayWindow` になります。ルートが `WorldSpaceWindow` でも例外にはなりません。
 
-`OverlayWindow.Of(context)` は、ルートがオーバーレイ以外(`DesktopWindow`)のときだけ
-`InvalidOperationException` を投げます。
+`OverlayWindow.Of(context)` は、ルートがオーバーレイ以外(`DesktopWindow`)のときだけ `InvalidOperationException` を投げます。
 
 ### Builder
 
@@ -280,7 +275,7 @@ Widget counterLabel = new ListenableBuilder
 
 > **△ 部分実装:** `FloatSoda.Hooks` プロジェクトに R3 ベースの `HookWidget` / `HookElement` がありますが、フレームワークのビルドループとは未統合です。`HookExtension` の `UseState` / `UseEffect` / `Depends` / `UseMemo` / `UseAction` は `NotImplementedException` を投げます。Phase 4 で統合します。
 
-`HookWidget.Build()` 内で `UseState(initialValue)` を呼ぶと `ReactiveProperty<T>` が返り、値の変更が再ビルドをトリガーする、という React フック風の API を目指しています。
+`HookWidget.Build()` 内で `UseState(initialValue)` を呼ぶと `ReactiveProperty<T>` が返ります。値の変更が再ビルドをトリガーする、React フック風の API を目指しています。
 
 ```csharp
 // 構想中の API(未動作。Button は FloatSoda.UI.Cream などのデザインシステム層のもの)
@@ -335,9 +330,9 @@ public override Widget Build(IBuildContext context)
 | `GridView` | ✗ 未実装(`internal`) | グリッドレイアウト | — |
 | `SingleChildScrollView` | ✗ 未実装(`internal`) | 単一子をスクロール | — |
 
-`Container` は、`Align` / `Padding` / `DecoratedBox` / `SizedBox` / `Transform` の組み合わせを1つのウィジェットにまとめた合成ウィジェットです。
-指定したプロパティに対応するウィジェットだけを、内側から配置・余白・装飾・寸法・変換の順で重ねます。
-`Padding` は装飾の内側に入るため、余白の分だけ子が装飾より小さくなります。
+`Container` は、`Align`、`Padding`、`DecoratedBox`、`SizedBox`、`Transform` を1つにまとめた合成ウィジェットです。
+指定したプロパティに対応するウィジェットだけを使い、内側から配置・余白・装飾・寸法・変換の順に重ねます。
+`Padding` は装飾の内側に入るため、子の領域は余白の分だけ装飾より小さくなります。
 `Color` と `Decoration` を同時に指定すると `InvalidOperationException` になります。背景色と角丸を両方使う場合は `BoxDecoration.Color` へまとめてください。
 
 ```csharp
@@ -359,13 +354,13 @@ Widget card = new Container
 };
 ```
 
-`ConstrainedBox` は、親から渡される制約を無視せず、その範囲内で追加の最小・最大サイズを子へ適用します。
+`ConstrainedBox` は、親から渡された制約の範囲内で、追加の最小・最大サイズを子へ適用します。
 
-`AspectRatio.Ratio`は幅を高さで割った値です。両軸が可変なら幅の上限を優先し、収まらない場合は高さの上限から幅を再計算します。幅と高さの両方に上限がない場所ではサイズを決められないため、親の`SizedBox`や`ConstrainedBox`から少なくとも一方の上限を与えてください。
+`AspectRatio.Ratio` は幅を高さで割った値です。両軸が可変の場合は幅の上限を優先し、収まらないときは高さの上限から幅を再計算します。幅と高さの両方に上限がない場所ではサイズを決められません。親の `SizedBox` や `ConstrainedBox` で少なくとも一方の上限を与えてください。
 
-`FittedBox`は子を制約なしの自然サイズでレイアウトしてから描画時に変換します。`BoxFit`には`Fill`, `Contain`, `Cover`, `FitWidth`, `FitHeight`, `None`, `ScaleDown`があり、`Cover`などではみ出す部分を切り抜く場合は`ClipBehavior`を指定します。
+`FittedBox` は、子を制約なしの自然サイズでレイアウトし、描画時に変換します。`BoxFit` には `Fill`、`Contain`、`Cover`、`FitWidth`、`FitHeight`、`None`、`ScaleDown` があります。`Cover` などで領域からはみ出す部分を切り抜く場合は、`ClipBehavior` を指定します。
 
-`LimitedBox`は、親から受け取った最大幅または最大高さが正の無限大の場合だけ対応する上限を適用します。有限の親制約がある場合は`MaxWidth` / `MaxHeight`を適用しません。
+`LimitedBox` は、親から受け取った最大幅または最大高さが正の無限大の場合にのみ、対応する上限を適用します。有限の親制約がある場合、`MaxWidth` と `MaxHeight` は適用されません。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -385,13 +380,12 @@ Widget thumbnail = new AspectRatio
 };
 ```
 
-`IndexedStack.Index` は0始まりです。`null`は全子をレイアウトしたまま全非表示にし、負値または`Children`の範囲外は`ArgumentOutOfRangeException`になります。
-`RotatedBox`は回転後の幅と高さをレイアウトへ反映します。レイアウト寸法を変えず描画だけを任意角度で変形する`Transform`とは用途が異なります。
+`IndexedStack.Index` は0始まりです。`null` を指定すると、すべての子をレイアウトしたまま非表示にします。負の値や `Children` の範囲外を指定すると `ArgumentOutOfRangeException` を投げます。
+`RotatedBox` は、回転後の幅と高さをレイアウトに反映します。レイアウト寸法を変えずに描画だけを任意の角度で変形する `Transform` とは用途が異なります。
 
 #### 表示・非表示の3つのウィジェットの使い分け
 
-`Visibility` / `Offstage` / `IndexedStack` はどれも「表示するものを切り替える」用途に見えますが、
-**非表示にした子の状態(`State`)を保つかどうか**と、**非表示の間もレイアウトを計算するか**が違います。
+`Visibility`、`Offstage`、`IndexedStack` はどれも表示を切り替えますが、**非表示にした子の状態(`State`)を保つかどうか**と、**非表示の間もレイアウトを計算するか**が異なります。
 
 | ウィジェット | 非表示の子の `State` | 非表示の子のレイアウト | 向いている用途 |
 |---|---|---|---|
@@ -399,23 +393,13 @@ Widget thumbnail = new AspectRatio
 | `Offstage` | 保たれる | 再レイアウト時に計算する | 戻したときに元の状態でいてほしい単一の子 |
 | `IndexedStack` | 保たれる | 再レイアウト時に全子ぶん計算する | タブのように複数の候補から1つを選ぶ |
 
-`Visibility` は `Visible = false` のとき、`Child` の代わりに `Replacement`(省略時は空の `SizedBox`)を
-ツリーへ置きます。`Child` と `Replacement` の実行時型が違えば `Widget.CanUpdate` が `false` になり、
-`Child` の Element と `State` は破棄されます。既定の `Replacement` を使う通常のケースはこれにあたります。
+`Visibility` は `Visible = false` のとき、`Child` の代わりに `Replacement`(省略時は空の `SizedBox`)をツリーへ置きます。`Child` と `Replacement` の実行時型が異なる場合、`Widget.CanUpdate` が `false` となり、`Child` の Element と `State` は破棄されます。既定の `Replacement` を使う通常のケースがこれに該当します。
 
-ただし**状態が必ず破棄されるわけではありません。** `Child` と `Replacement` が同じ実行時型で
-`Key` も等しい場合(どちらも `Key` を指定していない場合を含む)、`Element.UpdateChild` は
-既存の Element を再利用するため状態が残ります。
-非表示を状態のリセット手段として使うなら、型か `Key` を変えて破棄を確実にしてください。
+ただし、**状態が必ず破棄されるわけではありません**。`Child` と `Replacement` が同じ実行時型で `Key` も等しい場合(どちらも `Key` を指定していない場合を含む)、`Element.UpdateChild` が既存の Element を再利用するため状態が残ります。非表示を状態のリセット手段として使う場合は、型か `Key` を変えて破棄を確実にしてください。
 
-`Offstage` と `IndexedStack` は非表示の子もツリーに残すため状態が保たれますが、
-その代わり**再レイアウトが走るときには、表示していない子の分も計算します**。
-候補が多い場合や、子のレイアウトが重い場合はコストが積み上がります。
+`Offstage` と `IndexedStack` は、非表示の子もツリーに残すため状態を保ちます。しかし、**再レイアウト時には非表示の子の分も計算します**。候補が多い場合や子のレイアウトが重い場合は、計算コストが増加します。
 
-このコストは毎フレーム発生するわけではありません。ウィジェットにも RenderObject にも
-変更がないフレームはレイアウト自体がスキップされます(→ [BuildPipeline](BuildPipeline.md))。
-`IndexedStack` の `Index` を変えたときも `MarkNeedsPaint()` だけが走るため、
-タブの切り替えでは再レイアウトされません。
+このコストは毎フレーム発生するわけではありません。ウィジェットと RenderObject の両方に変更がないフレームでは、レイアウト自体がスキップされます(→ [BuildPipeline](BuildPipeline.md))。`IndexedStack` の `Index` を変えたときも `MarkNeedsPaint()` だけが実行されるため、タブの切り替えで再レイアウトは発生しません。
 
 ```csharp
 // 状態を保ちたい: 開閉してもスクロール位置を維持する
@@ -428,10 +412,8 @@ new Visibility { Visible = hasNotification, Child = new Text("新着あり") }
 new IndexedStack { Index = selectedTab, Children = [BuildHome(), BuildSettings()] }
 ```
 
-`Expanded` / `Flexible` / `Spacer` は `Row`、`Column`、`Flex` の直接の子として使用します。
-`Flex` は1以上の整数で、たとえば `Flex = 2` は `Flex = 1` の子の2倍の余剰領域を受け取ります。
-`Expanded` は `FlexFit.Tight` 固定、`Flexible` は既定で `FlexFit.Loose` です。
-主軸の最大制約が無限のときは余剰領域を決められないため、flex子を含む `Flex` は `InvalidOperationException` を投げます。親の `SizedBox` / `ConstrainedBox` などから有限の幅（`Row`）または高さ（`Column`）を与えてください。
+`Expanded`、`Flexible`、`Spacer` は、`Row`、`Column`、`Flex` の直接の子として使用します。`Flex` には1以上の整数を指定します。たとえば `Flex = 2` は、`Flex = 1` の子の2倍の余剰領域を受け取ります。`Expanded` は `FlexFit.Tight` 固定、`Flexible` は既定で `FlexFit.Loose` です。
+主軸の最大制約が無限の場合、余剰領域を決定できません。そのため、flex子を含む `Flex` は `InvalidOperationException` を投げます。親の `SizedBox` や `ConstrainedBox` で、有限の幅(`Row`)または高さ(`Column`)を与えてください。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -476,10 +458,7 @@ Widget panel = new ConstrainedBox
 };
 ```
 
-`ConstraintsTransformBox` は、親制約を `BoxConstraintsTransform` delegateで変換してから子へ渡します。
-子の自然サイズが親制約を超えた場合、自身は親制約内のサイズを採用し、`Alignment` に従って子を配置します。
-`ClipBehavior = Clip.None` ではoverflow部分も描画し、`Clip.HardEdge` または `Clip.Antialias` では自身の矩形で切り抜きます。
-`Clip` は `FloatSoda.Rendering.Layers` 名前空間の型なので、使用ファイルへ同名前空間をimportしてください。
+`ConstraintsTransformBox` は、親の制約を `BoxConstraintsTransform` delegate で変換してから子へ渡します。子の自然サイズが親の制約を超えた場合、自身は親の制約内のサイズを採用し、`Alignment` に従って子を配置します。`ClipBehavior = Clip.None` でははみ出した部分も描画し、`Clip.HardEdge` や `Clip.Antialias` では自身の矩形で切り抜きます。`Clip` は `FloatSoda.Rendering.Layers` 名前空間の型であるため、使用するファイルにこの名前空間を import してください。
 
 ```csharp
 using FloatSoda.Rendering.Layers;
@@ -502,11 +481,10 @@ Widget wideLogRow = new ConstraintsTransformBox
 - `MaxWidthUnconstrained` / `MaxHeightUnconstrained`: 指定軸の最大制約だけを外す
 - `MaxUnconstrained`: 両軸の最大制約だけを外す
 
-独自変換の戻り値は、最小値が0以上の有限値、最大値が対応する最小値以上の値または正の無限大である必要があります。
-NaN、負値、負の無限大、最小値が最大値を超える制約は、子のレイアウト前に `ArgumentException` になります。
+独自変換の戻り値では、最小値が0以上の有限値であり、かつ最大値が対応する最小値以上または正の無限大である必要があります。NaN、負の値、負の無限大、または最小値が最大値を超える制約を返した場合、子のレイアウト前に `ArgumentException` を投げます。
 
-`UnconstrainedBox` は `ConstraintsTransformBox` を合成する簡易ウィジェットです。
-`ConstrainedAxis = null`（既定値）では両軸の制約を外します。`Axis.Horizontal` では横軸の制約だけを維持し、`Axis.Vertical` では縦軸の制約だけを維持します。
+`UnconstrainedBox` は、`ConstraintsTransformBox` を組み合わせた簡易ウィジェットです。
+`ConstrainedAxis = null`(既定値)では両軸の制約を外します。`Axis.Horizontal` では横軸の制約のみ、`Axis.Vertical` では縦軸の制約のみを維持します。
 
 ```csharp
 Widget naturalWidthRow = new UnconstrainedBox
@@ -520,11 +498,11 @@ Widget naturalWidthRow = new UnconstrainedBox
 };
 ```
 
-`FractionallySizedBox` は、`WidthFactor` / `HeightFactor` を指定した軸で親の最大寸法にfactorを乗算し、その寸法を子へtight制約として渡します。`null` の軸は親制約を変更しません。factorを使う軸には有限の最大制約が必要です。
+`FractionallySizedBox` は、`WidthFactor` や `HeightFactor` を指定した軸において、親の最大寸法に factor を乗算し、その寸法を子へ tight 制約として渡します。`null` を指定した軸は親の制約を変更しません。factor を使用する軸には、有限の最大制約が必要です。
 
-`OverflowBox` は、`MinWidth` / `MaxWidth` / `MinHeight` / `MaxHeight` のうち指定した境界だけを親制約から上書きします。`Fit = OverflowBoxFit.Max` は有限の親領域を最大まで使用し、`OverflowBoxFit.DeferToChild` は親制約内で子のサイズに従います。overflow部分は切り抜かず、そのまま描画します。
+`OverflowBox` は、`MinWidth`、`MaxWidth`、`MinHeight`、`MaxHeight` のうち、指定した境界のみを親の制約から上書きします。`Fit = OverflowBoxFit.Max` は有限の親領域を最大まで使用し、`OverflowBoxFit.DeferToChild` は親の制約内で子のサイズに従います。領域からはみ出した部分は切り抜かず、そのまま描画します。
 
-`SizedOverflowBox` は、自身のサイズを `FloatSoda.Geometrics.Size` で指定する一方、子へは親から受け取った元の制約をそのまま渡します。自身と子を異なるサイズでレイアウトしたい場合に使用します。
+`SizedOverflowBox` は、自身のサイズを `FloatSoda.Geometrics.Size` で指定し、子へは親から受け取った元の制約をそのまま渡します。自身と子を異なるサイズでレイアウトしたい場合に使用します。
 
 ```csharp
 Widget overflowPreview = new SizedOverflowBox
@@ -545,9 +523,7 @@ Widget overflowPreview = new SizedOverflowBox
 };
 ```
 
-`IntrinsicWidth` / `IntrinsicHeight` は、通常レイアウトの前に子へ自然な寸法を問い合わせます。
-`StepWidth` / `StepHeight` を指定すると、計測値をその正の有限値の倍数へ切り上げます。
-たとえば内容量が異なるカードを一定のstep幅へ揃える場合に使えます。
+`IntrinsicWidth` と `IntrinsicHeight` は、通常のレイアウト前に子へ自然な寸法を問い合わせます。`StepWidth` や `StepHeight` を指定すると、計測値をその正の有限値の倍数へ切り上げます。たとえば、内容量が異なるカードを一定の step 幅へ揃える場合に使用します。
 
 ```csharp
 Widget statusCard = new IntrinsicWidth
@@ -557,8 +533,7 @@ Widget statusCard = new IntrinsicWidth
 };
 ```
 
-intrinsic測定は追加のツリー走査を必要とし、入れ子では最悪O(N²)になり得ます。
-スクロール領域や大量の項目を持つツリーでは使用せず、寸法が分かる場合は`SizedBox`や`ConstrainedBox`を優先してください。
+intrinsic 測定は追加のツリー走査を必要とするため、入れ子になると最悪で O(N²) の計算量になります。スクロール領域や大量の項目を持つツリーでは使用せず、寸法が分かっている場合は `SizedBox` や `ConstrainedBox` を優先してください。
 
 ### Painting
 
@@ -590,14 +565,13 @@ intrinsic測定は追加のツリー走査を必要とし、入れ子では最�
 | `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Fit`, `Alignment`, `Child`, `OnError` |
 | `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
 
-`Paint.Image` の `Fit` は `FittedBox` と同じ `BoxFit` を使い、既定は `Contain`(縦横比を維持して領域内へ収める)です。収めた画像を領域内のどこへ置くかは `Alignment` で指定します(既定は `Alignment.Center`)。`Cover` のように画像の一部だけを使う場合は**描画元の矩形を切り取って**描画するため、**どの `Fit` でも領域外へはみ出しません**。画像のどの部分を残すかは `Alignment` が決めます。
+`Paint.Image` の `Fit` には、`FittedBox` と同じ `BoxFit` を指定します。既定値は `Contain`(縦横比を維持して領域内へ収める)です。領域内の配置位置は `Alignment` で指定します(既定値は `Alignment.Center`)。`Cover` のように画像の一部だけを使う場合は、**描画元の矩形を切り取って**描画します。そのため、**どの `Fit` を指定しても領域外へはみ出しません**。画像のどの部分を残すかは `Alignment` によって決まります。
 
-`FittedBox` が `ClipBehavior` を持つのに `Paint.Image` が持たないのは、この違いによるものです。`FittedBox` は描画元を切り取れない子ウィジェットを拡大縮小するため切り抜きが要りますが、`Paint.Image` は描画元の矩形自体を狭められます。
+`FittedBox` が `ClipBehavior` を持ち、`Paint.Image` が持たない理由はここにあります。`FittedBox` は描画元を切り取れない子ウィジェットを拡大縮小するため、切り抜きの指定が必要です。一方、`Paint.Image` は描画元の矩形自体を狭めることができます。
 
+`Text` は表示する文字列を単一値コンストラクタで受け取り、書式は `init` プロパティで指定します。空文字列も有効です。
 
-`Text` は表示文字列を単一値コンストラクタで受け、書式は `init` プロパティで指定します。空文字列は有効です。
-
-書式は Flutter と同じ優先順位で解決します: **明示指定 > 祖先の `DefaultTextStyle` > フレームワークの既定値**(フォントサイズ30、Arial、黒、ウェイト400)。`TextStyle` の各プロパティは `null` を「未指定」として扱い、未指定のプロパティだけが継承で埋まります。
+書式は Flutter と同じ優先順位で解決されます。優先順位は **明示指定 > 祖先の `DefaultTextStyle` > フレームワークの既定値**(フォントサイズ30、Arial、黒、ウェイト400)です。`TextStyle` の各プロパティは `null` を未指定として扱い、未指定のプロパティのみが継承によって埋まります。
 
 ```csharp
 using FloatSoda.Geometrics;
@@ -618,7 +592,7 @@ new Text("Hello, VR!")
 }
 ```
 
-複数の `Text` へ同じ書式を適用するときは、`DefaultTextStyle` で祖先から伝播させます。配下の `Text` は明示したプロパティだけを上書きし、残りを継承します。`DefaultTextStyle` の `Style` を変更すると、依存する `Text` は自動で再ビルドされます。
+複数の `Text` に同じ書式を適用する場合は、`DefaultTextStyle` を使って祖先から伝播させます。配下の `Text` は明示したプロパティのみを上書きし、残りを継承します。`DefaultTextStyle` の `Style` を変更すると、依存する `Text` は自動的に再ビルドされます。
 
 ```csharp
 new DefaultTextStyle
@@ -635,9 +609,9 @@ new DefaultTextStyle
 }
 ```
 
-継承させたくない `Text` には、`Inherit = false` の `TextStyle` を指定します。この場合、未指定のプロパティにはフレームワークの既定値が適用されます。
+書式を継承させたくない `Text` には、`Inherit = false` を設定した `TextStyle` を指定します。この場合、未指定のプロパティにはフレームワークの既定値が適用されます。
 
-システムにないフォントは `FileFontProvider` で指定します。同じ値のProviderは内部で共有され、複数の `Text` / `Icon` から使ってもフォントリソースは一度だけ読み込まれます。
+システムにないフォントは `FileFontProvider` で指定します。同じ値の Provider は内部で共有されるため、複数の `Text` や `Icon` から使用しても、フォントリソースは1度だけ読み込まれます。
 
 ```csharp
 using FloatSoda.Core;
@@ -654,7 +628,7 @@ new Icon(new IconData(0xe88a, materialIcons))
 }
 ```
 
-`Button` / `IconButton` は、コアではなくデザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)が担う設計です。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` に置きます。**この3層はまだ提供していません**(→ [UILayering](UILayering.md#実装状況))。いま必要なボタンは [押せるボタンを作る](#押せるボタンを作る) の方法で組み立ててください。
+`Button` や `IconButton` は、コアではなくデザインシステム層(`FloatSoda.UI.Cream`、`FloatSoda.UI.FizzyPop`)が担う設計です。振る舞いを担うヘッドレスウィジェット(`ButtonBase` など)は `FloatSoda.UI` に置かれます。**これらの層はまだ提供されていません**(→ [UILayering](UILayering.md#実装状況))。現在のところ、必要なボタンは [押せるボタンを作る](#押せるボタンを作る) の方法で組み立ててください。
 
 ### Gesture
 
@@ -669,8 +643,7 @@ new Icon(new IconData(0xe88a, materialIcons))
 
 ## ジェスチャとヒットテスト
 
-ヒットテストは「ポインタ座標から、そこにある RenderObject を特定する」仕組みで、
-ジェスチャ認識は「特定した対象に届いたポインターイベント列を、タップやパンという意味へ解釈する」仕組みです。
+ヒットテストは「ポインタ座標からそこにある RenderObject を特定する」仕組みであり、ジェスチャ認識は「特定した対象へのポインターイベント列をタップやパンとして解釈する」仕組みです。
 FloatSoda では**どちらも実装済み**です。
 
 ```csharp
@@ -696,17 +669,17 @@ Widget tappable = new GestureDetector
 ### ポインタ入力が届く範囲
 
 **現時点でポインタ座標が届くのは、ダッシュボードオーバーレイ(`DashboardWindow`)だけです。**
-SteamVR はダッシュボード上のレーザーポインターをマウスイベントとして送ってくるため、
-FloatSoda はそれを `IRawPointerSource` として受け取っています。
-`WorldSpaceWindow` と `DeviceTrackedWindow` にはコントローラーレイ経路がまだ接続されておらず、
-ヒットテスト自体は動いても、そこへ渡す座標が供給されません。この接続は Phase 1 の残件です。
+SteamVR がダッシュボード上のレーザーポインターをマウスイベントとして送信するため、
+FloatSoda はこれを `IRawPointerSource` として受け取っています。
+`WorldSpaceWindow` と `DeviceTrackedWindow` はコントローラーレイの経路が未接続です。
+ヒットテスト自体は機能しますが、判定用の座標が供給されません。この接続は Phase 1 の残件です。
 
-つまり、`GestureDetector` を書いたコードは `WorldSpaceWindow` でもコンパイルは通り、
-例外も出ませんが、コールバックが呼ばれることはありません。
+したがって、`WorldSpaceWindow` で `GestureDetector` を使用しても、
+コンパイルや実行は成功しますがコールバックは呼ばれません。
 
 ### ヒットテストの振る舞い
 
-`Behaviour`(`HitTestBehaviour`)は、ウィジェット自身をヒット対象に含めるかどうかを決めます。
+`Behaviour`(`HitTestBehaviour`)は、ウィジェット自身をヒットテストの対象に含めるかを制御します。
 
 | 値 | 意味 |
 |---|---|
@@ -714,22 +687,22 @@ FloatSoda はそれを `IRawPointerSource` として受け取っています。
 | `Opaque` | 自身の領域全体をヒットとして扱い、背後の兄弟への探索を止める |
 | `Translucent` | 自身をヒットパスへ加えたうえで、背後の兄弟への探索も続ける |
 
-子を持たない領域(`SizedBox` だけの余白など)をタップ可能にしたい場合は、`Behaviour = HitTestBehaviour.Opaque` を指定します。
-`DeferToChild` では、描画内容を持たない子はヒットしません。
+`SizedBox` などの描画内容を持たない領域をタップ可能にするには、`Behaviour = HitTestBehaviour.Opaque` を指定します。
+`DeferToChild` の場合、描画内容を持たない子はヒット対象になりません。
 
-**既定値はウィジェットによって違います。**
+**`Behaviour` の既定値はウィジェットごとに異なります。**
 
 | ウィジェット | `Behaviour` の既定値 | 理由 |
 |---|---|---|
-| `GestureDetector` / `RawGestureDetector` / `Listener` | `DeferToChild` | 押下対象は子の描画領域と一致するのが普通で、余白まで拾うと背後のウィジェットを意図せず塞ぐ |
-| `PointerRegion` | `Opaque` | ホバー領域は子の隙間を含む矩形全体で扱いたい。隙間でホバーが切れると、状態が細かく点滅する |
+| `GestureDetector` / `RawGestureDetector` / `Listener` | `DeferToChild` | 押下対象は子の描画領域と一致させるのが一般的であり、余白まで判定すると背後のウィジェットを意図せず塞ぐため |
+| `PointerRegion` | `Opaque` | ホバー領域は子の隙間を含む矩形全体として扱うため。隙間で判定が切れると状態が細かく点滅するため |
 
-`PointerRegion` で子の描画領域だけをホバー対象にしたい場合は、`Behaviour = HitTestBehaviour.DeferToChild` を明示してください。
+`PointerRegion` で子の描画領域のみをホバー対象にする場合は、`Behaviour = HitTestBehaviour.DeferToChild` を明示します。
 
 ### 押せるボタンを作る
 
-`GestureDetector` と `StatefulWidget` を組み合わせると、押すたびに表示が変わるボタンになります。
-`OnTap` の中で `SetState` を呼ぶと、状態を書き換えたうえで再ビルドがスケジュールされます。
+`GestureDetector` と `StatefulWidget` を組み合わせることで、タップで表示が変わるボタンを作成できます。
+`OnTap` 内で `SetState` を呼ぶと、状態が更新され再ビルドがスケジュールされます。
 
 ```csharp
 using FloatSoda.Elements;
@@ -762,38 +735,38 @@ public class CounterPanelState : State<CounterPanel>
 }
 ```
 
-`State<T>` の派生は **`class` で宣言します**(`record` は `record` 以外のクラスを継承できません)。
+`State<T>` の派生型は **`class` で宣言します**(`record` は `record` 以外のクラスを継承できないため)。
 
-**押した瞬間に色を変えたい場合、`GestureDetector` だけでは足りません。**
-`GestureDetector.OnTap` は指を離した後に一度だけ呼ばれ、押し下げの瞬間を知らせる口がないためです。
-押下中の見た目を変えるには、次のどちらかを使います。
+**押下した瞬間に色を変えたい場合、`GestureDetector` のみでは実現できません。**
+`GestureDetector.OnTap` は指を離した後に一度だけ呼ばれ、押下開始を検知する手段がないためです。
+押下中の見た目を変更するには、以下のいずれかを使用します。
 
 | やりたいこと | 使うもの |
 |---|---|
 | 押し下げ・離す・取り消しを個別に扱う | `RawGestureDetector` + `TapGestureRecognizer` の `OnTapDown` / `OnTapUp` / `OnTapCancel`(下の「認識器を自分で組む」) |
 | ホバー(領域への出入り)で見た目を変える | `PointerRegion`(`OnPointerEnter` / `OnPointerExit`) |
 
-動くコードは次のサンプルにあります。
+動作するコードは以下のサンプルを参照してください。
 
 - `samples/FloatSoda.Samples.OverlayApp/CounterWidget.cs` — `GestureDetector` + `SetState` のカウンター
 - `samples/FloatSoda.Samples.PointerRegion/PointerRegionDemo.cs` — ホバー・押下・取り消しの状態をすべて表示するデモ
 
 ### 用意された `Button` はまだありません
 
-`Button` を提供するのは UI3層構成(`FloatSoda.UI` と `Cream` / `FizzyPop`)ですが、**これは Phase 5 の予定で、まだ使えません。**
-リポジトリには `ButtonBase` / `Button` / `ButtonStyle` の型が置いてあるものの、
-`ButtonBase` が `GestureDetector` へ配線されていないため押下・ホバーの状態が更新されず、
-3プロジェクトとも NuGet に配布していません(→ [UILayering](UILayering.md#実装状況))。
+`Button` は UI3層構成(`FloatSoda.UI` と `Cream` / `FizzyPop`)で提供予定ですが、**Phase 5 の対象であり現在は使用できません。**
+リポジトリに `ButtonBase` / `Button` / `ButtonStyle` の型は存在しますが、
+`ButtonBase` が `GestureDetector` に接続されておらず状態が更新されません。
+そのため、これらのプロジェクトは NuGet で配布していません(→ [UILayering](UILayering.md#実装状況))。
 
 **足りないのはフレームワークのジェスチャ基盤ではなく、その上に乗せる層です。**
-ボタンは上の[押せるボタンを作る](#押せるボタンを作る)の方法で組み立ててください。
+ボタンを作成する場合は、前述の[押せるボタンを作る](#押せるボタンを作る)の方法で構築してください。
 
 ### 認識器を自分で組む(`RawGestureDetector`)
 
-`GestureDetector` はタップとパンだけを扱う既製の組み合わせです。
-それ以外の解釈が必要な場合は `RawGestureDetector` を使い、`GestureRecognizer` を自分で登録します。
+`GestureDetector` は、タップとパンのみを扱う既製のウィジェットです。
+独自の解釈が必要な場合は、`RawGestureDetector` を使用して `GestureRecognizer` を手動で登録します。
 
-組み込みの認識器は2つあります。
+組み込みの認識器は以下の2つです。
 
 | 認識器 | コールバック |
 |---|---|
@@ -801,7 +774,7 @@ public class CounterPanelState : State<CounterPanel>
 | `PanGestureRecognizer` | `OnPanStart`, `OnPanUpdate`, `OnPanEnd` |
 
 `Gestures` は `Dictionary<Type, GestureRecognizerFactory>` です。
-キーは認識器の型、値は「生成するデリゲート」と「コールバックを設定するデリゲート」の組です。
+キーに認識器の型、値に「生成用デリゲート」と「コールバック設定用デリゲート」の組を指定します。
 
 ```csharp
 using FloatSoda.Gesture;
@@ -827,24 +800,24 @@ Widget tapOnly = new RawGestureDetector
 };
 ```
 
-**生成と設定を2つのデリゲートに分けているのは、認識器のインスタンスを再構築をまたいで保つためです。**
-`Widget` は `record` なので毎回作り直されますが、認識器は押下の途中経過を持っています。
-毎回作り直すと、押下中に再構築が起きた時点でジェスチャが途切れます。
+**デリゲートを生成用と設定用に分けているのは、ウィジェットの再構築をまたいで認識器のインスタンスを保持するためです。**
+`Widget` は `record` であり毎回作り直されますが、認識器はジェスチャの途中状態を保持します。
+認識器まで毎回作り直すと、押下中に再構築が発生した時点でジェスチャが途切れます。
 
-複数の認識器を登録すると、どれが勝つかは `GestureArenaManager` が決めます。決着のつき方は2通りです。
+複数の認識器を登録した場合、どれが採用されるかは `GestureArenaManager` が判定します。決着のつき方は2通りです。
 
-1. **どれかが勝利を宣言した時点で確定する。** たとえばパンは、指が一定距離を超えて動いた時点で
-   自分のジェスチャだと宣言します。このとき他の認識器は `RejectGesture` を受けて脱落します
+1. **いずれかが勝利を宣言した時点で確定する。** たとえばパンは、指が一定距離を越えて動いた時点で
+   自身のジェスチャだと宣言します。このとき他の認識器は `RejectGesture` を受けて脱落します。
 2. **誰も宣言しないままポインタが上がったら、最初に登録された認識器が勝つ。**
-   `Dictionary` の列挙順に依存するため、優先したい認識器を先に入れてください
+   `Dictionary` の列挙順に依存するため、優先したい認識器を先に登録してください。
 
-**組み込みの2つはどちらも自分で宣言するため、通常は1で決着します。**
-タップとパンを両方登録した場合、指をほとんど動かさずに離せばタップが、動かせばパンが勝ちます。
-2のルートは、勝利も辞退も宣言しない認識器を自作したときの保険です。
+**組み込みの認識器は2つとも自身で勝利を宣言するため、通常は1の条件で確定します。**
+タップとパンを両方登録した場合、指をほとんど動かさずに離せばタップが、動かせばパンが採用されます。
+2の条件は、勝利も辞退も宣言しない独自の認識器を作成した際のフォールバックです。
 
 ## Key
 
-`IKey` / `ValueKey<T>` / `UniqueKey` が定義され、`Widget.Key` プロパティと差分判定に組み込まれています。`Widget.CanUpdate(old, new)` は「同じ実行時型かつ `Key` が等しい」なら既存 Element を再利用します(Flutter と同じ型 + Key 判定)。`Element.UpdateChild` は先に record 等値の高速パスで同一 Widget をスキップし、その後 `CanUpdate` で更新可否を判断します。`MultiChildRenderObjectElement` の子リスト差分でも `Key` を使って要素の同一性を追跡します(詳細は [BuildPipeline](BuildPipeline.md))。
+`IKey` / `ValueKey<T>` / `UniqueKey` が定義されており、`Widget.Key` プロパティと差分判定に組み込まれています。`Widget.CanUpdate(old, new)` は、実行時型と `Key` が等しい場合に既存の Element を再利用します(Flutter と同じ「型 + Key」判定)。`Element.UpdateChild` は、まず record 等値の高速パスで同一 Widget をスキップし、その後 `CanUpdate` で更新可否を判断します。`MultiChildRenderObjectElement` の子リストの差分検出でも、`Key` を使用して要素の同一性を追跡します(詳細は [BuildPipeline](BuildPipeline.md) を参照)。
 
 既存の子ウィジェット自体を変更せずにキーを付けたい場合は、`KeyedSubtree` の `Key` と `Child` を指定します。
 
