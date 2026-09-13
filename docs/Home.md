@@ -20,7 +20,7 @@
 | [Input](Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) | 利用者 |
 | [APIDesign](APIDesign.md) | API 設計規約(コンポーネント設計・命名・イミュータビリティ) | コントリビュータ |
 | [DocumentationComments](DocumentationComments.md) | ドキュメントコメント規約(適用範囲・契約・副作用の明記) | コントリビュータ |
-| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・情報ごとの置き場所・変更時に更新する文書) | コントリビュータ |
+| [WritingDocumentation](WritingDocumentation.md) | ドキュメント執筆ガイド(どこに書くか・情報ごとの置き場所・変更時に更新する文書・種別ごとのテンプレート) | コントリビュータ |
 | [Localization](Localization.md) | ローカライゼーション方針(日本語デフォルト・resx・サテライトXML) | コントリビュータ |
 | [TestStrategy](TestStrategy.md) | テスト戦略(範囲 × 目的 × オラクルの3軸・現在の配置・既知の穴) | コントリビュータ |
 
