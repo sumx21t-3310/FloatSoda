@@ -3,9 +3,9 @@
 # UIレイヤリング(3層パッケージ構成)
 
 > **このページは実装ではなく設計方針です。** `FloatSoda.UI` / `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` の
-> 3プロジェクトは、いずれも `IsPackable=false` で **NuGet に配布していません**。
-> リポジトリには `ButtonBase` / `InteractionState` / `Button` / `ButtonStyle` / 各テーマの型が置いてありますが、
-> 骨組みだけで押下にもホバーにも反応しません([実装状況](#実装状況)を参照)。
+> 3プロジェクトは、いずれも `IsPackable=false` であり、**NuGet で配布していません**。
+> リポジトリには `ButtonBase` / `InteractionState` / `Button` / `ButtonStyle` / 各テーマの型が含まれていますが、
+> 骨組みだけであり、押下にもホバーにも反応しません([実装状況](#実装状況)を参照)。
 >
 > **いま UI を組む場合は、`FloatSoda` 本体のウィジェットを直接使ってください。**
 > 押せるボタンは `GestureDetector` で組み立てられます
@@ -32,47 +32,47 @@ graph TD
 | ヘッドレス | `FloatSoda.UI` | 振る舞い・状態機械のみ(`ButtonBase`, `InteractionState`)。見た目は builder デリゲートに完全委譲 | 予定(Phase 5) |
 | デザインシステム | `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` | ヘッドレスの状態から見た目へのマッピングと `*Style` レコード・テーマ | 予定(Phase 5) |
 
-デザインシステム同士は互いに参照しません。下位層はすべて見える「緩いレイヤリング」にします(デザインシステム層はプリミティブを直接使ってよい)。
+下位層はすべて見える「緩いレイヤリング」とします(デザインシステム層からプリミティブ層を直接使用できます)。
 
 ## 実装状況
 
-`FloatSoda` のプリミティブ層だけが利用できます。上2層は設計を確定させた段階で、実装はこれからです。
+`FloatSoda` のプリミティブ層のみ利用できます。上位2層は設計を確定した段階であり、実装はこれからです。
 
 | 対象 | 状況 |
 |---|---|
-| `FloatSoda`(プリミティブ) | ✓ 使える。NuGet で配布中 |
+| `FloatSoda`(プリミティブ) | ✓ 利用可能。NuGet で配布中 |
 | `FloatSoda.UI`(`ButtonBase` / `InteractionState`) | 予定。型は存在するが `ButtonBase` が `GestureDetector` へ未配線で、`InteractionState` の `IsPressed` / `IsHovered` / `IsFocused` が常に `false` |
 | `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`(`Button` / `ButtonStyle` / 各テーマ) | 予定。`ButtonBase` に依存しているため同様に反応しない |
 
 3プロジェクトとも `IsPackable=false` のため、NuGet パッケージとしては存在しません。
-使うにはリポジトリをクローンしてプロジェクト参照を張る必要がありますが、
-上記のとおり押下もホバーも動かないため、現時点では実用になりません。
+使用するにはリポジトリをクローンしてプロジェクト参照を追加する必要がありますが、
+前述のとおり押下もホバーも機能しないため、現時点では実用的ではありません。
 
 `FloatSoda.UI` の残作業は Phase 5 のマイルストーンにあります(`ButtonBase` への `GestureDetector` 配線が #102、
 `Cream` / `FizzyPop` の `Button` 完成が #78 / #100、背景ブラーが #38)。
 
 ## 境界基準
 
-- **Skia / レンダーツリーの型に依存するウィジェットはコア**(`FloatSoda`)に置く。`RenderObjectWidget<T>` 系は必然的にコア。
-- 見た目の方針(意見)を持たない合成ウィジェット(`Center`, `Container` など)もコア。Flutter の `widgets` 層に相当。
+- **Skia / レンダーツリーの型に依存するウィジェットはコア**(`FloatSoda`)に置く。`RenderObjectWidget<T>` 系は必然的にコアとなる。
+- 見た目の方針(意見)を持たない合成ウィジェット(`Center`, `Container` など)もコアに置く。Flutter の `widgets` 層に相当する。
 - **インタラクションの状態機械(pressed / hovered / focused / disabled など)は必ず `FloatSoda.UI`** に置く。
-- 色・余白・角丸などの具体的な見た目はデザインシステム層。
+- 色・余白・角丸などの具体的な見た目はデザインシステム層に置く。
 
 ## 2つの規約
 
-1. **振る舞いは必ず FloatSoda.UI に置く。** デザインシステム層の `State` には「ヘッドレスの状態 → 見た目のマッピング」以外のロジックを書かない。Flutter の `TextField` が `material` に振る舞いごと実装され、Cupertino が振る舞いを複製する羽目になった轍を踏まないため。
+1. **振る舞いは必ず FloatSoda.UI に置く。** デザインシステム層の `State` には「ヘッドレスの状態 → 見た目のマッピング」以外のロジックを書かない。Flutter の `TextField` が `material` に振る舞いごと実装され、Cupertino が振る舞いを複製する羽目になった轍を踏まないようにするためである。
 2. **FloatSoda.UI はデザインシステムの InheritedWidget なしで動作する。** ヘッドレスウィジェットは自前のデフォルトを持ち、`CreamTheme` / `FizzyPopTheme` の存在を前提にしない(Flutter の `Theme.of` / `Material` 祖先の暗黙要求のようなアンビエント依存を作らない)。
 
-**Litmus test:** 「2つ目のデザインシステムが、1つ目のコードをコピーせずに同じコンポーネントを作れるか」。Cream と FizzyPop を最初から並走させているのは、この検証を常時行うためです。ヘッドレス層のAPIに片方のデザインシステム固有の都合が漏れたら、もう片方が壊れることで検知できます。
+**Litmus test:** 「2つ目のデザインシステムが、1つ目のコードをコピーせずに同じコンポーネントを作れるか」。Cream と FizzyPop を最初から並走させているのは、この検証を常時行うためです。ヘッドレス層のAPIに片方のデザインシステム固有の都合が漏れた場合、もう片方が壊れることで検知できます。
 
 ## 見た目の注入方式
 
-Avalonia のルックレスコントロール(疑似クラス + `PART_` テンプレートパーツ)の契約を、型付きにした形を採ります:
+Avalonia のルックレスコントロール(疑似クラス + `PART_` テンプレートパーツ)の契約を型付きにした形を採用します:
 
 - 状態の公開 — 文字列の疑似クラスではなく `readonly record struct InteractionState`(型付き)
 - 見た目の注入 — 名前ベースの `PART_` 検索ではなく `required Func<IBuildContext, InteractionState, Widget> Builder`(型付きスロット、コンパイル時保証)
 
-次のコードは**目指す姿であり、いまは押下に反応しません。**
+次のコードは**目指す姿であり、現在は押下に反応しません。**
 
 ```csharp
 // ヘッドレス層(FloatSoda.UI): 振る舞いのみ
@@ -96,24 +96,24 @@ new Button { Child = new Text("OK"), OnPressed = () => ... };
 | テーマ | `CreamTheme` | `FizzyPopTheme` |
 | 現状 | `Button` + `ButtonStyle` の骨組みのみ。押下は未反応 | 同構成。加えて背景ブラーが未実装(下記) |
 
-テーマ(`XxxTheme.Of(context)`)はテーマ不在時に null を返し、コンポーネント側が既定スタイルへフォールバックします。テーマが無くても動くことを規約にします。
+テーマ(`XxxTheme.Of(context)`)はテーマ不在時に null を返し、コンポーネント側が既定スタイルへフォールバックします。テーマが存在しなくても動作することを規約とします。
 
 ## ロードマップ
 
-主要ヘッドレスUIライブラリ(Radix UI, Headless UI, React Aria, Ark UI, Base UI)の収録コンポーネントを横断調査すると、提供物は2層に分解できる: **Tier 1(分解不能な原始インタラクション)** と、**Tier 2(Tier 1 + Overlay の組み合わせでできる複合コンポーネント)**。この構造をそのままヘッドレス層の実装順に採用する。
+主要なヘッドレスUIライブラリ(Radix UI, Headless UI, React Aria, Ark UI, Base UI)の収録コンポーネントを横断調査すると、提供物は次の2層に分解できます。すなわち、**Tier 1(分解不能な原始インタラクション)** と、**Tier 2(Tier 1 + Overlay の組み合わせでできる複合コンポーネント)** です。この構造をそのままヘッドレス層の実装順に採用します。
 
 ### 0. ジェスチャ・ヒットテスト(前提条件) — 充足済み
 
-すべての Tier 1 コンポーネントが依存する基盤。コア側では実装済みで、`GestureDetector` / `Listener` /
-`PointerRegion` によって press / hover を受け取れる(→ [WidgetSystem § ジェスチャとヒットテスト](WidgetSystem.md#ジェスチャとヒットテスト))。
-残る制約は2つある。
+これはすべての Tier 1 コンポーネントが依存する基盤です。コア側では実装済みであり、`GestureDetector` / `Listener` /
+`PointerRegion` によって press / hover を受け取れます(→ [WidgetSystem § ジェスチャとヒットテスト](WidgetSystem.md#ジェスチャとヒットテスト))。
+残る制約は2つあります。
 
-- ポインタ座標が届くのはダッシュボードオーバーレイだけ。他のオーバーレイ種別への接続は Phase 1 の残件
-- フォーカスの概念はまだ存在しない。`InteractionState.IsFocused` を埋める仕組みは未設計
+- ポインタ座標が届くのはダッシュボードオーバーレイのみ。他のオーバーレイ種別への接続は Phase 1 の残作業。
+- フォーカスの概念はまだ存在しない。`InteractionState.IsFocused` を埋める仕組みは未設計。
 
 ### 1. Tier 1 — 原始インタラクション
 
-分解不能なインタラクションモデルを1つずつ実装する。各モデルは既存コードとの重複がないことを確認済み:
+分解不能なインタラクションモデルを1つずつ実装します。各モデルは既存コードとの重複がないことを確認済みです。
 
 | 順序 | コンポーネント | インタラクションモデル | 備考 |
 |---|---|---|---|
@@ -126,11 +126,11 @@ new Button { Child = new Text("OK"), OnPressed = () => ... };
 
 ### 2. Overlay / Positioning primitive(Tier 1 と並ぶ独立コンポーネント)
 
-Menu・Select・Combobox・DatePicker・Tooltip・ContextMenu など Tier 2 の大半が同じ Popover 実装を使い回している。HTML/CSS の世界には対応要素がなく、VRオーバーレイでは「アンカー要素に対して浮遊パネルを3D空間にどう配置するか」(画面外にはみ出ない、他ウィンドウと重ならない、視線方向を考慮する)が SteamVR 特有の難問になるため、Web版ヘッドレスUIの実装をそのまま輸入できない。Tier 2 全体をブロックする基盤なので、Tier 1 と並行して早期に着手する。
+Menu・Select・Combobox・DatePicker・Tooltip・ContextMenu など、Tier 2 の大半が同じ Popover 実装を使い回しています。HTML/CSS の世界には対応要素がありません。また、VRオーバーレイでは「アンカー要素に対して浮遊パネルを3D空間にどう配置するか」(画面外にはみ出ない、他ウィンドウと重ならない、視線方向を考慮するなど)が SteamVR 特有の難問となるため、Web版ヘッドレスUIの実装をそのまま持ち込むことはできません。これは Tier 2 全体をブロックする基盤であるため、Tier 1 と並行して早期に着手します。
 
 ### 3. Tier 2 — 複合コンポーネント
 
-Tier 1 + Overlay の組み合わせで実装し、状態機械を個別に再発明しない(Litmus test と同じ規律):
+Tier 1 + Overlay の組み合わせで実装し、状態機械を個別に再発明しません(Litmus test と同じ規律)。
 
 | コンポーネント | 組み合わせ元 |
 |---|---|
@@ -141,7 +141,7 @@ Tier 1 + Overlay の組み合わせで実装し、状態機械を個別に再発
 
 ### 4. FizzyPop の完成に必要なレンダー機能
 
-グラスモーフィズムの背景ブラーには `BackdropFilter` 相当(SkiaSharp の `SKImageFilter.CreateBlur` を使うレイヤー / RenderObject)が必要。現状は半透明ベタ塗りまで。Tier 1/2 の実装とは独立して進行可能。
+グラスモーフィズムの背景ブラーには、`BackdropFilter` に相当する機能(SkiaSharp の `SKImageFilter.CreateBlur` を使うレイヤー / RenderObject)が必要です。現状は半透明のベタ塗りまで対応しています。これは Tier 1/2 の実装とは独立して進行可能です。
 
 ## 関連ページ
 
