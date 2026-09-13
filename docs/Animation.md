@@ -3,10 +3,10 @@
 # アニメーション
 
 > **実装状況:**
-> - **実装済み:** `AnimationController`(Forward / Reverse / Stop / AnimateWith)、`WidgetTicker` / `ITickerProvider` / `TickerProviderState<T>`、`Curve` / `Curves`(標準イージング一式)、`InterpolationSimulation`、`FadeTransition`(`RenderAnimatedOpacity` 経由のペイントのみ更新)が動作します。
-> - **未実装:** `Tween<T>` / `CurvedAnimation` などのアニメーション合成、`AnimatedContainer` 系の暗黙的アニメーション、スプリング等の物理シミュレーションは未実装です(`ISimulation` を実装すれば `AnimateWith` で駆動は可能)。
+> - **実装済み:** `AnimationController`(Forward / Reverse / Stop / AnimateWith)、`WidgetTicker` / `ITickerProvider` / `TickerProviderState<T>`、`Curve` / `Curves`(標準イージング一式)、`InterpolationSimulation`、`FadeTransition`(`RenderAnimatedOpacity` 経由のペイントのみ更新)
+> - **未実装:** `Tween<T>` / `CurvedAnimation` などのアニメーション合成、`AnimatedContainer` 系の暗黙的アニメーション、スプリング等の物理シミュレーション(`ISimulation` を実装すれば `AnimateWith` で駆動可能)
 
-FloatSoda のアニメーションは Flutter のアニメーション基盤を踏襲しています。**Ticker がフレームごとに経過時間を供給し、AnimationController がそれを 0.0〜1.0 の値に変換し、値の変化を購読したものだけが再描画される**という構造です。`SetState()` によるリビルドを介さずにペイントだけを更新できるため、毎フレームのアニメーションでも Widget ツリーの再ビルドコストがかかりません。
+FloatSoda のアニメーションは、Flutter のアニメーション基盤を踏襲しています。**Ticker がフレームごとに経過時間を供給し、AnimationController がその時間を 0.0〜1.0 の値に変換し、値の変化を購読したものだけを再描画する**構造です。`SetState()` によるリビルドを介さずにペイントだけを更新できるため、毎フレームアニメーションさせても Widget ツリーの再ビルドコストがかかりません。
 
 ## 全体像
 
@@ -56,7 +56,7 @@ controller.Stop();             // 停止(Value は現在値のまま)
 
 ### AnimationStatus
 
-`Status` は値がどちら側にあるか・どちらへ進行中かを表します。
+`Status` は、値の現在位置と進行方向を表します。
 
 | Status | 意味 |
 |---|---|
@@ -65,17 +65,17 @@ controller.Stop();             // 停止(Value は現在値のまま)
 | `Reverse` | 逆方向に進行中 |
 | `Completed` | 停止・末尾(`UpperBound`) |
 
-`StatusChanged` を購読すると完了・折り返しを検知できます。往復アニメーションは `Completed` で `Reverse()`、`Dismissed` で `Forward()` を呼ぶのが定石です(`samples/FloatSoda.Samples.OverlayApp/PulseWidget.cs` 参照)。
+`StatusChanged` を購読すると、アニメーションの完了や折り返しを検知できます。往復アニメーションでは、`Completed` 時に `Reverse()` を、`Dismissed` 時に `Forward()` を呼ぶのが定石です(`samples/FloatSoda.Samples.OverlayApp/PulseWidget.cs` 参照)。
 
 ### AnimateWith(カスタムシミュレーション)
 
-`Forward` / `Reverse` は内部で `InterpolationSimulation` を使いますが、`AnimateWith(ISimulation)` に任意の `ISimulation` 実装を渡せば、スプリングなど時間関数が非線形なアニメーションも駆動できます。
+`Forward` や `Reverse` は内部で `InterpolationSimulation` を使います。一方、`AnimateWith(ISimulation)` に任意の `ISimulation` 実装を渡せば、スプリングなど時間関数が非線形なアニメーションも駆動できます。
 
 ## Ticker と TickerProvider
 
-`AnimationController` は自分では時計を持ちません。`Vsync` に渡された `ITickerProvider` から `WidgetTicker` を生成し、フレームコールバック(`IFrameScheduler`、通常は `WidgetBinding`)経由でタイムスタンプを受け取ります。
+`AnimationController` 自身は時計を持ちません。`Vsync` に渡された `ITickerProvider` から `WidgetTicker` を生成し、フレームコールバック(`IFrameScheduler`、通常は `WidgetBinding`)経由でタイムスタンプを受け取ります。
 
-`State` でコントローラを使う場合は `TickerProviderState<T>` を継承するのが最も簡単です:
+`State` でコントローラを使う場合は、`TickerProviderState<T>` を継承するのが最も簡単です。
 
 ```csharp
 public record PulseState : TickerProviderState<PulseWidget>
@@ -94,11 +94,11 @@ public record PulseState : TickerProviderState<PulseWidget>
 }
 ```
 
-`WidgetTicker` は `Muted = true` で(経過時間の基準を保ったまま)一時停止できます。`Dispose()` で Provider の追跡から外れます。
+`WidgetTicker` は `Muted = true` に設定すると(経過時間の基準を保ったまま)一時停止できます。`Dispose()` を呼ぶと Provider の追跡から外れます。
 
 ## Curve と Curves
 
-`ICurve.Transform(t)` は正規化された時刻 t∈[0,1] を写像します。抽象基底 `Curve` は Flutter と同じ契約(端点 t==0 / t==1 はそのまま返し、間だけ `TransformInternal` に委譲)を保証し、`Flipped` で時間・値軸を反転したカーブを得られます。
+`ICurve.Transform(t)` は正規化された時刻 t∈[0,1] を写像します。抽象基底 `Curve` は、Flutter と同じ契約(端点 t==0 / t==1 はそのまま返し、中間値の計算だけを `TransformInternal` に委譲すること)を保証します。また、`Flipped` を使うと時間軸と値軸を反転したカーブを得られます。
 
 ### カーブ型
 
@@ -117,7 +117,7 @@ public record PulseState : TickerProviderState<PulseWidget>
 
 ### 標準インスタンス(`Curves`)
 
-Flutter の `Curves` と同じ係数で、命名は C# 規約(PascalCase)です。
+Flutter の `Curves` と同じ係数を使用し、命名には C# 規約(PascalCase)を適用しています。
 
 | グループ | メンバ |
 |---|---|
@@ -128,11 +128,11 @@ Flutter の `Curves` と同じ係数で、命名は C# 規約(PascalCase)です�
 | バウンス | `BounceIn`, `BounceOut`, `BounceInOut` |
 | 弾性 | `ElasticIn`, `ElasticOut`, `ElasticInOut` |
 
-`Back` 系と `Elastic` 系は 0〜1 の範囲を行き過ぎる(オーバーシュートする)値を返します。`AnimationController` は `LowerBound`〜`UpperBound` で値をクランプするため、オーバーシュートをそのまま使いたい場合は注意してください。
+`Back` 系と `Elastic` 系は、0〜1 の範囲を超える(オーバーシュートする)値を返します。`AnimationController` は `LowerBound`〜`UpperBound` で値をクランプするため、オーバーシュートをそのまま使いたい場合は注意が必要です。
 
 ## FadeTransition と RenderAnimatedOpacity
 
-`FadeTransition` は `IAnimation<double>` で子の不透明度を駆動するウィジェットです。
+`FadeTransition` は、`IAnimation<double>` を使って子の不透明度を制御するウィジェットです。
 
 ```csharp
 new FadeTransition
@@ -142,17 +142,17 @@ new FadeTransition
 }
 ```
 
-ポイントは更新経路です。`RenderAnimatedOpacity` が `Changed` を購読し、値が変わったフレームだけ `MarkNeedsPaint()` を呼びます([RenderObjects](RenderObjects.md) の差分更新参照)。つまり:
+ポイントは更新の流れです。`RenderAnimatedOpacity` が `Changed` を購読し、値が変わったフレームのみ `MarkNeedsPaint()` を呼び出します([RenderObjects](RenderObjects.md) の差分更新参照)。つまり、次のようになります。
 
 - **Widget のリビルドは発生しない** — `SetState()` は不要
 - **レイアウトも走らない** — 再ペイントのみ(`OpacityLayer` の差し替え)
 - 不透明度が 0 のフレームは子のペイント自体をスキップ
 
-毎フレーム値が変わるアニメーションで `SetState()` を使うとフレームごとに Widget ツリーの差分ビルドが走るため、アニメーション値は `*Transition` 系ウィジェット(現状は `FadeTransition`)で RenderObject に直結させるのが推奨パターンです。
+毎フレーム値が変わるアニメーションで `SetState()` を使うと、フレームごとに Widget ツリーの差分ビルドが走ります。そのため、アニメーション値は `*Transition` 系ウィジェット(現状は `FadeTransition`)を使い、RenderObject に直結させるのが推奨パターンです。
 
 ## テストでの駆動
 
-`IFrameScheduler` を Fake に差し替えると、実時間なしでアニメーションを進められます(`tests/FloatSoda.Test/Animation/` の `FakeFrameScheduler` 参照):
+`IFrameScheduler` を Fake に差し替えると、実時間を経過させずにアニメーションを進められます(`tests/FloatSoda.Test/Animation/` の `FakeFrameScheduler` 参照)。
 
 ```csharp
 var scheduler = new FakeFrameScheduler();
