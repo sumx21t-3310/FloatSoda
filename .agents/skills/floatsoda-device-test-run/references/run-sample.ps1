@@ -6,7 +6,7 @@
   ./run-sample.ps1 -Scenario OverlayQuit   # same, for a floatsoda-device-test-gen harness scenario
   ./run-sample.ps1 stop                    # stop the current process only
 .NOTES
-  Log: <ResultsDir>/logs/<Name>.log (+ .err). State: <ResultsDir>/current.pid.
+  Log: <ResultsDir>/logs/<Name>.log (+ .err). State: <ResultsDir>/current.pid ("<pid>|<exe path>").
   ResultsDir defaults to $HOME/tmp/floatsoda-walkthrough/<today>.
   Harness exe: tests/FloatSoda.DeviceTest/bin/Debug/net10.0/FloatSoda.DeviceTest.exe --scenario <Id>
 #>
@@ -22,8 +22,15 @@ New-Item -ItemType Directory -Force $logDir | Out-Null
 $pidFile = Join-Path $ResultsDir 'current.pid'
 
 if (Test-Path $pidFile) {
-    $old = Get-Content $pidFile
-    if ($old) { Stop-Process -Id $old -Force -ErrorAction SilentlyContinue }
+    # current.pid holds "<pid>|<exe path>". Stop only if that PID still runs that exe —
+    # a stale file (crash after the 4 s check, external kill) may point at a reused PID.
+    $old = (Get-Content $pidFile -ErrorAction SilentlyContinue) -split '\|', 2
+    $proc = if ($old[0]) { Get-Process -Id $old[0] -ErrorAction SilentlyContinue } else { $null }
+    if ($proc -and $old.Count -eq 2 -and $proc.Path -eq $old[1]) {
+        Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+    } elseif ($proc) {
+        Write-Warning "current.pid ($($old[0])) now belongs to '$($proc.Path)', not the recorded sample; not stopping it"
+    }
     Remove-Item $pidFile -Force
 }
 if ($Name -eq 'stop') { 'stopped'; exit 0 }
@@ -40,7 +47,7 @@ $log = Join-Path $logDir "$Name.log"
 $startArgs = @{ FilePath = $exe; WorkingDirectory = (Split-Path $exe); RedirectStandardOutput = $log; RedirectStandardError = "$log.err"; PassThru = $true }
 if ($args.Count -gt 0) { $startArgs.ArgumentList = $args }
 $p = Start-Process @startArgs
-Set-Content $pidFile $p.Id
+Set-Content $pidFile "$($p.Id)|$exe"
 Start-Sleep -Seconds 4
 if ($p.HasExited) {
     "exited early (code $($p.ExitCode)):"

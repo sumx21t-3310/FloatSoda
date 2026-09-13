@@ -143,10 +143,10 @@
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/basic.dart:2108
    - 読み上げ指示：「2番目の旗が横長に歪んでいるか」
 
-3. **Cover + HardEdge ではみ出しが切られているか？**
+3. **Cover + HardEdge で左右のはみ出しが枠の端で切られているか？**
    - 根拠：samples/FloatSoda.Samples.FittedBox/FittedBoxDemo.cs:54-59
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/basic.dart:2108
-   - 読み上げ指示：「4番目の旗が枠いっぱいで、上下が切れているか」
+   - 読み上げ指示：「4番目の旗が枠の高さいっぱいで、左右が切れて背景が見えないか」
 
 ---
 
@@ -203,10 +203,10 @@
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/basic.dart:3426
    - 読み上げ指示：「2番目の茶色が枠全体で、赤い正方形が中央にあるか」
 
-3. **Fit = DeferToChild で自身が子と同じ寸法に縮んでいるか？**
+3. **Fit = DeferToChild で茶色が見えず、赤い正方形だけが枠の背景の中央にあるか？**
    - 根拠：samples/FloatSoda.Samples.OverflowBox/OverflowBoxDemo.cs:56-67
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/basic.dart:3426
-   - 読み上げ指示：「3番目で茶色が赤い正方形と同じサイズか」
+   - 読み上げ指示：「3番目で茶色が見えず、赤い正方形だけが中央にあるか」
 
 
 ---
@@ -289,6 +289,11 @@
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/image.dart:343
    - 読み上げ指示：「中央のカードの画像が全体表示で比率を保っているか」
 
+4. **COVER が横幅を満たし、上下が領域内で切り抜かれているか？**
+   - 根拠：samples/FloatSoda.Samples.Image/ImageDemo.cs:88-102（`BoxFit.Cover` + `Clip.HardEdge`）
+   - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/image.dart:343
+   - 読み上げ指示：「右のカードの画像が横幅いっぱいで、上下が切れて外にはみ出していないか」
+
 
 ---
 
@@ -298,8 +303,8 @@
 1. **DeferToChild で子のみが反応し、枠の空白は反応しないか？**
    - 根拠：samples/FloatSoda.Samples.Listener/ListenerDemo.cs:52-60
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/basic.dart:7146
-   - 読み上げ指示：「左の水色の正方形をクリック」
-   - 操作手順：(1) 左の四角の中央の小さい水色部分をコントローラーのトリガーで押す
+   - 読み上げ指示：「左の水色を押してカウントが増え、左の枠の空白を押しても増えないか」
+   - 操作手順：(1) 左の四角の中央の小さい水色部分をコントローラーのトリガーで押し、Down / Up が1ずつ増えるのを見る (2) 続けて左の枠の空白部分(水色の外)を押し、表示と回数が変わらないのを見る
 
 2. **Opaque で領域全体が反応しているか？**
    - 根拠：samples/FloatSoda.Samples.Listener/ListenerDemo.cs:65-74
@@ -351,11 +356,11 @@
    - 読み上げ指示：「トリガーを押す」
    - 操作手順：(1) ホバー中にトリガーを押して押しっぱなしにする
 
-3. **ホバー中にトリガーを押して領域外へ出ると「CANCELED」に変わるか？**
+3. **トリガーを押したままオーバーレイそのものの外へ出ると「CANCELED」に変わり、Tap が増えないか？**
    - 根拠：samples/FloatSoda.Samples.PointerRegion/PointerRegionDemo.cs:178-188
    - Flutter 参照：src/flutter/packages/flutter/lib/src/widgets/basic.dart:7288
-   - 読み上げ指示：「トリガーを押しながら領域外へ出す」
-   - 操作手順：(1) 領域内でトリガーを押して (2) 押しっぱなしで領域外へレーザーを移動
+   - 読み上げ指示：「トリガーを押したまま、的を越えてオーバーレイの外までレーザーを出す」
+   - 操作手順：(1) 的の中でトリガーを押して (2) 押しっぱなしで、的の外ではなく**オーバーレイそのものの外**までレーザーを移動する。的の外(オーバーレイ内)に出しただけでは Exit だけが増え、Cancel は増えない
 
 
 ---
@@ -379,10 +384,10 @@
 ## 集計
 
 - **総サンプル数**：17 個
-- **確認項目数**：51 項目（各サンプル平均 3.0 項目）
+- **確認項目数**：52 項目（各サンプル平均 3.1 項目）
   - レイアウト基礎(ステージ 1)：15 項目
   - 高度なレイアウト(ステージ 2)：9 項目
-  - 描画・視覚効果(ステージ 3)：9 項目
+  - 描画・視覚効果(ステージ 3)：10 項目
   - 入力処理(ステージ 4)：9 項目
 
 ---
