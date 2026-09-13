@@ -15,7 +15,7 @@ using var app = new OVRApplication(
 // app.Info.Type → ApplicationType.Overlay
 ```
 
-`builder.Services.AddFloatSoda()` は `FloatSodaOptions.AppKey` から `OVRAppInfo` を登録します。`host.RunAsync()` でFloatSodaのHostedServiceが開始されると、内部で `OVRApplication` を生成するため、通常は直接インスタンス化する必要はありません。
+`builder.Services.AddFloatSoda()` は `FloatSodaOptions.AppKey` から `OVRAppInfo` を登録します。`host.RunAsync()` で FloatSoda の HostedService が開始されると内部で `OVRApplication` を生成するため、通常は直接インスタンス化する必要はありません。
 
 ### ApplicationType
 
@@ -124,7 +124,7 @@ dispatcher.Register(EVREventType.VREvent_Quit, (in VREvent_t _) =>
 dispatcher.PollEvents();
 ```
 
-FloatSodaのHostedServiceは `VREvent_Quit` / `VREvent_ProcessQuit` を自動登録し、受信時にGeneric Host全体へ停止を通知します。
+FloatSoda の HostedService は `VREvent_Quit` / `VREvent_ProcessQuit` を自動登録し、受信時に Generic Host 全体へ停止を通知します。
 
 ## 例外体系
 
@@ -164,7 +164,7 @@ var hmd = matrix4x4.ToHmdMatrix34_t();
 OpenVR.Overlay.SetOverlayTransformAbsolute(handle, origin, ref hmd);
 ```
 
-`OverlayTransform` サブクラスを実装する場合は `GetMatrix()` が `Position` + `Rotation` から `Matrix4x4` を生成するので、`Apply()` で `ToHmdMatrix34_t()` を呼ぶだけで済みます。
+`OverlayTransform` サブクラスを実装する場合は、`GetMatrix()` が `Position` と `Rotation` から `Matrix4x4` を生成するため、`Apply()` で `ToHmdMatrix34_t()` を呼ぶだけで済みます。
 
 ## 関連ページ
 
