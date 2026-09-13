@@ -47,7 +47,7 @@ blocking にしてよいのは、重要度 1〜5 に該当し、かつ concrete 
 
 仕様が食い違ったときは、**上から順に**確認します(必須)。
 
-1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、正典としては扱いません
+1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、正典としては扱いません
 2. **Flutter 由来機能は、Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無いなら、Flutter が正典です
 3. **既存の FloatSoda 実装は根拠になりません** — 実装がそうなっていることは、それが正しいことを意味しません
 
@@ -102,7 +102,7 @@ RenderObject / Element / Widget / Layer に触れる変更では、次を確認�
 - Flutter 由来の Widget / RenderObject に、**明示された理由のない observable behavior の差異が入っていないか**(必須)。対象は property semantics / default values / layout / paint・clipping / hit testing / child handling / Widget update behavior / invalid・degenerate input handling / dirty layout・paint conditions / Element・state lifecycle semantics。
 - 「実装しやすい」「こちらの方が安全」「こちらの方が自然」**だけ**を理由にした独自仕様になっていないか(必須)。
 - C#/.NET として自然な表現への置換(`event`、`init` / `required`、`record` / `record struct`、.NET 標準機構の利用)は **behavioral difference ではありません**。これを差異として指摘しないでください。
-- **差異が必要と判断された場合、記録必須 5 項目が揃っているか**(必須) — Flutter の挙動 / FloatSoda の挙動 / 差異が必要な理由 / 差異を固定するテスト / 利用者に影響する場合のドキュメント。記録先は [known-divergences.md](.agents/skills/floatsoda-device-test/references/known-divergences.md)。
+- **差異が必要と判断された場合、記録必須 5 項目が揃っているか**(必須) — Flutter の挙動 / FloatSoda の挙動 / 差異が必要な理由 / 差異を固定するテスト / 利用者に影響する場合のドキュメント。記録先は [known-divergences.md](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md)。
 - Semantics ほか、既に明示された**非移植方針を parity を理由に破っていないか**(必須)。
 - Flutter を参照した PR で、**Flutter version / commit・参照した source・参照した tests** が PR から追跡できるか(推奨)。
 
@@ -134,5 +134,5 @@ RenderObject / Element / Widget / Layer に触れる変更では、次を確認�
 
 隣接する検証との住み分け:
 
-- SteamVR 実行時にしか観測できない挙動 → `floatsoda-device-test`
+- SteamVR 実行時にしか観測できない挙動 → `floatsoda-device-test-gen`
 - docs / API の発見性・誤誘導 → `floatsoda-junior-coder-test`

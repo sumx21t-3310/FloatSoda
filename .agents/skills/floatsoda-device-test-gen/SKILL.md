@@ -1,17 +1,18 @@
 ---
-name: floatsoda-device-test
+name: floatsoda-device-test-gen
 description: >-
   Run FloatSoda's device test — enumerate, with Codex, every scenario that can only break with
   SteamVR actually running plus every behavioural divergence from the Flutter port it mirrors,
-  route each one to headless xunit or to the on-HMD harness, build that harness, have the owner
-  run it in VR, and triage what falls out. Use whenever the user wants to test FloatSoda on real
-  hardware, mentions "実機テスト", "実機で確認", "デバイステスト", "HMDで動かして確認",
-  "シナリオを洗い出したい", "Flutterとの挙動差", "移植差異", "device test", or asks what could
-  break that the current unit tests would never catch. Also use when adding scenarios to an
-  existing harness. Enumeration is delegated to Codex; the VR run itself is owner-only.
+  route each one to headless xunit or to the on-HMD harness, and write those tests and harness
+  scenarios. This skill produces tests; it never puts a headset on — the on-device run and its
+  triage belong to floatsoda-device-test-run. Use whenever the user wants device-only or
+  divergence scenarios enumerated or turned into tests, mentions "デバイステスト", "シナリオを
+  洗い出したい", "Flutterとの挙動差", "移植差異", "device test", "ハーネスにシナリオを足して",
+  or asks what could break that the current unit tests would never catch. Enumeration is
+  delegated to Codex.
 ---
 
-# FloatSoda Device Test
+# FloatSoda Device Test — Gen
 
 ## Why this exists
 
@@ -26,7 +27,10 @@ So users (and the LLMs writing for them) arrive expecting Flutter's behaviour. *
 diverges, the user pays the same cost whether the divergence is a bug or a deliberate design call.**
 That makes divergence its own defect class, worth enumerating alongside the VR-only one.
 
-This skill turns both into a repeatable process instead of an ad-hoc VR session.
+This skill turns both into a repeatable process instead of an ad-hoc VR session. It is the
+**producer** half: enumerate → verify → route → write the tests. The **runner** half — launching
+each harness scenario on the HMD, taking the owner's verdict, triaging what fails — is
+`floatsoda-device-test-run`, which drives catalog samples and harness scenarios with one loop.
 
 ## The economics that shape everything below
 
@@ -40,16 +44,17 @@ Never let the two be the same size. A 40-scenario enumeration that routes 34 to 
 
 ## Orchestration and hard stops
 
-Claude Code drives: writing the Codex brief, **verifying what Codex reports**, routing, building the
-harness, triaging failures, filing issues.
+Claude Code drives: writing the Codex brief, **verifying what Codex reports**, routing, writing the
+headless tests, building the harness scenarios.
 
-Three things are the owner's alone:
+Two things are the owner's alone:
 
-1. **The VR run** — physically not delegable.
-2. **Final design calls** — whether a divergence is accepted or fixed.
-3. **Commit / push / tag** — always ask.
+1. **Final design calls** — the provisional axis B labels stay provisional until the owner confirms
+   them (that confirmation happens during triage, in `floatsoda-device-test-run`).
+2. **Commit / push / tag** — always ask.
 
-Issue filing needs no confirmation (existing repo practice). But this is a **public repository**, so before pasting a device-test log or stack trace into an issue, strip the local environment out of it — absolute paths, machine and user names — as the repo's own rule requires.
+The VR run itself is also owner-only, but it is not part of this skill: hand the built scenarios to
+`floatsoda-device-test-run`.
 
 ## Workflow
 
@@ -129,28 +134,26 @@ or action manifest, or verification of the startup sequence (no-DI, SteamVR abse
 
 Each scenario is one class carrying: `Name` / purpose / operating steps / expected result / `Build()`.
 
-### 4. Make the run judgeable from inside the headset
+### 4. Make each scenario judgeable from inside the headset
 
-A device failure loses its value the moment the operator forgets what "pass" looked like.
+A device failure loses its value the moment the operator forgets what "pass" looked like. The
+runner (`floatsoda-device-test-run`) speaks each scenario's expected result as a yes/no question
+and records the owner's verdict, so every scenario must give it something to say:
 
 - **Show the expected result on the overlay, in Japanese.** The console is invisible with the HMD on.
-- **Let PASS/FAIL be recorded from inside VR.** Removing the headset to record a verdict undoes the
-  point.
-- **Append results and logs to a file** — scenario, timestamp, verdict, stack trace.
-- **Record crashes as data too**: which scenario, how far it got.
+- **Expose `Name` / operating steps / expected result** in a form the runner can read without
+  launching the exe (a `--list` argument, or a generated Markdown list next to the project).
+- **Append logs to a file** — scenario, timestamp, stack trace — so a crash is data: which scenario,
+  how far it got.
 
-### 5. Owner runs it; then triage
+### 5. Hand off
 
-Ask the owner to run with SteamVR up and hand back the log. For each failure: attempt headless
-reproduction, then **propose** a classification — library bug / docs gap / intended behaviour.
-
-File the library-bug and docs-gap issues without waiting (existing repo practice). But **"intended
-behaviour", and every axis B label, is a design call and stays provisional until the owner confirms
-it** (hard stop 2). Do not record a divergence as accepted, and do not open the "document this
-deliberate divergence" issue, before that confirmation.
-
-Append newly confirmed divergences to `references/known-divergences.md` so the next enumeration
-starts further along.
+Write the headless tests (`HEADLESS` scenarios → `tests/FloatSoda.Test`, following
+`CONTRIBUTING.md` test naming) and the harness scenarios (`VR` → `tests/FloatSoda.DeviceTest`),
+build, and stop. Then tell the owner which scenarios are ready for the headset, in execution order.
+The run, the verdicts, the headless-reproduction attempt for each failure, the classification
+proposals, and the append to `references/known-divergences.md` all happen in
+`floatsoda-device-test-run`.
 
 ## Known-issue exclusion list
 
@@ -177,10 +180,13 @@ Refresh with `gh issue list --state open` rather than trusting this list wholesa
 - `floatsoda-junior-coder-test` measures docs/API quality black-box. This skill is white-box and
   measures implementation correctness. Don't merge them: feeding a junior model a bug-scenario list
   destroys what that test measures.
+- `floatsoda-device-test-run` is the runner for everything this skill produces, and the place
+  where confirmed divergences get appended to `references/known-divergences.md`.
 
 ## Report format
 
 Lead with the routing split (how many `HEADLESS` vs `VR`, out of how many enumerated) — that's the
-headline, because it says how much of the work avoids the headset. Then the `VR` scenarios in
-execution order, then axis B divergences grouped by their label, each with a `file:line` link into
-the real source. Say plainly which `file:line` citations you verified yourself and which you did not.
+headline, because it says how much of the work avoids the headset. Then the headless tests written,
+then the `VR` scenarios in execution order (ready for `floatsoda-device-test-run`), then axis B
+divergences grouped by their provisional label, each with a `file:line` link into the real source.
+Say plainly which `file:line` citations you verified yourself and which you did not.
