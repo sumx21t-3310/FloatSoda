@@ -208,6 +208,22 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
 - **Observation**: `HEADLESS`(サイズはレイアウト結果で判定できる)
 - **Label**: port mistake。修正は #268(breaking)。PR #264 の Codex レビューで発見。
 
+## 13. RTL(右から左)レイアウトと start/end ベースの API が無い
+
+- **FloatSoda**: `src/` 配下に `Directionality` / `TextDirection` / `*Directional` 系の型が1つも無い。
+  レイアウトは水平 LTR 固定で、`EdgeInsets` / `Alignment` / `Positioned` は left/right だけを持つ。
+- **Flutter**: `Directionality`(`widgets/basic.dart:171`、`8a9f61cfd67`)が `TextDirection` を
+  配り、`EdgeInsetsDirectional` / `AlignmentDirectional` / `PositionedDirectional` などが
+  start/end を方向に応じて解決する。
+- **Why**: 初期の対象言語が日本語・英語・中国語・韓国語で、RTL の要望がまだ無いため。CJK フォント
+  フォールバックや絵文字など、優先する項目が先にある。UI の RTL ミラーリングと、ユーザー生成文字列の
+  Unicode 双方向テキスト処理は別の関心事として扱う。
+- **Test**: — (not set)。型が存在しないことを固定するテストは作りにくい。移植時に `Directional`
+  系の型を足す PR は、このエントリと `docs/Localization.md` の方針を先に見直す。
+- **Docs**: `docs/Localization.md` の「6. RTL(右から左へのレイアウト)は現時点でスコープ外」(PR #265)
+- **Observation**: `HEADLESS`(API の有無と、レイアウト結果が LTR 固定であること)
+- **Label**: deliberate — 2026-09-16 にオーナーが確定。PR #265 の Codex レビューで記録漏れを指摘された。
+
 ---
 
 ## Triage 2026-09-09 — 範囲の振り分けと着手順(Phase 2 リリース後に実施)
