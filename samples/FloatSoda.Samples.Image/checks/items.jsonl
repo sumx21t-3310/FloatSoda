@@ -1,0 +1,6 @@
+{"id": "image-1", "source": "ImageDemo.cs:46-58", "flutter_ref": "image.dart:343", "question": "DIRECT / CONTAIN / COVERの3枚のカードすべてに画像が表示され、色とディテールが一致しているか", "read_aloud": "3つのカードに画像が見えて、色が同じか見て"}
+{"id": "image-2", "source": "ImageDemo.cs:71-86", "flutter_ref": "image.dart:343", "question": "DIRECTのカードで、BoxFit.Fillにより画像が320x220へ引き伸ばされて横長に変形しているか", "read_aloud": "左のカードの画像、横長に歪んでいるか見て"}
+{"id": "image-3", "source": "ImageDemo.cs:54", "flutter_ref": "image.dart:343", "question": "CONTAINのカードで、BoxFit.Containにより正方形の画像全体が比率を維持したまま表示され、左右に背景色が見えるか", "read_aloud": "中央のカードの画像、全体が見えて左右に背景色があるか見て"}
+{"id": "image-4", "source": "ImageDemo.cs:56", "flutter_ref": "image.dart:343", "question": "COVERのカードで、BoxFit.Coverにより画像が横幅いっぱいに表示され、上下がClip.HardEdgeで領域外へはみ出さずに切り抜かれているか", "read_aloud": "右のカードの画像、横幅いっぱいで上下が切れて外にはみ出していないか見て"}
+{"id": "image-5", "source": "ImageDemo.cs:71-86", "flutter_ref": "", "question": "DIRECTのカードで、画像の上に「CHILD ON TOP」というラベルの子要素が前面に重ねて表示されているか", "read_aloud": "左のカードの画像の上に赤い文字が重なって見えるか見て"}
+{"id": "image-6", "source": "ImageDemo.cs:27-30", "flutter_ref": "", "question": "デスクトップウィンドウのサイズが中身の大きさ(1100x620)に追従して表示されているか", "read_aloud": "ウィンドウの大きさが中身にぴったり合っているか見て"}

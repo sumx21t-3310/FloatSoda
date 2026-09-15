@@ -1,0 +1,4 @@
+{"id": "coloredbox-1", "source": "ColoredBoxDemo.cs:18-22", "flutter_ref": "basic.dart:8379", "question": "ウィンドウ全面が濃紺で塗られているか", "read_aloud": "背景全体が濃い紺色で塗られてるか見て"}
+{"id": "coloredbox-2", "source": "ColoredBoxDemo.cs:32-36", "flutter_ref": "basic.dart:8379", "question": "左側の水色の矩形が子のサイズ 200x160 で塗られているか", "read_aloud": "左の水色の四角が、横長の200かける160くらいの大きさか見て"}
+{"id": "coloredbox-3", "source": "ColoredBoxDemo.cs:41-46", "flutter_ref": "basic.dart:8379", "question": "中央の緑の矩形が、子を持たない ColoredBox として SizedBox の 120x160 いっぱいに塗られているか", "read_aloud": "真ん中の緑の四角が、縦長の120かける160くらいで塗られてるか見て"}
+{"id": "coloredbox-4", "source": "ColoredBoxDemo.cs:51-63", "flutter_ref": "basic.dart:8379", "question": "右側の入れ子で、朱色の矩形の四辺にグレーの縁が均等に(28)残り、朱色が透けずにグレーの上へ描かれているか", "read_aloud": "右の朱色の四角のまわりに、同じ太さのグレーの縁が残ってるか見て"}

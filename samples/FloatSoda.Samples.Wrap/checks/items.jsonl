@@ -1,0 +1,3 @@
+{"id": "wrap-1", "source": "WrapDemo.cs:34-49", "flutter_ref": "basic.dart:6080", "question": "幅360の枠に8個のチップが3つのrunに折り返され(1行目3個、2行目3個、3行目2個)、どのrunも幅360を超えておらず、子同士とrun同士の間隔がどちらも8で揃っているか", "read_aloud": "最初の枠、色付きの四角が3行に折り返されて、間隔も揃っているか見て"}
+{"id": "wrap-2", "source": "WrapDemo.cs:55-71", "flutter_ref": "basic.dart:6080", "question": "Alignment.Centerの枠で、折り返し自体は同じまま、各runが左右中央に寄って余りが左右均等に分かれているか(既定のStartでは左詰め)", "read_aloud": "2番目の枠、各行のチップが左詰めではなく中央寄りに見えるか確認して"}
+{"id": "wrap-3", "source": "WrapDemo.cs:77-90", "flutter_ref": "basic.dart:6080", "question": "CrossAxisAlignment.Centerの枠で、1行目の高さ違いの四角(32/48/64)が上下中央で揃い、一番高い黄色の上下に低い四角の余白が均等に見えるか", "read_aloud": "3番目の枠、高さの違う四角が上下中央で揃っているか見て"}

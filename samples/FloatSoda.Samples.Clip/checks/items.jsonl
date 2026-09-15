@@ -1,0 +1,5 @@
+{"id": "clip-1", "source": "ClipDemo.cs:31", "flutter_ref": "basic.dart:952", "question": "切り抜き無しの枠で、水色の矩形が枠の左右からはみ出して見えているか", "read_aloud": "1番目の枠、水色が枠の左右からはみ出してるか見て"}
+{"id": "clip-2", "source": "ClipDemo.cs:35", "flutter_ref": "basic.dart:952", "question": "ClipRect の枠で、はみ出しが消え、水色が枠の幅ちょうどで切れているか", "read_aloud": "2番目の枠、はみ出しが消えて枠の幅で切れてるか見て"}
+{"id": "clip-3", "source": "ClipDemo.cs:40-44", "flutter_ref": "basic.dart:1035", "question": "ClipRoundRect の枠で、水色の四隅が半径28程度で丸く切り取られているか", "read_aloud": "3番目の枠、水色の四隅が丸くなってるか見て"}
+{"id": "clip-4", "source": "ClipDemo.cs:48", "flutter_ref": "basic.dart:1217", "question": "ClipOval の枠で、水色が縁の滑らかな楕円形に切り取られているか", "read_aloud": "4番目の枠、水色がなめらかな丸に切り取られてるか見て"}
+{"id": "clip-5", "source": "ClipDemo.cs:53-57", "flutter_ref": "basic.dart:1217", "question": "HardEdge の枠で、ClipOval と同じ楕円だが曲線の縁がギザギザしていて、4番目と見分けられるか", "read_aloud": "最後の枠、同じ丸だけど縁がギザギザで、4番目と区別できるか見て"}

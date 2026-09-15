@@ -79,7 +79,6 @@ dotnet run --project samples/FloatSoda.Samples.FittedBox
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.AspectRatio](../FloatSoda.Samples.AspectRatio) — 描画ではなくレイアウト寸法の比率を固定する場合
 - [FloatSoda.Samples.Image](../FloatSoda.Samples.Image) — 画像での BoxFit の使用例

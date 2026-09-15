@@ -1,0 +1,5 @@
+{"id": "decorated-box-1", "source": "DecoratedBoxDemo.cs:30-41", "flutter_ref": "container.dart:63", "question": "背景色と角丸のみを指定したセルで、水色の四角(110x110)の四隅が半径24で丸まって見えるか", "read_aloud": "最初の水色の四角、四隅が丸くなっているか見て"}
+{"id": "decorated-box-2", "source": "DecoratedBoxDemo.cs:45-60", "flutter_ref": "container.dart:63", "question": "ボーダーのみを指定したセルで、朱色の四角の四辺に太さ6の黄色い枠線が同じ太さで引かれ、角が直角のままか", "read_aloud": "2番目、朱色に黄色い枠線が四辺とも同じ太さであるか見て"}
+{"id": "decorated-box-3", "source": "DecoratedBoxDemo.cs:64-80", "flutter_ref": "container.dart:63", "question": "角丸とボーダーを組み合わせたセルで、水色の枠線が角丸の形状に沿って途切れずに引かれているか", "read_aloud": "3番目、丸い角に沿って枠線が途切れず続いているか見て"}
+{"id": "decorated-box-4", "source": "DecoratedBoxDemo.cs:85-100", "flutter_ref": "container.dart:63", "question": "Position=Foregroundのセルで、水色の四角の上に半透明の黄色がかぶさり、全体が黄緑がかった色に透けて見えるか", "read_aloud": "最後のセル、黄色が水色に透けて黄緑っぽく見えるか見て"}
+{"id": "decorated-box-5", "source": "DecoratedBoxDemo.cs:108-129", "flutter_ref": "", "question": "4つのラベル付きセルの外枠がすべて同じ大きさ(150x150)に見えるか", "read_aloud": "4つの枠、全部同じ大きさに見えるか見て"}

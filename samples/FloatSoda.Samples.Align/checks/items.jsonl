@@ -1,0 +1,5 @@
+{"id": "align-1", "source": "AlignDemo.cs:30-34", "flutter_ref": "basic.dart:2479", "question": "TopLeft の枠で、水色の四角が枠の左上隅に接しているか", "read_aloud": "1番目の枠、水色の四角が左上の角にくっついてるか見て"}
+{"id": "align-2", "source": "AlignDemo.cs:37-41", "flutter_ref": "basic.dart:2479", "question": "Center の枠で、水色の四角が上下左右とも中央にあるか", "read_aloud": "2番目の枠、水色の四角がど真ん中にあるか見て"}
+{"id": "align-3", "source": "AlignDemo.cs:44-48", "flutter_ref": "basic.dart:2479", "question": "BottomRight の枠で、水色の四角が枠の右下隅に接しているか", "read_aloud": "3番目の枠、水色の四角が右下の角にくっついてるか見て"}
+{"id": "align-4", "source": "AlignDemo.cs:52-55", "flutter_ref": "basic.dart:2479", "question": "Center ウィジェットの枠で、朱色の四角が Center の枠と同じ中央位置にあるか", "read_aloud": "4番目の朱色の四角、2番目と同じ真ん中の位置か見て"}
+{"id": "align-5", "source": "AlignDemo.cs:63-76", "flutter_ref": "basic.dart:2479", "question": "係数 2.0 の枠で、黄色の四角(48x48)の周囲に茶色の下地が 96x96 で見え、その外側は枠の背景色のままか", "read_aloud": "最後の枠、黄色い四角のまわりに茶色い下地があって、枠いっぱいには広がってないか見て"}

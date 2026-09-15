@@ -110,6 +110,5 @@ dotnet run --project samples/FloatSoda.Samples.Clip
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Image](../FloatSoda.Samples.Image) — `FittedBox` と組み合わせた画像の切り抜き

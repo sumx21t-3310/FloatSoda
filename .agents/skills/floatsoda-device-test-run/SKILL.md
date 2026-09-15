@@ -20,8 +20,8 @@ description: >-
 
 | 対象 | 出どころ | 判定項目 |
 |---|---|---|
-| カタログサンプル `samples/FloatSoda.Samples.<Name>` | Issue #188 の層1。各サンプルは結合テストのシナリオも兼ねる: 「docs に書いてあるとおりに書いたら、実際にそう表示されるか」(`CONTRIBUTING.md` サンプルを追加する場合の規約) | `references/checklist.md`、サンプルごとに 1〜3 項目 |
-| ハーネスシナリオ `tests/FloatSoda.DeviceTest --scenario <Id>` | `floatsoda-device-test-gen` が作る(列挙 → 振り分け → 構築)。各シナリオは自分の期待結果を持つ | シナリオごとに1項目: 期待結果を yes/no の質問に言い換えたもの |
+| カタログサンプル `samples/FloatSoda.Samples.<Name>` | Issue #188 の層1。各サンプルは結合テストのシナリオも兼ねる: 「docs に書いてあるとおりに書いたら、実際にそう表示されるか」(`CONTRIBUTING.md` サンプルを追加する場合の規約) | `samples/<Name>/checks/items.jsonl`(サンプルごとに `floatsoda-device-test-gen` が機械生成、3〜7項目) |
+| ハーネスシナリオ `tests/FloatSoda.DeviceTest --scenario <Id>` | `floatsoda-device-test-gen` が作る(列挙 → 振り分け → 構築)。各シナリオは自分の期待結果を持つ | シナリオごとに1項目: 期待結果を yes/no の質問に言い換えたもの(ハーネスシナリオの扱いはこの変更の対象外) |
 
 `floatsoda-device-test-gen` との分担は producer / runner。あちらは**何が**壊れうるかを決めて
 テストを書く(ヘッドレスなものは xunit、残りはハーネスシナリオ)。こちらはヘッドセットを被る
@@ -40,7 +40,8 @@ description: >-
 **音声セッション(Codex Voice モードなど):** このスキルを読み込む*前に*音声モードでチャットを
 始めること — テキストモードで始めたチャットは音声ディクテーションになるだけで、会話スレッドに
 ならない。巡回(手順1)は音声スレッド本体で回す: ターンテイキングと割り込みが要る。
-トリアージ(手順2)は別タスクへ委任してよい。共有状態である `results.md` のパスを渡す。
+トリアージ(手順2)は別タスクへ委任してよい。共有状態である `samples/<Name>/checks/results/*.jsonl`
+のパスを渡す。
 
 ## 地上ルール
 
@@ -64,28 +65,68 @@ description: >-
    `samples/FloatSoda.Samples.<Name>/bin/Debug/net10.0/FloatSoda.Samples.<Name>.exe` にビルドされる。
 2. SteamVR が動いていることを確認する(`vrserver` / `vrmonitor` プロセス)。自分では起動しない。
    オーナーが起動する。
-3. `references/results-template.md` から結果ファイルを
-   `$HOME/tmp/floatsoda-walkthrough/<yyyy-MM-dd>/results.md` に作る(リポジトリの外 — ローカル
-   パスを含むので、決してコミットしない)。
+3. 巡回対象サンプルそれぞれの `samples/<Name>/checks/items.jsonl` を読む。結果は
+   `samples/<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` に記録するので
+   (詳細は手順1)、この時点ではファイルを作らなくてよい。巡回の開始時刻(ISO 8601、秒まで)を
+   `run_id`、`git rev-parse --short HEAD` を `commit` として控えておく。巡回中の全行で同じ値を使う。
 4. 任意で、読み取り専用のスタック監視を横で回す(`vr-stack-watch -Watch`、オーナーのマシンに
    あるユーザーレベルのスキル)。巡回中の GPU ハングにタイムスタンプが付く。
-5. `references/checklist.md` を読む。2026-09-13 にブランチ `test/188-all-samples` のサンプルと
-   照合済み。**これから回すサンプルの `Demo.cs` 引用行を抜き取り確認する** — サンプルは変わるが、
-   チェックリストは自動では追従しない。
+5. **これから回すサンプルの `Demo.cs` 引用行を抜き取り確認する** — サンプルは変わるが、
+   `items.jsonl` は自動では追従しない。`source` の `file:line` が実際の Demo.cs と一致しているか
+   スポットチェックする。
+
+このスキルの変更対象はカタログサンプルの検証項目管理だけで、ハーネスシナリオ
+(`tests/FloatSoda.DeviceTest --scenario <Id>`)側の扱いは変えない。
 
 ### 1. 巡回(ヘッドセットを被った状態)
 
-順序: まずカタログサンプル(チェックリスト末尾のとおり、レイアウト → 制約 → 描画 → 入力系は最後)、
-次にハーネスシナリオを列挙時の順で。対象ごとに:
+順序: まずカタログサンプル(レイアウト → 制約 → 描画 → 入力系は最後)、次にハーネスシナリオを
+列挙時の順で。1回の巡回で複数サンプルを回るので、結果は対象サンプルごとに対応する
+`samples/<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` へ追記する
+(存在しなければこの時点で作る)。ファイル名の `<hmd>` `<gpu>` `<platform>` はオーナーの環境から
+取得する(例: Virtual Desktop の接続先デバイス名、`Get-CimInstance Win32_VideoController` の
+GPU 名、Windows ビルド番号)。`<mode>` は `desktop` か `dashboard` — その対象を `--desktop` で
+起動したか、SteamVR ダッシュボードで起動したかを表す。デスクトップでは完結しない項目
+(ポインタ入力を伴うもの、issue #182)は、ダッシュボードでも別途回して別ファイルに記録すること —
+`items.jsonl` は表示方法を区別しないので、この区別は結果側の `<mode>` だけが持つ。
+
+ハーネスシナリオの結果は、同じファイル名で `tests/FloatSoda.DeviceTest/checks/results/` へ追記する
+(全シナリオで1ファイル)。
+
+**results/*.jsonl のスキーマ**(1行1実行結果、実行のたびに追記):
+```json
+{"run_id": "2026-09-16T21:05:00+09:00", "commit": "a1b2c3d", "id": "padding-1", "result": "ok", "remarks": ""}
+```
+`run_id` と `commit` は手順0で控えた値。同じ日・同じ環境で再実行しても、どの巡回のどの版の
+結果かを行ごとに区別できる。`result` は `ok` / `ng` / `crash` / `skip` のいずれか。`skip` は
+ダッシュボードが開けない・時間切れなど、判定そのものを行えなかった場合に使う。`remarks` は
+NG/CRASH/SKIP のときにオーナーが言った理由(それ以外は空文字)。結果ファイルは環境間の比較のために
+コミットして履歴に残すので、`remarks` にはローカルパス・マシン名・ユーザー名を書かず、現象だけを書く
+(ログ末尾を写すときも、パスは `$HOME` やリポジトリ相対に置き換える)。`skip` はバグの兆候ではないため、
+トリアージ(手順2)の対象に含めない。
+
+`id` は次のどれか:
+
+- サンプルの項目: 該当サンプルの `items.jsonl` の `id`
+- 項目を1つも判定する前にサンプルが終了した・起動できなかった: `<サンプル名kebab-case>-launch`
+  (例: `padding-launch`)。`result` は `crash` か `skip`
+- ハーネスシナリオ: シナリオの `<Id>`
+
+対象ごとに:
 
 1. リポジトリルートから、サンプルなら
-   `./.agents/skills/floatsoda-device-test-run/references/run-sample.ps1 <Name>`、ハーネスシナリオなら
-   同じスクリプトに `-Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って
-   生きているかを報告する。すぐ終了していたら、ログの末尾を判定(`CRASH`)として記録して次へ。
-2. 対象名を言い、最初の読み上げ行を言う(シナリオなら: 期待結果を yes/no の質問1つに言い換える)。
+   `./.agents/skills/floatsoda-device-test-run/references/run-sample.ps1 <Name>`(`desktop` モードでは
+   `-Desktop` を付けて `--desktop` をサンプルへ渡す)、ハーネスシナリオなら同じスクリプトに
+   `-Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って生きているかを報告する。
+   すぐ終了していたら、ログの末尾を `remarks` にして `<サンプル名kebab-case>-launch` の `crash` 行を
+   記録し、次へ。
+2. 対象名 + 最初の読み上げ行を言う(サンプルなら該当 `items.jsonl` の `read_aloud`、シナリオなら
+   期待結果を yes/no の質問1つに言い換える)。
 3. OK / NG を待つ。NG なら、何がおかしいかを一言だけ聞く。それ以上は聞かない。
-4. 項目ごとに `results.md` へ1行をすぐ追記する — まとめて書かない。
-5. 残りの項目を繰り返し、同じスクリプトに `stop` を渡して止める。
+4. 該当サンプルの `results/*.jsonl` へ1行をすぐ追記する — まとめて書かない。
+5. **次の項目があれば、その読み上げ行を言ってから手順3に戻る。** 記録(手順4)は発話を
+   省略していい合図ではない — 項目ごとに必ず「言う → 待つ → 記録する」の3つをこの順でやる。
+6. 項目が尽きたら、同じスクリプトに `stop` を渡して止め、次の対象の手順1へ進む。
 
 入力系サンプル3つ(Listener、GestureDetector、PointerRegion)では、項目の前に操作手順を言う
 (「左の箱にコントローラーのレイを当てて、トリガーを引いて」)。ポインタ入力はダッシュボード
@@ -94,7 +135,8 @@ description: >-
 
 ### 2. トリアージ(ヘッドセットを外した状態)
 
-NG / CRASH の行ごとに:
+`results/*.jsonl` のうち今回の `run_id` の行で、`result` が `ng` / `crash` の行ごとに(過去の巡回の
+行は、修正前の結果なのでトリアージし直さない):
 
 1. まずヘッドレス再現を試みる(`src/FloatSoda.Testing` のビットマップレンダラか xunit テスト)。
    ヘッドレスで再現する見た目の NG は、書かれるのを待っている回帰テスト。
@@ -111,11 +153,13 @@ NG / CRASH の行ごとに:
    `deliberate` の差異で `Test` が未設定なら、その回帰テストを書くまでエントリは未完了として扱う。
    これで次回の列挙がより先から始められる。「deliberate」で確定した差異は、文書化されるまで
    `docs/` のギャップ。
-5. NG がチェックリスト側の誤り(サンプルが変わった、項目が間違っていた)と分かったら、
-   `references/checklist.md` を、それ以外を何も変えない PR で直す。
+5. NG が `items.jsonl` 側の誤り(サンプルが変わった、項目が間違っていた)と分かったら、
+   該当サンプルの `samples/<Name>/checks/items.jsonl` を、それ以外を何も変えない PR で直す
+   (`floatsoda-device-test-gen` の手順6と同じ生成ルールに従う)。
 
 ## 報告形式
 
-集計を最初に: 回したサンプル数 / 答えた項目数 / NG / CRASH。続いて NG の行をオーナーの言葉
-そのままに、サンプルと項目番号つきで。次に NG ごとの分類提案を、提案であると明示して。
-巡回前にどのチェックリスト引用行を抜き取り確認したかを述べること。
+集計を最初に: 巡回した対象数(サンプル + ハーネスシナリオ)/ 答えた項目数 / NG / CRASH の件数を、
+巡回した全サンプルとハーネスの `results/*.jsonl` から、今回の `run_id` の行だけを横断して集計する。続いて NG の行をオーナーの言葉
+そのままに、サンプルと項目 `id` つきで。次に NG ごとの分類提案を、提案であると明示して。
+巡回前にどの `items.jsonl` の `file:line` を抜き取り確認したかを述べること。

@@ -1,0 +1,4 @@
+{"id": "overflow-box-1", "source": "OverflowBoxDemo.cs:31-36", "flutter_ref": "basic.dart:3426", "question": "OverflowBox が親より大きい制約(MaxWidth=210)を子に渡し、水色の帯(幅190)が枠の左右の端を越えてはみ出しているか", "read_aloud": "最初の水色の帯が枠からはみ出しているか見て"}
+{"id": "overflow-box-2", "source": "OverflowBoxDemo.cs:41-51", "flutter_ref": "basic.dart:3426", "question": "Fit=Max(既定)で OverflowBox 自身が領域いっぱい(150x150)に広がり、茶色の中央に朱色の四角があるか", "read_aloud": "2番目で茶色が枠いっぱいで中に朱色の四角があるか見て"}
+{"id": "overflow-box-3", "source": "OverflowBoxDemo.cs:56-67", "flutter_ref": "basic.dart:3426", "question": "Fit=DeferToChildで自身が子と同じ寸法まで縮み、茶色が見えず朱色の四角だけが枠の背景色の中央にあるか", "read_aloud": "3番目で茶色が見えず朱色の四角だけがあるか見て"}
+{"id": "overflow-box-4", "source": "OverflowBoxDemo.cs:73-84", "flutter_ref": "basic.dart:3426", "question": "SizedOverflowBox で自身の寸法(80x80)の茶色の四角の中央に、幅120の黄色の帯が左右へはみ出しているか", "read_aloud": "4番目で黄色い帯が茶色の四角からはみ出しているか見て"}

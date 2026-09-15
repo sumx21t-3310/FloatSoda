@@ -1,0 +1,5 @@
+{"id": "transform-1", "source": "TransformDemo.cs:32-39", "flutter_ref": "basic.dart:1585", "question": "原点を指定しない回転のセルで、水色の四角が15度傾いており、左上の角が回転前の位置から動かずに軸となっているか", "read_aloud": "最初のセル、四角の左上を軸に傾いているか見て"}
+{"id": "transform-2", "source": "TransformDemo.cs:43-51", "flutter_ref": "basic.dart:1585", "question": "Alignment.Centerを指定したセルで、朱色の四角が同じ15度の傾きのまま、枠の中央にとどまって(その場で回って)いるか", "read_aloud": "2番目のセル、四角が中央にとどまって回っているか見て"}
+{"id": "transform-3", "source": "TransformDemo.cs:54-62", "flutter_ref": "basic.dart:1585", "question": "縮小0.6のセルで、黄色の四角が0.6倍(54x54)のサイズで枠の中央に表示されているか", "read_aloud": "3番目のセル、黄色い四角が小さく中央にあるか見て"}
+{"id": "transform-4", "source": "TransformDemo.cs:67-74", "flutter_ref": "basic.dart:1585", "question": "平行移動のセルで、水色の四角が中央から右下へずれ、レイアウト領域(枠)は動かず、描画だけが枠の端を越えてはみ出しているか", "read_aloud": "最後のセル、四角が右下にずれて枠からはみ出しているか見て"}
+{"id": "transform-5", "source": "TransformDemo.cs:82-103", "flutter_ref": "", "question": "4つのラベル付きセルの外枠がすべて同じ大きさ(150x150)に見えるか", "read_aloud": "4つの枠、全部同じ大きさに見えるか見て"}

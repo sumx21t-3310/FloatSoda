@@ -1,0 +1,4 @@
+{"id": "aspect-ratio-1", "source": "AspectRatioDemo.cs:30-37", "flutter_ref": "basic.dart:3748", "question": "16:9の比率で、水色の四角が枠の幅いっぱい(150)を採り、高さ約84の横長になっているか", "read_aloud": "最初の水色が幅いっぱいで横長の長方形に見えるか見て"}
+{"id": "aspect-ratio-2", "source": "AspectRatioDemo.cs:42-49", "flutter_ref": "basic.dart:3748", "question": "3:4の比率で、幅150では高さが足りず高さ側が上限になり、朱色が高さいっぱい(150)・幅約113の縦長になっているか", "read_aloud": "2番目の赤が幅狭めで背が高い長方形に見えるか見て"}
+{"id": "aspect-ratio-3", "source": "AspectRatioDemo.cs:52-59", "flutter_ref": "basic.dart:3748", "question": "1:2の比率で、黄色の四角が高さ150・幅75の細長い縦長になっているか", "read_aloud": "3番目の黄色がさらに幅の狭い縦長に見えるか確認して"}
+{"id": "aspect-ratio-4", "source": "AspectRatioDemo.cs:64-68", "flutter_ref": "basic.dart:3748", "question": "親の制約がtight(固定)な最後の枠では、16:9の指定にもかかわらず比率が効かず、水色が枠いっぱいの正方形(150x150)になっているか", "read_aloud": "最後のセルで水色が正方形に見えるか確認して"}

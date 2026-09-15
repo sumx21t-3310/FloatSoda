@@ -1,0 +1,3 @@
+{"id": "sizedbox-1", "source": "SizedBoxDemo.cs:32-45", "flutter_ref": "basic.dart:2773", "question": "上段の3つの矩形の高さが等しく、幅だけが 200 / 120 / 60 と異なるか", "read_aloud": "上の段の3つの四角、高さが同じで幅だけ違うか見て"}
+{"id": "sizedbox-2", "source": "SizedBoxDemo.cs:40-42", "flutter_ref": "basic.dart:2773", "question": "子を持たない SizedBox で、上段の矩形どうしの間隔が均等に約40空いているか", "read_aloud": "上の段の四角どうしのすき間が同じ幅か見て"}
+{"id": "sizedbox-3", "source": "SizedBoxDemo.cs:52-63", "flutter_ref": "basic.dart:2773", "question": "下段のグレーの帯が Height = 70 のみの指定で、幅は余白いっぱいまで伸び、中央にラベルがあるか", "read_aloud": "下の灰色の帯が横いっぱいに伸びて、真ん中に文字があるか見て"}

@@ -1,0 +1,3 @@
+{"id": "limited-box-1", "source": "LimitedBoxDemo.cs:31-36", "flutter_ref": "basic.dart:3365", "question": "bounded(枠のtight制約)な場所ではMaxWidth/MaxHeightが無視され、水色が枠いっぱいに塗られているか", "read_aloud": "最初の枠が水色でいっぱいに塗られているか見て"}
+{"id": "limited-box-2", "source": "LimitedBoxDemo.cs:41-49", "flutter_ref": "basic.dart:3365", "question": "UnconstrainedBoxでunboundedにした場所ではMaxWidthが上限として効き、朱色の帯が幅100で止まっているか", "read_aloud": "2番目の朱色の帯が短く中央にあるか見て"}
+{"id": "limited-box-3", "source": "LimitedBoxDemo.cs:53-56", "flutter_ref": "basic.dart:3365", "question": "LimitedBoxなしの比較で、黄色の帯(幅220)が枠の左右の端を越えてはみ出しているか", "read_aloud": "3番目の黄色い帯が枠からはみ出しているか見て"}
