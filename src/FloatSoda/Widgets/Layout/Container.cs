@@ -10,8 +10,7 @@ namespace FloatSoda.Widgets.Layout;
 /// 装飾、寸法、配置、および変換を組み合わせる便利なウィジェットです。
 /// </summary>
 /// <remarks>
-/// FlutterのContainerと同様に、内側から配置、装飾、寸法制約、変換の順で合成します。
-/// PaddingはIssue #192の実装を取り込んだ後に追加します。
+/// FlutterのContainerと同様に、内側から配置、余白、装飾、寸法制約、変換の順で合成します。
 /// </remarks>
 public record Container : StatelessWidget
 {
@@ -32,6 +31,24 @@ public record Container : StatelessWidget
             if (value is { } alignment && (!float.IsFinite(alignment.X) || !float.IsFinite(alignment.Y)))
             {
                 throw new ArgumentOutOfRangeException(nameof(value), value, "配置値には有限値を指定してください。");
+            }
+
+            field = value;
+        }
+    }
+
+    /// <summary>
+    /// 装飾の内側で子ウィジェットの周囲へ確保する余白を取得します。
+    /// <see langword="null"/>の場合、余白ウィジェットを追加しません。
+    /// </summary>
+    public EdgeInsets? Padding
+    {
+        get;
+        init
+        {
+            if (value is { } padding && !IsValidPadding(padding))
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), value, "余白の各辺には0以上の有限値を指定してください。");
             }
 
             field = value;
@@ -139,6 +156,15 @@ public record Container : StatelessWidget
             };
         }
 
+        if (Padding is { } padding)
+        {
+            current = new Padding
+            {
+                Spacing = padding,
+                Child = current
+            };
+        }
+
         var effectiveDecoration = Decoration
                                   ?? (Color is { } color ? new BoxDecoration { Color = color } : null);
         if (effectiveDecoration is not null)
@@ -160,8 +186,6 @@ public record Container : StatelessWidget
             };
         }
 
-        // TODO(#192): Paddingがmainへ入った後、装飾の内側へPaddingを合成する。
-
         if (Transform is { } transform)
         {
             current = new FloatSoda.Widgets.Paint.Transform
@@ -174,6 +198,14 @@ public record Container : StatelessWidget
 
         return current;
     }
+
+    private static bool IsValidPadding(EdgeInsets padding) =>
+        IsFiniteAndNonNegative(padding.Left)
+        && IsFiniteAndNonNegative(padding.Top)
+        && IsFiniteAndNonNegative(padding.Right)
+        && IsFiniteAndNonNegative(padding.Bottom);
+
+    private static bool IsFiniteAndNonNegative(double value) => double.IsFinite(value) && value >= 0;
 
     private static void ValidateDimension(double? value)
     {

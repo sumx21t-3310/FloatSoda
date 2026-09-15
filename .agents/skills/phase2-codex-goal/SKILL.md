@@ -13,7 +13,7 @@ description: >
 
 FloatSoda(`%USERPROFILE%\projects\libs\FloatSoda`)の Phase 2 は、Flutter の基礎ウィジェット約48個を
 Widget / Element / RenderObject の3層で移植するフェーズ。進捗はトラッキング Issue **#178** の
-チェックリストで管理され、Codex が `feat/<issue番号>-<slug>` ブランチで Draft PR を作る運用(ブランチ命名規則は CONTRIBUTING.md が正典。エージェント名をブランチ名に含めない)。
+チェックリストで管理され、Codex が `<issue番号>-<primary-area>-<slug>` ブランチで Draft PR を作る運用(ブランチ命名規則は CONTRIBUTING.md が正典。エージェント名をブランチ名に含めない)。
 
 このスキルの目的は「今リモートがどうなっているかを正確に把握し、**進行中の PR と競合しない**
 次のタスクを選んで、Codex がそのまま自走できる /goal プロンプトを書く」こと。
@@ -63,7 +63,7 @@ Flutter 本家の同名ウィジェットの設計を正典として踏襲しつ
 RenderProxyBox・dirty layout/paint 設計・命名規約に合わせること。
 
 コンテキスト:
-- ブランチは origin/main (<最新mainのSHA>) から `feat/<issue番号>-<slug>` を切る(CONTRIBUTING.md のブランチ命名規則に従う。`codex/` 等のエージェント名を含めない)。
+- ブランチは origin/main (<最新mainのSHA>) から `<issue番号>-<primary-area>-<slug>` を切る(`<primary-area>` は Issue の `area:*` ラベルの主要領域)(CONTRIBUTING.md のブランチ命名規則に従う。`codex/` 等のエージェント名を含めない)。
 - 進行中の Draft PR <#番号リスト> とはファイルを競合させない。<依存回避の具体的指示>
 - 参考: docs/WidgetSystem.md、既存の類似ウィジェットの実装パターン。
 

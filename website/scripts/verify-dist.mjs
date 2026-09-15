@@ -1,0 +1,174 @@
+#!/usr/bin/env node
+/**
+ * ビルド生成物(dist/)を検査する。`npm run build` の後に実行する(CI では必須)。
+ *
+ * 検査内容:
+ * 0. ランディング(サイト専用ページ)が生成されている
+ * 1. docs/ の全ページ(サブディレクトリ込み)が HTML と素の Markdown の両方で生成されている
+ * 2. llms.txt / llms-full.txt が存在し、llms-full.txt に全ページのタイトルが含まれる
+ * 3. HTML 内のサイト内リンク(href="/…")の遷移先ページとアンカー(#…)が実在する
+ * 4. LLM 向けのテキスト(llms-*.txt と素の Markdown)が BOM なしの正しい UTF-8 である
+ *    (astro preview は charset を付けずに配信するのでブラウザでは化けて見える。本番の GitHub Pages は
+ *    charset=utf-8 を付ける。ここでバイト列を機械的に確かめ、目視に頼らない)
+ */
+import fs from "node:fs";
+import path from "node:path";
+import {
+  docsDir,
+  firstHeading,
+  listDocs,
+  llmsCustomSets,
+  llmsPageLinks,
+  slugOf,
+  websiteDir,
+} from "./docs-source.mjs";
+
+const distDir = path.join(websiteDir, "dist");
+const failures = [];
+
+function pageFile(slug) {
+  return path.join(distDir, slug, "index.html");
+}
+
+/** サイト内パス(/foo/ や /foo.md)を dist 上のファイルへ解決する。無ければ undefined */
+function resolveHref(href) {
+  const clean = href.replace(/^\//, "").replace(/\/$/, "");
+  const candidates =
+    clean === ""
+      ? [path.join(distDir, "index.html")]
+      : [path.join(distDir, clean, "index.html"), path.join(distDir, clean)];
+  return candidates.find((file) => fs.existsSync(file) && fs.statSync(file).isFile());
+}
+
+function decodeAttr(value) {
+  const unescaped = value.replace(/&amp;/g, "&").replace(/&#x27;/g, "'").replace(/&quot;/g, '"');
+  try {
+    return decodeURIComponent(unescaped);
+  } catch {
+    return unescaped;
+  }
+}
+
+function* htmlFiles(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) yield* htmlFiles(full);
+    else if (entry.name.endsWith(".html")) yield full;
+  }
+}
+
+// 0. ランディング(website/content/index.mdx 由来)
+if (!fs.existsSync(path.join(distDir, "index.html"))) failures.push("landing page missing: index.html");
+
+// 1. ページの存在
+const docs = listDocs();
+for (const doc of docs) {
+  const slug = slugOf(doc.rel);
+  if (!fs.existsSync(pageFile(slug))) failures.push(`page missing: /${slug}/ (docs/${doc.rel}.md)`);
+  if (!fs.existsSync(path.join(distDir, `${slug}.md`))) failures.push(`raw markdown missing: /${slug}.md`);
+}
+
+// 2. llms.txt
+for (const file of ["llms.txt", "llms-full.txt"]) {
+  const full = path.join(distDir, file);
+  if (!fs.existsSync(full) || fs.statSync(full).size === 0) failures.push(`${file} missing or empty`);
+}
+const llmsFullPath = path.join(distDir, "llms-full.txt");
+if (fs.existsSync(llmsFullPath)) {
+  const llmsFull = fs.readFileSync(llmsFullPath, "utf8");
+  for (const doc of docs) {
+    const title = firstHeading(fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8"));
+    if (title && !llmsFull.includes(title)) failures.push(`llms-full.txt lacks page: ${doc.rel} ("${title}")`);
+  }
+}
+
+// 2b. 系統ごとの分割ファイル(_llms-txt/<key>.txt。starlight-llms-txt の customSets の出力先)に、その系統の全ページが入っている
+for (const set of llmsCustomSets()) {
+  const relPath = `_llms-txt/${set.label}.txt`;
+  const file = path.join(distDir, relPath);
+  if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
+    failures.push(`${relPath} missing or empty`);
+    continue;
+  }
+  const body = fs.readFileSync(file, "utf8");
+  for (const slug of set.paths) {
+    const doc = docs.find((d) => slugOf(d.rel) === slug);
+    const title = doc && firstHeading(fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8"));
+    if (title && !body.includes(title)) failures.push(`${relPath} lacks page: ${slug} ("${title}")`);
+  }
+}
+
+// 2c. llms.txt(索引)に全ページの素の Markdown へのリンクがある
+const llmsIndexPath = path.join(distDir, "llms.txt");
+if (fs.existsSync(llmsIndexPath)) {
+  const llmsIndex = fs.readFileSync(llmsIndexPath, "utf8");
+  for (const link of llmsPageLinks()) {
+    if (!llmsIndex.includes(link.url)) failures.push(`llms.txt lacks page link: ${link.url}`);
+  }
+}
+
+// 3. サイト内リンクとアンカー
+const idCache = new Map();
+function idsOf(file) {
+  if (!idCache.has(file)) {
+    const html = fs.readFileSync(file, "utf8");
+    idCache.set(file, new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => decodeAttr(m[1]))));
+  }
+  return idCache.get(file);
+}
+
+let linkCount = 0;
+for (const file of htmlFiles(distDir)) {
+  const html = fs.readFileSync(file, "utf8");
+  for (const match of html.matchAll(/href="(\/[^"]*)"/g)) {
+    const href = decodeAttr(match[1]);
+    if (href.startsWith("/_astro/") || href.startsWith("/pagefind/")) continue;
+    const [target, anchor] = href.split("#");
+    const resolved = target === "" ? file : resolveHref(target);
+    linkCount++;
+    if (!resolved) {
+      failures.push(`broken link ${href} in ${path.relative(distDir, file)}`);
+      continue;
+    }
+    if (anchor && resolved.endsWith(".html") && !idsOf(resolved).has(anchor)) {
+      failures.push(`missing anchor ${href} in ${path.relative(distDir, file)}`);
+    }
+  }
+}
+
+// 4. LLM 向けテキストの文字コード
+function* textFiles(dir) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      if (!["_astro", "pagefind"].includes(entry.name)) yield* textFiles(full);
+    } else if (
+      /^llms.*\.txt$/.test(entry.name) ||
+      entry.name.endsWith(".md") ||
+      (path.basename(dir) === "_llms-txt" && entry.name.endsWith(".txt"))
+    ) {
+      yield full;
+    }
+  }
+}
+
+const utf8 = new TextDecoder("utf-8", { fatal: true });
+let textCount = 0;
+for (const file of textFiles(distDir)) {
+  const bytes = fs.readFileSync(file);
+  const relPath = path.relative(distDir, file);
+  textCount++;
+  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) failures.push(`BOM found in ${relPath}`);
+  try {
+    utf8.decode(bytes);
+  } catch {
+    failures.push(`invalid UTF-8 in ${relPath}`);
+  }
+}
+
+if (failures.length > 0) {
+  console.error(`verify-dist: ${failures.length} problem(s)`);
+  for (const failure of failures) console.error(`  - ${failure}`);
+  process.exit(1);
+}
+console.log(`verify-dist: OK (${docs.length} pages, ${linkCount} internal links, ${textCount} UTF-8 text files checked)`);

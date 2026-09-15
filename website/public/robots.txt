@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://floatsoda.sumx21t.com/sitemap-index.xml
