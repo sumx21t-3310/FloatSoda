@@ -126,7 +126,7 @@ FloatSoda のランタイムや対象ユーザーに存在しない機能につ�
 4. **差異を固定するテスト**（ファイルとテストメソッド名）
 5. **利用者に影響する場合のドキュメント**
 
-記録先は [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳のマスター**であり、本ドキュメントは判断原則だけを持ちます。
+記録先は [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳のマスター**であり、本ドキュメントは判断原則だけを持ちます。
 
 5 について、利用者から見える差異は台帳に記録するだけでは不十分です。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](../CONTRIBUTING.md)）にも記載してください。台帳はコントリビュータ向け、docs とサンプルは利用者向けです。
 

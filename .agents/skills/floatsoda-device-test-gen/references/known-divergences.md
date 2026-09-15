@@ -164,6 +164,21 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   (レンズ越しの可読性)。
 - **Label**: deliberate
 
+## 10. `Stack` は範囲を超えた子をクリップしない(`clipBehavior` が無い)
+
+- **FloatSoda**: `src/FloatSoda/RenderObjects/Layout/RenderStack.cs` の `Paint` が子を無条件に
+  `PaintChild` する。`src/FloatSoda/Widgets/Layout/Stack.cs` に `Clip` 系のプロパティは無い。
+  Flutter で `clipBehavior: Clip.none` を書いた状態に固定されている。
+- **Flutter**: `Stack.clipBehavior`(既定 `Clip.hardEdge`、`widgets/basic.dart:4753`)。
+  `RenderStack.paint`(`rendering/stack.dart:717-719`)は
+  `clipBehavior != Clip.none && _hasVisualOverflow` のときだけ `pushClipRect` する。
+- **Test**: — (not set)
+- **Docs**: `samples/FloatSoda.Samples.Stack/README.md` の `## Flutterとの違い`(回避策として
+  `ClipRect` で包む案内)。差異が解消したら行を削除する。
+- **Observation**: `HEADLESS`(はみ出し子の描画有無はビットマップで判定できる)
+- **Label**: not ported — 2026-09-14 にオーナーが確定。修正は #257(`ClipBehavior` を追加し、
+  既定を `Clip.HardEdge` に揃える。breaking)。
+
 ---
 
 ## Triage 2026-09-09 — 範囲の振り分けと着手順(Phase 2 リリース後に実施)
