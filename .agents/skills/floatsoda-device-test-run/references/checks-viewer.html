@@ -52,7 +52,6 @@
     color: var(--muted);
     background: var(--panel);
     transition: border-color .15s, background .15s;
-    cursor: pointer;
   }
   #drop.drag-over {
     border-color: var(--accent);
@@ -143,7 +142,11 @@
   </p>
 
   <div id="drop">
-    <div>ここにフォルダ / <code>*.jsonl</code> をドラッグ&ドロップ、またはクリックして選択</div>
+    <div>ここにフォルダ / <code>*.jsonl</code> をドラッグ&ドロップ、または下のボタンで選択</div>
+    <div class="hint">
+      <button type="button" id="pickFiles">ファイルを選択</button>
+      <button type="button" id="pickDir">フォルダを選択</button>
+    </div>
     <div class="hint">フォルダを選ぶと配下の <code>checks/items.jsonl</code> だけを自動で拾います</div>
     <input id="fileInput" type="file" accept=".jsonl" multiple />
     <input id="dirInput" type="file" webkitdirectory directory multiple />
@@ -175,7 +178,8 @@
   /** @type {{sample:string, path:string, items:object[]}[]} */
   let groups = [];
 
-  drop.addEventListener('click', () => fileInput.click());
+  document.getElementById('pickFiles').addEventListener('click', () => fileInput.click());
+  document.getElementById('pickDir').addEventListener('click', () => dirInput.click());
 
   drop.addEventListener('dragover', (e) => {
     e.preventDefault();

@@ -66,8 +66,9 @@ description: >-
 2. SteamVR が動いていることを確認する(`vrserver` / `vrmonitor` プロセス)。自分では起動しない。
    オーナーが起動する。
 3. 巡回対象サンプルそれぞれの `samples/<Name>/checks/items.jsonl` を読む。結果は
-   `samples/<Name>/checks/results/<hmd>-<gpu>-<platform>-<yyyy-MM-dd>.jsonl` に記録するので
-   (詳細は手順1)、この時点ではファイルを作らなくてよい。
+   `samples/<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` に記録するので
+   (詳細は手順1)、この時点ではファイルを作らなくてよい。巡回の開始時刻(ISO 8601、秒まで)を
+   `run_id`、`git rev-parse --short HEAD` を `commit` として控えておく。巡回中の全行で同じ値を使う。
 4. 任意で、読み取り専用のスタック監視を横で回す(`vr-stack-watch -Watch`、オーナーのマシンに
    あるユーザーレベルのスキル)。巡回中の GPU ハングにタイムスタンプが付く。
 5. **これから回すサンプルの `Demo.cs` 引用行を抜き取り確認する** — サンプルは変わるが、
@@ -89,21 +90,34 @@ GPU 名、Windows ビルド番号)。`<mode>` は `desktop` か `dashboard` — 
 (ポインタ入力を伴うもの、issue #182)は、ダッシュボードでも別途回して別ファイルに記録すること —
 `items.jsonl` は表示方法を区別しないので、この区別は結果側の `<mode>` だけが持つ。
 
+ハーネスシナリオの結果は、同じファイル名で `tests/FloatSoda.DeviceTest/checks/results/` へ追記する
+(全シナリオで1ファイル)。
+
 **results/*.jsonl のスキーマ**(1行1実行結果、実行のたびに追記):
 ```json
-{"id": "padding-1", "result": "ok", "remarks": ""}
+{"run_id": "2026-09-16T21:05:00+09:00", "commit": "a1b2c3d", "id": "padding-1", "result": "ok", "remarks": ""}
 ```
-`result` は `ok` / `ng` / `crash` / `skip` のいずれか。`skip` はダッシュボードが開けない・
-時間切れなど、判定そのものを行えなかった場合に使う。`remarks` は NG/CRASH/SKIP のときに
-オーナーが言った理由(それ以外は空文字)。`id` は該当サンプルの `items.jsonl` の `id` と
-対応させる。`skip` はバグの兆候ではないため、トリアージ(手順2)の対象に含めない。
+`run_id` と `commit` は手順0で控えた値。同じ日・同じ環境で再実行しても、どの巡回のどの版の
+結果かを行ごとに区別できる。`result` は `ok` / `ng` / `crash` / `skip` のいずれか。`skip` は
+ダッシュボードが開けない・時間切れなど、判定そのものを行えなかった場合に使う。`remarks` は
+NG/CRASH/SKIP のときにオーナーが言った理由(それ以外は空文字)。`skip` はバグの兆候ではないため、
+トリアージ(手順2)の対象に含めない。
+
+`id` は次のどれか:
+
+- サンプルの項目: 該当サンプルの `items.jsonl` の `id`
+- 項目を1つも判定する前にサンプルが終了した・起動できなかった: `<サンプル名kebab-case>-launch`
+  (例: `padding-launch`)。`result` は `crash` か `skip`
+- ハーネスシナリオ: シナリオの `<Id>`
 
 対象ごとに:
 
 1. リポジトリルートから、サンプルなら
-   `./.agents/skills/floatsoda-device-test-run/references/run-sample.ps1 <Name>`、ハーネスシナリオなら
-   同じスクリプトに `-Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って
-   生きているかを報告する。すぐ終了していたら、ログの末尾を判定(`CRASH`)として記録して次へ。
+   `./.agents/skills/floatsoda-device-test-run/references/run-sample.ps1 <Name>`(`desktop` モードでは
+   `-Desktop` を付けて `--desktop` をサンプルへ渡す)、ハーネスシナリオなら同じスクリプトに
+   `-Scenario <Id>` — 前のプロセスを止め、これを起動し、数秒待って生きているかを報告する。
+   すぐ終了していたら、ログの末尾を `remarks` にして `<サンプル名kebab-case>-launch` の `crash` 行を
+   記録し、次へ。
 2. 対象名 + 最初の読み上げ行を言う(サンプルなら該当 `items.jsonl` の `read_aloud`、シナリオなら
    期待結果を yes/no の質問1つに言い換える)。
 3. OK / NG を待つ。NG なら、何がおかしいかを一言だけ聞く。それ以上は聞かない。
@@ -119,7 +133,8 @@ GPU 名、Windows ビルド番号)。`<mode>` は `desktop` か `dashboard` — 
 
 ### 2. トリアージ(ヘッドセットを外した状態)
 
-`results/*.jsonl` の `result` が `ng` / `crash` の行ごとに:
+`results/*.jsonl` のうち今回の `run_id` の行で、`result` が `ng` / `crash` の行ごとに(過去の巡回の
+行は、修正前の結果なのでトリアージし直さない):
 
 1. まずヘッドレス再現を試みる(`src/FloatSoda.Testing` のビットマップレンダラか xunit テスト)。
    ヘッドレスで再現する見た目の NG は、書かれるのを待っている回帰テスト。
@@ -143,6 +158,6 @@ GPU 名、Windows ビルド番号)。`<mode>` は `desktop` か `dashboard` — 
 ## 報告形式
 
 集計を最初に: 巡回した対象数(サンプル + ハーネスシナリオ)/ 答えた項目数 / NG / CRASH の件数を、
-巡回した全サンプルの `results/*.jsonl` を横断して集計する。続いて NG の行をオーナーの言葉
+巡回した全サンプルとハーネスの `results/*.jsonl` から、今回の `run_id` の行だけを横断して集計する。続いて NG の行をオーナーの言葉
 そのままに、サンプルと項目 `id` つきで。次に NG ごとの分類提案を、提案であると明示して。
 巡回前にどの `items.jsonl` の `file:line` を抜き取り確認したかを述べること。
