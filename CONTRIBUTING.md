@@ -2,11 +2,11 @@
 
 FloatSoda は現在 **Alpha 段階** です。API は予告なく破壊的に変更されることがあります。この点をご理解の上でコントリビューションをお願いします。
 
-このドキュメントは**開発・コントリビューション規約の正典**です。人間のコントリビュータと、作業を行うコーディングエージェントの両方に等しく適用します。本文中の **必須** は MUST、**推奨** は SHOULD の強さで読んでください。
+このドキュメントは**開発・コントリビューション規約の一次情報**です。人間のコントリビュータと、作業を行うコーディングエージェントの両方に等しく適用します。本文中の **必須** は MUST、**推奨** は SHOULD の強さで読んでください。
 
-隣接する正典は次のとおりです。同じ規約を二重に書かず、参照してください。
+隣接する規約の置き場所は次のとおりです。同じ規約を二重に書かず、参照してください。
 
-| 目的 | 正典 |
+| 目的 | 置き場所 |
 |---|---|
 | コードレビューの判断基準 | [REVIEW.md](REVIEW.md) |
 | API 設計原則・Flutter parity | [docs/APIDesign.md](docs/APIDesign.md) |
@@ -51,7 +51,7 @@ typo の修正、明白なドキュメント修正、CI・管理ファイルの�
 
 Issue のタイトルは「何をする Issue か」の記述に集中させ、種別・領域などの分類は GitHub Labels で表現します(必須)。`feat(Widget):` のような Conventional Commit 風の prefix はタイトルに付けません。
 
-ラベルは3つの軸で構成します。ラベルの一覧と説明は[リポジトリの Labels ページ](https://github.com/sumx21t-3310/FloatSoda/labels)が正典です。
+ラベルは3つの軸で構成します。ラベルの一覧と説明は[リポジトリの Labels ページ](https://github.com/sumx21t-3310/FloatSoda/labels)が一次情報です。
 
 | 軸 | ラベル | 付け方 |
 |---|---|---|
@@ -98,7 +98,7 @@ dotnet test tests/FloatSoda.Test --configuration Release --no-build
 - Issue 番号を先頭に置きます。「Issue #216 の作業ブランチを探す」が前方一致検索で済むようにするためです
 - `<primary-area>` は Issue の `area:*` ラベルのうち主要な領域1つです。Issue 側に領域ラベルが複数あっても、ブランチ名には1つだけ選びます
 - `<slug>` は **lowercase ASCII + ハイフン**で書きます
-- `feature` / `bug` などの種別と、`breaking-change` などの補助属性はブランチ名に入れません。分類の正典は Issue の Labels です
+- `feature` / `bug` などの種別と、`breaking-change` などの補助属性はブランチ名に入れません。分類の一次情報は Issue の Labels です
 
 例:
 
@@ -229,11 +229,11 @@ tests/FloatSoda.Test/RenderObjects/…    →   namespace FloatSoda.Test.RenderO
 
 ## エージェント向け skill を追加・変更する場合
 
-リポジトリが提供する agent skill の**唯一の正典は [`.agents/skills/`](.agents/skills/) です**(必須)。
+リポジトリが提供する agent skill の**唯一の一次情報は [`.agents/skills/`](.agents/skills/) です**(必須)。
 
 - **skill の追加・変更は必ず `.agents/skills/` 側から行ってください**(必須)。
-- `.claude/skills/` は、`.agents/skills/` を直接サポートしない Claude Code のための **compatibility fallback** です。frontmatter と正典へのポインタしか持たない **derived artifact であり、直接編集してはいけません**(必須)。
-- 特定のエージェント(Claude / Codex / Cursor 等)向けに、**同一 skill の独立したコピーを正典として管理しないでください**(必須)。
+- `.claude/skills/` は、`.agents/skills/` を直接サポートしない Claude Code のための **compatibility fallback** です。frontmatter と一次情報へのポインタしか持たない **derived artifact であり、直接編集してはいけません**(必須)。
+- 特定のエージェント(Claude / Codex / Cursor 等)向けに、**同一 skill の独立したコピーを一次情報として管理しないでください**(必須)。
 
 ### エージェント向けファイルの言語
 
@@ -244,7 +244,7 @@ tests/FloatSoda.Test/RenderObjects/…    →   namespace FloatSoda.Test.RenderO
 新しい skill を追加する手順:
 
 1. `.agents/skills/<name>/SKILL.md` に本体を書く。参照ファイルは `.agents/skills/<name>/references/` に置く
-2. `.claude/skills/<name>/SKILL.md` に、正典と同じ frontmatter + 正典へのポインタだけのスタブを置く(既存のスタブを雛形にしてください)
+2. `.claude/skills/<name>/SKILL.md` に、一次情報と同じ frontmatter + 一次情報へのポインタだけのスタブを置く(既存のスタブを雛形にしてください)
 
 skill 名は **`<project>-<subject>-<verb>` の順**で付けます(例: `floatsoda-device-test-gen` / `floatsoda-device-test-run`)。広い語を先に、動詞を最後に置くと、対になる skill が一覧で隣り合い、`floatsoda-device-test-` までの入力で補完が絞れます。skill のディレクトリはネストできない(Claude Code は `.claude/skills/*/SKILL.md` の1階層だけを探索する)ため、分類はディレクトリではなく名前の接頭辞で持ちます。
 
@@ -406,6 +406,7 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 - [ ] `dotnet test` が通る
 - [ ] 追加した `public` プロパティに XML ドキュメントコメントを付けた
 - [ ] Wiki同期対象の `docs/*.md` を直接編集した(Wiki側は編集していない)
+- [ ] 散文は敬体、箇条書きは常体で書いた(→ [docs/WritingDocumentation.md](docs/WritingDocumentation.md) の「文体」)
 - [ ] プリミティブ層(basic.dart相当)を超える複合ウィジェットを追加していない
 - [ ] **新しいウィジェットを追加した場合**、サンプル(README + `checks/items.jsonl`)を追加した(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))。`items.jsonl` は [`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルで生成する
 - [ ] **新しい public API を追加した場合**、docs を更新し、ジュニアコーダーテスト([`floatsoda-junior-coder-test`](.agents/skills/floatsoda-junior-coder-test/SKILL.md))を通した

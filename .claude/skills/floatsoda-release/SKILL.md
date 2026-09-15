@@ -11,8 +11,8 @@ description: >-
   作成は、常にオーナーの明示的な承認を必要とする。
 ---
 
-<!-- 派生互換スタブ — 直接編集禁止。正典: .agents/skills/floatsoda-release/ -->
+<!-- 派生互換スタブ — 直接編集禁止。一次情報: .agents/skills/floatsoda-release/ -->
 
-**このスキルの正典は [`.agents/skills/floatsoda-release/SKILL.md`](../../../.agents/skills/floatsoda-release/SKILL.md)。そのファイルを読み、そこにある手順に従うこと。** `references/` ファイルは正典の隣、`.agents/skills/floatsoda-release/references/` にある。
+**このスキルの一次情報は [`.agents/skills/floatsoda-release/SKILL.md`](../../../.agents/skills/floatsoda-release/SKILL.md)。そのファイルを読み、そこにある手順に従うこと。** `references/` ファイルは一次情報の隣、`.agents/skills/floatsoda-release/references/` にある。
 
-このスタブは、Claude Code が `.agents/skills/` を読まず `.claude/skills/` を読むためだけに存在する。正典から生成された派生物で、固有の手順は持たない。このスキルの動きを変えるときは正典を編集すること — このファイルは決して編集しない。
+このスタブは、Claude Code が `.agents/skills/` を読まず `.claude/skills/` を読むためだけに存在する。一次情報から生成された派生物で、固有の手順は持たない。このスキルの動きを変えるときは一次情報を編集すること — このファイルは決して編集しない。

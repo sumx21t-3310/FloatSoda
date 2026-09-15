@@ -9,8 +9,8 @@ description: >
   個別 PR のレビューや、次タスクの委任(phase2-codex-goal)とは別物。
 ---
 
-<!-- 派生互換スタブ — 直接編集禁止。正典: .agents/skills/phase2-adversarial-review/ -->
+<!-- 派生互換スタブ — 直接編集禁止。一次情報: .agents/skills/phase2-adversarial-review/ -->
 
-**このスキルの正典は [`.agents/skills/phase2-adversarial-review/SKILL.md`](../../../.agents/skills/phase2-adversarial-review/SKILL.md)。そのファイルを読み、そこにある手順に従うこと。** `references/` ファイルは正典の隣、`.agents/skills/phase2-adversarial-review/references/` にある。
+**このスキルの一次情報は [`.agents/skills/phase2-adversarial-review/SKILL.md`](../../../.agents/skills/phase2-adversarial-review/SKILL.md)。そのファイルを読み、そこにある手順に従うこと。** `references/` ファイルは一次情報の隣、`.agents/skills/phase2-adversarial-review/references/` にある。
 
-このスタブは、Claude Code が `.agents/skills/` を読まず `.claude/skills/` を読むためだけに存在する。正典から生成された派生物で、固有の手順は持たない。このスキルの動きを変えるときは正典を編集すること — このファイルは決して編集しない。
+このスタブは、Claude Code が `.agents/skills/` を読まず `.claude/skills/` を読むためだけに存在する。一次情報から生成された派生物で、固有の手順は持たない。このスキルの動きを変えるときは一次情報を編集すること — このファイルは決して編集しない。

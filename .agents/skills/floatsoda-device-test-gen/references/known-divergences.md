@@ -1,6 +1,6 @@
 # 確認済みの Flutter 移植差異
 
-**この台帳が、確認済みの FloatSoda ↔ Flutter 差異の正典。** そもそも差異がいつ許されるかを
+**この台帳が、確認済みの FloatSoda ↔ Flutter 差異の一次情報。** そもそも差異がいつ許されるかを
 定める設計原則は [`docs/APIDesign.md`](../../../../docs/APIDesign.md)(「判断原則: Flutter 由来の
 observable behavior に差異を作らない」)にあり、このファイルは個別のエントリを保持する。
 差異をここ以外の場所に記録すると記録が分裂する — 必ずここに追記すること。
@@ -242,7 +242,7 @@ regression test、not ported は Issue で、unlabelled のままテストを書
 | 4 | HEADLESS 単体 | deliberate(確定済み) | **今すぐ書ける。** `ScopeType_具象Windowを差し替え_依存Elementが再構築される` を `tests/FloatSoda.Test/Widgets/WindowWidgetTest.cs` に追加。既存の `Of_FindsConcreteWindow_ViaBaseTypeLookup` は検索側だけを検証している。`Docs` も未設定なので `docs/WidgetSystem.md` に1行書く |
 | 5 | HEADLESS 単体 | port mistake(確定) | **今すぐ書ける。** `Layout_制約が同じで再レイアウト境界だけ変わる_PerformLayoutを再実行しない` を `tests/FloatSoda.Test/RenderObjects/` に追加。`PerformLayout` の回数を数えるプローブは `Widgets/IndexedStackTest.cs` の方式を流用する。現状では落ちる(red)ので、修正は別コミット |
 | 6 | HEADLESS 結合 | 4件に分割 | post-frame callback は not ported として Issue(LLM は `addPostFrameCallback` を当然のように書く)。`finalizeTree` は #2 へ吸収。compositing bits は FloatSoda の Layer 構造で必要かを判断してから。semantics は非移植方針が `REVIEW.md` にあるので文書のみ |
-| 7 | HEADLESS 結合 | deliberate 候補 | Why 案: OpenVR のオーバーレイ入力は `PollNextOverlayEvent` で取り出す方式で、プッシュの経路が無い。量子化はプラットフォームの性質。`BeginFrame_フレーム間の複数ポインタイベント_次のBeginFrameでまとめて配信する` を `tests/FloatSoda.Test/Core/WidgetBindingTest.cs` に追加。`IEngineWindow` の test double がテストに無いので、`PointerSource` を持つ fake を同じファイルに足す |
+| 7 | HEADLESS 結合 | deliberate 候補 | Why 案: OpenVR のオーバーレイ入力は `PollNextOverlayEvent` で取り出す方式で、プッシュで受け取る仕組みが無い。量子化はプラットフォームの性質。`BeginFrame_フレーム間の複数ポインタイベント_次のBeginFrameでまとめて配信する` を `tests/FloatSoda.Test/Core/WidgetBindingTest.cs` に追加。`IEngineWindow` の test double がテストに無いので、`PointerSource` を持つ fake を同じファイルに足す |
 | 8 | HEADLESS 結合 → VR | #7 に大半を吸収 | ヘッドレスで答えが出る部分: `PointerController` の待ち行列は無制限の `ConcurrentQueue` で、`SystemEventDispatcher.PollEvents` は毎フレーム全件を取り出す。FloatSoda の内側では「遅延」であって「欠落」は起きない。VR で確かめる問いは「フレームを落としたとき OpenVR 側のイベントバッファが溢れるか」だけに絞る |
 | 9 | VR | deliberate(確定済み) | ヘッドレス側は完了。30 が妥当な値かは、レンズ越しの可読性を人が判定する device test のシナリオにする。xunit では扱わない |
 

@@ -4,7 +4,7 @@
 
 役割分担は次のとおりです。このファイルに開発手順や API 設計原則を書かないでください。
 
-| 目的 | 正典 |
+| 目的 | 置き場所 |
 |---|---|
 | 開発・コントリビューション規約(ブランチ命名 / namespace / skill / PR 運用 / テスト観点) | [CONTRIBUTING.md](CONTRIBUTING.md) |
 | API 設計原則・Flutter parity | [docs/APIDesign.md](docs/APIDesign.md) |
@@ -34,7 +34,7 @@
 ## 2. finding の基準
 
 - **concrete failure mode を説明できる問題を優先します**(必須)。「どの入力・状態で、何が壊れるか」を書けない指摘は、書けるようになるまで格下げしてください。
-- **subjective な好みだけの指摘をしません**(必須)。規約・契約・失敗経路のいずれにも紐づかない「私ならこう書く」は指摘ではありません。
+- **subjective な好みだけの指摘をしません**(必須)。規約・契約・failure mode のいずれにも紐づかない「私ならこう書く」は指摘ではありません。
 - **hypothetical な問題を過剰に報告しません**(必須)。「将来こう使われたら壊れるかもしれない」は、その使い方が実際に到達可能であることを示せる場合にのみ挙げます。
 - **Issue のスコープ外の改善要求を、安易に blocking にしません**(必須)。気づいた点は「別 Issue 向け」と明示して非 blocking で伝えます(→ [CONTRIBUTING.md](CONTRIBUTING.md) の scope discipline)。
 - **既存コードがそうなっているという理由だけで、正しい仕様と判断しません**(必須)。次章の優先順位で確認してください。
@@ -43,12 +43,12 @@ blocking にしてよいのは、重要度 1〜5 に該当し、かつ concrete 
 
 ---
 
-## 3. 仕様の正典と優先順位
+## 3. 仕様の一次情報と優先順位
 
 仕様が食い違ったときは、**上から順に**確認します(必須)。
 
-1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、正典としては扱いません
-2. **Flutter 由来機能は、Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無いなら、Flutter が正典です
+1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、一次情報としては扱いません
+2. **Flutter 由来機能は、Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無いなら、Flutter の仕様が一次情報です
 3. **既存の FloatSoda 実装は根拠になりません** — 実装がそうなっていることは、それが正しいことを意味しません
 
 **古い Issue や既存実装だけを根拠に、新しい挙動を決めないでください**(必須)。Issue が書かれた時点の前提が今も成り立つかを確認します。
@@ -66,7 +66,7 @@ RenderObject / Element / Widget / Layer に触れる変更では、次を確認�
 - **parent / child ownership** — 子の差し替え時に、旧 child が drop され、新 child が adopt されているか。`SingleChildContainer<T>` / `MultiChildrenCollection<T>` を経由せず親子リンクを直接書き換えていないか。片方向だけ張られて `Parent` が古いまま残っていないか。
 - **adopt / drop** — 代入のたびに対称に走るか。同じ子を二重に adopt していないか。drop 後に `Parent` が `null` に戻るか。
 - **attach / detach** — 子の追加・削除で attach/detach が転送されるか。detach 済みのノードが `RenderPipeline` の dirty リストに残らないか。
-- **mount / update / replace / dispose** — `Element.Mount()` / `UpdateChild()` / `InflateWidget()` の経路と、`State.Dispose()` の呼び漏れ。
+- **mount / update / replace / dispose** — `Element.Mount()` / `UpdateChild()` / `InflateWidget()` の呼び出しの流れと、`State.Dispose()` の呼び漏れ。
   **FloatSoda には inactive-element プールが無く、`Deactivate` は終端(= unmount 相当)です。** keyed subtree を別の親へ移すと `State` は破棄されます。Flutter の再活性化を前提にしたコードを移植していないか確認してください(→ known-divergences #2)。
 - **keyed update** — `Widget.CanUpdate`(同一 runtime 型 + `Key` 一致)の判定と、`MultiChildRenderObjectElement.UpdateChildren()` の二端差分。Key 付きの子を並べ替えたとき、`State` と RenderObject が意図どおり保持されるか。重複 Key が入り込まないか。
 
@@ -97,7 +97,7 @@ RenderObject / Element / Widget / Layer に触れる変更では、次を確認�
 
 ## 6. Flutter parity
 
-判断基準の正典は [docs/APIDesign.md](docs/APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」です。レビューでは次を確認します。
+判断基準の一次情報は [docs/APIDesign.md](docs/APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」です。レビューでは次を確認します。
 
 - Flutter 由来の Widget / RenderObject に、**明示された理由のない observable behavior の差異が入っていないか**(必須)。対象は property semantics / default values / layout / paint・clipping / hit testing / child handling / Widget update behavior / invalid・degenerate input handling / dirty layout・paint conditions / Element・state lifecycle semantics。
 - 「実装しやすい」「こちらの方が安全」「こちらの方が自然」**だけ**を理由にした独自仕様になっていないか(必須)。
