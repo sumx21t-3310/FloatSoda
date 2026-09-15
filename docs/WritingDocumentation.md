@@ -36,7 +36,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 境界で迷いやすい情報は、次のように分類します。
 
 - **利用者から観測できる制約**は User docs に書き、**その制約を成立させる内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
-- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
+- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
 - **同じテーマは1つの系統で詳述**し、ほかの系統からはリンクします。概念を Guide で説明し直したり、シグネチャを Concept に並べたりしません
 
 ### User docs の範囲
@@ -96,7 +96,7 @@ User docs は、公開 API および API Reference と合わせて、**#188 の�
 | 設計理由と採用しなかった選択肢 | Contributor Design |
 | invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | Contributor Requirements。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../AGENTS.md) の規約表) |
 | API 設計の原則と Flutter parity / divergence の判断基準 | [APIDesign](APIDesign.md) |
-| 確認済みの Flutter との差異 | [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) |
+| 確認済みの Flutter との差異 | [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) |
 | 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) |
 | ドキュメントの分類とサンプルの3層構成 | [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) |
 
@@ -115,7 +115,7 @@ XML ドキュメントコメントは `internal` や `private` にも書きま�
 | アーキテクチャの境界を変更する | Contributor Architecture と Requirements |
 | 設計判断を変更する | Contributor Design。必要なら Requirements と [APIDesign](APIDesign.md) |
 | invariant を追加・変更する | Contributor Requirements とテスト |
-| Flutter との差異を導入・変更する | [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) と divergence テスト。利用者から観測できるなら User docs とサンプルの「Flutterとの違い」節 |
+| Flutter との差異を導入・変更する | [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) と divergence テスト。利用者から観測できるなら User docs とサンプルの「Flutterとの違い」節 |
 | 新しい代表ユースケースを追加する | User Guide / Tutorial と、#188 の層に沿ったサンプル |
 | サンプルを追加・変更する | サンプルの README と `checklist.md`([CONTRIBUTING.md](../CONTRIBUTING.md) の規約) |
 | ドキュメントのページを移動・改名する | リンク元のページと [Home](Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
@@ -184,7 +184,7 @@ User docs は新しく書くページが多いため、先に骨格を定めま�
 
 ## 5. Contributor docs の書くもの / 書かないものとテンプレート
 
-Contributor docs は、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
+Contributor docs は、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
 
 現行ページには複数の種別が混ざっています。例えば [RenderObjects](RenderObjects.md) の「差分更新」節は、伝播の仕組み(Architecture)と「プロパティを変更したら `MarkNeedsLayout()` / `MarkNeedsPaint()` を呼ぶ」という契約(Requirements)が同じ節にあります。再編では、混ざっている節を種別ごとに分けるか、別種別のページへリンクします。
 
@@ -240,7 +240,7 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 書かないもの:
 
 - **現在の処理の流れの詳細** → Architecture
-- **Flutter との個別の差異** → [`known-divergences.md`](../.agents/skills/floatsoda-device-test/references/known-divergences.md)。Design は判断原則だけを持つ([APIDesign](APIDesign.md) と台帳の分担と同じ)
+- **Flutter との個別の差異** → [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md)。Design は判断原則だけを持つ([APIDesign](APIDesign.md) と台帳の分担と同じ)
 - **手順** → Development
 - **議論の経過** — 決めたことと理由だけを書く。経過は Issue に残す
 

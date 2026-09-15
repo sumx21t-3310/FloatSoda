@@ -27,9 +27,9 @@ hypothetical な指摘を量産する問題への対策でもある。書いて�
 層の分担の正典は REVIEW.md 9章。この監査が**報告してはいけないもの**:
 
 - 重要度 7〜8(style / maintainability / 具体的影響のない performance)— 入口レビュー(CodeRabbit)の領分
-- SteamVR 実行時にしか観測できない挙動 — `floatsoda-device-test` の領分
+- SteamVR 実行時にしか観測できない挙動 — `floatsoda-device-test-gen` の領分
 - docs の分かりにくさ・API の発見性 — `floatsoda-junior-coder-test` の領分
-- `.agents/skills/floatsoda-device-test/references/known-divergences.md` で `Label: deliberate` とされ、
+- `.agents/skills/floatsoda-device-test-gen/references/known-divergences.md` で `Label: deliberate` とされ、
   **かつ差異を固定する `Test` が設定済み**のエントリ(それ以外 — unlabelled / port mistake、および
   `Test: — (not set)` のままの deliberate — は、除外どころか parity 軸の検証候補になる)
 
@@ -86,7 +86,7 @@ GOAL: FloatSoda リポジトリ(<リポジトリの絶対パス>)の Phase 2 成
 - 監査対象は Phase 2 で実装されたウィジェット群: <#178 から列挙したインベントリ>
 - Flutter parity の正典クローン: <flutter_reference の絶対パス>。
   期待値は Flutter 本家の実装・公式テストから引く。FloatSoda 側で期待値を想像しない。
-- 既知差異の台帳は .agents/skills/floatsoda-device-test/references/known-divergences.md。
+- 既知差異の台帳は .agents/skills/floatsoda-device-test-gen/references/known-divergences.md。
   `Label: deliberate` かつ `Test` 設定済みのエントリは finding にしない。
   `Test: — (not set)` の deliberate エントリは、台帳に記録された FloatSoda の挙動が現在も
   成立するかを検証する — 黙って revert されていれば red test 付きの finding、成立していれば
@@ -120,7 +120,7 @@ GOAL: FloatSoda リポジトリ(<リポジトリの絶対パス>)の Phase 2 成
 制約:
 - 修正しない。修正案は PR 本文の黒判定の項に1〜2行で添えるだけにする
 - 重要度 7〜8(style / maintainability / 具体的影響のない performance)は報告しない(入口レビューの領分)
-- SteamVR 実行時にしか観測できない挙動(実機の入力経路等)は追わない(floatsoda-device-test の領分)
+- SteamVR 実行時にしか観測できない挙動(実機の入力経路等)は追わない(floatsoda-device-test-gen の領分)
 - docs の分かりにくさ・API の発見性は追わない(floatsoda-junior-coder-test の領分)
 - 到達可能性を示せない hypothetical を finding にしない(REVIEW.md 2章)
 ```

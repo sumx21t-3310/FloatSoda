@@ -21,7 +21,7 @@
 | 単体 | ジオメトリ型、RenderObject 1個、Widget 1個 | `dotnet test` |
 | 結合 | `WidgetBinding` から `RenderPipeline` までを通したフロー。差分更新、入力の配送 | `dotnet test` |
 | 描画 | `FloatSoda.Testing` のビットマップ描画による画素 | `dotnet test` |
-| 実機 | SteamVR が動いている状態でしか観測できないもの。オーバーレイハンドル、コントローラーの座標、レンダースレッドの GL コンテキスト | HMD を着けて手動で操作する(`.agents/skills/floatsoda-device-test`) |
+| 実機 | SteamVR が動いている状態でしか観測できないもの。オーバーレイハンドル、コントローラーの座標、レンダースレッドの GL コンテキスト | HMD を着けて手動で操作する(`floatsoda-device-test-run`) |
 
 オラクルは「期待値をどう定義できるか」で選びます。
 
@@ -56,7 +56,7 @@
 | 機能 | 結合 | 例示 | 薄い | `WidgetBinding` を端から端まで動かすテストは、`Core/WidgetBindingTest.cs` と `Core/PointerInputIntegrationTest.cs` の2ファイルのみ |
 | 機能 | 描画 | 例示 | ある | `GetPixel` による画素の検証が15ファイル、84箇所 |
 | 機能 | 実機 | 例示 | 無い | デバイスのテスト手順は存在するが、テストハーネスは未着手 |
-| 機能 | 実機 | 差分 | 文書のみ | [known-divergences.md](../.agents/skills/floatsoda-device-test/references/known-divergences.md) に9件。うち8件が `Test: — (not set)` |
+| 機能 | 実機 | 差分 | 文書のみ | [known-divergences.md](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に9件。うち8件が `Test: — (not set)` |
 | 回帰 | 単体 | 例示 | ある | バグ修正ごとの regression test の追加を [REVIEW.md](../REVIEW.md) で必須としている |
 | 回帰 | 描画 | ゴールデン | 無い | 参照画像は0件。`GetPixel` で要件を満たしている間は優先度が低い |
 | 非機能 | 結合 | 例示(閾値) | 未着手 | `tests/FloatSoda.Test/FloatSoda.Test.csproj` は BenchmarkDotNet を参照しているが、`[Benchmark]` は0件 |
@@ -82,7 +82,7 @@
 
 ## 5. Flutter との差異とテストの関係
 
-差異の台帳は [known-divergences.md](../.agents/skills/floatsoda-device-test/references/known-divergences.md) です。ラベルによって記述すべきテストの方向性が逆転するため、**テストを作成する前にラベルを決定します。**
+差異の台帳は [known-divergences.md](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。ラベルによって記述すべきテストの方向性が逆転するため、**テストを作成する前にラベルを決定します。**
 
 | ラベル | 作成するテスト |
 |---|---|
