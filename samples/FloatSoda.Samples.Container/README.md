@@ -66,7 +66,7 @@ new ContainerWidget
 
 ### 子を配置する
 
-`Alignment` を指定すると、`Container` は利用できる領域いっぱいに広がり、子をその中で配置します。
+`Child` と `Alignment` を指定すると、`Container` は利用できる領域いっぱいに広がり、子をその中で配置します。`Child` が無いときは `Alignment` は無視されます。
 
 ```csharp
 new ContainerWidget
@@ -104,8 +104,10 @@ new ContainerWidget
 | `constraints`(追加の制約) | 無し。`ConstrainedBox` で `Container` を包む | `constraints` プロパティ |
 | `foregroundDecoration`(前面の装飾) | 無し | `foregroundDecoration` プロパティ |
 | `clipBehavior`(子の切り抜き) | 無し | `clipBehavior` プロパティ |
+| ボーダーぶんの内側余白 | 加算しない。`Border` を付けて `Padding` を省略すると、子がボーダーの下まで広がる。重ねたくないときはボーダー幅を `Padding` に明示する | `decoration.padding`(ボーダー寸法)を `padding` に加算する |
+| `Child` が無いときの大きさ | 空の `SizedBox` になり、緩い制約の下では 0 に縮む。広げたいときは `Width` / `Height` を指定する | 有限の制約の下では最大まで広がる(`LimitedBox` + `BoxConstraints.expand()`) |
 
-指定したプロパティに対応するウィジェットを内側から重ねる合成順(配置 → 余白 → 装飾 → 寸法 → 変換)は Flutter と同じです。`Color` と `Decoration` の同時指定が例外になる点も同じです。
+指定したプロパティに対応するウィジェットを内側から重ねる合成順(配置 → 余白 → 装飾 → 寸法 → 変換)は Flutter と同じです(上表のボーダーぶんの余白を除く)。`Color` と `Decoration` の同時指定が例外になる点も同じです。
 
 ## 実行
 
