@@ -8,6 +8,9 @@ riderModule.iml
 # IDE state — local, not published
 .idea/
 
+# Shared agent memory (Basic Memory MCP) — no longer used, but existing clones may still hold local data
+.agent-memory/
+
 # Local AI tool config — local, not published
 .mcp.json
 .codex/
@@ -56,11 +59,6 @@ x86/
 bld/
 [Ll]og/
 [Ll]ogs/
-artifacts/
-
-# NuGet package output (FloatSoda ships packages — see RELEASING.md)
-*.nupkg
-*.snupkg
 
 # dotnet test / coverage output
 [Tt]est[Rr]esult*/

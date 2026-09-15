@@ -98,7 +98,7 @@ resx と違い、XML ドキュメントコメントはビルド時に `FloatSoda
 
 FloatSoda v0.x は日本語・英語・中国語・韓国語を対象とした水平 LTR レイアウトのみをサポートします。`Directionality`、`PositionedDirectional`、`EdgeInsetsDirectional`、`AlignmentDirectional` など start/end ベースのレイアウト API は導入していません。RTL レイアウトへの対応は、利用者からの要望が確認できるまで見送ります。
 
-これは、[TargetUsers](TargetUsers.md) が定義する初期利用者層(VRChat エコシステムで日本語・英語・中国語・韓国語を使う層)を前提とした製品判断です。RTL より優先する項目は次の通りです。
+これは、VRChat エコシステムで日本語・英語・中国語・韓国語を使う層を初期の対象言語とする製品判断です。RTL より優先する項目は次の通りです。
 
 - CJK フォントフォールバック
 - 絵文字の描画
