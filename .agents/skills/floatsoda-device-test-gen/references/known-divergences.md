@@ -179,6 +179,35 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
 - **Label**: not ported — 2026-09-14 にオーナーが確定。修正は #257(`ClipBehavior` を追加し、
   既定を `Clip.HardEdge` に揃える。breaking)。
 
+## 11. `Container` がボーダーぶんの余白を `Padding` に加算しない
+
+- **FloatSoda**: `src/FloatSoda/Widgets/Layout/Container.cs:159` が指定された `Padding` だけを
+  挿入する。`src/FloatSoda/Painting/BoxDecoration.cs` に `Padding` に相当するプロパティが無い。
+  `Border` 付きで `Padding` を省略すると、子がボーダーの下まで広がる。
+- **Flutter**: `Container._paddingIncludingDecoration`(`widgets/container.dart:378-384`、
+  `8a9f61cfd67`)が `padding` と `decoration.padding`(ボーダー寸法)を加算し、`build`
+  (`:400-403`)で `Padding` として挿入する。
+- **Test**: — (not set)
+- **Docs**: `samples/FloatSoda.Samples.Container/README.md` の `## Flutterとの違い`(回避策として
+  ボーダー幅を `Padding` に明示する案内)。差異が解消したら行を削除する。
+- **Observation**: `HEADLESS`(子の配置位置はビットマップで判定できる)
+- **Label**: port mistake — 余白合成は実装済みで加算だけが抜けている。修正は #267(breaking)。PR #264 の Codex レビューで発見。
+
+## 12. `Child` の無い `Container` が緩い制約の下で 0 に縮む
+
+- **FloatSoda**: `src/FloatSoda/Widgets/Layout/Container.cs:148` の `Child ?? new SizedBox()`。
+  `SizedBox` は `BoxConstraints.TightFor(null, null)` なので、緩い制約では最小サイズになる。
+- **Flutter**: `Container.build`(`widgets/container.dart:390-395`、`8a9f61cfd67`)は
+  `child == null && (constraints == null || !constraints.isTight)` のとき
+  `LimitedBox(maxWidth: 0, maxHeight: 0, child: ConstrainedBox(BoxConstraints.expand()))` を使う。
+  有限の制約では最大まで広がり、無限の制約でだけ 0 になる。`alignment` を子がある場合だけ
+  適用する点は FloatSoda と同じ。
+- **Test**: — (not set)
+- **Docs**: `samples/FloatSoda.Samples.Container/README.md` の `## Flutterとの違い`(回避策として
+  `Width` / `Height` を指定する案内)。差異が解消したら行を削除する。
+- **Observation**: `HEADLESS`(サイズはレイアウト結果で判定できる)
+- **Label**: port mistake。修正は #268(breaking)。PR #264 の Codex レビューで発見。
+
 ---
 
 ## Triage 2026-09-09 — 範囲の振り分けと着手順(Phase 2 リリース後に実施)
