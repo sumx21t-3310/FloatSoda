@@ -246,6 +246,8 @@ tests/FloatSoda.Test/RenderObjects/…    →   namespace FloatSoda.Test.RenderO
 1. `.agents/skills/<name>/SKILL.md` に本体を書く。参照ファイルは `.agents/skills/<name>/references/` に置く
 2. `.claude/skills/<name>/SKILL.md` に、正典と同じ frontmatter + 正典へのポインタだけのスタブを置く(既存のスタブを雛形にしてください)
 
+skill 名は **`<project>-<subject>-<verb>` の順**で付けます(例: `floatsoda-device-test-gen` / `floatsoda-device-test-run`)。広い語を先に、動詞を最後に置くと、対になる skill が一覧で隣り合い、`floatsoda-device-test-` までの入力で補完が絞れます。skill のディレクトリはネストできない(Claude Code は `.claude/skills/*/SKILL.md` の1階層だけを探索する)ため、分類はディレクトリではなく名前の接頭辞で持ちます。
+
 ---
 
 ## コーディング規約

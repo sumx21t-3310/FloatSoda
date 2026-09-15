@@ -2,7 +2,7 @@
 
 # RenderObject ツリー
 
-RenderObject ツリーはレイアウト計算と描画コマンド記録を担う低レベル API です。`FloatSoda` の描画は最終的にすべてこのツリーを通過します。
+RenderObject ツリーは、レイアウト計算と描画コマンドの記録を担う低レベル API です。`FloatSoda` の描画は、最終的にすべてこのツリーを通過します。
 
 ## 基本契約
 
@@ -49,32 +49,30 @@ RenderView (tight 制約: ビューポートサイズ)
 |---|---|
 | `BoxConstraints.Tight(w, h)` | 幅・高さを固定 |
 | `BoxConstraints.TightFor(width: w)` | 幅だけ固定、高さはフリー |
-| `constraints.Loosen()` | min を 0 に緩める（子が自由にサイズを決められる） |
+| `constraints.Loosen()` | min を 0 に緩める(子が自由にサイズを決められる) |
 | `constraints.Enforce(other)` | 別の制約で上書き |
 
 ## 差分更新(dirty フラグ)
 
-RenderObject は Flutter と同様に **変更があった部分だけを再レイアウト・再ペイント** します。プロパティを変更したら `MarkNeedsLayout()` / `MarkNeedsPaint()` を呼ぶのが契約です([BuildPipeline](BuildPipeline.md) の `UpdateRenderObject` から呼ばれるのが典型)。
+RenderObject は Flutter と同様に **変更があった部分だけを再レイアウト・再ペイント** します。プロパティの変更時は、`MarkNeedsLayout()` または `MarkNeedsPaint()` を呼ぶ規約です(通常は [BuildPipeline](BuildPipeline.md) の `UpdateRenderObject` から呼ばれます)。
 
 ### MarkNeedsLayout と RelayoutBoundary
 
-`MarkNeedsLayout()` は自身の `NeedsLayout` を立て、**RelayoutBoundary**(自分のサイズ変更が親に影響しない境界。tight 制約を受けたノードなどが該当)まで親方向に伝播します。境界ノードが `RenderPipeline.NodesNeedingLayout` に登録され、`FlushLayout()` が `Depth` 順に `LayoutWithoutResize()` を呼びます。
+`MarkNeedsLayout()` は自身の `NeedsLayout` を立て、**RelayoutBoundary** まで親方向へ伝播します。RelayoutBoundary とは、自身のサイズ変更が親に影響しない境界を指し、tight 制約を受けたノードなどが該当します。伝播が止まった境界ノードは `RenderPipeline.NodesNeedingLayout` に登録され、`FlushLayout()` が `Depth` 順に `LayoutWithoutResize()` を呼び出します。
 
 ### MarkNeedsPaint と RepaintBoundary
 
-`MarkNeedsPaint()` は `IsRepaintBoundary == true` のノードまで親方向に伝播し、そのノードが `RenderPipeline.NodesNeedingPaint` に登録されます。`FlushPaint()` が `PaintingContext.RepaintCompositedChild()` で再記録します。
+`MarkNeedsPaint()` は `IsRepaintBoundary == true` のノードまで親方向へ伝播し、そのノードが `RenderPipeline.NodesNeedingPaint` に登録されます。`FlushPaint()` が `PaintingContext.RepaintCompositedChild()` で再記録します。
 
-境界になるのは `RenderView`(ツリーのルート。常に境界)と `RenderRepaintBoundary`(`RepaintBoundary` ウィジェットの実体)です。毎フレーム変化する部分を `RepaintBoundary` で囲むと、その内側の `MarkNeedsPaint()` が祖先へ伝播しなくなり、変化していない周囲を再描画せずに済みます。
+境界になるノードは、ツリーのルートである `RenderView`(常に境界)と、`RepaintBoundary` ウィジェットの実体である `RenderRepaintBoundary` です。毎フレーム変化する部分を `RepaintBoundary` で囲むと、その内側の `MarkNeedsPaint()` が祖先へ伝播しなくなり、変化していない周囲を再描画せずに済みます。
 
-いずれの場合も `RenderPipeline.RequestVisualUpdate()` が呼ばれ、`WidgetBinding` に「このフレームは描画が必要」と通知されます。変更がないフレームではレイアウトもペイントも実行されません。
+レイアウトとペイントのいずれの場合も `RenderPipeline.RequestVisualUpdate()` が呼ばれ、このフレームで描画が必要な旨が `WidgetBinding` へ通知されます。変更がないフレームではレイアウトもペイントも実行されません。
 
 > **Semantics 系の dirty フラグは持ちません:** Flutter の `markNeedsSemanticsUpdate()` に相当する API は FloatSoda では実装していません。理由は [APIDesign § 実装しない API — Semantics](APIDesign.md#実装しない-api--semantics-アクセシビリティツリー) を参照してください。Flutter 本家から RenderObject を移植する際も、semantics 関連のフックは削除します。
 
 ## intrinsic 測定
 
-通常のレイアウトは「制約を渡してサイズを受け取る」一方通行です。これに対し intrinsic 測定は、
-**制約を渡す前に「子が本来ほしがっているサイズ」を問い合わせる**仕組みです。
-`IntrinsicWidth` / `IntrinsicHeight` や `RenderFlex` の一部の配置計算がこれを使います。
+通常のレイアウトは「制約を渡してサイズを受け取る」一方通行です。これに対し intrinsic 測定は、**制約を渡す前に「子が本来必要とするサイズ」を問い合わせる**仕組みです。`IntrinsicWidth` / `IntrinsicHeight` や、`RenderFlex` の一部の配置計算で使われます。
 
 `RenderBox` は4つの問い合わせ口を持ちます。
 
@@ -85,19 +83,15 @@ RenderObject は Flutter と同様に **変更があった部分だけを再レ�
 | `GetMinIntrinsicHeight(width)` | この幅で、内容を切り詰めずに描ける最小の高さ |
 | `GetMaxIntrinsicHeight(width)` | この幅で、これ以上高くしても見た目が変わらない高さ |
 
-サブクラスは対応する `ComputeMinIntrinsicWidth(double)` などを `protected override` で実装します。
-`RenderProxyBox` は既定で子へそのまま委譲します。実装しないまま問い合わせを受けると
-`NotSupportedException` になります。
+サブクラスは対応する `ComputeMinIntrinsicWidth(double)` などを `protected override` で実装します。`RenderProxyBox` は、既定で子へそのまま委譲します。実装しないまま問い合わせを受けると `NotSupportedException` がスローされます。
 
-> **コストに注意:** intrinsic 測定は通常のレイアウトとは別にツリーを走査します。
-> 入れ子にすると走査が掛け算で増え、最悪 O(N²) になります。
-> 寸法があらかじめ分かっている場合は `SizedBox` や `ConstrainedBox` を使ってください。
+> **コストに注意:** intrinsic 測定は、通常のレイアウトとは別にツリーを走査します。入れ子にすると走査が掛け算で増え、計算量が最悪 O(N²) になります。寸法があらかじめ分かっている場合は `SizedBox` や `ConstrainedBox` を使ってください。
 
 ## PaintingContext とレイヤーツリー
 
-`Paint` の引数 `PaintingContext` は Skia のキャンバスを抽象化したものです。ドローコールを記録し、`PictureLayer`（`SKPicture`）としてレイヤーツリーに蓄積します。
+`Paint` の引数 `PaintingContext` は、Skia のキャンバスを抽象化したものです。ドローコールを記録し、`PictureLayer`(`SKPicture`)としてレイヤーツリーに蓄積します。
 
-クリッピングやオパシティを挟む場合は `PushClip*` / `PushOpacity` を使います。
+クリッピングや不透明度を適用する場合は、`PushClip*` や `PushOpacity` を使います。
 
 ```csharp
 // クリップレイヤーを挿入してから子を描画
@@ -112,7 +106,7 @@ context.PushClipRect(childOffset, clipRect, Clip.Antialias, (ctx, off) =>
 | レイヤー | 役割 |
 |---|---|
 | `ContainerLayer` | 子レイヤーをまとめるノード |
-| `PictureLayer` | `SKPicture`（Skia の記録済み描画コマンド）を保持するリーフ |
+| `PictureLayer` | `SKPicture`(Skia の記録済み描画コマンド)を保持するリーフ |
 | `ClipRectLayer` / `ClipRoundRectLayer` / `ClipPathLayer` | 矩形・角丸・パスのクリッピング |
 | `OpacityLayer` | アルファ合成 |
 | `TransformLayer` | 変換行列を適用 |
@@ -224,7 +218,7 @@ var clipped = new RenderClipPath
 
 ## RenderPipeline
 
-`RenderPipeline` は `WidgetBinding.DrawFrame()` から毎フレーム呼ばれます。dirty なノードのリスト(`NodesNeedingLayout` / `NodesNeedingPaint`)を保持し、`Flush*` で消化します。
+`RenderPipeline` は `WidgetBinding.DrawFrame()` から毎フレーム呼ばれます。dirty なノードのリスト(`NodesNeedingLayout` と `NodesNeedingPaint`)を保持し、`Flush*` メソッドで消化します。
 
 ```csharp
 pipeline.FlushLayout();  // NodesNeedingLayout を Depth 順に LayoutWithoutResize()
@@ -232,7 +226,7 @@ pipeline.FlushPaint();   // NodesNeedingPaint を RepaintCompositedChild() で�
 var layer = pipeline.RenderView.Layer?.Clone(); // スレッドセーフにコピー
 ```
 
-dirty なノードがないフレームでは何も行われません。初回フレームは `RenderView.PrepareInitialFrame()` がルートを両リストに登録することで全体をレイアウト・ペイントします。
+dirty なノードがないフレームでは、何も行われません。初回フレームでは、`RenderView.PrepareInitialFrame()` がルートを両リストに登録し、全体をレイアウトおよびペイントします。
 
 ## 関連ページ
 
