@@ -1,0 +1,6 @@
+{"id": "flex-1", "source": "FlexDemo.cs:32", "flutter_ref": "basic.dart:5294", "question": "MainAxisAlignment.Start の帯で、3つの矩形が左端に詰まり右側に余白が残っているか", "read_aloud": "上から1本目の帯、3つの四角が左に寄ってるか見て"}
+{"id": "flex-2", "source": "FlexDemo.cs:34", "flutter_ref": "basic.dart:5294", "question": "MainAxisAlignment.Center の帯で、3つの矩形がまとまって中央にあり左右の余白が等しいか", "read_aloud": "2本目の帯、3つの四角が真ん中にまとまってるか見て"}
+{"id": "flex-3", "source": "FlexDemo.cs:36", "flutter_ref": "basic.dart:5294", "question": "SpaceBetween の帯で、左端と右端に矩形が接し、2箇所の間隔が等しいか", "read_aloud": "3本目の帯、両端の四角が端にくっついて、間隔が同じか見て"}
+{"id": "flex-4", "source": "FlexDemo.cs:41", "flutter_ref": "basic.dart:5294", "question": "CrossAxisAlignment.Start の帯で、高さの異なる3つの矩形の上端が揃っているか", "read_aloud": "4本目の帯、高さの違う3つの四角の上がそろってるか見て"}
+{"id": "flex-5", "source": "FlexDemo.cs:43", "flutter_ref": "basic.dart:5294", "question": "CrossAxisAlignment.Center の帯で、3つの矩形の上下中央が揃っているか", "read_aloud": "5本目の帯、3つの四角の真ん中の高さがそろってるか見て"}
+{"id": "flex-6", "source": "FlexDemo.cs:49-66", "flutter_ref": "basic.dart:5294", "question": "最下段で、長さの異なる2本の横棒(160 と 220)が上端と下端に分かれて配置されているか", "read_aloud": "一番下、長さの違う2本の棒が上と下に分かれてるか見て"}

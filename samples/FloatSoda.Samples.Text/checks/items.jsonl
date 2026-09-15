@@ -1,0 +1,6 @@
+{"id": "text-1", "source": "TextDemo.cs:33-41", "flutter_ref": "text.dart:497", "question": "1行目(Style 省略)が明るい灰色の帯の上に黒文字で描かれ、5行のなかで最も小さいか", "read_aloud": "1行目、明るい帯の上に黒い文字で、一番小さく出てるか見て"}
+{"id": "text-2", "source": "TextDemo.cs:45-52", "flutter_ref": "text.dart:497", "question": "2行目が FontSize 36 の白い文字として、1行目より明確に大きいか", "read_aloud": "2行目の白い文字、1行目よりはっきり大きいか見て"}
+{"id": "text-3", "source": "TextDemo.cs:56-64", "flutter_ref": "text.dart:497", "question": "3行目(水色)が FontWeight 700 の太字で、同じサイズの4行目より線が太いか", "read_aloud": "3行目の水色の文字、4行目より太く見えるか確認して"}
+{"id": "text-4", "source": "TextDemo.cs:67-75", "flutter_ref": "text.dart:497", "question": "4行目(朱色)が IsItalic で右に傾いた斜体になっているか", "read_aloud": "4行目の朱色の文字、右に傾いてるか見て"}
+{"id": "text-5", "source": "TextDemo.cs:79-89", "flutter_ref": "basic.dart:6496", "question": "5行目(灰色の RichText)が Text の行と同じ品質で描画されているか", "read_aloud": "最後の灰色の行、ほかの行と同じくきれいに出てるか見て"}
+{"id": "text-6", "source": "TextDemo.cs:39-86", "flutter_ref": "text.dart:497", "question": "日本語が文字化けや豆腐(□)にならずに全行表示されているか", "read_aloud": "全部の行で、日本語が四角の記号に化けてないか見て"}

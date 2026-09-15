@@ -110,7 +110,6 @@ dotnet run --project samples/FloatSoda.Samples.Flex
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.SizedBox](../FloatSoda.Samples.SizedBox) — 子の間隔の作り方
 - [FloatSoda.Samples.Align](../FloatSoda.Samples.Align) — 単一の子の配置

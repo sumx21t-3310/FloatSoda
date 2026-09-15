@@ -104,6 +104,5 @@ dotnet run --project samples/FloatSoda.Samples.Text
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.ColoredBox](../FloatSoda.Samples.ColoredBox) — 背景色の付け方
