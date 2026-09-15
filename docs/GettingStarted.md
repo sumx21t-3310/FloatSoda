@@ -10,7 +10,7 @@
 
 ## サンプルアプリを動かす（最速）
 
-リポジトリをクローンしたらまずサンプルアプリを起動してフレームワークの動作を確認できます。
+リポジトリのクローン後、サンプルアプリを起動してフレームワークの動作を確認できます。
 
 ```bash
 # SteamVR を起動してから実行する
@@ -19,13 +19,13 @@ dotnet run --project samples/FloatSoda.Samples.OverlayApp
 
 起動すると SteamVR ダッシュボードに、レイアウト、時計、アニメーション、カウンターのデモ用タブが追加されます。左コントローラー追従とワールド座標固定の時計オーバーレイも生成されます(`samples/FloatSoda.Samples.OverlayApp/Program.cs`)。
 
-SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動終了します。
+SteamVR を終了するか、`VREvent_Quit` を受信すると、アプリも自動終了します。
 
-> サンプルには `StatefulWidget` を使った時計ウィジェット(`WatchWidget.cs`)が含まれており、`SetState()` による毎秒の再ビルドで時刻が更新されます。
+> サンプルには `StatefulWidget` を使った時計ウィジェット(`WatchWidget.cs`)が含まれます。`SetState()` による毎秒の再ビルドで時刻が更新されます。
 
 ### 用途別のサンプル一覧
 
-`samples/` には目的の異なる5つのプロジェクトがあります。
+`samples/` には目的の異なる12のプロジェクトがあります。**総合デモと低レベル API のサンプル**、および**ウィジェット1つ(または1グループ)の使い方を示すカタログ型サンプル**に分かれます。
 
 | プロジェクト | 内容 | SteamVR |
 |---|---|---|
@@ -35,9 +35,23 @@ SteamVR を終了するか `VREvent_Quit` を受信するとアプリも自動�
 | `FloatSoda.Samples.PrimitiveOverlay` | ウィジェット層を使わず、`FloatSoda.OVR` の低レベル API だけでオーバーレイを出す | 必要 |
 | `FloatSoda.Samples.PaintingSample` | Widget / RenderObject / Layer の各ツリーを PNG へ書き出す | **不要** |
 
-**`PaintingSample` だけは SteamVR も HMD もいりません。** `FloatSoda.Testing` のヘッドレスレンダラーで
-ツリーを画像化し、デスクトップへ `widget_tree_output.png` などを保存します。
-レイアウトの結果だけを確かめたいときは、HMD をかぶらずにこれで見られます。
+### ウィジェットカタログ
+
+ウィジェットごとの使い方を示すサンプルです。各ディレクトリの `README.md` がそのままチュートリアルで、`checklist.md` に目視確認の手順があります。`--desktop` を付けるとデスクトップウィンドウへ表示できます。
+
+| プロジェクト | 扱うウィジェット |
+|---|---|
+| `FloatSoda.Samples.Text` | `Text` / `RichText` / `TextSpan` / `TextStyle` |
+| `FloatSoda.Samples.ColoredBox` | `ColoredBox` |
+| `FloatSoda.Samples.Align` | `Align` / `Center` |
+| `FloatSoda.Samples.SizedBox` | `SizedBox` |
+| `FloatSoda.Samples.Flex` | `Flex` / `Row` / `Column` |
+| `FloatSoda.Samples.Clip` | `ClipRect` / `ClipRoundRect` / `ClipOval` / `ClipCustomPath` |
+| `FloatSoda.Samples.Image` | `Image` / `FileImageProvider` / `BoxFit` |
+
+いずれも SteamVR の起動が必要です(`--desktop` でも OpenVR を初期化するため)。
+
+**`PaintingSample` だけは SteamVR も HMD も不要です。** `FloatSoda.Testing` のヘッドレスレンダラーでツリーを画像化し、デスクトップへ `widget_tree_output.png` などを保存します。レイアウトの結果だけを確かめたいときは、HMD を装着せずに確認できます。
 
 ```bash
 dotnet run --project samples/FloatSoda.Samples.PaintingSample
@@ -55,7 +69,7 @@ dotnet add reference ../path/to/FloatSoda/src/FloatSoda/FloatSoda.csproj
 
 ### 2. 最小構成のコードを書く
 
-`Program.cs` を以下のように書き換えます。Widget ベースの書き方が推奨です。
+`Program.cs` を以下のように書き換えます。Widget ベースの書き方を推奨します。
 
 ```csharp
 using FloatSoda;
@@ -92,11 +106,11 @@ await host.RunAsync();
 dotnet run
 ```
 
-Window の作成は Host 側で行います。`host.RunAsync()` は SteamVR が終了するまで待機し、SteamVR の終了イベント、Ctrl+C、または Host の停止要求を受けると正常終了します。
+Window の作成は Host 側で行います。`host.RunAsync()` は SteamVR が終了するまで待機します。SteamVR の終了イベント、Ctrl+C、または Host の停止要求を受けると正常終了します。
 
-> **Widget の実装状況:** レイアウト系(`Center`, `Align`, `Row`, `Column`, `Padding`, `Container`, `Stack`, `Wrap`, `Expanded`, `AspectRatio` など)、描画系(`ColoredBox`, `DecoratedBox`, `Opacity`, `Transform`, `Clip*`)、入力系(`GestureDetector`, `Listener`)は使用可能で、`StatefulWidget` / `InheritedWidget` も動作します。
-> `internal` のため公開 API から使えないのは、スクロール系の `ListView` / `GridView` / `SingleChildScrollView` です。画像とアイコンには描画系の `Paint.Image` / `Paint.Icon` を使用できます。
-> **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 で、現時点では NuGet 未配布・押下も未反応です(→ [UILayering](UILayering.md#実装状況))。ボタンは `GestureDetector` で組み立ててください(→ [WidgetSystem.md](WidgetSystem.md#押せるボタンを作る))。
+> **Widget の実装状況:** レイアウト系(`Center`, `Align`, `Row`, `Column`, `Padding`, `Container`, `Stack`, `Wrap`, `Expanded`, `AspectRatio` など)、描画系(`ColoredBox`, `DecoratedBox`, `Opacity`, `Transform`, `Clip*`)、入力系(`GestureDetector`, `Listener`)は使用可能です。`StatefulWidget` / `InheritedWidget` も動作します。
+> スクロール系の `ListView` / `GridView` / `SingleChildScrollView` は `internal` のため、公開 API からは使えません。画像とアイコンには描画系の `Paint.Image` / `Paint.Icon` を使用できます。
+> **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`)は Phase 5 で提供予定です。現時点では NuGet 未配布であり、押下しても反応しません(→ [UILayering](UILayering.md#実装状況))。ボタンは `GestureDetector` で組み立ててください(→ [WidgetSystem.md](WidgetSystem.md#押せるボタンを作る))。
 
 <details>
 <summary>RenderObject レベルの直接操作（低レベル API）</summary>
@@ -144,8 +158,7 @@ public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositio
 ## オーバーレイ種別の選び方
 
 `app.CreateWindow(...)` に渡すウィンドウ定義 `WindowWidget` の種類でオーバーレイ種別を選びます。
-`Size` を指定しない場合、オーバーレイのサイズは `Child` ウィジェットのレイアウト結果に追従します
-（`Size` を指定するとそのサイズで固定されます）。
+`Size` を指定しない場合、オーバーレイのサイズは `Child` ウィジェットのレイアウト結果に追従します（`Size` を指定するとそのサイズで固定されます）。
 
 | ウィンドウ定義 | オーバーレイ種別 | 位置の管理 | ポインタ入力 |
 |---|---|---|---|
@@ -153,14 +166,9 @@ public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositio
 | `WorldSpaceWindow { Title, Child, Size?, Position, Rotation }` | `WorldSpaceOverlay` | ワールド座標で固定（`Vector3 Position`、既定は前方1m・高さ1m） | ✗ 届かない |
 | `DeviceTrackedWindow { Title, Child, Size?, Target, Offset, Rotation }` | `DeviceTrackedOverlay` | トラッキングデバイスに追従（`TrackedDevice` 列挙体） | ✗ 届かない |
 
-**ポインタ入力が届くのはダッシュボードオーバーレイだけです。** SteamVR はダッシュボード上のレーザーポインターを
-マウスイベントとして送ってくるため、FloatSoda はそれをそのままヒットテストへ流せます。
-ワールド座標固定とデバイス追従のオーバーレイには、コントローラーレイからポインタ座標を作る経路がまだありません。
-これらのウィンドウに `GestureDetector` を置いてもコンパイルは通り、例外も出ませんが、コールバックは呼ばれません。
+**ポインタ入力が届くのはダッシュボードオーバーレイだけです。** SteamVR はダッシュボード上のレーザーポインターをマウスイベントとして送信するため、FloatSoda はそれをそのままヒットテストへ渡せます。ワールド座標固定とデバイス追従のオーバーレイには、コントローラーのレイからポインタ座標を生成する仕組みがまだありません。これらのウィンドウに `GestureDetector` を置くと、コンパイルは通り例外も出ませんが、コールバックは呼ばれません。
 
-`Title` は SteamVR 上の表示名（ダッシュボードタブ名など）です。OpenVR のオーバーレイキーは
-「エントリアセンブリ名 + `Title` のスネークケース」から自動生成されます
-（例: アセンブリ `MyOverlayApp` + `Title = "My Dashboard"` → `my_overlay_app.my_dashboard`）。
+`Title` は SteamVR 上の表示名（ダッシュボードタブ名など）です。OpenVR のオーバーレイキーは「エントリアセンブリ名 + `Title` のスネークケース」から自動生成されます（例: アセンブリ `MyOverlayApp` + `Title = "My Dashboard"` → `my_overlay_app.my_dashboard`）。
 
 ```csharp
 // ダッシュボード

@@ -2,7 +2,7 @@
 
 # ビルドパイプライン(Widget 差分更新)
 
-このページは Widget ツリーの差分ビルドの仕組み — `BuildOwner` / dirty list / `BuildScope` / `Element.UpdateChild` — を解説します。RenderObject 側の差分レイアウト・差分ペイントは [RenderObjects](RenderObjects.md) を参照してください。
+このページでは、Widget ツリーの差分ビルドの仕組み — `BuildOwner` / dirty list / `BuildScope` / `Element.UpdateChild` — を解説します。RenderObject 側の差分レイアウト・差分ペイントは [RenderObjects](RenderObjects.md) を参照してください。
 
 > **実装状況:** `BuildOwner` と `StatelessElement` / `StatefulElement` / `InheritedElement` / `SingleChildRenderObjectElement` / `MultiChildRenderObjectElement`(`Key` 対応の子リスト差分)/ `RenderObjectToWidgetElement` の再ビルドが動作します。`Key`(`ValueKey<T>` / `UniqueKey`)は `Widget.CanUpdate` に組み込み済みです。
 
@@ -60,15 +60,15 @@ public void MarkNeedsBuild()
 
 ### BuildScope の再ビルドループ
 
-`BuildScope()` は dirty list を **`Depth` 昇順(親が先)** にソートしてから順に `Rebuild()` します。親を先にビルドするのは、親の再ビルドで子も更新される場合に子の個別ビルドを無駄にしないためです(Flutter と同じ戦略)。
+`BuildScope()` は dirty list を **`Depth` 昇順(親が先)** にソートしてから順に `Rebuild()` します。親を先にビルドするのは、親の再ビルドによって子も更新される場合に、子を個別にビルドする無駄を省くためです(Flutter と同じ戦略)。
 
-ビルド中に新たな Element が dirty になった場合(ビルド中の `MarkNeedsBuild`)はリストを再ソートしてループを継続します。ループ終了後に `InDirtyList` フラグをクリアして dirty list を空にします。
+ビルド中に新たな Element が dirty になった場合(ビルド中の `MarkNeedsBuild` 呼び出し時)は、リストを再ソートしてループを継続します。ループ終了後に `InDirtyList` フラグをクリアして dirty list を空にします。
 
 `Element` は `IComparable<Element>` を実装しており、`Depth` → `Dirty` の順で比較されます。
 
 ## Element の再ビルドと UpdateChild
 
-再ビルドの実体は各 Element の `PerformRebuild()` です。
+再ビルド処理の実体は、各 Element の `PerformRebuild()` です。
 
 ### ComponentElement(StatelessElement など)
 
@@ -81,7 +81,7 @@ public override void PerformRebuild()
 }
 ```
 
-`UpdateChild(child, newWidget)` は Widget の差分を Element ツリーに適用する中心的メソッドです。
+`UpdateChild(child, newWidget)` は、Widget の差分を Element ツリーに適用する中心的なメソッドです。
 
 | 条件 | 動作 |
 |---|---|
@@ -91,13 +91,13 @@ public override void PerformRebuild()
 | `Widget.CanUpdate(old, new)` | `child.Update(newWidget)` で既存 Element を更新 |
 | それ以外 | 子を破棄して `InflateWidget` で作り直し |
 
-> **`CanUpdate` の判定:** `Widget.CanUpdate(old, new)` は Flutter と同じく「同じ実行時型かつ `Key` が等しい」なら `true` を返し、既存 Element を再利用します。その手前にある `child.Widget == newWidget`(record の等値比較)は完全一致を素通しする高速パスで、ここで一致すれば `Update` すら呼びません。プロパティだけが変わった同型・同 Key の Widget は Element を再利用してプロパティ差分だけが適用されます。`Key`(`ValueKey<T>` / `UniqueKey`)は `Widget.Key` として差分判定に組み込み済みです。
+> **`CanUpdate` の判定:** `Widget.CanUpdate(old, new)` は Flutter と同じく「同じ実行時型かつ `Key` が等しい」なら `true` を返し、既存 Element を再利用します。事前の `child.Widget == newWidget`(record の等値比較)は完全一致を処理する高速パスであり、一致した場合は `Update` も呼び出しません。プロパティだけが変わった同型かつ同じ `Key` の Widget は、既存の Element を再利用してプロパティの差分のみを適用します。`Key`(`ValueKey<T>` / `UniqueKey`)は `Widget.Key` として差分判定に組み込み済みです。
 
 ### RenderObjectElement
 
-`RenderObjectElement<T>` は `Mount` 時に `CreateRenderObject()` で RenderObject を生成し、`AttachRenderObject()` で最も近い祖先 RenderObjectElement の RenderObject に挿入します(Widget ツリー上では `StatelessWidget` などレンダリングを伴わない Element を挟めるため、探索が必要です)。
+`RenderObjectElement<T>` は `Mount` 時に `CreateRenderObject()` で RenderObject を生成し、`AttachRenderObject()` で祖先の中で最も近い `RenderObjectElement` の RenderObject に挿入します(Widget ツリーには `StatelessWidget` のようなレンダリングを伴わない Element が挟まる場合があるため、探索が必要です)。
 
-更新時は `PerformRebuild()` が `Widget.UpdateRenderObject(renderObject)` を呼び、**既存の RenderObject のプロパティだけを書き換えます**。プロパティのセッターが `MarkNeedsLayout()` / `MarkNeedsPaint()` を呼ぶことで、RenderObject 側の差分更新([RenderObjects](RenderObjects.md))につながります。
+更新時は、`PerformRebuild()` が `Widget.UpdateRenderObject(renderObject)` を呼び出し、**既存の RenderObject のプロパティだけを書き換えます**。プロパティのセッターが `MarkNeedsLayout()` / `MarkNeedsPaint()` を呼ぶことで、RenderObject 側の差分更新([RenderObjects](RenderObjects.md))につながります。
 
 ```
 Widget が変わる
@@ -110,7 +110,7 @@ Widget が変わる
 
 ## ルートの接続: RenderObjectToWidgetAdapter
 
-Widget ツリーのルートは `RenderObjectToWidgetAdapter`(Widget)と `RenderObjectToWidgetElement<RenderView>`(Element)のペアが `RenderView` に橋渡しします。
+Widget ツリーのルートでは、`RenderObjectToWidgetAdapter`(Widget)と `RenderObjectToWidgetElement<RenderView>`(Element)のペアが `RenderView` へ橋渡しをします。
 
 ```csharp
 RenderViewElement = new RenderObjectToWidgetAdapter
@@ -124,7 +124,7 @@ RenderViewElement = new RenderObjectToWidgetAdapter
 `AttachToRenderTree(owner, element)` の動作:
 
 - **初回(`element == null`)** — Element を生成し、`owner.BuildScope(() => result.Mount(null))` でビルドスコープ内にツリー全体を `Mount` します。
-- **2 回目以降** — 既存 Element の `NewWidget` に新しいルート Widget をセットして `MarkNeedsBuild()` するだけです。実際の適用は次の `BuildScope()` 内の `PerformRebuild()` で行われます(ホットリロードやルート差し替えに対応)。
+- **2 回目以降** — 既存 Element の `NewWidget` に新しいルート Widget をセットし、`MarkNeedsBuild()` を呼び出します。実際の適用は、次の `BuildScope()` 内の `PerformRebuild()` で行われます(ホットリロードやルート差し替えに対応しています)。
 
 ## WidgetBinding.DrawFrame
 
@@ -151,7 +151,7 @@ public void DrawFrame()
 }
 ```
 
-`NeedsVisualUpdate` は次のいずれかで立ちます。
+`NeedsVisualUpdate` は、次のいずれかの条件で `true` になります。
 
 - `BuildOwner` がビルドをスケジュールしたとき(`onBuildScheduled`)
 - RenderObject が `MarkNeedsLayout` / `MarkNeedsPaint` したとき(`RenderPipeline.OnNeedVisualUpdate`)
@@ -165,8 +165,8 @@ public void DrawFrame()
 | スクロール系ウィジェット | `ListView` / `GridView` / `SingleChildScrollView` は `internal` で公開 API から除外。viewport 基盤とあわせて Phase 3 で実装 |
 | 画像・アイコン | 描画系の `Paint.Image` / `Paint.Icon` を使用可能。フォントは `FontProvider` 経由で解決 |
 | ポインタ入力源 | ヒットテストとジェスチャ認識は実装済み。ただし座標の供給元がダッシュボードオーバーレイにしか接続されておらず、`WorldSpaceWindow` / `DeviceTrackedWindow` では入力が届かない |
-| UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`) | Phase 5 の予定。`ButtonBase` / `Button` / `ButtonStyle` の型はあるが `GestureDetector` へ未配線で、3プロジェクトとも NuGet 未配布 |
-| `FloatSoda.Hooks` | `HookWidget` / `HookElement`(R3 の `ReactiveProperty` による `UseState`)が部分実装。フレームワークのビルドループとは未統合で、`HookExtension` の各ヘルパーは `NotImplementedException` |
+| UI3層構成(`FloatSoda.UI` / `Cream` / `FizzyPop`) | Phase 5 の予定。`ButtonBase` / `Button` / `ButtonStyle` の型はあるが `GestureDetector` へ未配線で、3つのプロジェクトはいずれも NuGet で未配布 |
+| `FloatSoda.Hooks` | `HookWidget` / `HookElement`(R3 の `ReactiveProperty` による `UseState`)が部分実装。フレームワークのビルドループとは統合されておらず、`HookExtension` の各ヘルパーは `NotImplementedException` |
 
 ## 関連ページ
 
