@@ -5,14 +5,14 @@ riderModule.iml
 /_ReSharper.Caches/
 *.DotSettings.user
 
-# Shared agent memory (Basic Memory MCP) — local, not published
-.agent-memory/
-.mcp.json
-
 # IDE state — local, not published
 .idea/
 
+# Shared agent memory (Basic Memory MCP) — no longer used, but existing clones may still hold local data
+.agent-memory/
+
 # Local AI tool config — local, not published
+.mcp.json
 .codex/
 
 # Local scratch plans (Hermes) — local, not published
@@ -20,3 +20,60 @@ riderModule.iml
 
 # Local AI tool config — local, not published
 .ai/
+
+# Other coding agent local config (preventive — not currently used in this repo)
+.cursor/
+.windsurf/
+.continue/
+.clinerules/
+.roo/
+.amazonq/
+.junie/
+.aider*
+
+# Visual Studio user-specific / build-tool files
+*.suo
+*.user
+*.sln.docstates
+ipch/
+*.aps
+*.ncb
+*.opensdf
+*.sdf
+*.cachefile
+*.psess
+*.vsp
+*.vspx
+_NCrunch*
+
+# .NET build outputs (per-config/platform, native build for SkiaSharp/GLFW)
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+
+# dotnet test / coverage output
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+CodeCoverage/
+*.binlog
+
+# Secrets — never commit
+.env
+
+# Windows detritus
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS detritus
+.DS_Store
