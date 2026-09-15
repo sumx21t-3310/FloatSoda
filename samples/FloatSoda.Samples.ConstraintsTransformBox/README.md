@@ -94,6 +94,5 @@ dotnet run --project samples/FloatSoda.Samples.ConstraintsTransformBox
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.LimitedBox](../FloatSoda.Samples.LimitedBox) — 取り除かれた制約に上限を戻す場合

@@ -81,6 +81,5 @@ dotnet run --project samples/FloatSoda.Samples.SizedBox
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Flex](../FloatSoda.Samples.Flex) — 余白を挟む相手側の並べ方

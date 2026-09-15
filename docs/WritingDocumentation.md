@@ -117,7 +117,7 @@ XML ドキュメントコメントは `internal` や `private` にも書きま�
 | invariant を追加・変更する | Contributor Requirements とテスト |
 | Flutter との差異を導入・変更する | [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) と divergence テスト。利用者から観測できるなら User docs とサンプルの「Flutterとの違い」節 |
 | 新しい代表ユースケースを追加する | User Guide / Tutorial と、#188 の層に沿ったサンプル |
-| サンプルを追加・変更する | サンプルの README と `checklist.md`([CONTRIBUTING.md](../CONTRIBUTING.md) の規約) |
+| サンプルを追加・変更する | サンプルの README と `checks/items.jsonl`([CONTRIBUTING.md](../CONTRIBUTING.md) の規約) |
 | ドキュメントのページを移動・改名する | リンク元のページと [Home](Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
 
 PR では、テンプレートの `## Documentation` 節に、変更種別と更新した文書(更新が不要と判断した場合はその理由)を記載します。レビューでは、その判断がこの表と一致しているかを確認します。

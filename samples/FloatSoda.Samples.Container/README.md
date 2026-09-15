@@ -128,7 +128,6 @@ dotnet run --project samples/FloatSoda.Samples.Container
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Padding](../FloatSoda.Samples.Padding) — 余白単体の付き方と収縮
 - [FloatSoda.Samples.DecoratedBox](../FloatSoda.Samples.DecoratedBox) — 装飾単体の描画

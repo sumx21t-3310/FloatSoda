@@ -1,0 +1,5 @@
+{"id": "expanded-1", "source": "ExpandedDemo.cs:33-42", "flutter_ref": "basic.dart:6021", "question": "Flex比1:2:1の帯が水色・朱色・黄色で隙間なく埋まり、朱色の幅が水色・黄色のちょうど2倍(155/310/155)に見えるか", "read_aloud": "1番目の帯、真ん中の赤が左右の青と黄色の2倍の幅に見えるか見て"}
+{"id": "expanded-2", "source": "ExpandedDemo.cs:47-55", "flutter_ref": "basic.dart:6021", "question": "固定幅220の水色に続いて、残り全部(400)が朱色のExpandedで埋まっているか", "read_aloud": "2番目の帯、青の右側の残り全部が赤で埋まっているか確認して"}
+{"id": "expanded-3", "source": "ExpandedDemo.cs:62-76", "flutter_ref": "basic.dart:6021", "question": "幅90を要求するSizedBoxをExpandedで包むと、要求を無視して帯いっぱい(620)に水色が広がっているか", "read_aloud": "3番目の帯、青がExpandedで帯いっぱいに引き伸ばされているか見て"}
+{"id": "expanded-4", "source": "ExpandedDemo.cs:78-92", "flutter_ref": "basic.dart:5930", "question": "同じ幅90のSizedBoxをFlexibleで包むと、Expandedと違い朱色は左端の幅90だけで残りは帯の背景色のままか", "read_aloud": "4番目の帯、赤がFlexibleで小さいまま左端に残っているか見て"}
+{"id": "expanded-5", "source": "ExpandedDemo.cs:97-108", "flutter_ref": "packages/flutter/lib/src/widgets/spacer.dart:41", "question": "Spacer 1:2 の帯で、3本の四角の間の空白が2つあり、右側の空白が左側のちょうど2倍(約117/233)に見えるか", "read_aloud": "5番目の帯、右側の余白が左側より広いか確認して"}

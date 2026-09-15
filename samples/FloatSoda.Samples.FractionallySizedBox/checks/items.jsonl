@@ -1,0 +1,4 @@
+{"id": "fractionally-sized-box-1", "source": "FractionallySizedBoxDemo.cs:30-34", "flutter_ref": "basic.dart:3254", "question": "WidthFactor=0.5で水色の縦帯が幅75(枠の半分)・高さ150(枠いっぱい)で左右中央にあるか", "read_aloud": "最初の水色の帯が幅だけ半分で高さは枠いっぱいか見て"}
+{"id": "fractionally-sized-box-2", "source": "FractionallySizedBoxDemo.cs:38-43", "flutter_ref": "basic.dart:3254", "question": "WidthFactor/HeightFactor=0.5で朱色の四角が75x75になり、上下左右とも中央に配置されているか", "read_aloud": "2番目の朱色の四角が小さくなり中央にあるか見て"}
+{"id": "fractionally-sized-box-3", "source": "FractionallySizedBoxDemo.cs:46-52", "flutter_ref": "basic.dart:3254", "question": "Alignment.TopLeftにより黄色の四角(75x75)が枠の左上隅に接しているか", "read_aloud": "3番目の黄色い四角が枠の左上に寄っているか見て"}
+{"id": "fractionally-sized-box-4", "source": "FractionallySizedBoxDemo.cs:57-62", "flutter_ref": "basic.dart:3254", "question": "WidthFactor=1.4で水色の横帯(幅210)が枠の左右の端を越えて枠の外まで描かれているか", "read_aloud": "4番目の水色の帯が枠からはみ出しているか見て"}

@@ -1,0 +1,4 @@
+{"id": "padding-1", "source": "PaddingDemo.cs:30-34", "flutter_ref": "basic.dart:2317", "question": "EdgeInsets.All(16) で四辺の余白が同じ幅に見えているか", "read_aloud": "最初の青い四角に、上下左右同じ幅の余白があるか見て"}
+{"id": "padding-2", "source": "PaddingDemo.cs:38-42", "flutter_ref": "basic.dart:2317", "question": "EdgeInsets.Symmetric(12, 36) で左右の余白が上下より明らかに広いか", "read_aloud": "2番目の朱色の四角、左右の余白が上下より広いか確認して"}
+{"id": "padding-3", "source": "PaddingDemo.cs:46-50", "flutter_ref": "basic.dart:2317", "question": "Left だけ 48 の指定で、左側だけに広い余白が付き、上下と右は枠に接しているか", "read_aloud": "3番目の黄色い四角、左側だけ余白が広くて上と右はぴったりか見て"}
+{"id": "padding-4", "source": "PaddingDemo.cs:53-71", "flutter_ref": "basic.dart:2317", "question": "子に合わせて縮むケースで、茶色の下地が48x48の水色に対して各辺16の余白を持ち80x80まで縮んでいて、枠いっぱいには広がっていないか", "read_aloud": "最後のセルで茶色い小さな四角が見えるか、枠いっぱいじゃないか確認して"}

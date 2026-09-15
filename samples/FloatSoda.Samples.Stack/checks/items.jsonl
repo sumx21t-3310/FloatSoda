@@ -1,0 +1,5 @@
+{"id": "stack-1", "source": "StackDemo.cs:30-39", "flutter_ref": "basic.dart:4743", "question": "重ね順の枠で、水色→朱色→黄色の順に子が積まれ、リストの後の子ほど手前(小さい四角ほど手前)に見えるか", "read_aloud": "青い四角の上に赤が乗って、その上に黄色が乗っているか見て"}
+{"id": "stack-2", "source": "StackDemo.cs:43-51", "flutter_ref": "basic.dart:4743", "question": "Alignment.BottomRight で水色と朱色の四角が2つとも右下隅に寄り、右下の角が揃っているか", "read_aloud": "2番目の枠、青と赤の四角が右下のコーナーに集まっているか確認して"}
+{"id": "stack-3", "source": "StackDemo.cs:56-73", "flutter_ref": "basic.dart:4894", "question": "Positioned の枠で、水色の四角が左上から10離れた位置に、朱色の四角が右下から10離れた位置にあるか", "read_aloud": "3番目の枠、青が左上寄り、赤が右下寄りに配置されているか見て"}
+{"id": "stack-4", "source": "StackDemo.cs:77-90", "flutter_ref": "basic.dart:4894", "question": "Left と Right を同時指定した黄色の帯が、左右とも枠から10離れた位置まで水平に引き伸ばされているか(幅130)", "read_aloud": "4番目の枠、黄色い帯が左右に引き伸ばされて見えるか確認して"}
+{"id": "stack-5", "source": "StackDemo.cs:95-108", "flutter_ref": "basic.dart:4743", "question": "はみ出しの枠で、朱色の四角(56x56)が枠の右端を横切って枠の外(紺色の背景の上)まで描かれ、右端で切り取られていないか", "read_aloud": "最後の枠で赤い四角が枠からはみ出して見えているか確認して"}

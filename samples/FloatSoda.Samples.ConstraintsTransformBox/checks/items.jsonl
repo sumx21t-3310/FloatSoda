@@ -1,0 +1,4 @@
+{"id": "constraints-transform-box-1", "source": "ConstraintsTransformBoxDemo.cs:32-36", "flutter_ref": "basic.dart:2958", "question": "UnconstrainedBox の ConstrainedAxis=Horizontal により、幅220の要求を持つ帯が枠の幅150で止まっているか", "read_aloud": "最初の枠で朱色の帯が枠の幅ぴったりで止まっているか見て"}
+{"id": "constraints-transform-box-2", "source": "ConstraintsTransformBoxDemo.cs:40-44", "flutter_ref": "basic.dart:2958", "question": "ClipBehavior=HardEdge により、黄色の帯のはみ出しが枠の端で切り取られているか", "read_aloud": "2番目の枠で黄色い帯が枠の端で切れているか見て"}
+{"id": "constraints-transform-box-3", "source": "ConstraintsTransformBoxDemo.cs:49-53", "flutter_ref": "basic.dart:2958", "question": "ConstraintsTransformBox のカスタム変換(最大寸法100)により、水色の正方形が100x100に制限され中央にあるか", "read_aloud": "3番目の枠で水色の四角が小さく中央に収まっているか見て"}
+{"id": "constraints-transform-box-4", "source": "ConstraintsTransformBoxDemo.cs:58-61", "flutter_ref": "basic.dart:2958", "question": "UnconstrainedBox で両軸の制約を取り除いた結果、水色の帯(幅220)が枠の左右の端を越えてはみ出しているか", "read_aloud": "4番目の枠で水色の帯が枠からはみ出しているか見て"}

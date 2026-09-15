@@ -1,0 +1,5 @@
+{"id": "container-1", "source": "ContainerDemo.cs:31-39", "flutter_ref": "container.dart:246", "question": "Color + 寸法の枠で、水色の四角(96x96)が枠の中央にあり、枠いっぱいには広がっていないか", "read_aloud": "1番目の枠、水色の四角が真ん中にあって枠いっぱいじゃないか見て"}
+{"id": "container-2", "source": "ContainerDemo.cs:44-61", "flutter_ref": "container.dart:246", "question": "Decoration の枠で、朱色の角丸四角(110x110、角丸16)の外周に太さ4の黄色いボーダーが四辺とも見えるか", "read_aloud": "2番目の枠、朱色の角丸の四角に黄色いふちが四辺ともあるか見て"}
+{"id": "container-3", "source": "ContainerDemo.cs:66-80", "flutter_ref": "container.dart:246", "question": "Padding の枠で、黄色の角丸四角の内側に各辺16の余白があり、水色の子が装飾より小さく角丸に重ならないか", "read_aloud": "3番目の枠、黄色の内側に同じ幅の余白があって、水色が角にかかってないか見て"}
+{"id": "container-4", "source": "ContainerDemo.cs:85-94", "flutter_ref": "container.dart:246", "question": "Alignment の枠で、朱色の四角(40x40)が枠の右下隅に接し、ほかの位置には何も描かれていないか", "read_aloud": "4番目の枠、朱色の小さい四角が右下の角にくっついてるか見て"}
+{"id": "container-5", "source": "ContainerDemo.cs:98-108", "flutter_ref": "container.dart:246", "question": "Transform の枠で、水色の四角(80x80)が中心を軸に時計回りへ22.5度傾いているか", "read_aloud": "最後の枠、水色の四角が真ん中を軸に右回りに少し傾いてるか見て"}

@@ -3,6 +3,7 @@
   Launch one catalog sample for the walkthrough, stopping whichever one is running first.
 .EXAMPLE
   ./run-sample.ps1 Padding                 # stop previous, launch the Padding sample, report alive / exited
+  ./run-sample.ps1 Padding -Desktop        # same, but pass --desktop to show it in a desktop window
   ./run-sample.ps1 -Scenario OverlayQuit   # same, for a floatsoda-device-test-gen harness scenario
   ./run-sample.ps1 stop                    # stop the current process only
 .NOTES
@@ -13,6 +14,7 @@
 param(
     [Parameter(Mandatory = $true)][string]$Name,
     [switch]$Scenario,
+    [switch]$Desktop,
     [string]$ResultsDir = (Join-Path $HOME ("tmp/floatsoda-walkthrough/" + (Get-Date -Format 'yyyy-MM-dd')))
 )
 $ErrorActionPreference = 'Stop'
@@ -40,7 +42,7 @@ if ($Scenario) {
     $args = @('--scenario', $Name)
 } else {
     $exe = Join-Path $repo "samples/FloatSoda.Samples.$Name/bin/Debug/net10.0/FloatSoda.Samples.$Name.exe"
-    $args = @()
+    $args = if ($Desktop) { @('--desktop') } else { @() }
 }
 if (-not (Test-Path $exe)) { throw "not built: $exe (run dotnet build first)" }
 $log = Join-Path $logDir "$Name.log"

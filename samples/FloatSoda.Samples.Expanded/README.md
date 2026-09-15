@@ -115,6 +115,5 @@ dotnet run --project samples/FloatSoda.Samples.Expanded
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Wrap](../FloatSoda.Samples.Wrap) — 収まらない子を折り返す場合

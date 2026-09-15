@@ -307,7 +307,7 @@ FloatSoda の第一の利用者は「コードを自分では書かず LLM に�
 | `Program.cs` | エントリーポイントのみ。Host の構築、表示先の切り替え、`CreateWindow`、`RunAsync`。**ウィジェットツリーを書かない** |
 | `<Name>Demo.cs` | サンプル本体。`StatelessWidget` / `StatefulWidget` として実装する |
 | `README.md` | チュートリアル本文。**そのままドキュメントサイトのページ本文になる** |
-| `checklist.md` | 目視確認手順。**結合テストのシナリオそのもの**。サイトへは転用しない |
+| `checks/items.jsonl` | 目視確認手順(JSON Lines、1行1項目)。**結合テストのシナリオそのもの**。[`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルが `<Name>Demo.cs` から機械生成する。サイトへは転用しない |
 | `FloatSoda.Samples.<Name>.csproj` | `TargetFramework` を明示する(`samples/Directory.Build.props` は TFM を設定しない) |
 
 **ディレクトリ名・プロジェクト名・ルート名前空間は一致させます。** `samples/FloatSoda.Samples.Wrap/` なら、プロジェクトファイルは `FloatSoda.Samples.Wrap.csproj`、名前空間は `FloatSoda.Samples.Wrap` です。`Sample` のようなサフィックスを足したり、言い換えたりしないでください。
@@ -341,7 +341,7 @@ app.CreateWindow(useDesktop
 注意点が2つあります。
 
 - **`--desktop` でも HMD の接続と SteamVR の起動は必要です。** `FloatSodaApp.Initialize()` は表示先によらず OpenVR を初期化するため、HMD 未接続では `Init_HmdNotFound` で起動に失敗します(issue #140)。省けるのは「被る」ことだけです。
-- **デスクトップで動いたことは、ダッシュボードオーバーレイで動くことの証明にはなりません。** ウィンドウ種別ごとに入力経路が異なります(issue #182)。ポインタ操作を伴うサンプルの `checklist.md` には、必ずダッシュボードでの確認項目を含めてください。
+- **デスクトップで動いたことは、ダッシュボードオーバーレイで動くことの証明にはなりません。** ウィンドウ種別ごとに入力経路が異なります(issue #182)。`checks/items.jsonl` は表示方法(デスクトップ/ダッシュボード)を区別しません。区別は実機巡回の結果側(`checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` の `<mode>` フィールド)が持ちます。ポインタ操作を伴うサンプルは、実機巡回で必ず `dashboard` モードでも確認してください。
 
 ### README の構成
 
@@ -352,24 +352,26 @@ app.CreateWindow(useDesktop
 ## 使い方            — 最小の例から段階的に機能を足す
 ## Flutterとの違い   — 差異があれば明記する。無ければ「同等」と1行書く(節を空にしない)
 ## 実行              — dotnet run コマンド2種(--desktop / ダッシュボード)
-## 関連              — docs/ の該当ページ、関連サンプル、checklist.md へのリンク
+## 関連              — docs/ の該当ページ、関連サンプルへのリンク
 ```
 
 `## Flutterとの違い` は省略しないでください。FloatSoda の docs は Flutter の語彙で概念を教えるため、読者(と LLM)は Flutter の挙動を期待して来ます。**差異がバグでも意図的な設計判断でも、利用者が払うコストは同じ**です。
 
-### checklist.md の構成
+### checks/items.jsonl の構成
 
-```markdown
-# <ウィジェット名> 確認手順
+`checks/items.jsonl` は開発者が手書きするものではなく、[`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルが `<Name>Demo.cs` を読んで生成するファイルです。目視で区別できるデモケース(色分け・比較ペア・プロパティ違いのセルなど)を1行1項目の JSON Lines で列挙します。
 
-## デスクトップ(`--desktop`)
-1. …
-
-## ダッシュボード(HMD を被って判定)
-1. …
+**スキーマ**(1行1項目、JSON Lines):
+```json
+{"id": "padding-1", "source": "PaddingDemo.cs:30-34", "flutter_ref": "basic.dart:2317", "question": "EdgeInsets.All(16) で四辺の余白が同じ幅に見えているか?", "read_aloud": "最初の青い四角に、左右上下同じ幅の枠があるか見て"}
 ```
+- `id`: `<サンプル名kebab-case>-<連番>`。例: `padding-1`, `padding-2`。
+- `source`: 実装の根拠 `<Demo.csファイル名>:<開始行>-<終了行>`。
+- `flutter_ref`: 対応する Flutter 本家実装の `<ファイル>:<行>`(該当する概念クラスの場所)。分からなければ空文字。
+- `question`: 何を確認する項目かの説明文(見るべき点の説明)。
+- `read_aloud`: オーナーが HMD を被ったまま聞いて yes/no で答えられる短い口頭指示(20〜40文字程度)。
 
-HMD が要るかどうかは**節の見出しで区別**します(`★` のような記号は使いません)。デスクトップで完結する項目とダッシュボードが要る項目を最初から2節に分けておくと、実機セッションの前に全サンプルの「ダッシュボード」節だけを機械的に集約できます。
+デスクトップ表示かダッシュボード表示かは `items.jsonl` 側では区別しません。区別は実機巡回の結果側(`checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` の `<mode>` フィールド、`desktop` か `dashboard`)が持ちます。新規サンプル追加時も、既存サンプルが変わった(`<Name>Demo.cs` の行番号がずれた、ケースが増減した)ときの再生成時も、[`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルを使ってください。
 
 ### 禁止事項
 
@@ -405,5 +407,5 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 - [ ] 追加した `public` プロパティに XML ドキュメントコメントを付けた
 - [ ] Wiki同期対象の `docs/*.md` を直接編集した(Wiki側は編集していない)
 - [ ] プリミティブ層(basic.dart相当)を超える複合ウィジェットを追加していない
-- [ ] **新しいウィジェットを追加した場合**、サンプル(README + checklist.md)を追加した(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))
+- [ ] **新しいウィジェットを追加した場合**、サンプル(README + `checks/items.jsonl`)を追加した(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))。`items.jsonl` は [`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルで生成する
 - [ ] **新しい public API を追加した場合**、docs を更新し、ジュニアコーダーテスト([`floatsoda-junior-coder-test`](.agents/skills/floatsoda-junior-coder-test/SKILL.md))を通した

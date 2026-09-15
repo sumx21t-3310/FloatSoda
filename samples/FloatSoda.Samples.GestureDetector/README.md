@@ -111,7 +111,6 @@ dotnet run --project samples/FloatSoda.Samples.GestureDetector
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/Input.md](../../docs/Input.md) — 入力イベントの流れとジェスチャ認識
 - [FloatSoda.Samples.Listener](../FloatSoda.Samples.Listener) — 生のポインターイベントが要る場合
 - [FloatSoda.Samples.PointerRegion](../FloatSoda.Samples.PointerRegion) — Enter / Exit / Cancel と Tap の組み合わせ

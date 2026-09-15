@@ -1,0 +1,5 @@
+{"id": "fitted-box-1", "source": "FittedBoxDemo.cs:31-34", "flutter_ref": "basic.dart:2108", "question": "Contain(既定)で旗が比率を保ったまま幅いっぱいに拡大され、上下に枠の背景色が均等に見えるか", "read_aloud": "最初の旗が横幅いっぱいで、上下に同じ余白があるか見て"}
+{"id": "fitted-box-2", "source": "FittedBoxDemo.cs:38-42", "flutter_ref": "basic.dart:2108", "question": "Fillで比率を無視して枠全体へ引き伸ばされ、右下の目印の正方形が縦長に歪んでいるか", "read_aloud": "2番目の旗の右下の四角が縦長に歪んでいるか見て"}
+{"id": "fitted-box-3", "source": "FittedBoxDemo.cs:46-50", "flutter_ref": "basic.dart:2108", "question": "Noneで拡縮せず、旗が自然な大きさ(120x64)のまま中央にあり四辺に枠の背景色が見えるか", "read_aloud": "3番目の旗が小さいまま中央にあるか見て"}
+{"id": "fitted-box-4", "source": "FittedBoxDemo.cs:54-59", "flutter_ref": "basic.dart:2108", "question": "Cover+HardEdgeで旗が枠の高さいっぱいに拡大され、左右のはみ出しが枠の端で切り取られているか", "read_aloud": "4番目の旗が枠の高さいっぱいで左右が切れているか見て"}
+{"id": "fitted-box-5", "source": "FittedBoxDemo.cs:63-67", "flutter_ref": "basic.dart:2108", "question": "Cover(クリップなし)で4番と同じ拡大率のまま、はみ出した部分が枠の外まで描かれているか", "read_aloud": "5番目の旗のはみ出しが枠の外まで見えているか見て"}

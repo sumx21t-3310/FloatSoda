@@ -102,6 +102,5 @@ dotnet run --project samples/FloatSoda.Samples.Padding
 
 ## 関連
 
-- 動作確認の手順: [checklist.md](checklist.md)
 - [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Stack](../FloatSoda.Samples.Stack) — 位置指定で子を置く場合

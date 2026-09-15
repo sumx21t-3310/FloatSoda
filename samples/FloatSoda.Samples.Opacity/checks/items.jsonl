@@ -1,0 +1,5 @@
+{"id": "opacity-1", "source": "OpacityDemo.cs:30, 94-115", "flutter_ref": "basic.dart:336", "question": "1.0(既定)のセルで、水色と朱色の四角が原色のまま重なり、重なり部分が手前の朱色で完全に覆われているか", "read_aloud": "最初のセル、水色と朱色が鮮やかな原色のまま重なっているか見て"}
+{"id": "opacity-2", "source": "OpacityDemo.cs:35-39", "flutter_ref": "basic.dart:336", "question": "0.5のセルで、水色と朱色の四角が両方とも薄くなり、背後の枠の背景色が透けて見えるか", "read_aloud": "2番目のセル、2つの四角が両方とも薄く透けて見えるか見て"}
+{"id": "opacity-3", "source": "OpacityDemo.cs:35-39", "flutter_ref": "basic.dart:336", "question": "0.5のセルで、四角の重なり部分の濃さが朱色単独の部分と同じ濃さに見えるか(重なり部分だけ濃くなっていないか)", "read_aloud": "2番目のセル、重なった部分だけ濃くなっていないか見て"}
+{"id": "opacity-4", "source": "OpacityDemo.cs:44-62", "flutter_ref": "basic.dart:336", "question": "0.0のセルで、水色と黄色の四角の間に、四角1つぶんと間隔ぶんの空白が空いているか(朱色の四角は透明のまま領域だけ残っているか)", "read_aloud": "3番目のセル、真ん中が空いて見えるか見て"}
+{"id": "opacity-5", "source": "OpacityDemo.cs:70-91", "flutter_ref": "", "question": "3つのラベル付きセルの外枠がすべて同じ大きさ(150x150)に見えるか", "read_aloud": "3つの枠、全部同じ大きさに見えるか見て"}
