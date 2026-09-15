@@ -1,0 +1,89 @@
+---
+title: FloatSoda
+description: SteamVR Overlay を Flutter のような宣言的 UI で作る .NET 10 / C# 14 向けフレームワーク。UI はすべて C# コード
+template: splash
+hero:
+  tagline: SteamVR Overlay を、Flutter のような宣言的 UI で。UI はすべて C# コードで書き、シーンもプレハブも持ちません。
+---
+
+{/*
+  サイト専用の入口(ランディング)。src/pages/index.astro が StarlightPage で描画し、
+  hero のボタンと本文中のリンク先(props.links / props.tracks)は docs/ の実在から計算して渡してくる。
+  docs コレクションの外にあるので、サイドバーにも llms-*.txt にも入らない。
+  事実情報は docs/ が正典なので、ここには案内と導線だけを書く。
+*/}
+
+import { Card, CardGrid, Code, LinkCard } from "@astrojs/starlight/components";
+import program from "../../samples/FloatSoda.Samples.GettingStarted/Program.cs?raw";
+
+## 3 つの入口
+
+読者によって知りたいことが違うので、ドキュメントは 3 系統に分かれています。
+
+<CardGrid>
+  <LinkCard
+    title="User Guide — Learn / Build"
+    href={props.tracks.user.href}
+    description="FloatSoda でアプリを作る人向け。概念の概要、使い方、チュートリアル。公開 API だけでアプリを完成させることが目標です"
+  />
+  <LinkCard
+    title="Contributor Guide — Understand / Change"
+    href={props.tracks.contributor.href}
+    description="FloatSoda 本体を変える・レビューする人向け。動作原理、設計判断、変更後も守るべき条件"
+  />
+  {props.tracks.api.exists ? (
+    <LinkCard
+      title="API Reference — Look up"
+      href={props.tracks.api.href}
+      description="公開 API の正確な契約。XML ドキュメントコメントから生成します"
+    />
+  ) : (
+    <Card title="API Reference — Look up" icon="document">
+      公開 API の正確な契約。XML ドキュメントコメントから生成します。**準備中**で、それまではソースコードの XML ドキュメントコメントを参照してください。
+    </Card>
+  )}
+</CardGrid>
+
+## 最小構成のコード
+
+SteamVR のダッシュボードに 100×100 の青い箱を出すオーバーレイです。`samples/FloatSoda.Samples.GettingStarted` の `Program.cs` そのもので、ビルドのたびにここへ読み込まれます。
+
+{/* Program.cs は BOM 付き UTF-8 なので、先頭の BOM(U+FEFF)を落としてから表示する */}
+<Code code={program.charCodeAt(0) === 0xfeff ? program.slice(1) : program} lang="csharp" title="Program.cs" />
+
+## 誰のためのフレームワークか
+
+3 タイプの作り手を想定しています。自分に近いものから読み始めてください。詳しくは <a href={props.links.targetUsers}>Target Users</a> にあります。
+
+<CardGrid>
+  <Card title="AI と一緒に自分用のツールを作りたい VRChatter" icon="rocket">
+    コードが書けなくても構いません。AI にコードを書いてもらう「バイブコーディング」で完結できることが設計目標です。
+
+    読む順: <a href={props.links.gettingStarted}>GettingStarted</a> のサンプルを動かし、あとは AI に「これを改造して◯◯を作って」と頼む。AI には下の `llms-full.txt` を渡してください。
+  </Card>
+  <Card title="Booth でオーバーレイ作品を売りたいクリエイター" icon="pencil">
+    Unity でワールドやギミックを作れるなら十分です。新しく覚えるのは「宣言的 UI」という考え方だけ。シーンもプレハブも `.meta` もありません。
+
+    読む順: <a href={props.links.gettingStarted}>GettingStarted</a> → <a href={props.links.widgetSystem}>WidgetSystem</a>
+  </Card>
+  <Card title="uGUI を使いたくないエンジニア" icon="laptop">
+    UI が 100% C# コードです。diff が読め、PR レビューができ、grep が効きます。Flutter の三ツリーモデルを .NET 上に実装しています。
+
+    読む順: <a href={props.links.architecture}>Architecture</a> → <a href={props.links.apiDesign}>APIDesign</a>
+  </Card>
+</CardGrid>
+
+## AI に読ませる
+
+このサイトは、コーディングエージェントがそのまま読めるように作ってあります。
+
+<CardGrid>
+  <LinkCard title="llms.txt" href="/llms.txt" description="サイトの索引。エージェントにはまずこれを渡す" />
+  <LinkCard title="llms-full.txt" href="/llms-full.txt" description="全ページを 1 ファイルにまとめた全文" />
+</CardGrid>
+
+各ページは URL 末尾の `/` を `.md` に置き換えると素の Markdown で取得できます(例: <code>{props.links.widgetSystem}</code> のページは <code>{props.links.widgetSystemMd}</code>)。
+
+## いまの状況
+
+Alpha 段階です。ユーザー操作(タップ・パン)が動くのはダッシュボードオーバーレイだけで、ワールド座標固定とデバイス追従のオーバーレイは表示専用です。Phase ごとの到達点と残件は <a href={props.links.roadmap}>ロードマップ</a> にあります。
