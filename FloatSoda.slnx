@@ -12,6 +12,7 @@
         <Project Path="src/FloatSoda/FloatSoda.csproj" />
     </Folder>
     <Folder Name="/samples/">
+        <Project Path="samples/FloatSoda.Samples.Container/FloatSoda.Samples.Container.csproj" />
         <Project Path="samples/FloatSoda.Samples.GettingStarted/FloatSoda.Samples.GettingStarted.csproj" />
         <Project Path="samples/FloatSoda.Samples.Image/FloatSoda.Samples.Image.csproj" />
         <Project Path="samples/FloatSoda.Samples.OverlayApp/FloatSoda.Samples.OverlayApp.csproj" />
