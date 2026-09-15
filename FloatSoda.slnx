@@ -16,6 +16,7 @@
         <Project Path="samples/FloatSoda.Samples.AspectRatio/FloatSoda.Samples.AspectRatio.csproj" />
         <Project Path="samples/FloatSoda.Samples.Clip/FloatSoda.Samples.Clip.csproj" />
         <Project Path="samples/FloatSoda.Samples.ColoredBox/FloatSoda.Samples.ColoredBox.csproj" />
+        <Project Path="samples/FloatSoda.Samples.Container/FloatSoda.Samples.Container.csproj" />
         <Project Path="samples/FloatSoda.Samples.ConstraintsTransformBox/FloatSoda.Samples.ConstraintsTransformBox.csproj" />
         <Project Path="samples/FloatSoda.Samples.DecoratedBox/FloatSoda.Samples.DecoratedBox.csproj" />
         <Project Path="samples/FloatSoda.Samples.Expanded/FloatSoda.Samples.Expanded.csproj" />
