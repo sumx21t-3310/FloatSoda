@@ -209,11 +209,7 @@ public class TextPainter
 
     private void MarkNeedsLayout() => _textBlock = null;
 
-    private Style CreateDefaultStyle() => new()
-    {
-        FontSize = 30,
-        TextColor = SKColors.Black
-    };
+    private static Style CreateDefaultStyle() => new TextStyle().ToRichTextKitStyle();
 
     private TextBlock CreateTextBlock()
     {

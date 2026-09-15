@@ -2,7 +2,7 @@
 name: Milestone tracking
 about: Project progress and milestone definition
 title: "[Milestone]: "
-labels: milestone, tracking
+labels: tracking
 assignees: ''
 
 ---
