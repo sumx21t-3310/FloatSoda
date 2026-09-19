@@ -224,6 +224,35 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
 - **Observation**: `HEADLESS`(API の有無と、レイアウト結果が LTR 固定であること)
 - **Label**: deliberate — 2026-09-16 にオーナーが確定。PR #265 の Codex レビューで記録漏れを指摘された。
 
+## 14. `Image.LoadingBuilder` は読み込み中だけ呼ばれ、完成した画像を受け取らない
+
+- **FloatSoda**: `LoadingBuilder` は `Func<IBuildContext, ImageLoadingProgress?, Widget>`。読み込みが完了するまでのあいだだけ呼ばれ、
+  返したウィジェットが画像の**代わりに**表示される。完了後は呼ばれない(`src/FloatSoda/Widgets/Paint/Image.cs` の `BuildSnapshot`)。
+  `ErrorBuilder` は `Func<IBuildContext, Exception, Widget>` で、引数にスタックトレースを持たない(`Exception.StackTrace` にある)。
+- **Flutter**: `ImageLoadingBuilder` は `(context, child, loadingProgress)`。読み込み完了後も毎回呼ばれ、完成した画像を `child` として
+  受け取って包む。`loadingProgress == null` が「完了または進捗なし」を表す(`widgets/image.dart:231`、`:878`)。
+  `errorBuilder` は `(context, error, stackTrace)`(`:893`)。
+- **Why**: 「`null` なら完了なので `child` を返す」という読み替えを、API の利用者である LLM が取り違えやすい。戻り値を
+  「読み込み中に表示するもの」に限定すると、取り違えても完成した画像が消えない。2026-09-20 にオーナーが #214 で確定。
+- **Test**: `tests/FloatSoda.Test/Widgets/ImageTest.cs` の `Build_読み込みが完了_LoadingBuilderの結果を画像へ置き換える` と
+  `Build_読み込みが未完了_LoadingBuilderへnullの進捗を渡して結果を表示する`。
+- **Docs**: `samples/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
+- **Observation**: `HEADLESS`
+- **Label**: deliberate
+
+## 15. 画像キャッシュが、借りられているあいだしか画像を保持しない(LRU が無い)
+
+- **FloatSoda**: `ImageCache`(internal)は `ImageHandle` の参照カウントだけで寿命を決める。最後のハンドルが破棄された時点で
+  `SKImage` を解放し、エントリを取り除く(`src/FloatSoda/Core/Providers/ImageCache.cs` の `Release`)。同じ画像を表示し直すと
+  再度読み込む。
+- **Flutter**: `ImageCache` は LRU で、表示が終わった画像も `maximumSize`(既定 1000 件)/ `maximumSizeBytes`(既定 100 MiB)まで
+  保持する(`painting/image_cache.dart:86`、`:490`)。
+- **Why**: —(差異を意図していない。LRU は #214 の対象外として後続 Issue に分けた)
+- **Test**: — (not set)
+- **Docs**: `samples/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
+- **Observation**: `HEADLESS`
+- **Label**: not ported — `ImageHandle` の貸し借りの形は LRU を足しても変わらないので、public API を壊さずに追加できる。
+
 ---
 
 ## Triage 2026-09-09 — 範囲の振り分けと着手順(Phase 2 リリース後に実施)

@@ -10,8 +10,10 @@ namespace FloatSoda.Widgets.Paint;
 /// 画像プロバイダーから読み込んだ画像を自身の領域へ描画します。
 /// </summary>
 /// <remarks>
-/// 読み込みが完了するまで、および読み込みに失敗した場合は<see cref="Child"/>だけを描画します。
-/// 失敗はアプリケーションを停止させず、<see cref="OnError"/>で通知します。
+/// 読み込みが完了するまでは<see cref="LoadingBuilder"/>、読み込みに失敗した場合は<see cref="ErrorBuilder"/>が
+/// 返すウィジェットを代わりに表示します。指定しない場合は何も表示しません。
+/// 失敗してもアプリケーションは停止しません。
+/// 等しい<see cref="Provider"/>を使う<see cref="Image"/>同士は、読み込んだ画像を共有します。
 /// </remarks>
 /// <seealso cref="RenderImage"/>
 public record Image : StatefulWidget<Image>
@@ -32,20 +34,23 @@ public record Image : StatefulWidget<Image>
     /// <summary>収めた画像を自身の領域内へ配置する位置を取得します。</summary>
     public Alignment Alignment { get; init; } = Alignment.Center;
 
-    /// <summary>画像の上に配置する子ウィジェットを取得します。</summary>
-    public Widget? Child { get; init; }
+    /// <summary>読み込みが完了するまで、画像の代わりに表示するウィジェットを構築する処理を取得します。</summary>
+    /// <remarks>
+    /// 第2引数は読み込みの進み具合です。進み具合を報告しないプロバイダー
+    /// (<see cref="FileImageProvider"/>など)では常に<see langword="null"/>です。
+    /// </remarks>
+    public Func<IBuildContext, ImageLoadingProgress?, Widget>? LoadingBuilder { get; init; }
 
-    /// <summary>画像の読み込みに失敗したときに一度だけ呼び出す処理を取得します。</summary>
-    /// <remarks>指定しない場合、失敗は通知されずプレースホルダー表示のみになります。</remarks>
-    public Action<Exception>? OnError { get; init; }
+    /// <summary>読み込みに失敗したとき、画像の代わりに表示するウィジェットを構築する処理を取得します。</summary>
+    /// <remarks>第2引数は失敗の原因です。</remarks>
+    public Func<IBuildContext, Exception, Widget>? ErrorBuilder { get; init; }
 
     /// <inheritdoc />
     public override State<Image> CreateState() => new ImageState();
 
     private sealed class ImageState : State<Image>
     {
-        private Task<SkiaSharp.SKImage> _loadTask = null!;
-        private bool _reportedError;
+        private Task<ImageHandle> _loadTask = null!;
 
         public override void InitState() => StartLoading();
 
@@ -57,15 +62,15 @@ public record Image : StatefulWidget<Image>
             }
         }
 
-        public override Widget Build(IBuildContext context) => new TaskBuilder<SkiaSharp.SKImage>
+        public override Widget Build(IBuildContext context) => new TaskBuilder<ImageHandle>
         {
             Task = _loadTask,
-            Builder = (_, snapshot) => BuildSnapshot(snapshot)
+            Builder = BuildSnapshot
         };
 
         /// <summary>
-        /// このStateがツリーから外れるときに、読み込み済みの画像を解放する。
-        /// SKImageはネイティブメモリを持つためGC任せにはできない。
+        /// このStateがツリーから外れるときに、借りていた画像を返す。
+        /// 返さないとキャッシュが画像(ネイティブメモリ)を保持し続ける。
         /// </summary>
         public override void Dispose()
         {
@@ -75,16 +80,15 @@ public record Image : StatefulWidget<Image>
 
         private void StartLoading()
         {
-            // Providerが差し替わった場合、前回読み込んだ画像はもう誰も参照しないためここで解放する。
+            // Providerが差し替わった場合、前回借りた画像はこのStateではもう使わないためここで返す。
             DisposeLoadedImage(_loadTask);
-            _reportedError = false;
-            _loadTask = Widget!.Provider.LoadAsync().AsTask();
+            _loadTask = Widget!.Provider.ResolveAsync().AsTask();
         }
 
         /// <summary>
-        /// 読み込み済みなら画像を破棄する。未完了のタスクは完了後に破棄されるよう継続を登録する。
+        /// 借り終わっていればハンドルを破棄する。未完了のタスクは完了後に破棄されるよう継続を登録する。
         /// </summary>
-        private static void DisposeLoadedImage(Task<SkiaSharp.SKImage>? task)
+        private static void DisposeLoadedImage(Task<ImageHandle>? task)
         {
             if (task is null) return;
 
@@ -109,30 +113,33 @@ public record Image : StatefulWidget<Image>
             else _ = task.Exception;
         }
 
-        private Widget BuildSnapshot(TaskSnapshot<SkiaSharp.SKImage> snapshot)
+        private Widget BuildSnapshot(IBuildContext context, TaskSnapshot<ImageHandle> snapshot)
         {
-            // 読み込み失敗をここで再スローするとBuildScope→DrawFrameを貫通し、
-            // FloatSodaApp.MainLoopのcatchでアプリ全体が停止してしまう。
-            // 1枚の画像の失敗を全画面消失に広げないため、Child(またはプレースホルダー)へフォールバックする。
-            if (snapshot.HasError && !_reportedError)
+            // Providerを差し替えた直後のSnapshotは、前回のData(返却済みのハンドル)を持ったままWaitingになる。
+            // 完了したタスクの結果だけを画像として扱う。
+            if (snapshot is { ConnectionState: TaskConnectionState.Done, HasData: true })
             {
-                _reportedError = true;
-                Widget!.OnError?.Invoke(snapshot.Error!);
+                return new ResolvedImage
+                {
+                    Image = snapshot.Data!.Image,
+                    Fit = Widget!.Fit,
+                    Alignment = Widget!.Alignment
+                };
             }
 
-            return snapshot.HasData
-                ? new ResolvedImage
-                {
-                    Image = snapshot.Data!,
-                    Fit = Widget!.Fit,
-                    Alignment = Widget!.Alignment,
-                    Child = Widget!.Child
-                }
-                : new SizedBox { Child = Widget!.Child };
+            // 読み込み失敗をここで再スローするとBuildScope→DrawFrameを貫通し、
+            // FloatSodaApp.MainLoopのcatchでアプリ全体が停止してしまう。
+            // 1枚の画像の失敗を全画面消失に広げないため、ErrorBuilder(またはプレースホルダー)へフォールバックする。
+            if (snapshot.HasError)
+            {
+                return Widget!.ErrorBuilder?.Invoke(context, snapshot.Error!) ?? new SizedBox();
+            }
+
+            return Widget!.LoadingBuilder?.Invoke(context, null) ?? new SizedBox();
         }
     }
 
-    private sealed record ResolvedImage : SingleChildRenderObjectWidget<RenderImage>
+    private sealed record ResolvedImage : LeafRenderObjectWidget<RenderImage>
     {
         public required SkiaSharp.SKImage Image { get; init; }
 

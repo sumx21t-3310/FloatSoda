@@ -1,7 +1,12 @@
+using FloatSoda.Core;
 using FloatSoda.Core.Providers;
+using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.RenderObjects;
+using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Testing;
+using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using SkiaSharp;
 using ImageWidget = FloatSoda.Widgets.Paint.Image;
@@ -26,13 +31,21 @@ public class ImageTest
         return path;
     }
 
+    /// <summary>
+    /// 画像を先に借りておく。借りているあいだは<see cref="ImageProvider.ResolveAsync"/>が同期的に完了するため、
+    /// 1回のビルド・レイアウト・ペイントで画像まで描画される。
+    /// </summary>
+    private static ImageHandle Preload(string path) =>
+        new FileImageProvider(path).ResolveAsync().AsTask().GetAwaiter().GetResult();
+
     [Fact]
-    public void Render_ヘッドレスレンダラーで描画_1パスで画像が反映される()
+    public void Render_画像を先に借りてからヘッドレスレンダラーで描画_1パスで画像が反映される()
     {
         var path = CreateTempPng(SKColors.Blue);
 
         try
         {
+            using var preloaded = Preload(path);
             var widget = new SizedBox
             {
                 Width = Size.Width,
@@ -51,30 +64,27 @@ public class ImageTest
     }
 
     [Fact]
-    public void Render_ファイルが存在しない_例外を投げずOnErrorへ通知する()
+    public void Build_ファイルが存在しない_例外を投げずErrorBuilderの結果を表示する()
     {
         var path = Path.Combine(Path.GetTempPath(), $"floatsoda-missing-{Guid.NewGuid():N}.png");
         Exception? reported = null;
 
-        var widget = new SizedBox
+        var root = MountAndWaitForCompletion(new ImageWidget
         {
-            Width = Size.Width,
-            Height = Size.Height,
-            Child = new ImageWidget
+            Provider = new FileImageProvider(path),
+            ErrorBuilder = (_, exception) =>
             {
-                Provider = new FileImageProvider(path),
-                OnError = exception => reported = exception
+                reported = exception;
+                return new SizedBox { Width = 12, Height = 12 };
             }
-        };
-
-        using var bitmap = Renderer.Render(widget, Size);
+        });
 
         Assert.IsType<FileNotFoundException>(reported);
-        Assert.Equal(default, bitmap.GetPixel(20, 20));
+        Assert.Equal(new SKSize(12, 12), FindRenderObject<RenderConstrainedBox>(root).Size);
     }
 
     [Fact]
-    public void Load_画像として解釈できないファイル_InvalidOperationExceptionを投げる()
+    public void Build_画像として解釈できないファイル_ErrorBuilderへInvalidOperationExceptionを渡す()
     {
         var path = Path.Combine(Path.GetTempPath(), $"floatsoda-broken-{Guid.NewGuid():N}.png");
         File.WriteAllText(path, "これはPNGではありません");
@@ -83,13 +93,15 @@ public class ImageTest
         {
             Exception? reported = null;
 
-            var widget = new ImageWidget
+            MountAndWaitForCompletion(new ImageWidget
             {
                 Provider = new FileImageProvider(path),
-                OnError = exception => reported = exception
-            };
-
-            using var bitmap = Renderer.Render(widget, Size);
+                ErrorBuilder = (_, exception) =>
+                {
+                    reported = exception;
+                    return new SizedBox();
+                }
+            });
 
             Assert.IsType<InvalidOperationException>(reported);
         }
@@ -100,12 +112,127 @@ public class ImageTest
     }
 
     [Fact]
+    public void Build_読み込みに失敗しErrorBuilderが未指定_例外を投げず何も表示しない()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"floatsoda-missing-{Guid.NewGuid():N}.png");
+
+        var root = MountAndWaitForCompletion(new ImageWidget { Provider = new FileImageProvider(path) });
+
+        Assert.Equal(SKSize.Empty, FindRenderObject<RenderConstrainedBox>(root).Size);
+    }
+
+    [Fact]
+    public void Build_読み込みが未完了_LoadingBuilderへnullの進捗を渡して結果を表示する()
+    {
+        var progressValues = new List<ImageLoadingProgress?>();
+
+        var (root, _) = Mount(new ImageWidget
+        {
+            Provider = new PendingImageProvider(Guid.NewGuid()),
+            LoadingBuilder = (_, progress) =>
+            {
+                progressValues.Add(progress);
+                return new SizedBox { Width = 7, Height = 7 };
+            }
+        });
+
+        Assert.Equal([null], progressValues);
+        Assert.Equal(new SKSize(7, 7), FindRenderObject<RenderConstrainedBox>(root).Size);
+    }
+
+    [Fact]
+    public void Build_読み込みが完了_LoadingBuilderの結果を画像へ置き換える()
+    {
+        var path = CreateTempPng(SKColors.Blue);
+
+        try
+        {
+            var root = MountAndWaitForCompletion(new ImageWidget
+            {
+                Provider = new FileImageProvider(path),
+                LoadingBuilder = (_, _) => new SizedBox { Width = 7, Height = 7 }
+            });
+
+            Assert.Equal(new SKSize(8, 8), FindRenderObject<RenderImage>(root).Size);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void DidUpdateWidget_読み込み済みのProviderを未完了のProviderへ差し替え_返却済みの画像を使わずLoadingBuilderへ戻る()
+    {
+        // 回帰テスト: TaskBuilderは差し替え直後も前回のDataを保持する。
+        // 返却済みのハンドルから画像を取り出すと、Build中にObjectDisposedExceptionでアプリ全体が停止する。
+        var path = CreateTempPng(SKColors.Blue);
+
+        try
+        {
+            using var preloaded = Preload(path);
+            var (root, owner) = Mount(new ImageWidget { Provider = new FileImageProvider(path) });
+            Assert.NotNull(FindRenderObjectOrDefault<RenderImage>(root));
+
+            Update(root, owner, new ImageWidget
+            {
+                Provider = new PendingImageProvider(Guid.NewGuid()),
+                LoadingBuilder = (_, _) => new SizedBox { Width = 7, Height = 7 }
+            });
+
+            Assert.Null(FindRenderObjectOrDefault<RenderImage>(root));
+            Assert.Equal(new SKSize(7, 7), FindRenderObject<RenderConstrainedBox>(root).Size);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void Dispose_ツリーから外す_借りていた画像を返す()
+    {
+        var path = CreateTempPng(SKColors.Blue);
+
+        try
+        {
+            SKImage image;
+            using (var preloaded = Preload(path))
+            {
+                image = preloaded.Image;
+                var (root, owner) = Mount(new ImageWidget { Provider = new FileImageProvider(path) });
+
+                Update(root, owner, new SizedBox());
+            }
+
+            // テスト側のハンドルとImage側のハンドルの両方が返されたので、画像は解放されている。
+            Assert.Equal(IntPtr.Zero, image.Handle);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void PerformLayout_緩い制約_画像の原寸を自身のサイズにする()
+    {
+        using var image = CreateSolidImage();
+        var renderImage = new RenderImage { Image = image };
+
+        renderImage.Layout(new BoxConstraints(0, 100, 0, 100));
+
+        Assert.Equal(new SKSize(8, 8), renderImage.Size);
+    }
+
+    [Fact]
     public void Fit_既定は横長画像の縦横比を維持し上下に余白ができる()
     {
         var path = CreateTempPng(SKColors.Blue, 8, 4);
 
         try
         {
+            using var preloaded = Preload(path);
             using var bitmap = Renderer.Render(
                 new SizedBox
                 {
@@ -133,6 +260,7 @@ public class ImageTest
 
         try
         {
+            using var preloaded = Preload(path);
             using var bitmap = Renderer.Render(
                 new SizedBox
                 {
@@ -158,6 +286,7 @@ public class ImageTest
 
         try
         {
+            using var preloaded = Preload(path);
             using var bitmap = Renderer.Render(
                 new SizedBox
                 {
@@ -184,6 +313,7 @@ public class ImageTest
 
         try
         {
+            using var preloaded = Preload(path);
             using var bitmap = Renderer.Render(
                 new SizedBox
                 {
@@ -232,6 +362,7 @@ public class ImageTest
 
         try
         {
+            using var preloaded = Preload(path);
             using var rendered = Renderer.Render(
                 new SizedBox
                 {
@@ -276,5 +407,80 @@ public class ImageTest
         using var bitmap = new SKBitmap(8, 8);
         bitmap.Erase(SKColors.Blue);
         return SKImage.FromBitmap(bitmap);
+    }
+
+    /// <summary>読み込みが完了しないプロバイダー。</summary>
+    private sealed record PendingImageProvider(Guid Key) : ImageProvider
+    {
+        private readonly TaskCompletionSource<SKImage> _source = new();
+
+        protected override ValueTask<SKImage> LoadAsync(CancellationToken cancellationToken) => new(_source.Task);
+    }
+
+    private static (RenderObjectToWidgetElement<RenderView> Root, BuildOwner Owner) Mount(
+        Widget widget,
+        Action? onBuildScheduled = null)
+    {
+        var renderView = new RenderView(100, 100);
+        var pipeline = new RenderPipeline
+        {
+            OnNeedVisualUpdate = () => { },
+            RenderView = renderView
+        };
+        var owner = new BuildOwner(onBuildScheduled ?? (() => { }));
+        var root = new RenderObjectToWidgetAdapter
+        {
+            Container = renderView,
+            Child = new Align { Child = widget }
+        }.AttachToRenderTree(owner, null);
+
+        renderView.PrepareInitialFrame();
+        pipeline.FlushLayout();
+        return (root, owner);
+    }
+
+    /// <summary>マウントしたあと、読み込みの完了がBuildOwnerへ戻ってくるのを待って再ビルドする。</summary>
+    private static RenderObjectToWidgetElement<RenderView> MountAndWaitForCompletion(Widget widget)
+    {
+        using var buildScheduled = new ManualResetEventSlim();
+        var (root, owner) = Mount(widget, buildScheduled.Set);
+
+        Assert.True(buildScheduled.Wait(TimeSpan.FromSeconds(5)), "読み込みの完了が通知されませんでした。");
+        owner.BuildScope();
+        root.RenderObject!.Owner!.FlushLayout();
+        return root;
+    }
+
+    private static void Update(RenderObjectToWidgetElement<RenderView> root, BuildOwner owner, Widget widget)
+    {
+        new RenderObjectToWidgetAdapter
+        {
+            Container = (RenderView)root.RenderObject!,
+            Child = new Align { Child = widget }
+        }.AttachToRenderTree(owner, root);
+        owner.BuildScope();
+        root.RenderObject!.Owner!.FlushLayout();
+    }
+
+    private static T FindRenderObject<T>(RenderObjectToWidgetElement<RenderView> root) where T : RenderObject =>
+        FindRenderObjectOrDefault<T>(root) ?? throw new InvalidOperationException($"{typeof(T).Name} が見つかりません。");
+
+    private static T? FindRenderObjectOrDefault<T>(RenderObjectToWidgetElement<RenderView> root) where T : RenderObject
+    {
+        T? found = null;
+        Visit(root.RenderObject!);
+        return found;
+
+        void Visit(RenderObject node)
+        {
+            if (found is not null) return;
+            if (node is T match)
+            {
+                found = match;
+                return;
+            }
+
+            node.VisitChildren(Visit);
+        }
     }
 }
