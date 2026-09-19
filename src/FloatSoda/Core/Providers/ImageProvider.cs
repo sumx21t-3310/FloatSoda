@@ -77,7 +77,10 @@ public record FileImageProvider(string Path) : ImageProvider
 public sealed record ImageLoadingProgress(long BytesLoaded, long? TotalBytes);
 
 /// <summary><see cref="ImageProvider.ResolveAsync"/>で借りた画像を表します。</summary>
-/// <remarks>破棄すると画像を返します。破棄したあとは<see cref="Image"/>を使用できません。</remarks>
+/// <remarks>
+/// 保持しているあいだ、キャッシュは画像を解放しません。破棄すると画像を返します。
+/// 画像そのものはFloatSodaの内部だけで使い、公開しません(キャッシュが所有する画像を利用者が破棄できないようにするため)。
+/// </remarks>
 public sealed class ImageHandle : IDisposable
 {
     private readonly SKImage _image;
@@ -89,9 +92,9 @@ public sealed class ImageHandle : IDisposable
         _release = release;
     }
 
-    /// <summary>借りている画像を取得します。この画像を直接破棄しないでください。</summary>
+    /// <summary>借りている画像を取得します。キャッシュが所有するため、取得した側では破棄しません。</summary>
     /// <exception cref="ObjectDisposedException">このハンドルは既に破棄されています。</exception>
-    public SKImage Image
+    internal SKImage Image
     {
         get
         {
