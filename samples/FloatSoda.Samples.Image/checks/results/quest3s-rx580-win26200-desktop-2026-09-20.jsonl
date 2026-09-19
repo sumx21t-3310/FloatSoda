@@ -1,0 +1,7 @@
+{"id": "image-pr273-loading", "result": "skip", "remarks": "早すぎてよくわからなかった(items.jsonl に無い PR #273 用の追加確認。2回起動して観察)"}
+{"id": "image-1", "result": "ok", "remarks": "色は同じ"}
+{"id": "image-2", "result": "ok", "remarks": "横に引き伸ばされてる"}
+{"id": "image-3", "result": "ok", "remarks": "全体が見えてて左右に背景色がある"}
+{"id": "image-4", "result": "ok", "remarks": "横幅いっぱいで上下が切れてて、はみ出してない"}
+{"id": "image-5", "result": "ng", "remarks": "見えてない"}
+{"id": "image-6", "result": "ok", "remarks": "ぴったり合ってる"}

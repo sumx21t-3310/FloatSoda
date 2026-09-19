@@ -77,7 +77,7 @@ public class ImageTest
                 reported = exception;
                 return new SizedBox { Width = 12, Height = 12 };
             }
-        });
+        }, _ => reported is not null);
 
         Assert.IsType<FileNotFoundException>(reported);
         Assert.Equal(new SKSize(12, 12), FindRenderObject<RenderConstrainedBox>(root).Size);
@@ -101,7 +101,7 @@ public class ImageTest
                     reported = exception;
                     return new SizedBox();
                 }
-            });
+            }, _ => reported is not null);
 
             Assert.IsType<InvalidOperationException>(reported);
         }
@@ -116,9 +116,17 @@ public class ImageTest
     {
         var path = Path.Combine(Path.GetTempPath(), $"floatsoda-missing-{Guid.NewGuid():N}.png");
 
-        var root = MountAndWaitForCompletion(new ImageWidget { Provider = new FileImageProvider(path) });
+        // 読み込み中は色付きの目印を出す。目印が消えたら、失敗が反映されている。
+        var root = MountAndWaitForCompletion(
+            new ImageWidget
+            {
+                Provider = new FileImageProvider(path),
+                LoadingBuilder = (_, _) => new FloatSoda.Widgets.Paint.ColoredBox { Color = new Color(255, 0, 0) }
+            },
+            r => FindRenderObjectOrDefault<RenderColoredBox>(r) is null);
 
-        Assert.Equal(SKSize.Empty, FindRenderObject<RenderConstrainedBox>(root).Size);
+        Assert.Null(FindRenderObjectOrDefault<RenderImage>(root));
+        Assert.Null(FindRenderObjectOrDefault<RenderColoredBox>(root));
     }
 
     [Fact]
@@ -151,7 +159,7 @@ public class ImageTest
             {
                 Provider = new FileImageProvider(path),
                 LoadingBuilder = (_, _) => new SizedBox { Width = 7, Height = 7 }
-            });
+            }, r => FindRenderObjectOrDefault<RenderImage>(r) is not null);
 
             Assert.Equal(new SKSize(8, 8), FindRenderObject<RenderImage>(root).Size);
         }
@@ -256,6 +264,48 @@ public class ImageTest
             }
 
             Assert.Equal(IntPtr.Zero, image.Handle);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void Render_Stackで画像の上に子を重ねる_子が画像の前面に描画される()
+    {
+        var path = CreateTempPng(SKColors.Blue);
+
+        try
+        {
+            using var preloaded = Preload(path);
+            using var bitmap = Renderer.Render(
+                new SizedBox
+                {
+                    Width = Size.Width,
+                    Height = Size.Height,
+                    Child = new Stack
+                    {
+                        Fit = StackFit.Expand,
+                        Children =
+                        {
+                            new ImageWidget { Provider = new FileImageProvider(path), Fit = BoxFit.Fill },
+                            new Center
+                            {
+                                Child = new SizedBox
+                                {
+                                    Width = 10,
+                                    Height = 10,
+                                    Child = new FloatSoda.Widgets.Paint.ColoredBox { Color = new Color(255, 0, 0) }
+                                }
+                            }
+                        }
+                    }
+                },
+                Size);
+
+            Assert.Equal(SKColors.Red, bitmap.GetPixel(20, 20));
+            Assert.Equal(SKColors.Blue, bitmap.GetPixel(2, 2));
         }
         finally
         {
@@ -464,6 +514,18 @@ public class ImageTest
         public CancellationToken Token { get; set; }
     }
 
+    /// <summary>読み込みの完了をテストから制御するための共有状態。recordの等価性を変えないよう、プロバイダーの外に持つ。</summary>
+    private sealed class LoadGate
+    {
+        public TaskCompletionSource<SKImage> Source { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+    }
+
+    /// <summary>テストが<see cref="LoadGate.Source"/>を完了させるまで読み込みが終わらないプロバイダー。</summary>
+    private sealed record GatedImageProvider(Guid Key, LoadGate Gate) : ImageProvider
+    {
+        protected override ValueTask<SKImage> LoadAsync(CancellationToken cancellationToken) => new(Gate.Source.Task);
+    }
+
     /// <summary>読み込みが完了しないプロバイダー。</summary>
     private sealed record PendingImageProvider(Guid Key, TokenRecorder? Recorder = null) : ImageProvider
     {
@@ -498,15 +560,28 @@ public class ImageTest
         return (root, owner);
     }
 
-    /// <summary>マウントしたあと、読み込みの完了がBuildOwnerへ戻ってくるのを待って再ビルドする。</summary>
-    private static RenderObjectToWidgetElement<RenderView> MountAndWaitForCompletion(Widget widget)
+    /// <summary>
+    /// マウントしたあと、<paramref name="settled"/>が成り立つまで再ビルドを繰り返す。
+    /// 小さいファイルは、TaskBuilderが購読を始める前に読み込みが終わることがある。その場合は完了の通知が
+    /// 来ないため、通知を待つのではなく、ツリーが期待した状態になったかどうかで判定する。
+    /// </summary>
+    private static RenderObjectToWidgetElement<RenderView> MountAndWaitForCompletion(
+        Widget widget,
+        Func<RenderObjectToWidgetElement<RenderView>, bool> settled)
     {
         using var buildScheduled = new ManualResetEventSlim();
         var (root, owner) = Mount(widget, buildScheduled.Set);
 
-        Assert.True(buildScheduled.Wait(TimeSpan.FromSeconds(5)), "読み込みの完了が通知されませんでした。");
-        owner.BuildScope();
-        root.RenderObject!.Owner!.FlushLayout();
+        var deadline = DateTime.UtcNow + TimeSpan.FromSeconds(5);
+        while (!settled(root))
+        {
+            Assert.True(DateTime.UtcNow < deadline, "読み込みの完了がツリーへ反映されませんでした。");
+            buildScheduled.Wait(TimeSpan.FromMilliseconds(20));
+            buildScheduled.Reset();
+            owner.BuildScope();
+            root.RenderObject!.Owner!.FlushLayout();
+        }
+
         return root;
     }
 
