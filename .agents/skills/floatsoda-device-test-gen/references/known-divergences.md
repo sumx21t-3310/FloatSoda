@@ -251,7 +251,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
 - **Test**: — (not set)
 - **Docs**: `samples/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
 - **Observation**: `HEADLESS`
-- **Label**: not ported — `ImageHandle` の貸し借りの形は LRU を足しても変わらないので、public API を壊さずに追加できる。
+- **Label**: not ported(#275)— `ImageHandle` の貸し借りの形は LRU を足しても変わらないので、public API を壊さずに追加できる。
 
 ---
 
