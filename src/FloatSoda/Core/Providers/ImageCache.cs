@@ -34,7 +34,7 @@ internal sealed class ImageCache
         {
             if (!_entries.TryGetValue(provider, out entry))
             {
-                entry = new Entry(provider);
+                entry = new Entry(provider, Evict);
                 _entries.Add(provider, entry);
             }
 
@@ -66,13 +66,31 @@ internal sealed class ImageCache
 
     private ImageHandle CreateHandle(Entry entry, SKImage image) => new(image, () => Release(entry));
 
+    /// <summary>
+    /// 失敗またはキャンセルされた読み込みを、待機者が参照を返すのを待たずに取り除く。
+    /// 残しておくと、待機者がまだ残っているあいだの再試行が失敗済みの結果へ相乗りし、読み込み直さない。
+    /// </summary>
+    private void Evict(Entry entry)
+    {
+        lock (_gate) RemoveIfCurrent(entry);
+    }
+
+    // 取り除かれたあとに同じプロバイダーで新しいエントリが作られている場合がある。自分のエントリだけを取り除く。
+    private void RemoveIfCurrent(Entry entry)
+    {
+        if (_entries.TryGetValue(entry.Provider, out var current) && ReferenceEquals(current, entry))
+        {
+            _entries.Remove(entry.Provider);
+        }
+    }
+
     private void Release(Entry entry)
     {
         lock (_gate)
         {
             if (--entry.ReferenceCount > 0) return;
 
-            _entries.Remove(entry.Provider);
+            RemoveIfCurrent(entry);
         }
 
         // 誰も待っていない読み込みは中断する。完了していれば画像を解放し、失敗していれば例外を観測する。
@@ -92,11 +110,23 @@ internal sealed class ImageCache
 
     private sealed class Entry
     {
-        internal Entry(ImageProvider provider)
+        internal Entry(ImageProvider provider, Action<Entry> onFailed)
         {
             Provider = provider;
             Load = new Lazy<Task<SKImage>>(
-                () => StartAsync(provider, Cancellation.Token),
+                () =>
+                {
+                    var load = StartAsync(provider, Cancellation.Token);
+
+                    // 待機者の継続より先に登録する。継続は登録順に走るため、
+                    // 待機者が失敗を観測した時点で、このエントリは既に取り除かれている。
+                    _ = load.ContinueWith(
+                        _ => onFailed(this),
+                        CancellationToken.None,
+                        TaskContinuationOptions.NotOnRanToCompletion | TaskContinuationOptions.ExecuteSynchronously,
+                        TaskScheduler.Default);
+                    return load;
+                },
                 LazyThreadSafetyMode.ExecutionAndPublication);
         }
 

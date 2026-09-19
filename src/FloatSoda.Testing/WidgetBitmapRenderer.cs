@@ -39,19 +39,33 @@ public sealed class WidgetBitmapRenderer
 
         var owner = new BuildOwner(() => { });
         
-        new RenderObjectToWidgetAdapter
+        var root = new RenderObjectToWidgetAdapter
         {
             Container = renderView,
             Child = widget
         }.AttachToRenderTree(owner, null);
 
-        pipeline.RenderView.PrepareInitialFrame();
-        pipeline.FlushLayout();
-        pipeline.FlushPaint();
+        try
+        {
+            pipeline.RenderView.PrepareInitialFrame();
+            pipeline.FlushLayout();
+            pipeline.FlushPaint();
 
-        var layer = renderView.Layer?.Clone();
-        return layer == null
-            ? new SKBitmap(imageSize.Width, imageSize.Height)
-            : _layerRenderer.Render(layer, imageSize);
+            var layer = renderView.Layer?.Clone();
+            return layer == null
+                ? new SKBitmap(imageSize.Width, imageSize.Height)
+                : _layerRenderer.Render(layer, imageSize);
+        }
+        finally
+        {
+            // Widgetツリーを外してStateを破棄する。外さないと、Imageが借りた画像のように
+            // Stateが解放を担うリソースが、描画のたびに残り続ける。
+            new RenderObjectToWidgetAdapter
+            {
+                Container = renderView,
+                Child = null
+            }.AttachToRenderTree(owner, root);
+            owner.BuildScope();
+        }
     }
 }

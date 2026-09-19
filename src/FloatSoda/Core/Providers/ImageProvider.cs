@@ -19,7 +19,8 @@ public abstract record ImageProvider
 {
     /// <summary>このプロバイダーが指す画像を借ります。</summary>
     /// <param name="cancellationToken">
-    /// この呼び出しの待機をキャンセルするトークン。読み込み自体は他の利用者と共有するため中断しません。
+    /// この呼び出しの待機をキャンセルするトークン。他の利用者が残っているあいだは、共有している読み込みを中断しません。
+    /// この呼び出しが最後の利用者だった場合は、読み込みにもキャンセルを通知します。
     /// </param>
     /// <returns>画像を借りているあいだ保持し、使い終わったら破棄するハンドル。</returns>
     /// <remarks>
@@ -69,7 +70,10 @@ public record FileImageProvider(string Path) : ImageProvider
 /// <summary>画像の読み込みの進み具合を表します。</summary>
 /// <param name="BytesLoaded">これまでに受け取ったバイト数。</param>
 /// <param name="TotalBytes">全体のバイト数。分からない場合は<see langword="null"/>。</param>
-/// <remarks>進み具合を報告しないプロバイダー(<see cref="FileImageProvider"/>など)では使用されません。</remarks>
+/// <remarks>
+/// 現在は、プロバイダーが進み具合を報告する手段がありません。ネットワークから読み込むプロバイダーを追加するときに用意します。
+/// それまでは、この値を受け取る側へ常に<see langword="null"/>が渡されます。
+/// </remarks>
 public sealed record ImageLoadingProgress(long BytesLoaded, long? TotalBytes);
 
 /// <summary><see cref="ImageProvider.ResolveAsync"/>で借りた画像を表します。</summary>

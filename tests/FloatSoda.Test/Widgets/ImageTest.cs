@@ -215,6 +215,55 @@ public class ImageTest
     }
 
     [Fact]
+    public void Dispose_読み込みが未完了のままツリーから外す_読み込みを中断して参照を返す()
+    {
+        // 回帰テスト: 待機をキャンセルしないと、完了しない読み込みの参照がStateの破棄後も残り続ける。
+        var recorder = new TokenRecorder();
+        var (root, owner) = Mount(new ImageWidget { Provider = new PendingImageProvider(Guid.NewGuid(), recorder) });
+        Assert.False(recorder.Token.IsCancellationRequested);
+
+        Update(root, owner, new SizedBox());
+
+        // 待機のキャンセルから参照の返却までは、スレッドプール上の継続で進む。
+        Assert.True(SpinWait.SpinUntil(() => recorder.Token.IsCancellationRequested, TimeSpan.FromSeconds(3)));
+    }
+
+    [Fact]
+    public void DidUpdateWidget_読み込みが未完了のままProviderを差し替え_前の読み込みを中断する()
+    {
+        var recorder = new TokenRecorder();
+        var (root, owner) = Mount(new ImageWidget { Provider = new PendingImageProvider(Guid.NewGuid(), recorder) });
+
+        Update(root, owner, new ImageWidget { Provider = new PendingImageProvider(Guid.NewGuid()) });
+
+        // 待機のキャンセルから参照の返却までは、スレッドプール上の継続で進む。
+        Assert.True(SpinWait.SpinUntil(() => recorder.Token.IsCancellationRequested, TimeSpan.FromSeconds(3)));
+    }
+
+    [Fact]
+    public void Render_ヘッドレスレンダラーで描画した後_Imageが借りた画像を返している()
+    {
+        // 回帰テスト: 描画後にWidgetツリーを外さないと、Imageが借りたハンドルが返らず画像が解放されない。
+        var path = CreateTempPng(SKColors.Blue);
+
+        try
+        {
+            SKImage image;
+            using (var preloaded = Preload(path))
+            {
+                image = preloaded.Image;
+                using var bitmap = Renderer.Render(new ImageWidget { Provider = new FileImageProvider(path) }, Size);
+            }
+
+            Assert.Equal(IntPtr.Zero, image.Handle);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Fact]
     public void PerformLayout_緩い制約_画像の原寸を自身のサイズにする()
     {
         using var image = CreateSolidImage();
@@ -409,12 +458,22 @@ public class ImageTest
         return SKImage.FromBitmap(bitmap);
     }
 
+    /// <summary>LoadAsyncへ渡されたトークンを記録する。recordの等価性を変えないよう、プロバイダーの外に持つ。</summary>
+    private sealed class TokenRecorder
+    {
+        public CancellationToken Token { get; set; }
+    }
+
     /// <summary>読み込みが完了しないプロバイダー。</summary>
-    private sealed record PendingImageProvider(Guid Key) : ImageProvider
+    private sealed record PendingImageProvider(Guid Key, TokenRecorder? Recorder = null) : ImageProvider
     {
         private readonly TaskCompletionSource<SKImage> _source = new();
 
-        protected override ValueTask<SKImage> LoadAsync(CancellationToken cancellationToken) => new(_source.Task);
+        protected override ValueTask<SKImage> LoadAsync(CancellationToken cancellationToken)
+        {
+            if (Recorder is not null) Recorder.Token = cancellationToken;
+            return new ValueTask<SKImage>(_source.Task);
+        }
     }
 
     private static (RenderObjectToWidgetElement<RenderView> Root, BuildOwner Owner) Mount(

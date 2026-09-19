@@ -175,6 +175,29 @@ public class ImageProviderTest
     }
 
     [Fact]
+    public async Task ResolveAsync_失敗を観測した直後に再試行_ほかの待機者の解放を待たずに読み込み直す()
+    {
+        // 回帰テスト: 失敗済みのエントリを待機者の参照が0になるまで残すと、
+        // ほかの待機者がまだ参照を返していないあいだの再試行が、失敗済みの結果へ相乗りする。
+        var control = new LoadControl();
+        var provider = new ControlledImageProvider(Guid.NewGuid(), control);
+        var cache = new ImageCache();
+        var first = cache.ResolveAsync(provider, CancellationToken.None);
+        var second = cache.ResolveAsync(provider, CancellationToken.None);
+        control.Source.SetException(new IOException("失敗"));
+        await Assert.ThrowsAsync<IOException>(async () => await first);
+
+        control.Reset();
+        control.Source.SetResult(CreateImage());
+        using var handle = await cache.ResolveAsync(provider, CancellationToken.None);
+
+        Assert.Equal(2, control.LoadCount);
+        await Assert.ThrowsAsync<IOException>(async () => await second);
+        // 遅れて参照を返した古いエントリが、新しいエントリを取り除いていない。
+        Assert.Equal(1, cache.Count);
+    }
+
+    [Fact]
     public async Task ResolveAsync_LoadAsyncが同期的に例外を投げる_返すタスクの失敗として通知する()
     {
         var resolve = new ImageCache().ResolveAsync(new ThrowingImageProvider(Guid.NewGuid()), CancellationToken.None);

@@ -36,8 +36,8 @@ public record Image : StatefulWidget<Image>
 
     /// <summary>読み込みが完了するまで、画像の代わりに表示するウィジェットを構築する処理を取得します。</summary>
     /// <remarks>
-    /// 第2引数は読み込みの進み具合です。進み具合を報告しないプロバイダー
-    /// (<see cref="FileImageProvider"/>など)では常に<see langword="null"/>です。
+    /// 第2引数は読み込みの進み具合です。現在はどのプロバイダーでも常に<see langword="null"/>です
+    /// (<see cref="ImageLoadingProgress"/>を参照)。
     /// </remarks>
     public Func<IBuildContext, ImageLoadingProgress?, Widget>? LoadingBuilder { get; init; }
 
@@ -51,6 +51,7 @@ public record Image : StatefulWidget<Image>
     private sealed class ImageState : State<Image>
     {
         private Task<ImageHandle> _loadTask = null!;
+        private CancellationTokenSource? _loadCancellation;
 
         public override void InitState() => StartLoading();
 
@@ -74,6 +75,7 @@ public record Image : StatefulWidget<Image>
         /// </summary>
         public override void Dispose()
         {
+            CancelLoading();
             DisposeLoadedImage(_loadTask);
             base.Dispose();
         }
@@ -81,8 +83,21 @@ public record Image : StatefulWidget<Image>
         private void StartLoading()
         {
             // Providerが差し替わった場合、前回借りた画像はこのStateではもう使わないためここで返す。
+            CancelLoading();
             DisposeLoadedImage(_loadTask);
-            _loadTask = Widget!.Provider.ResolveAsync().AsTask();
+            _loadCancellation = new CancellationTokenSource();
+            _loadTask = Widget!.Provider.ResolveAsync(_loadCancellation.Token).AsTask();
+        }
+
+        /// <summary>
+        /// 未完了の読み込みの待機をやめて、キャッシュへ参照を返す。
+        /// やめないと、完了しない読み込みの参照がこのStateの破棄後も残り続ける。
+        /// </summary>
+        private void CancelLoading()
+        {
+            _loadCancellation?.Cancel();
+            _loadCancellation?.Dispose();
+            _loadCancellation = null;
         }
 
         /// <summary>
