@@ -96,13 +96,24 @@ public class WatchState : State<WatchWidget>
             null, dueTime: 0, period: 1000);
     }
 
+    // ツリーから外れるときに呼ばれる。タイマーや購読はここで止める。
+    public override void Dispose()
+    {
+        _timer?.Dispose();
+        base.Dispose();
+    }
+
     public override Widget Build(IBuildContext context) => new Text(_time);
 }
 ```
 
 (このサンプルの全体は `samples/FloatSoda.Samples.OverlayApp/WatchWidget.cs` にあります)
 
-`State<T>` のライフサイクルメソッド: `InitState()` / `SetState(Action)` / `DidUpdateWidget(T oldWidget)` / `DidChangeDependencies()`。
+`State<T>` のライフサイクルメソッド: `InitState()` / `SetState(Action)` / `DidUpdateWidget(T oldWidget)` / `DidChangeDependencies()` / `Dispose()`。
+
+`Dispose()` は、この `State` がツリーから外れるときに一度だけ呼ばれます。`InitState()` で始めたタイマー・購読・`WidgetTicker` は、ここで止めてください。止めないと、ウィジェットが画面から消えたあとも動き続けます。
+
+> **スレッドについての注意:** `SetState` は排他制御を行っていません。`System.Threading.Timer` のコールバックや `await` の続きは、FloatSoda のメインループとは別のスレッドで実行されるため、そこから `SetState` を呼ぶとビルドと競合することがあります。上の時計のように1つの値を差し替えるだけなら実害は出にくいものの、`List` などのコレクションを `SetState` の中で書き換える場合は、`Build` がそれを列挙している最中に書き換わる可能性があります。`await` の続きをメインスレッドへ戻す仕組みは、次のリリースで導入する予定です([#281](https://github.com/sumx21t-3310/FloatSoda/issues/281))。
 
 ## InheritedWidget
 
@@ -316,7 +327,7 @@ public override Widget Build(IBuildContext context)
 | `IntrinsicWidth` | ✓ | 子の最大intrinsic幅へ収縮し、任意のstep単位で切り上げ | `StepWidth`, `Child` |
 | `IntrinsicHeight` | ✓ | 子の最大intrinsic高さへ収縮し、任意のstep単位で切り上げ | `StepHeight`, `Child` |
 | `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
-| `Stack` | ✓ | 複数の子を重ね、非Positioned子を`Alignment`と`Fit`で配置 | `Children`, `Alignment`, `Fit` |
+| `Stack` | ✓ | 複数の子を重ね、非Positioned子を`Alignment`と`Fit`で配置。`Fit`は`StackFit.Loose`(既定。子は自分の大きさを選べる)/ `StackFit.Expand`(子をStackの大きさいっぱいへ広げる)/ `StackFit.Passthrough`(親の制約をそのまま渡す) | `Children`, `Alignment`, `Fit` (`StackFit`) |
 | `Positioned` | ✓ | `Stack`の子を辺からの距離または固定寸法で絶対配置 | `Left`, `Top`, `Right`, `Bottom`, `Width`, `Height`, `Child` |
 | `IndexedStack` | ✓ | 全子をレイアウトし、`Index`で選んだ1子だけを描画・ヒットテスト。`null`なら全子を非表示 | `Children`, `Index`, `Alignment`, `Fit` |
 | `Offstage` | ✓ | 子をレイアウトしたまま描画・ヒットテストから除外 | `IsOffstage`, `Child` |
@@ -565,6 +576,52 @@ intrinsic 測定は追加のツリー走査を必要とするため、入れ子�
 | `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中は`LoadingBuilder`、失敗時は`ErrorBuilder`が返すウィジェットを代わりに表示する。子は持たないので、画像の上へ重ねるときは`Stack`を使う | `Provider`, `Fit`, `Alignment`, `LoadingBuilder`, `ErrorBuilder` |
 | `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
 
+`Paint.Image` の読み込みは非同期です。読み込みが完了するまでは `LoadingBuilder` が、失敗したときは `ErrorBuilder` が返すウィジェットを、画像の代わりに表示します。どちらも省略でき、その場合は何も表示しません。読み込みに失敗してもアプリケーションは停止しません。
+
+```csharp
+using FloatSoda.Core.Providers;   // FileImageProvider
+using FloatSoda.Geometrics;       // BoxFit
+using FloatSoda.Widgets;
+using FloatSoda.Widgets.Layout;   // Center
+using FloatSoda.Widgets.Paint;    // Image
+
+Widget photo = new Image
+{
+    Provider = new FileImageProvider("Assets/photo.png"),
+    Fit = BoxFit.Cover,
+    // 読み込みが完了するまで表示する。progress は現在は常に null
+    LoadingBuilder = (context, progress) => new Center { Child = new Text("読み込み中") },
+    // 読み込みに失敗したときに表示する。exception は失敗の原因
+    ErrorBuilder = (context, exception) => new Center { Child = new Text("読めませんでした") }
+};
+```
+
+| プロパティ | 型 |
+|---|---|
+| `LoadingBuilder` | `Func<IBuildContext, ImageLoadingProgress?, Widget>?` |
+| `ErrorBuilder` | `Func<IBuildContext, Exception, Widget>?` |
+
+`Paint.Image` は子を持ちません。画像の上にウィジェットを重ねるときは `Stack` を使います。
+
+```csharp
+Widget labeled = new SizedBox
+{
+    Width = 320,
+    Height = 180,
+    Child = new Stack
+    {
+        Fit = StackFit.Expand,   // Positioned でない子を、Stack の大きさいっぱいへ広げる
+        Children =
+        [
+            new Image { Provider = new FileImageProvider("Assets/photo.png"), Fit = BoxFit.Cover },
+            new Center { Child = new Text("2026-09-21") }
+        ]
+    }
+};
+```
+
+等しい `Provider`(同じパスの `FileImageProvider` など)を使う `Image` 同士は、読み込んだ画像を共有します。
+
 `Paint.Image` の `Fit` には、`FittedBox` と同じ `BoxFit` を指定します。既定値は `Contain`(縦横比を維持して領域内へ収める)です。領域内の配置位置は `Alignment` で指定します(既定値は `Alignment.Center`)。`Cover` のように画像の一部だけを使う場合は、**描画元の矩形を切り取って**描画します。そのため、**どの `Fit` を指定しても領域外へはみ出しません**。画像のどの部分を残すかは `Alignment` によって決まります。
 
 `FittedBox` が `ClipBehavior` を持ち、`Paint.Image` が持たない理由はここにあります。`FittedBox` は描画元を切り取れない子ウィジェットを拡大縮小するため、切り抜きの指定が必要です。一方、`Paint.Image` は描画元の矩形自体を狭めることができます。
@@ -777,9 +834,10 @@ public class CounterPanelState : State<CounterPanel>
 キーに認識器の型、値に「生成用デリゲート」と「コールバック設定用デリゲート」の組を指定します。
 
 ```csharp
-using FloatSoda.Gesture;
+using FloatSoda.Gesture;               // GestureRecognizerFactory
+using FloatSoda.Gesture.Recognizers;   // TapGestureRecognizer / PanGestureRecognizer
 using FloatSoda.Widgets;
-using FloatSoda.Widgets.Gesture;
+using FloatSoda.Widgets.Gesture;       // RawGestureDetector
 
 Widget tapOnly = new RawGestureDetector
 {

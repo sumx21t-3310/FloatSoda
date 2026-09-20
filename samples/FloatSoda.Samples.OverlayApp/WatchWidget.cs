@@ -27,6 +27,13 @@ public class WatchState : State<WatchWidget>
 
     private void UpdateTime(object? _) => SetState(() => _time = DateTime.Now.ToString("HH:mm:ss"));
 
+    // ツリーから外れるときに呼ばれる。タイマーや購読はここで止める。
+    public override void Dispose()
+    {
+        _timer?.Dispose();
+        base.Dispose();
+    }
+
     public override Widget Build(IBuildContext context)
     {
         return new Align
