@@ -10,7 +10,7 @@ hero:
   サイト専用の入口(ランディング)。src/pages/index.astro が StarlightPage で描画し、
   hero のボタンと本文中のリンク先(props.links / props.tracks)は docs/ の実在から計算して渡してくる。
   docs コレクションの外にあるので、サイドバーにも llms-*.txt にも入らない。
-  事実情報は docs/ が正典なので、ここには案内と導線だけを書く。
+  事実情報は docs/ が一次情報なので、ここには案内と導線だけを書く。
 */}
 
 import { Card, CardGrid, Code, LinkCard } from "@astrojs/starlight/components";

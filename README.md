@@ -9,7 +9,7 @@
 
 > 📖 The documentation below is in Japanese. See the [documentation site](https://floatsoda.sumx21t.com/) for details — LLM agents can read [llms.txt](https://floatsoda.sumx21t.com/llms.txt) or [llms-full.txt](https://floatsoda.sumx21t.com/llms-full.txt) — or check the [minimal example](#最小構成のコード); the code speaks for itself.
 
-**FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。SkiaSharp → OpenGL → OpenVR という経路でレンダリングし、複数のオーバーレイを統一的に管理できます。
+**FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。SkiaSharp → OpenGL → OpenVR という流れでレンダリングし、複数のオーバーレイを統一的に管理できます。
 
 ## 特徴
 
@@ -239,6 +239,6 @@ sequenceDiagram
 - [x] ParentDataWidget による親固有レイアウト情報の伝達（Expanded / Positioned）
 - [x] アニメーションシステム（AnimationController / Ticker / FadeTransition）
 - [x] ヒットテストとジェスチャ認識（GestureDetector / Listener / タップ・パン）
-- [ ] 非ダッシュボードオーバーレイへのポインタ接続（コントローラーレイ経路）
+- [ ] 非ダッシュボードオーバーレイへのポインタ接続（コントローラーレイからの入力）
 - [ ] スクロール（ListView / GridView / SingleChildScrollView）
 - [ ] マニフェストファイルの自動生成（検討中）

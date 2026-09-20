@@ -1,7 +1,7 @@
 @AGENTS.md
 
 <!--
-このファイルは意図的にスタブです。プロジェクト指示の正典は AGENTS.md 一本に統一しています。
+このファイルは意図的にスタブです。プロジェクト指示の一次情報は AGENTS.md 一本に統一しています。
 
 - Codex など AGENTS.md 対応ツールは AGENTS.md を直接読みます
 - Claude Code は AGENTS.md を読まないため、上記 `@AGENTS.md` インポートで取り込みます
