@@ -40,4 +40,13 @@ public readonly record struct EdgeInsets(double Left = 0, double Top = 0, double
     
     /// <summary>左辺と右辺、および上辺と下辺を入れ替えた余白を取得します。</summary>
     public EdgeInsets Flipped => new(Right, Bottom, Left, Top);
+
+    // recordが自動生成するPrintMembersは、publicなインスタンスプロパティをすべて出力する。
+    // Flippedは自分と同じ型を毎回作って返すため、自動生成のままだとToString()が無限再帰し、
+    // スタックオーバーフローでプロセスごと落ちる。出力するのは4辺の値だけにする。
+    private bool PrintMembers(System.Text.StringBuilder builder)
+    {
+        builder.Append($"Left = {Left}, Top = {Top}, Right = {Right}, Bottom = {Bottom}");
+        return true;
+    }
 }

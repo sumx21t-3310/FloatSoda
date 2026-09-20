@@ -27,6 +27,7 @@
 
 ### Fixed
 
+- `EdgeInsets.ToString()` が無限再帰し、スタックオーバーフローでプロセスごと異常終了する問題を修正。`$"{padding}"` のような文字列補間やログ出力でも起きていた。`Curve`(`Curves.Linear` など)の `ToString()` が `InsufficientExecutionStackException` を投げる問題も同じ原因で、あわせて修正(#279)
 - `Row` / `Column` / `Stack` / `Wrap` などの複数の子を持つウィジェットで、子の RenderObject の順番が Widget の並びと食い違う問題を修正。途中の子の RenderObject が別の型へ差し替わったときや、子リストの途中へ Widget を追加したとき、`Key` つきの子を並べ替えたときに、対象の RenderObject が末尾へ入ったり元の位置に残ったりしていた。`Stack` では重なり順が、`Row` / `Column` では並び順が崩れていた(#276)
 
 ## [0.3.1] - 2026-07-24
