@@ -102,7 +102,7 @@ public class RenderObjectSlotTest
         Update(owner, renderView, root, new Row { Children = { third, first, second } });
 
         // 並べ替えではRenderObjectを作り直さず、同じインスタンスを移動する。
-        // RenderObjectそのものを比べると、失敗時の表示がEdgeInsets.ToString()の無限再帰を踏むため、元の位置で比べる。
+        // 失敗時の表示を読みやすくするため、RenderObjectそのものではなく元の位置で比べる。
         var after = Children<RenderFlex>(renderView).Select(child => before.IndexOf(child)).ToArray();
         Assert.Equal([2, 0, 1], after);
     }
