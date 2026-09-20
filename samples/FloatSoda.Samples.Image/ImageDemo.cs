@@ -72,15 +72,31 @@ public sealed record ImageDemo : StatelessWidget
     {
         Width = CardWidth,
         Height = ImageHeight,
-        Child = new ImageWidget
+        // Imageは子を持たない。画像の上へ重ねるときはStackを使う。
+        Child = new Stack
         {
-            Provider = provider,
-            // 既定のBoxFit.Containでは縦横比が維持され、CONTAINカードと見分けがつかない。
-            // このカードは「領域いっぱいへ引き伸ばす」比較対象なのでFillを明示する。
-            Fit = BoxFit.Fill,
-            Child = new Center
+            Fit = StackFit.Expand,
+            Children =
             {
-                Child = Label("CHILD ON TOP", 20, new Color(255, 111, 97), 700)
+                new ImageWidget
+                {
+                    Provider = provider,
+                    // 既定のBoxFit.Containでは縦横比が維持され、CONTAINカードと見分けがつかない。
+                    // このカードは「領域いっぱいへ引き伸ばす」比較対象なのでFillを明示する。
+                    Fit = BoxFit.Fill,
+                    LoadingBuilder = (_, _) => new Center
+                    {
+                        Child = Label("LOADING", 20, new Color(124, 205, 255), 700)
+                    },
+                    ErrorBuilder = (_, _) => new Center
+                    {
+                        Child = Label("LOAD FAILED", 20, new Color(255, 111, 97), 700)
+                    }
+                },
+                new Center
+                {
+                    Child = Label("CHILD ON TOP", 20, new Color(255, 111, 97), 700)
+                }
             }
         }
     };

@@ -109,7 +109,7 @@ public class FloatSodaApp : IDisposable
         _pendingTasks.Enqueue(() =>
         {
             var title = window.Title;
-            var widgetBinding = new WidgetBinding(_ioTaskRunner);
+            var widgetBinding = new WidgetBinding();
             _bindings.TryAdd(title, widgetBinding);
             initialize(widgetBinding);
             widgetBinding.AttachRootWidget(window);

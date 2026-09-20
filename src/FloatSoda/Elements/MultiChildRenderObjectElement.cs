@@ -27,7 +27,17 @@ public class MultiChildRenderObjectElement<T> : RenderObjectElement<T> where T :
     public override void Mount(Element? parent)
     {
         base.Mount(parent);
-        Children = WidgetCasted.Children.Select(InflateWidget).ToList();
+
+        var children = new List<Element>(WidgetCasted.Children.Count);
+        Element? previousChild = null;
+        foreach (var childWidget in WidgetCasted.Children)
+        {
+            var child = InflateWidget(childWidget, new IndexedSlot(children.Count, previousChild));
+            children.Add(child);
+            previousChild = child;
+        }
+
+        Children = children;
     }
 
     /// <summary>
@@ -48,6 +58,32 @@ public class MultiChildRenderObjectElement<T> : RenderObjectElement<T> where T :
     {
         if (RenderObject is IHasMultiChildrenRenderObject ro) ro.AddChild(child);
     }
+
+    /// <summary>
+    /// slotが示す直前の兄弟のRenderObjectの次へ、子RenderObjectを挿入します。
+    /// </summary>
+    /// <param name="child">挿入する子RenderObject。</param>
+    /// <param name="slot">子の<see cref="IndexedSlot"/>。</param>
+    public override void InsertRenderObjectChild(RenderObject? child, object? slot)
+    {
+        if (child is null || RenderObject is not IHasMultiChildrenRenderObject ro) return;
+
+        ro.InsertChild(child, After(slot));
+    }
+
+    /// <summary>
+    /// 新しいslotが示す直前の兄弟のRenderObjectの次へ、子RenderObjectを移動します。
+    /// </summary>
+    /// <param name="child">移動する子RenderObject。</param>
+    /// <param name="oldSlot">移動前のslot。</param>
+    /// <param name="newSlot">移動後の<see cref="IndexedSlot"/>。</param>
+    public override void MoveRenderObjectChild(RenderObject child, object? oldSlot, object? newSlot)
+    {
+        if (RenderObject is IHasMultiChildrenRenderObject ro) ro.MoveChild(child, After(newSlot));
+    }
+
+    // 直前の兄弟がRenderObjectを持たないElement(ComponentElementなど)でも、Element.RenderObjectが子孫から探す。
+    private static RenderObject? After(object? slot) => (slot as IndexedSlot?)?.Previous?.RenderObject;
 
     /// <inheritdoc/>
     public override void RemoveRenderObjectChild(RenderObject? child)

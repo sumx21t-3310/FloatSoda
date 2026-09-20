@@ -149,12 +149,39 @@ public abstract class Element : IBuildContext, IComparable<Element>
 
 
     /// <summary>
+    /// 親がこのElementへ割り当てた、親の子リストの中での位置を取得します。
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// 値の意味は親が決めます。複数の子を持つ<see cref="MultiChildRenderObjectElement{T}"/>は
+    /// <see cref="IndexedSlot"/>を、子が1つの親は<see langword="null"/>を割り当てます。
+    /// RenderObjectを持たないElement(<see cref="ComponentElement"/>など)は、自身のslotをそのまま子へ引き継ぎます。
+    /// </para>
+    /// <para>
+    /// <see cref="RenderObjectElement"/>は、自身のRenderObjectを祖先のRenderObjectへ挿入する位置としてこの値を使います。
+    /// </para>
+    /// </remarks>
+    public object? Slot { get; private set; }
+
+    /// <summary>
     /// 既存の子Elementを新しいWidget構成へ更新し、再利用できない場合は子Elementを置き換えます。
+    /// 子のslotには、RenderObjectを持たないElementなら自身の<see cref="Slot"/>を、
+    /// <see cref="RenderObjectElement"/>なら<see langword="null"/>を割り当てます。
     /// </summary>
     /// <param name="child">現在の子Element。子が存在しない場合は<see langword="null"/>。</param>
     /// <param name="newWidget">子として適用するWidget。子を取り除く場合は<see langword="null"/>。</param>
     /// <returns>更新または生成された子Element。子を取り除いた場合は<see langword="null"/>。</returns>
-    protected Element? UpdateChild(Element? child, Widget? newWidget)
+    protected Element? UpdateChild(Element? child, Widget? newWidget) =>
+        UpdateChild(child, newWidget, this is RenderObjectElement ? null : Slot);
+
+    /// <summary>
+    /// 既存の子Elementを新しいWidget構成とslotへ更新し、再利用できない場合は子Elementを置き換えます。
+    /// </summary>
+    /// <param name="child">現在の子Element。子が存在しない場合は<see langword="null"/>。</param>
+    /// <param name="newWidget">子として適用するWidget。子を取り除く場合は<see langword="null"/>。</param>
+    /// <param name="newSlot">子へ割り当てるslot。</param>
+    /// <returns>更新または生成された子Element。子を取り除いた場合は<see langword="null"/>。</returns>
+    protected Element? UpdateChild(Element? child, Widget? newWidget, object? newSlot)
     {
         if (newWidget == null)
         {
@@ -167,23 +194,53 @@ public abstract class Element : IBuildContext, IComparable<Element>
         }
 
 
-        if (child == null) return InflateWidget(newWidget);
+        if (child == null) return InflateWidget(newWidget, newSlot);
 
 
         if (child.Widget == newWidget)
         {
+            UpdateSlotForChild(child, newSlot);
             return child;
         }
 
         if (Widget.CanUpdate(child.Widget, newWidget))
         {
+            UpdateSlotForChild(child, newSlot);
             child.Update(newWidget);
             return child;
         }
 
         DeactivateChild(child);
-        return InflateWidget(newWidget);
+        return InflateWidget(newWidget, newSlot);
     }
+
+    /// <summary>
+    /// 子Elementのslotを更新し、RenderObjectを持つ子孫へ届くまで引き継ぎます。
+    /// </summary>
+    /// <param name="child">slotを更新する直接の子Element。</param>
+    /// <param name="newSlot">新しいslot。</param>
+    protected void UpdateSlotForChild(Element child, object? newSlot)
+    {
+        if (Equals(child.Slot, newSlot)) return;
+
+        Visit(child);
+        return;
+
+        void Visit(Element element)
+        {
+            element.UpdateSlot(newSlot);
+
+            // RenderObjectElementの子のslotは、そのRenderObjectElementが決める。引き継ぐのはそこまで。
+            if (element is RenderObjectElement) return;
+            element.VisitChildren(Visit);
+        }
+    }
+
+    /// <summary>
+    /// このElementの<see cref="Slot"/>を更新します。
+    /// </summary>
+    /// <param name="newSlot">新しいslot。</param>
+    protected internal virtual void UpdateSlot(object? newSlot) => Slot = newSlot;
 
     /// <summary>
     /// このElementが管理するWidgetを、更新後の構成へ置き換えます。
@@ -197,12 +254,15 @@ public abstract class Element : IBuildContext, IComparable<Element>
     /// 指定したWidgetに対応するElementを生成し、このElementの子としてマウントします。
     /// </summary>
     /// <param name="newWidget">Elementを生成するWidget。</param>
+    /// <param name="newSlot">子へ割り当てるslot。</param>
     /// <returns>生成してマウントされた子Element。</returns>
-    protected Element InflateWidget(Widget newWidget)
+    protected Element InflateWidget(Widget newWidget, object? newSlot = null)
     {
         var newChild = newWidget.CreateElement();
 
         newChild.Widget = newWidget;
+        // MountがAttachRenderObjectまで進むため、slotはMountより前に割り当てる。
+        newChild.Slot = newSlot;
         newChild.Mount(this);
 
         return newChild;
