@@ -4,7 +4,9 @@
 
 `Image` は、`ImageProvider` から読み込んだ画像を自身の領域へ描画するウィジェットです。Flutter の `Image` に対応します。
 
-読み込みは非同期に行われます。**完了するまでの間と、読み込みに失敗した場合は `Child` だけが描画されます。** 読み込み失敗はアプリケーションを停止させず、`OnError` で通知されます。
+読み込みは非同期に行われます。**読み込み完了までは `LoadingBuilder`、失敗時は `ErrorBuilder` の返すウィジェットが代わりに表示されます。** どちらも指定しなければ何も表示されません。読み込みに失敗してもアプリケーションは停止しません。
+
+等しい `Provider`(同じパスの `FileImageProvider` など)を使う `Image` 同士は、読み込んだ画像を共有します。
 
 ## 使い方
 
@@ -57,32 +59,48 @@ new ColoredBox
 };
 ```
 
-### 画像の上に子を重ねる
+### 読み込み中と失敗時の表示を決める
 
-`Child` に渡したウィジェットは画像の上に描画されます。
+`LoadingBuilder` は読み込み完了まで、`ErrorBuilder` は読み込み失敗時に、画像の代わりに表示するウィジェットを返します。
 
 ```csharp
 new ImageWidget
 {
     Provider = provider,
-    Fit = BoxFit.Fill,
-    Child = new Center
-    {
-        Child = Label("CHILD ON TOP", 20, new Color(255, 111, 97), 700)
-    }
+    LoadingBuilder = (context, progress) => new Center { Child = Label("LOADING", 20, new Color(124, 205, 255), 700) },
+    ErrorBuilder = (context, exception) => new Center { Child = Label("LOAD FAILED", 20, new Color(255, 111, 97), 700) }
 }
 ```
 
-`Child` は読み込み中と読み込み失敗時にも描画されるため、プレースホルダーとしても機能します。
+`LoadingBuilder` の第2引数 `progress` は、読み込みの進み具合(`ImageLoadingProgress`)です。`FileImageProvider` は進み具合を報告しないため、常に `null` が渡されます。
+
+### 画像の上に子を重ねる
+
+`Image` は子を持ちません。画像の上へウィジェットを重ねるときは `Stack` を使います。
+
+```csharp
+new Stack
+{
+    Fit = StackFit.Expand,
+    Children =
+    {
+        new ImageWidget { Provider = provider, Fit = BoxFit.Fill },
+        new Center
+        {
+            Child = Label("CHILD ON TOP", 20, new Color(255, 111, 97), 700)
+        }
+    }
+}
+```
 
 ## Flutterとの違い
 
 | 項目 | FloatSoda | Flutter |
 |---|---|---|
 | `Fit` の既定値 | `BoxFit.Contain`。領域より小さい画像も拡大される | `fit` は null 許容で、`paintImage` が `BoxFit.scaleDown` として解決する。領域より小さい画像は拡大されない |
-| 画像の上への重ね描き | `Child` を持つ | `Image` は子を持たない。`Stack` で重ねる |
 | 読み込み元の指定 | `Provider` プロパティ1本 | `Image.asset` / `Image.network` / `Image.file` などの名前付きコンストラクタ |
-| 読み込み失敗時 | `Child` を描画し、`OnError` で通知する | `errorBuilder` で代替ウィジェットへ差し替えられる |
+| 読み込み中の表示 | `LoadingBuilder` は読み込み中だけ呼ばれ、画像の代わりに表示するウィジェットを返す | `loadingBuilder` は読み込み完了後も呼ばれ、完成した画像を `child` として受け取って包む |
+| 画像の共有 | 借りている `Image` がある間だけ共有し、最後の1つがツリーから外れると解放する | `ImageCache` が LRU で保持し、表示が終わった画像も上限まで残す |
 
 ## 実行
 

@@ -9,11 +9,19 @@
 
 ### Added
 
+- `Image` に `LoadingBuilder` / `ErrorBuilder` を追加。読み込み中と読み込み失敗時に、画像の代わりに表示するウィジェットを指定できる。`LoadingBuilder` は読み込みの進み具合(`ImageLoadingProgress?`)を受け取る(`FileImageProvider` では常に `null`)
+- `ImageProvider.ResolveAsync()` と `ImageHandle` を追加。等しい `ImageProvider`(record の値の等価性)から借りた画像は共有され、最後のハンドルを破棄した時点で解放される
+- 画像の読み込みを並行化。複数の `Image` が1本の I/O スレッドで順番待ちをしなくなった
 - `DefaultTextStyle` を追加。配下の `Text` が明示しなかった書式プロパティを祖先から継承する(明示指定 > `DefaultTextStyle` > 既定値)。`Style` の変更は `InheritedWidget` の依存追跡で配下の `Text` を再ビルドする
 - `TextStyle.Merge` と `TextStyle.Inherit` を追加(Flutter の `TextStyle.merge` / `inherit` 相当)
 
 ### Changed (Breaking)
 
+- `ResourceProvider<T>` を削除。`ImageProvider` と `FontProvider` はそれぞれ独立した型になった
+- `ImageProvider.LoadAsync()` は `protected abstract ValueTask<SKImage> LoadAsync(CancellationToken)` になり、派生型が実装する読み込み処理を表すようになった。画像を使う側は `ResolveAsync()` で `ImageHandle` を借り、`Dispose()` で返す(`SKImage` を直接破棄しない)
+- `FontProvider` の読み込みを同期の `protected abstract FontResource Load()` に変更し、公開されていた `LoadAsync()` を削除。読み込んだフォントはアプリケーションの終了まで保持される
+- `Image.Child` と `Image.OnError` を削除。読み込み中・失敗時の表示は `LoadingBuilder` / `ErrorBuilder` へ、画像の上への重ね描きは `Stack` へ置き換える
+- `RenderImage` を子を持たない RenderObject に変更(基底型は `RenderBox`)。`RenderImage.Child` を削除
 - `IHasMultiChildrenRenderObject` に `InsertChild(child, after)` と `MoveChild(child, after)` を追加。複数の子を持つ RenderObject を自作している場合は、これら2つの実装が必要(`MultiChildrenCollection<T>.Insert` / `Move` へ委譲すればよい)
 - `TextStyle` の各プロパティ(`FontSize` / `Color` / `Font` / `FontWeight` / `IsItalic`)を nullable 化し、`null` を「未指定(継承対象)」として扱うように変更。既定値(30 / 黒 / Arial / 400 / 非斜体)は描画時に適用されるため、書式を明示的に構築・描画するだけのコードの表示結果は変わらない
 

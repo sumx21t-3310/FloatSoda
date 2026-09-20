@@ -3,7 +3,6 @@ using FloatSoda.Core.Providers;
 using FloatSoda.Painting;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets.Paint;
-using FloatSoda.Engine;
 using SkiaSharp;
 
 namespace FloatSoda.Test.Widgets;
@@ -13,19 +12,14 @@ public class FontProviderTest
     private sealed class LoadCounter
     {
         public int LoadCount { get; private set; }
-        public string? ThreadName { get; private set; }
 
-        public void Increment()
-        {
-            LoadCount++;
-            ThreadName = Thread.CurrentThread.Name;
-        }
+        public void Increment() => LoadCount++;
     }
 
     private sealed record CountingFontProvider(Guid Key, LoadCounter Counter) : FontProvider
     {
 
-        protected override FontResource Load(CancellationToken cancellationToken)
+        protected override FontResource Load()
         {
             Counter.Increment();
             return FontResource.FromSystem("Arial");
@@ -33,27 +27,15 @@ public class FontProviderTest
     }
 
     [Fact]
-    public async Task LoadAsync_システムフォントを指定_フォントリソースを返す()
+    public void LoadResource_システムフォントを指定_フォントリソースを返す()
     {
-        using var resource = await new SystemFontProvider("Arial").LoadAsync();
+        using var resource = new SystemFontProvider("Arial").LoadResource();
 
         Assert.Equal("Arial", resource.FamilyName);
     }
 
     [Fact]
-    public async Task LoadAsync_IOTaskRunnerを指定_専用スレッドで読み込む()
-    {
-        using var runner = new IOTaskRunner("ProviderIOThread");
-        var provider = new CountingFontProvider(Guid.NewGuid(), new LoadCounter());
-        runner.Start();
-
-        using var resource = await provider.LoadAsync(runner);
-
-        Assert.Equal("ProviderIOThread", provider.Counter.ThreadName);
-    }
-
-    [Fact]
-    public async Task LoadAsync_有効なフォントファイルを指定_フォントリソースを返す()
+    public async Task LoadResource_有効なフォントファイルを指定_フォントリソースを返す()
     {
         var path = Path.Combine(Path.GetTempPath(), $"floatsoda-font-{Guid.NewGuid():N}.ttf");
         using var stream = SKTypeface.Default.OpenStream();
@@ -64,7 +46,7 @@ public class FontProviderTest
 
         try
         {
-            using var resource = await new FileFontProvider(path).LoadAsync();
+            using var resource = new FileFontProvider(path).LoadResource();
 
             Assert.False(string.IsNullOrWhiteSpace(resource.FamilyName));
         }

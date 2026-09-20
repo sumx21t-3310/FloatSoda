@@ -5,7 +5,6 @@ using FloatSoda.Abstractions.Input;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.Elements;
 using FloatSoda.Engine;
-using FloatSoda.Core.Providers;
 using FloatSoda.Gesture;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.RenderObjects;
@@ -21,20 +20,13 @@ namespace FloatSoda.Core;
 /// <seealso cref="BuildOwner"/>
 public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
 {
-    private readonly IOTaskRunner? _ioTaskRunner;
-
     /// <summary>フレーム予約とジェスチャ処理をこのウィンドウへ関連付けたバインディングを初期化します。</summary>
-    public WidgetBinding() : this((IOTaskRunner?)null)
+    public WidgetBinding()
     {
-    }
-
-    internal WidgetBinding(IOTaskRunner? ioTaskRunner)
-    {
-        _ioTaskRunner = ioTaskRunner;
         BuildOwner = new BuildOwner(EnsureVisualUpdate) { FrameScheduler = this, GestureBinding = this };
     }
 
-    internal WidgetBinding(RenderView renderView) : this((IOTaskRunner?)null)
+    internal WidgetBinding(RenderView renderView) : this()
     {
         Pipeline = new RenderPipeline
         {
@@ -158,7 +150,6 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     /// <remarks>初回接続では視覚更新を予約します。接続済みの場合は既存Elementを再利用して更新します。</remarks>
     public void AttachRootWidget(Widget rootWidget)
     {
-        using var resourceProviderScope = ResourceProviderContext.Push(_ioTaskRunner);
 
         var isBootStrapFrame = RenderViewElement == null;
 
@@ -185,7 +176,6 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     /// <remarks>Elementの再構築は毎フレーム確認します。<see cref="NeedsVisualUpdate"/>が未設定の場合、またはウィンドウ作成前の場合はレイアウトと描画を行いません。</remarks>
     public void DrawFrame()
     {
-        using var resourceProviderScope = ResourceProviderContext.Push(_ioTaskRunner);
 
         if (RenderViewElement != null)
         {

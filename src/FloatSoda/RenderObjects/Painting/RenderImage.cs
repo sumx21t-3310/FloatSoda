@@ -5,7 +5,7 @@ using SkiaSharp;
 namespace FloatSoda.RenderObjects.Painting;
 
 /// <summary>
-/// 画像を自身の領域へ<see cref="Fit"/>に従って収めて描画し、その上に任意の子を描画するRenderObjectです。
+/// 画像を自身の領域へ<see cref="Fit"/>に従って収めて描画する、子を持たないRenderObjectです。
 /// </summary>
 /// <remarks>
 /// <see cref="BoxFit.Cover"/>のように画像の一部だけを使う<see cref="Fit"/>では、描画元の矩形を
@@ -13,8 +13,9 @@ namespace FloatSoda.RenderObjects.Painting;
 /// 領域外へはみ出すことはありません。
 /// <see cref="FloatSoda.Widgets.Layout.FittedBox"/>が<c>ClipBehavior</c>を必要とするのは、
 /// 描画元を切り取れない子ウィジェットを拡大縮小するためで、この型では不要です。
+/// 制約が許す範囲で、画像の原寸を自身のサイズにします。
 /// </remarks>
-public class RenderImage : RenderProxyBox
+public class RenderImage : RenderBox
 {
     /// <summary>
     /// 描画する画像を取得します。
@@ -61,34 +62,23 @@ public class RenderImage : RenderProxyBox
     } = Alignment.Center;
 
     /// <inheritdoc/>
-    public override void PerformLayout()
-    {
-        if (Child is not null)
-        {
-            Child.Layout(Constraints);
-            Size = Child.Size;
-        }
-        else
-        {
-            Size = Constraints.Constrain(new SKSize(Image.Width, Image.Height));
-        }
-    }
+    public override void PerformLayout() => Size = Constraints.Constrain(new SKSize(Image.Width, Image.Height));
 
     /// <inheritdoc/>
     internal override SKSize ComputeDryLayout(Geometrics.BoxConstraints constraints) =>
-        Child?.GetDryLayout(constraints) ?? constraints.Constrain(Image.Width, Image.Height);
+        constraints.Constrain(Image.Width, Image.Height);
 
     /// <inheritdoc/>
-    protected override double ComputeMinIntrinsicWidth(double height) => Child?.GetMinIntrinsicWidth(height) ?? Image.Width;
+    protected override double ComputeMinIntrinsicWidth(double height) => Image.Width;
 
     /// <inheritdoc/>
-    protected override double ComputeMaxIntrinsicWidth(double height) => Child?.GetMaxIntrinsicWidth(height) ?? Image.Width;
+    protected override double ComputeMaxIntrinsicWidth(double height) => Image.Width;
 
     /// <inheritdoc/>
-    protected override double ComputeMinIntrinsicHeight(double width) => Child?.GetMinIntrinsicHeight(width) ?? Image.Height;
+    protected override double ComputeMinIntrinsicHeight(double width) => Image.Height;
 
     /// <inheritdoc/>
-    protected override double ComputeMaxIntrinsicHeight(double width) => Child?.GetMaxIntrinsicHeight(width) ?? Image.Height;
+    protected override double ComputeMaxIntrinsicHeight(double width) => Image.Height;
 
     /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
@@ -97,7 +87,7 @@ public class RenderImage : RenderProxyBox
         var fittedSizes = Fit.Apply(imageSize, Size);
 
         // Fitの結果が空になるのは、画像か自身の領域のどちらかが空のとき。
-        // その場合はDrawImageに空の矩形を渡さず、子だけを描画する。
+        // その場合はDrawImageに空の矩形を渡さず、何も描画しない。
         if (!fittedSizes.Source.IsEmpty && !fittedSizes.Destination.IsEmpty)
         {
             var sourceOffset = Alignment.ComputeOffset(imageSize, fittedSizes.Source);
@@ -116,8 +106,6 @@ public class RenderImage : RenderProxyBox
 
             context.Canvas.DrawImage(Image, source, destination);
         }
-
-        if (Child != null) context.PaintChild(Child, offset);
     }
 
     private static void ValidateAlignment(Alignment value, string parameterName)
