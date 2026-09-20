@@ -14,23 +14,28 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 
 ## 1. どこに書くか
 
-書こうとしている情報について、上から順に問いに答えます。
+書こうとしている情報について、3つの問いに順に答えます。1問目では、どのズームまで見れば理解できる情報かを C4 Model のレベルに当てはめます。2問目は Lv3 の情報だけに使い、読者が何をしたいかで割ります。3問目では、系統の中の種別を Diátaxis で決めます。C4 と Diátaxis は書き手の判定基準です。サイトの見出しには出さず、読者には「導入する / 使う / 変える / 調べる」の区分で示します。Lv ごとの FloatSoda での中身は、[Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) の「情報の置き場所を決める順序」の表を一次情報とします。
 
 ```text
-利用者が正しく使うために必要な情報?
- ├─ はい
- │   ├─ 概念を理解するための説明          → User / Concept
- │   ├─ 特定の目的を達成する手順          → User / Guide
- │   └─ 完成物を作りながら学ぶ道筋        → User / Tutorial
- └─ いいえ
-     └─ FloatSoda を変更する人に必要な情報?
-         ├─ いまどう動いているか            → Contributor / Architecture
-         ├─ なぜそう設計したか              → Contributor / Design
-         ├─ 変更後も何を維持するか          → Contributor / Requirements
-         └─ どう変更・レビュー・公開するか  → Contributor / Development
+1. どのズームまで見れば理解できる情報か
+   Lv1  アプリと SteamVR・VRChat・HMD の関係、3ペルソナ          → 導入(Home、TargetUsers)
+   Lv2  参照するパッケージ、スレッド、ウィンドウ種別               → User
+   Lv3  三ツリー、BuildOwner、RenderPipeline、Layer、入力の流れ    → 2 へ
+   Lv4  型・メンバー・引数・戻り値・例外・nullability の契約       → XML ドキュメントコメント(API Reference の原稿)
 
-型・メンバー・引数・戻り値・例外・nullability の正確な公開契約?
- → XML ドキュメントコメント(API Reference の原稿)
+2. Lv3 の情報は、読者が何をしたいかで割る
+   使う   — 正しく使うために必要                                   → User
+   変える — 変更とレビューに必要                                   → Contributor
+   調べる — 型どうしの対応関係                                     → XML ドキュメントコメントの <seealso>
+
+3. 系統の中の種別を Diátaxis で決める
+   完成物を作りながら学ぶ道筋                                       → User / Tutorial
+   特定の目的を達成する手順                                         → User / Guide(How-to)
+   概念を理解するための説明                                         → User / Concept(Explanation)
+   いまどう動いているか                                             → Contributor / Architecture(Explanation)
+   なぜそう設計したか                                               → Contributor / Design(Explanation)
+   変更後も何を維持するか                                           → Contributor / Requirements(Reference)
+   どう変更・レビュー・公開するか                                   → Contributor / Development(How-to)
 ```
 
 境界で迷いやすい情報は、次のように分類します。
