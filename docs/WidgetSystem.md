@@ -113,7 +113,7 @@ public class WatchState : State<WatchWidget>
 
 `Dispose()` は、この `State` がツリーから外れるときに一度だけ呼ばれます。`InitState()` で始めたタイマー・購読・`WidgetTicker` は、ここで止めてください。止めないと、ウィジェットが画面から消えたあとも動き続けます。
 
-> **スレッドについての注意:** `SetState` は排他制御を行っていません。`System.Threading.Timer` のコールバックや `await` の続きは、FloatSoda のメインループとは別のスレッドで実行されるため、そこから `SetState` を呼ぶとビルドと競合することがあります。上の時計のように1つの値を差し替えるだけなら実害は出にくいものの、`List` などのコレクションを `SetState` の中で書き換える場合は、`Build` がそれを列挙している最中に書き換わる可能性があります。`await` の続きをメインスレッドへ戻す仕組みは、次のリリースで導入する予定です([#281](https://github.com/sumx21t-3310/FloatSoda/issues/281))。
+> **スレッドについての注意:** `SetState` は排他制御を行っていません。`System.Threading.Timer` のコールバックは FloatSoda のメインループとは別のスレッドで実行され、`await` の続きも別のスレッドで実行されることがあります。そこから `SetState` を呼ぶと、更新する状態が1つの値でもコレクションでも、ビルドと競合する可能性があります(上の時計のお手本も、この形です)。`SetState` の中で `List` などのコレクションを書き換える場合は、`Build` がそれを列挙している最中に書き換わる可能性もあります。この競合で実際に壊れた例は確認できていませんが、安全であるという保証はありません。`await` の続きをメインスレッドへ戻す仕組みは、次のリリースで導入する予定です([#281](https://github.com/sumx21t-3310/FloatSoda/issues/281))。
 
 ## InheritedWidget
 
@@ -327,7 +327,7 @@ public override Widget Build(IBuildContext context)
 | `IntrinsicWidth` | ✓ | 子の最大intrinsic幅へ収縮し、任意のstep単位で切り上げ | `StepWidth`, `Child` |
 | `IntrinsicHeight` | ✓ | 子の最大intrinsic高さへ収縮し、任意のstep単位で切り上げ | `StepHeight`, `Child` |
 | `Padding` | ✓ | 子の制約を余白分だけ縮小し、子を余白の左上位置へ配置 | `Spacing` (`EdgeInsets`, 必須), `Child` |
-| `Stack` | ✓ | 複数の子を重ね、非Positioned子を`Alignment`と`Fit`で配置。`Fit`は`StackFit.Loose`(既定。子は自分の大きさを選べる)/ `StackFit.Expand`(子をStackの大きさいっぱいへ広げる)/ `StackFit.Passthrough`(親の制約をそのまま渡す) | `Children`, `Alignment`, `Fit` (`StackFit`) |
+| `Stack` | ✓ | 複数の子を重ね、非Positioned子を`Alignment`と`Fit`で配置。`Fit`は`StackFit.Loose`(既定。子は自分の大きさを選べる)/ `StackFit.Expand`(最大制約が有限の軸では、子をStackの大きさいっぱいへ広げる。最大制約が無限の軸では広げない)/ `StackFit.Passthrough`(親の制約をそのまま渡す) | `Children`, `Alignment`, `Fit` (`StackFit`) |
 | `Positioned` | ✓ | `Stack`の子を辺からの距離または固定寸法で絶対配置 | `Left`, `Top`, `Right`, `Bottom`, `Width`, `Height`, `Child` |
 | `IndexedStack` | ✓ | 全子をレイアウトし、`Index`で選んだ1子だけを描画・ヒットテスト。`null`なら全子を非表示 | `Children`, `Index`, `Alignment`, `Fit` |
 | `Offstage` | ✓ | 子をレイアウトしたまま描画・ヒットテストから除外 | `IsOffstage`, `Child` |
