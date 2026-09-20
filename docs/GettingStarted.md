@@ -95,7 +95,7 @@ Widget root = new Center
     }
 };
 
-// オーバーレイのサイズは root ウィジェットのレイアウト結果に自動追従します。
+// Size を指定しない場合、オーバーレイのサイズは起動時の root ウィジェットのレイアウト結果で決まります。
 app.CreateWindow(new DashboardWindow { Title = "HelloWorld", Child = root });
 
 await host.RunAsync();
@@ -158,7 +158,17 @@ public sealed record RawRootWidget : SingleChildRenderObjectWidget<RenderPositio
 ## オーバーレイ種別の選び方
 
 `app.CreateWindow(...)` に渡すウィンドウ定義 `WindowWidget` の種類でオーバーレイ種別を選びます。
-`Size` を指定しない場合、オーバーレイのサイズは `Child` ウィジェットのレイアウト結果に追従します（`Size` を指定するとそのサイズで固定されます）。
+`Size` を指定しない場合、オーバーレイのサイズは起動時の `Child` ウィジェットのレイアウト結果で決まります。`Size` を指定すると、そのサイズで固定されます。
+
+> **既知の問題([#285](https://github.com/sumx21t-3310/FloatSoda/issues/285)):** `Size` を指定していないウィンドウは、起動後に中身の大きさが変わっても、SteamVR 上の表示が最初の大きさのまま更新されません。新しく増えた部分は表示されません。リストに項目を追加するなど、中身の大きさが変わるウィンドウには `Size` を指定してください。
+>
+> ```csharp
+> using SkiaSharp;   // SKSize
+>
+> app.CreateWindow(new DashboardWindow { Title = "Album", Size = new SKSize(1000, 600), Child = root });
+> ```
+>
+> `Size` を指定すると、子には同じ大きさの制約が渡ります。`Wrap` はこの幅で折り返します。`Size` を指定しない場合は幅の上限が無いため、`Wrap` は折り返さずに横一列に並べます。
 
 | ウィンドウ定義 | オーバーレイ種別 | 位置の管理 | ポインタ入力 |
 |---|---|---|---|
