@@ -108,6 +108,26 @@ Widget が変わる
           → FlushLayout / FlushPaint(変わった部分だけ)
 ```
 
+### slot: 子の RenderObject を挿入する位置
+
+親は、それぞれの子 Element に **slot**(`Element.Slot`)を割り当てます。slot は「親の子リストの中で、この子がどこにいるか」を表す値です。
+
+| 親 | 子へ割り当てる slot |
+|---|---|
+| `MultiChildRenderObjectElement<T>`(`Row` / `Column` / `Stack` など) | `IndexedSlot(Index, Previous)`。自分の位置と、直前の兄弟 Element |
+| `SingleChildRenderObjectElement<T>` など、子が1つの RenderObjectElement | `null` |
+| `ComponentElement`(`StatelessElement` / `StatefulElement` / `InheritedElement` など) | 自身の slot をそのまま引き継ぐ |
+
+`RenderObjectElement` は、`AttachRenderObject()` で自身の slot を祖先へ渡します。`MultiChildRenderObjectElement<T>` は、`IndexedSlot.Previous` の RenderObject の次へ子を挿入します。`Previous` が `StatefulElement` のように RenderObject を持たない Element でも、`Element.RenderObject` が子孫から探すので、挿入位置が決まります。
+
+slot が必要になるのは、次の3つの場面です。どれも、子の RenderObject を末尾へ足すだけでは順番が崩れます。
+
+- **途中の子の RenderObject が差し替わる。** `StatefulWidget` の Build 結果が別の型の RenderObjectWidget に変わった場合です(`Image` が読み込み中の表示から画像へ切り替わるときなど)。新しい RenderObject は、古い RenderObject があった位置へ入ります
+- **子リストの途中へ Widget を足す。** 新しい RenderObject は、足した位置へ入ります
+- **`Key` つきの子を並べ替える。** Element を再利用したうえで、slot の変化を `UpdateSlot` → `MoveRenderObjectChild` で伝え、同じ RenderObject を新しい位置へ移動します
+
+slot が変わらない子では、RenderObject の移動もレイアウトの要求も起きません。
+
 ## ルートの接続: RenderObjectToWidgetAdapter
 
 Widget ツリーのルートでは、`RenderObjectToWidgetAdapter`(Widget)と `RenderObjectToWidgetElement<RenderView>`(Element)のペアが `RenderView` へ橋渡しをします。

@@ -18,8 +18,23 @@ public abstract class RenderObjectElement : Element
     public override void AttachRenderObject()
     {
         _ancestorRenderObjectElement = FindAncestorRenderObjectElement();
-        _ancestorRenderObjectElement?.InsertRenderObjectChild(RenderObject);
+        _ancestorRenderObjectElement?.InsertRenderObjectChild(RenderObject, Slot);
         ApplyParentData();
+    }
+
+    /// <summary>
+    /// slotを更新し、接続先の祖先へ、このElementのRenderObjectを新しい位置へ移動するよう伝えます。
+    /// </summary>
+    /// <param name="newSlot">新しいslot。</param>
+    protected internal override void UpdateSlot(object? newSlot)
+    {
+        var oldSlot = Slot;
+        base.UpdateSlot(newSlot);
+
+        if (RenderObject is { } renderObject)
+        {
+            _ancestorRenderObjectElement?.MoveRenderObjectChild(renderObject, oldSlot, newSlot);
+        }
     }
 
     private void ApplyParentData()
@@ -55,6 +70,23 @@ public abstract class RenderObjectElement : Element
     /// </summary>
     /// <param name="child">挿入する子RenderObject。子を持たないことを表す場合は<see langword="null"/>。</param>
     public virtual void InsertRenderObjectChild(RenderObject? child) { }
+
+    /// <summary>
+    /// このElementのRenderObjectへ、slotが示す位置に子RenderObjectを挿入します。
+    /// </summary>
+    /// <param name="child">挿入する子RenderObject。子を持たないことを表す場合は<see langword="null"/>。</param>
+    /// <param name="slot">子の<see cref="Element.Slot"/>。</param>
+    /// <remarks>基底実装はslotを使わず、<see cref="InsertRenderObjectChild(RenderObject?)"/>を呼び出します。</remarks>
+    public virtual void InsertRenderObjectChild(RenderObject? child, object? slot) => InsertRenderObjectChild(child);
+
+    /// <summary>
+    /// このElementのRenderObjectの中で、子RenderObjectを新しいslotが示す位置へ移動します。
+    /// </summary>
+    /// <param name="child">移動する子RenderObject。</param>
+    /// <param name="oldSlot">移動前のslot。</param>
+    /// <param name="newSlot">移動後のslot。</param>
+    /// <remarks>基底実装は何もしません。子の順序を持つElementが上書きします。</remarks>
+    public virtual void MoveRenderObjectChild(RenderObject child, object? oldSlot, object? newSlot) { }
 
 
     /// <summary>
@@ -106,6 +138,9 @@ public abstract class RenderObjectElement : Element
 
         var newChildren = new Element?[newWidgets.Count];
 
+        // slotは「自分のindexと、直前の兄弟Element」の組。直前の兄弟のRenderObjectの次が挿入位置になる。
+        Element? previousChild = null;
+
         // 1. 前方から一致する部分を進める
         while (oldChildrenTop <= oldChildrenBottom && newChildrenTop <= newChildrenBottom)
         {
@@ -113,8 +148,9 @@ public abstract class RenderObjectElement : Element
             var newWidget = newWidgets[newChildrenTop];
             if (oldChild == null || !Widget.CanUpdate(oldChild.Widget!, newWidget)) break;
 
-            var newChild = UpdateChild(oldChild, newWidget);
+            var newChild = UpdateChild(oldChild, newWidget, new IndexedSlot(newChildrenTop, previousChild));
             newChildren[newChildrenTop] = newChild;
+            previousChild = newChild;
             newChildrenTop++;
             oldChildrenTop++;
         }
@@ -171,8 +207,9 @@ public abstract class RenderObjectElement : Element
                 }
             }
 
-            var newChild = UpdateChild(oldChild, newWidget);
+            var newChild = UpdateChild(oldChild, newWidget, new IndexedSlot(newChildrenTop, previousChild));
             newChildren[newChildrenTop] = newChild;
+            previousChild = newChild;
             newChildrenTop++;
         }
 
@@ -183,8 +220,9 @@ public abstract class RenderObjectElement : Element
         {
             var oldChild = oldChildren[oldChildrenTop];
             var newWidget = newWidgets[newChildrenTop];
-            var newChild = UpdateChild(oldChild, newWidget);
+            var newChild = UpdateChild(oldChild, newWidget, new IndexedSlot(newChildrenTop, previousChild));
             newChildren[newChildrenTop] = newChild;
+            previousChild = newChild;
             newChildrenTop++;
             oldChildrenTop++;
         }
