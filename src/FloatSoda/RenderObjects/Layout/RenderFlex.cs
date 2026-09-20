@@ -65,6 +65,16 @@ public class RenderFlex : RenderBox, IHasMultiChildrenRenderObject
     /// </remarks>
     public void AddChild(RenderObject child) => Children.Add((RenderBox)child);
 
+    /// <summary>指定したRenderObjectを<paramref name="after"/>の次へ挿入します。<paramref name="after"/>が<see langword="null"/>なら先頭へ挿入します。</summary>
+    /// <param name="child">挿入するRenderObject。<see cref="RenderBox"/>である必要があります。</param>
+    /// <param name="after">挿入位置の基準にする子。</param>
+    public void InsertChild(RenderObject child, RenderObject? after) => Children.Insert((RenderBox)child, (RenderBox?)after);
+
+    /// <summary>保持している子を<paramref name="after"/>の次へ移動します。<paramref name="after"/>が<see langword="null"/>なら先頭へ移動します。</summary>
+    /// <param name="child">移動するRenderObject。</param>
+    /// <param name="after">移動先の基準にする子。</param>
+    public void MoveChild(RenderObject child, RenderObject? after) => Children.Move((RenderBox)child, (RenderBox?)after);
+
     /// <summary>
     /// 指定したRenderObjectを子のコレクションから削除します。
     /// </summary>

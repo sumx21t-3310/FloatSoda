@@ -314,6 +314,40 @@ public class ImageTest
     }
 
     [Fact]
+    public void Build_Stackの先頭のImageが読み込み完了で画像へ差し替わる_Stackの子の順序を保つ()
+    {
+        // 回帰テスト(実機巡回 image-5): 読み込み中の表示から画像へ差し替わるとき、新しいRenderObjectが
+        // Stackの末尾へ入ると、後ろに重ねたはずの子が画像の下に隠れる。
+        var gate = new LoadGate();
+        using var buildScheduled = new ManualResetEventSlim();
+        var (root, owner) = Mount(
+            new Stack
+            {
+                Children =
+                {
+                    new ImageWidget { Provider = new GatedImageProvider(Guid.NewGuid(), gate) },
+                    new FloatSoda.Widgets.Paint.ColoredBox { Color = new Color(255, 0, 0) }
+                }
+            },
+            buildScheduled.Set);
+        Assert.Null(FindRenderObjectOrDefault<RenderImage>(root));
+
+        buildScheduled.Reset();
+        gate.Source.SetResult(CreateSolidImage());
+        Assert.True(buildScheduled.Wait(TimeSpan.FromSeconds(5)), "読み込みの完了が通知されませんでした。");
+        owner.BuildScope();
+        root.RenderObject!.Owner!.FlushLayout();
+
+        var children = new List<RenderObject>();
+        FindRenderObject<RenderStack>(root).VisitChildren(children.Add);
+
+        Assert.Equal(2, children.Count);
+        Assert.IsType<RenderImage>(children[0]);
+
+        Update(root, owner, new SizedBox());
+    }
+
+    [Fact]
     public void PerformLayout_緩い制約_画像の原寸を自身のサイズにする()
     {
         using var image = CreateSolidImage();

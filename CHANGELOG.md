@@ -22,7 +22,12 @@
 - `FontProvider` の読み込みを同期の `protected abstract FontResource Load()` に変更し、公開されていた `LoadAsync()` を削除。読み込んだフォントはアプリケーションの終了まで保持される
 - `Image.Child` と `Image.OnError` を削除。読み込み中・失敗時の表示は `LoadingBuilder` / `ErrorBuilder` へ、画像の上への重ね描きは `Stack` へ置き換える
 - `RenderImage` を子を持たない RenderObject に変更(基底型は `RenderBox`)。`RenderImage.Child` を削除
+- `IHasMultiChildrenRenderObject` に `InsertChild(child, after)` と `MoveChild(child, after)` を追加。複数の子を持つ RenderObject を自作している場合は、これら2つの実装が必要(`MultiChildrenCollection<T>.Insert` / `Move` へ委譲すればよい)
 - `TextStyle` の各プロパティ(`FontSize` / `Color` / `Font` / `FontWeight` / `IsItalic`)を nullable 化し、`null` を「未指定(継承対象)」として扱うように変更。既定値(30 / 黒 / Arial / 400 / 非斜体)は描画時に適用されるため、書式を明示的に構築・描画するだけのコードの表示結果は変わらない
+
+### Fixed
+
+- `Row` / `Column` / `Stack` / `Wrap` などの複数の子を持つウィジェットで、子の RenderObject の順番が Widget の並びと食い違う問題を修正。途中の子の RenderObject が別の型へ差し替わったときや、子リストの途中へ Widget を追加したとき、`Key` つきの子を並べ替えたときに、対象の RenderObject が末尾へ入ったり元の位置に残ったりしていた。`Stack` では重なり順が、`Row` / `Column` では並び順が崩れていた(#276)
 
 ## [0.3.1] - 2026-07-24
 
