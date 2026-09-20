@@ -39,9 +39,8 @@ internal sealed class FontResolver
             return false;
         }
 
-        // TypefaceFromStyleはレイアウト/描画中に同期的に呼ばれるため、I/Oランナーへ投げて待つと
-        // 先にキューへ並んだ画像読み込みが全部終わるまでフレームスレッドが止まる。
-        // ここでは呼び出しスレッド上で直接読み込み、キュー越しのブロックを避ける。
+        // TypefaceFromStyleはレイアウト/描画中に同期的に呼ばれるため、呼び出しスレッド上で直接読み込む。
+        // 読み込んだリソースは解放せずに保持する(FontProviderの契約)。
         var lazy = _resources.GetOrAdd(
             provider,
             static key => new Lazy<FontResource>(

@@ -562,7 +562,7 @@ intrinsic 測定は追加のツリー走査を必要とするため、入れ子�
 | `RichText` | ✓ | `TextSpan` でスタイル付きテキストを表示 | `Text` (`TextSpan`) |
 | `Text` | ✓ | 単一書式のテキスト表示(`RichText` / `TextSpan` に委譲) | `Data` (string), `Style` (`TextStyle?`) |
 | `DefaultTextStyle` | ✓ | 配下の `Text` へ既定のテキスト書式を伝播する `InheritedWidget` | `Style` (`TextStyle`), `Child` |
-| `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中と失敗時は`Child`のみを描画し、失敗は`OnError`で通知 | `Provider`, `Fit`, `Alignment`, `Child`, `OnError` |
+| `Paint.Image` | ✓ | `ImageProvider`から読み込んだ画像を`Fit`に従って表示。読み込み中は`LoadingBuilder`、失敗時は`ErrorBuilder`が返すウィジェットを代わりに表示する。子は持たないので、画像の上へ重ねるときは`Stack`を使う | `Provider`, `Fit`, `Alignment`, `LoadingBuilder`, `ErrorBuilder` |
 | `Paint.Icon` | ✓ | `IconData`と`FontProvider`で指定したアイコンフォントのグリフを表示 | `Data`, `Size`, `Color` |
 
 `Paint.Image` の `Fit` には、`FittedBox` と同じ `BoxFit` を指定します。既定値は `Contain`(縦横比を維持して領域内へ収める)です。領域内の配置位置は `Alignment` で指定します(既定値は `Alignment.Center`)。`Cover` のように画像の一部だけを使う場合は、**描画元の矩形を切り取って**描画します。そのため、**どの `Fit` を指定しても領域外へはみ出しません**。画像のどの部分を残すかは `Alignment` によって決まります。
@@ -611,7 +611,7 @@ new DefaultTextStyle
 
 書式を継承させたくない `Text` には、`Inherit = false` を設定した `TextStyle` を指定します。この場合、未指定のプロパティにはフレームワークの既定値が適用されます。
 
-システムにないフォントは `FileFontProvider` で指定します。同じ値の Provider は内部で共有されるため、複数の `Text` や `Icon` から使用しても、フォントリソースは1度だけ読み込まれます。
+システムにないフォントは `FileFontProvider` で指定します。同じ値の Provider は内部で共有されるため、複数の `Text` や `Icon` から使用しても、フォントリソースは1度だけ読み込まれます。読み込んだフォントはアプリケーションの終了まで保持されます。
 
 ```csharp
 using FloatSoda.Core;

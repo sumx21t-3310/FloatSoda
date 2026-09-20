@@ -35,6 +35,16 @@ public abstract record Curve : ICurve
 
     /// <summary>時間軸・値軸を反転したカーブ(Flutterの<c>flipped</c>)。</summary>
     public Curve Flipped => new FlippedCurve(this);
+
+    /// <summary><see cref="object.ToString"/>が出力するメンバーを書き出します。基底の<see cref="Curve"/>は何も出力しません。</summary>
+    /// <param name="builder">出力先。</param>
+    /// <returns>メンバーを出力した場合は<see langword="true"/>。</returns>
+    /// <remarks>
+    /// recordが自動生成する実装は、publicなインスタンスプロパティをすべて出力します。
+    /// <see cref="Flipped"/>は新しいカーブを毎回作って返すため、自動生成のままだと
+    /// <see cref="object.ToString"/>が無限再帰します。派生型が宣言したメンバーは、派生型の実装が出力します。
+    /// </remarks>
+    protected virtual bool PrintMembers(System.Text.StringBuilder builder) => false;
 }
 
 /// <summary>t をそのまま返す線形カーブ。</summary>

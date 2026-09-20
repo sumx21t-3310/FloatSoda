@@ -152,11 +152,16 @@ sequenceDiagram
 |---|---|---|
 | **メインスレッド** | RenderPipeline, Widget/RenderObject ツリー, VREventDispatcher | `RenderPostTaskRunner.PostTask(Action)` でタスクをキューに積む |
 | **レンダースレッド** | OpenGL コンテキスト, `GLView`, `Renderer`, `OverlayWindow` | `ConcurrentQueue<Action>` を処理 |
-| **I/Oスレッド** | `ImageProvider` / `FontProvider` によるリソース読み込み | `IOTaskRunner.RunAsync(...)` に投入し、完了は `BuildOwner` の `TaskScheduler` 経由でメインスレッドへ戻る |
+| **スレッドプール** | `ImageProvider` による画像の読み込みとデコード | `ImageProvider.ResolveAsync()` が返すタスクの完了は、`BuildOwner` の `TaskScheduler` 経由でメインスレッドへ戻る |
+| **I/Oスレッド** | 投入順に1件ずつ実行する必要がある処理(利用者のコード向け) | `IOTaskRunner.RunAsync(...)` に投入する |
 
 OpenGL のコンテキストはレンダースレッドが独占します。ウィンドウの作成も `PostTask` を経由してレンダースレッド上で実行されます。
 
-I/O スレッドは `IOTaskRunner` が持つ単一のバックグラウンドスレッドであり、タスクを投入順に1件ずつ処理します。`Image` の画像読み込みはこのスレッドで行い、完了後の再ビルドはメインスレッドの `BuildScope` で実行します。ただし、テキストレイアウト中のフォント解決は同期 API から呼ばれるため、このキューを経由せず、呼び出し元のスレッド上で直接読み込みます。
+`Image` の画像読み込みは .NET のスレッドプールで行うため、複数の画像を並行して読み込めます。完了後の再ビルドはメインスレッドの `BuildScope` で実行します。読み込んだ画像は共有キャッシュが所有し、等しい `ImageProvider` を使う `Image` 同士で共有します。借りている `Image` が1つもなくなった時点で解放します。
+
+フォントは寿命の扱いが画像と異なります。テキストレイアウト中のフォント解決は同期 API から呼ばれるため、`FontProvider` は呼び出し元のスレッド上で同期的に読み込みます。読み込んだフォントはアプリケーションの終了まで保持します。
+
+I/O スレッドは `IOTaskRunner` が持つ単一のバックグラウンドスレッドであり、タスクを投入順に1件ずつ処理します。FloatSoda 自身の画像・フォント読み込みには使いません。
 
 ```text
 メインスレッド

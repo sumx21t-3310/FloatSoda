@@ -20,6 +20,12 @@ public interface IHasMultiChildrenRenderObject
     /// <summary>子を末尾に追加する。</summary>
     void AddChild(RenderObject child);
 
+    /// <summary>子を<paramref name="after"/>の次へ挿入する。<paramref name="after"/>が<see langword="null"/>なら先頭へ挿入する。</summary>
+    void InsertChild(RenderObject child, RenderObject? after);
+
+    /// <summary>保持している子を<paramref name="after"/>の次へ移動する。<paramref name="after"/>が<see langword="null"/>なら先頭へ移動する。</summary>
+    void MoveChild(RenderObject child, RenderObject? after);
+
     /// <summary>指定した子を取り除く。取り除けたら true。</summary>
     bool RemoveChild(RenderObject child);
 }
@@ -84,6 +90,47 @@ public class MultiChildrenCollection<T>(RenderObject owner) : ICollection<T> whe
     {
         owner.AdoptChild(child);
         _children.Add(child);
+    }
+
+    /// <summary>子を<paramref name="after"/>の次へ挿入する。<paramref name="after"/>が<see langword="null"/>なら先頭へ挿入する。</summary>
+    /// <remarks>
+    /// 所有者をLayout Dirtyとしてマークし、次のパイプライン更新時に再レイアウトを要求します。
+    /// </remarks>
+    /// <exception cref="ArgumentException"><paramref name="after"/>がこのコレクションの子ではありません。</exception>
+    public void Insert(T child, T? after)
+    {
+        var index = IndexAfter(after);
+        owner.AdoptChild(child);
+        _children.Insert(index, child);
+    }
+
+    /// <summary>保持している子を<paramref name="after"/>の次へ移動する。<paramref name="after"/>が<see langword="null"/>なら先頭へ移動する。</summary>
+    /// <remarks>
+    /// 位置が変わった場合、所有者をLayout Dirtyとしてマークします。既にその位置にある場合、Dirty状態は変更されません。
+    /// </remarks>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="child"/>または<paramref name="after"/>がこのコレクションの子ではありません。
+    /// </exception>
+    public void Move(T child, T? after)
+    {
+        var oldIndex = _children.IndexOf(child);
+        if (oldIndex < 0) throw new ArgumentException("このコレクションが保持していない子は移動できません。", nameof(child));
+        if (ReferenceEquals(child, after)) throw new ArgumentException("子を自分自身の次へは移動できません。", nameof(after));
+
+        _children.RemoveAt(oldIndex);
+        var newIndex = IndexAfter(after);
+        _children.Insert(newIndex, child);
+
+        if (newIndex != oldIndex) owner.MarkNeedsLayout();
+    }
+
+    private int IndexAfter(T? after)
+    {
+        if (after is null) return 0;
+
+        var index = _children.IndexOf(after);
+        if (index < 0) throw new ArgumentException("このコレクションが保持していない子は、挿入位置の基準にできません。", nameof(after));
+        return index + 1;
     }
 
     /// <summary>保持している子を指定した配列へコピーする。</summary>
@@ -187,6 +234,14 @@ public static class MultiChildrenCollectionExtensions
     /// </remarks>
     public static void AddErased<T>(this MultiChildrenCollection<T> collection, RenderObject child)
         where T : RenderObject => collection.Add((T)child);
+
+    /// <summary><see cref="RenderObject"/>を要素型へ変換して<paramref name="after"/>の次へ挿入する。Element境界の非総称な挿入に使う。</summary>
+    public static void InsertErased<T>(this MultiChildrenCollection<T> collection, RenderObject child, RenderObject? after)
+        where T : RenderObject => collection.Insert((T)child, (T?)after);
+
+    /// <summary><see cref="RenderObject"/>を要素型へ変換して<paramref name="after"/>の次へ移動する。Element境界の非総称な移動に使う。</summary>
+    public static void MoveErased<T>(this MultiChildrenCollection<T> collection, RenderObject child, RenderObject? after)
+        where T : RenderObject => collection.Move((T)child, (T?)after);
 
     /// <summary><see cref="RenderObject"/>を要素型として取り除く。要素型でない・保持していない場合は false。</summary>
     /// <remarks>

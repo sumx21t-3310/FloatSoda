@@ -176,7 +176,7 @@ context.PushClipRect(childOffset, clipRect, Clip.Antialias, (ctx, off) =>
 | クラス | 説明 | 主なプロパティ |
 |---|---|---|
 | `RenderParagraph` | `RichText` のテキストレイアウト・描画エンジン（Topten.RichTextKit 使用） | `Text` (`TextSpan`) |
-| `RenderImage` | `SKImage` を `BoxFit` に従って描画 | `Image` (required), `Fit`, `Alignment` |
+| `RenderImage` | `SKImage` を `BoxFit` に従って描画する。子は持たず、制約が許す範囲で画像の原寸を自身のサイズにする | `Image` (required), `Fit`, `Alignment` |
 
 ## カスタムクリッパーの実装
 

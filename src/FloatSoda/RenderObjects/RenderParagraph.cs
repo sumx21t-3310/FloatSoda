@@ -19,6 +19,12 @@ public class RenderParagraph : RenderBox, IHasMultiChildrenRenderObject
 
     void IHasMultiChildrenRenderObject.AddChild(RenderObject child) => Children.AddErased(child);
 
+    void IHasMultiChildrenRenderObject.InsertChild(RenderObject child, RenderObject? after) =>
+        Children.InsertErased(child, after);
+
+    void IHasMultiChildrenRenderObject.MoveChild(RenderObject child, RenderObject? after) =>
+        Children.MoveErased(child, after);
+
     bool IHasMultiChildrenRenderObject.RemoveChild(RenderObject child) => Children.RemoveErased(child);
 
     /// <inheritdoc/>

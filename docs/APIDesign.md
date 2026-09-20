@@ -679,6 +679,29 @@ var wider = insets with { Left = 32, Right = 32 };
 | `with` 式 | ✅ | ✅ | ❌ |
 | 分解 (`Deconstruct`) | ✅ | 手動 | 手動 |
 
+### 自分と同じ型を返す計算プロパティには `PrintMembers` を書く
+
+record が自動生成する `ToString()` は、public なインスタンスプロパティをすべて出力します。`EdgeInsets.Flipped` のように、自分と同じ型の値を毎回作って返す計算プロパティがあると、その値を出力するために再度 `ToString()` を呼び出すため、処理が終了しなくなります。`record struct` ではスタックオーバーフローになり、プロセスごと異常終了します(catch できません)。`$"{padding}"` やログ出力の1行で起きます。
+
+このようなプロパティを追加するときは、`PrintMembers` を自分で実装して、出力するメンバーを選びます。
+
+```csharp
+public readonly record struct EdgeInsets(double Left = 0, double Top = 0, double Right = 0, double Bottom = 0)
+{
+    public EdgeInsets Flipped => new(Right, Bottom, Left, Top);
+
+    private bool PrintMembers(System.Text.StringBuilder builder)
+    {
+        builder.Append($"Left = {Left}, Top = {Top}, Right = {Right}, Bottom = {Bottom}");
+        return true;
+    }
+}
+```
+
+`abstract record` の基底型では `protected virtual bool PrintMembers(StringBuilder builder)` にします(`Curve` を参照)。`ToString()` そのものを上書きしても構いません。
+
+書き忘れは `tests/FloatSoda.Test/RecordToStringTest.cs` が検出します。公開アセンブリの record をリフレクションで調べ、該当するプロパティを持つのに `PrintMembers` も `ToString` も自動生成のままの型があると、テストが落ちます。
+
 ## 8.5 実数は `double` を基本とし、Skia型を公開APIに出さない
 
 ### 実数型の方針

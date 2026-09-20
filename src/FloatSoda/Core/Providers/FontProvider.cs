@@ -1,7 +1,23 @@
 ﻿namespace FloatSoda.Core.Providers;
 
 /// <summary>テキスト描画に使用するフォントファミリを読み込む方法を表します。</summary>
-public abstract record FontProvider : ResourceProvider<FontResource>;
+/// <remarks>
+/// フォントは、最初に使われたレイアウトの中で同期的に一度だけ読み込み、アプリケーションの終了まで保持します。
+/// 等しいプロバイダー(recordの値の等価性)は同じ読み込み結果を共有します。
+/// 画像(<see cref="ImageProvider"/>)と違って解放や入れ替えを行わないため、利用者が破棄するものはありません。
+/// </remarks>
+public abstract record FontProvider
+{
+    /// <summary>フォントファミリを同期的に読み込みます。</summary>
+    /// <returns>読み込んだフォントリソース。所有権はFloatSodaへ移ります。</returns>
+    /// <remarks>
+    /// テキストのレイアウト中に、フレームを処理するスレッドから呼び出されます。
+    /// 失敗した場合は既定の書体で描画し、次に使われたときに読み込みをやり直します。
+    /// </remarks>
+    protected abstract FontResource Load();
+
+    internal FontResource LoadResource() => Load();
+}
 
 /// <summary>システムへインストールされたフォントファミリを使用するプロバイダーです。</summary>
 public sealed record SystemFontProvider : FontProvider
@@ -22,11 +38,7 @@ public sealed record SystemFontProvider : FontProvider
     public string FamilyName { get; }
 
     /// <inheritdoc/>
-    protected override FontResource Load(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        return FontResource.FromSystem(FamilyName);
-    }
+    protected override FontResource Load() => FontResource.FromSystem(FamilyName);
 }
 
 /// <summary>ファイルからフォントファミリを読み込むプロバイダーです。</summary>
@@ -48,13 +60,7 @@ public sealed record FileFontProvider : FontProvider
     public string Path { get; }
 
     /// <inheritdoc/>
-    protected override FontResource Load(CancellationToken cancellationToken)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        var bytes = File.ReadAllBytes(Path);
-        cancellationToken.ThrowIfCancellationRequested();
-        return FontResource.FromData(bytes);
-    }
+    protected override FontResource Load() => FontResource.FromData(File.ReadAllBytes(Path));
 }
 
 /// <summary>
