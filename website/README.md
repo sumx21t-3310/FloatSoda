@@ -19,7 +19,7 @@
 
 ### `docs/` の構造がそのままサイトの構造になる
 
-#188 の情報設計(User / Contributor / API Reference の 3 系統)に合わせ、`docs/` のディレクトリを正典にします。
+#188 の情報設計(User / Contributor / API Reference の 3 系統)に合わせ、`docs/` のディレクトリを一次情報にします。
 
 | `docs/` | サイト | サイドバー |
 |---|---|---|
@@ -63,11 +63,11 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 | ファイル | 中身 | 使いどころ |
 |---|---|---|
 | `/llms.txt` | 索引。全ページの素の Markdown へのリンクと一行説明、分割ファイルの一覧 | エージェントに最初に渡す |
-| `/llms-full.txt` | 全ページの全文(約 13 万文字) | 一度に読み切れる経路(ChatGPT など) |
-| `/_llms-txt/<系統>.txt` | サイドバーのグループ(再編前は `user` / `contributor`、再編後は `docs/` の系統ディレクトリ名)ごとの全文。各 7 万文字以下 | 取得上限が 10 万文字前後の経路(Claude.ai など) |
-| `/<slug>.md` | ページ単位の素の Markdown | 上限が小さい経路、または必要なページだけ読むとき |
+| `/llms-full.txt` | 全ページの全文(約 13 万文字) | 一度に読み切れる読ませ先(ChatGPT など) |
+| `/_llms-txt/<系統>.txt` | サイドバーのグループ(再編前は `user` / `contributor`、再編後は `docs/` の系統ディレクトリ名)ごとの全文。各 7 万文字以下 | 取得上限が 10 万文字前後の読ませ先(Claude.ai など) |
+| `/<slug>.md` | ページ単位の素の Markdown | 上限が小さい読ませ先、または必要なページだけ読むとき |
 
-分割ファイルの単位と索引の並びは `scripts/docs-source.mjs` の `sidebarGroups()` から作るので、`docs/` の構造が変わればサイドバーと一緒に追従します。HTML しか取得できない経路(2026-09-09 時点の Gemini の Web チャット)には、各ページの HTML をそのまま読ませます。
+分割ファイルの単位と索引の並びは `scripts/docs-source.mjs` の `sidebarGroups()` から作るので、`docs/` の構造が変わればサイドバーと一緒に追従します。HTML しか取得できない読ませ先(2026-09-09 時点の Gemini の Web チャット)には、各ページの HTML をそのまま読ませます。
 
 `npm run preview`(`astro preview`)は `llms.txt` や `/<slug>.md` を charset なしの `text/plain` で返すため、ブラウザで開くと日本語が化けて見えます。ファイル自体は UTF-8 で、本番の GitHub Pages は `text/plain; charset=utf-8` を付けて配信します。ローカルで中身を確かめるときは `npm run verify`(UTF-8 の検査を含む)か、`curl http://localhost:4321/llms.txt` を使ってください。
 

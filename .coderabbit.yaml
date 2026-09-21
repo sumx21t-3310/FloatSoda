@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://storage.googleapis.com/coderabbit_public_assets/schema.v2.json
 #
 # CodeRabbit は PR 入口の自動レビュー層(→ REVIEW.md 9章「レビューの層と分担」)。
-# 判断基準の正典は REVIEW.md。ここに書く instructions はその要約なので、
+# 判断基準の一次情報は REVIEW.md。ここに書く instructions はその要約なので、
 # REVIEW.md を変更したらこのファイルとの同期を確認すること。
 
 language: "ja-JP"
@@ -37,7 +37,7 @@ reviews:
   path_instructions:
     - path: "src/**/*.cs"
       instructions: |
-        REVIEW.md が判断基準の正典。特に:
+        REVIEW.md が判断基準の一次情報。特に:
         - 指摘は REVIEW.md 1章の重要度順。style / 具体的影響のない performance は非ブロッキングの提案とする
         - Flutter 由来の挙動は REVIEW.md 3章の優先順位で判断する
           (FloatSoda の明示的設計判断 > Flutter 本家 > 既存実装は根拠にならない)
@@ -62,5 +62,5 @@ reviews:
         - docs/ は GitHub Wiki に自動同期される一次情報。Wiki 側の編集を提案しない
     - path: ".claude/skills/**"
       instructions: |
-        このディレクトリは .agents/skills/ の派生スタブ(frontmatter + 正典へのポインタのみ)。
-        手順本文が書かれていたら指摘する。frontmatter が正典側と食い違っていたら指摘する。
+        このディレクトリは .agents/skills/ の派生スタブ(frontmatter + 一次情報へのポインタのみ)。
+        手順本文が書かれていたら指摘する。frontmatter が一次情報側と食い違っていたら指摘する。
