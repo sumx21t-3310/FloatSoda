@@ -38,10 +38,14 @@
 - `RenderImage` の名前空間を `FloatSoda.RenderObjects` から `FloatSoda.RenderObjects.Painting` へ移動。子を持たない RenderObject に変更し(基底型は `RenderBox`)、`Child` を削除
 - `Text` と `RichText` の名前空間を `FloatSoda.Widgets.Components` から `FloatSoda.Widgets` へ移動。`using` の書き換えが必要
 - `TapGestureRecognizer` と `PanGestureRecognizer` の名前空間を `FloatSoda.Gesture` から `FloatSoda.Gesture.Recognizers` へ移動
-- `RenderPadding` の名前空間を `FloatSoda.Widgets.Layout` から `FloatSoda.RenderObjects.Layout` へ移動。`RenderSiftedBox` を削除
+- `RenderPadding` の名前空間を `FloatSoda.Widgets.Layout` から `FloatSoda.RenderObjects.Layout` へ移動し、`Spacing` プロパティを `Padding` へ改名。`RenderSiftedBox` を削除
 - `FloatSoda.Engine` のスレッド実行基盤を再編。`IThreadRunner` → `ITaskRunner`、`ThreadRunner` → `PostTaskRunner`、`RenderThreadRunner` → `RenderPostTaskRunner` へ改名し、投入順に1件ずつ処理する `IOTaskRunner` を追加
 - `IHasMultiChildrenRenderObject` に `InsertChild(child, after)` と `MoveChild(child, after)` を追加。複数の子を持つ RenderObject を自作している場合は、両メソッドの実装が必要(`MultiChildrenCollection<T>.Insert` / `Move` へ委譲すればよい)
 - `TextSpan.Style` の型を、Topten.RichTextKit の `Style` から FloatSoda の `TextStyle` へ変更
+- `TextSpan.Build(TextBlock, Style)` を削除。`TextSpan` の描画は `TextPainter` / `RenderParagraph` が担う
+- `ConstrainedBox.Constraints` を削除し、必須の `AdditionalConstraints` へ置き換え(Flutter の `ConstrainedBox.constraints` と同じく、親の制約に追加で課す制約を指定する)。`Constraints = …` は `AdditionalConstraints = …` へ書き換える
+- `PointerEvent.Transform` と `HitTestEntry.Transform` の型を `Offset?` から `Matrix3x2?` へ、`HitTestResult.LastTransform` の型を `Offset` から `Matrix3x2` へ変更。`FittedBox` や `Transform` の拡縮と回転を、ヒットテストの座標変換に反映するため。平行移動だけを渡していたコードは `Matrix3x2.CreateTranslation(x, y)` へ書き換える
+- 非ジェネリックの `LeafRenderObjectElement` を削除し、`LeafRenderObjectElement<T>` へ置き換え。子を持たない RenderObject のウィジェットは、`LeafRenderObjectWidget<T>` を継承すれば Element を自作せずに済む
 
 ### Fixed
 
