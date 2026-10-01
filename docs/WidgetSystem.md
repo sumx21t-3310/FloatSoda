@@ -729,7 +729,7 @@ Widget tappable = new GestureDetector
 SteamVR がダッシュボード上のレーザーポインターをマウスイベントとして送信するため、
 FloatSoda はこれを `IRawPointerSource` として受け取っています。
 `WorldSpaceWindow` と `DeviceTrackedWindow` はコントローラーレイからの入力が未接続です。
-ヒットテスト自体は機能しますが、判定用の座標が供給されません。この接続は Phase 1 の残件です。
+ヒットテスト自体は機能しますが、判定用の座標が供給されません。この接続は Phase 3.5 で扱います([#182](https://github.com/sumx21t-3310/FloatSoda/issues/182))。
 
 したがって、`WorldSpaceWindow` で `GestureDetector` を使用しても、
 コンパイルや実行は成功しますがコールバックは呼ばれません。
