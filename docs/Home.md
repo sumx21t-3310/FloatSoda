@@ -70,9 +70,10 @@ graph LR
 
 | Phase | 内容 | 状況 |
 |---|---|---|
-| Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 🚧 進行中 |
+| Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | ✅ 完了 |
 | Phase 2 | basic.dart 相当の表示系ウィジェット網羅(画像・アイコン含む) | 🚧 進行中 |
 | Phase 3 | スクロールとアニメーションの充実(Tween / 暗黙的アニメーション / 物理シミュレーション) | 未着手 |
+| Phase 3.5 | SteamVR API 確定(`FloatSoda.OVR` の公開面の収束) | 未着手 |
 | Phase 4 | Hooks・テキスト入力・API安定化 | 未着手 |
 | Phase 5 | Cream / FizzyPop デザインシステム完成 | 未着手 |
 | Phase 6 | DX 向上(Storybook・manifest 自動生成・ライフサイクル) | 未着手 |
@@ -87,16 +88,17 @@ graph LR
 > ボタンは `GestureDetector` を使って組み立ててください
 > (→ [WidgetSystem](WidgetSystem.md#押せるボタンを作る))。
 
-進行中の2つの Phase に残っている主な作業は次のとおりです。
+進行中の Phase と、ほかの Phase へ移した作業は次のとおりです。
 
 | Phase | 残件 |
 |---|---|
-| Phase 1 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイからの入力) |
-| Phase 2 | `ImageProvider` の拡充、`CustomPaint`、`ViewMetrics`(`MediaQuery` 相当) |
+| Phase 2 | ドキュメントとサンプルの整備。表示系ウィジェットは一巡した |
+| Phase 3 | `CustomPaint`(Phase 2 から移動) |
+| Phase 3.5 | 非ダッシュボードオーバーレイへのポインタ接続(コントローラーレイからの入力。Phase 1 から移動)、`ViewMetrics`(`MediaQuery` 相当。Phase 2 から移動) |
 
 ## 実装状況サマリ
 
-現在は Alpha 段階(Phase 1 と Phase 2 が並行して進行中)です。主要コンポーネントの実装状況は以下のとおりです。詳細は各ページの実装状況欄を参照してください。
+現在は Alpha 段階(Phase 1 は完了し、Phase 2 を仕上げ中)です。主要コンポーネントの実装状況は以下のとおりです。詳細は各ページの実装状況欄を参照してください。
 
 状況欄の記号は次の意味を表します。
 

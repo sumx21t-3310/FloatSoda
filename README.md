@@ -178,7 +178,6 @@ sequenceDiagram
 > **`Button` などの UI コンポーネントはまだ提供していません。** 用意する予定の3層構成
 > （`FloatSoda.UI` / `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`）は Phase 5 で、
 > 現時点では NuGet 未配布・押下も未反応です。ボタンは `GestureDetector` で組み立ててください。
-> `Container` は使えますが、`Padding` の合成にはまだ対応していません。余白は `Padding` を入れ子にしてください。
 
 ## ドキュメント
 
@@ -212,15 +211,16 @@ sequenceDiagram
 
 ## 開発ステータス
 
-本プロジェクトは現在 **Alpha 段階・Phase 1(入力基盤)と Phase 2(表示系ウィジェット)が並行して進行中** です。簡単なアプリケーションは動作しますが、API は予告なく変更されます。
+本プロジェクトは現在 **Alpha 段階・Phase 2(表示系ウィジェット)の仕上げ中** です。Phase 1(入力基盤)は完了しています。簡単なアプリケーションは動作しますが、API は予告なく変更されます。
 
 開発は Phase 単位で進めています。Phase は「フレームワークとして何ができる段階か」を表す機能上の到達点で、NuGet のバージョン番号とは対応しません。バージョンはリリースの通し番号として独立に上がり、同じ Phase 中に複数のバージョンが公開されることがあります(バージョン番号から Phase を推定することはできません。`1.0.0` のみ Phase 7 に対応)。各 Phase の詳細スコープは [GitHub マイルストーン](https://github.com/sumx21t-3310/FloatSoda/milestones) を参照してください。
 
 | Phase | 内容 | 作れるようになるアプリ | 状況 |
 |---|---|---|---|
-| Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 操作できるパネル(GestureDetector で完全自作したボタン・トグル) | 🚧 進行中(残件は非ダッシュボードオーバーレイへのポインタ接続) |
-| Phase 2 | basic.dart 相当の表示系ウィジェット網羅 | リッチな HUD / 字幕オーバーレイ | 🚧 進行中(レイアウト・描画・入力・画像・アイコンは一巡。残るのは`CustomPaint`・`DefaultTextStyle`・`ViewMetrics`) |
+| Phase 1 | 入力基盤(HitTest / Pointer / Gesture) | 操作できるパネル(GestureDetector で完全自作したボタン・トグル) | ✅ 完了(非ダッシュボードオーバーレイへのポインタ接続は Phase 3.5 へ移動) |
+| Phase 2 | basic.dart 相当の表示系ウィジェット網羅 | リッチな HUD / 字幕オーバーレイ | 🚧 進行中(レイアウト・描画・入力・テキスト・画像・アイコンのウィジェットは一巡。残るのはドキュメントとサンプルの整備。`CustomPaint` は Phase 3、`ViewMetrics` は Phase 3.5 へ移動) |
 | Phase 3 | スクロールとアニメーションの充実(Tween / 暗黙的アニメーション / 物理シミュレーション) | チャットビューア等のリスト系アプリ | 未着手 |
+| Phase 3.5 | SteamVR API 確定(`FloatSoda.OVR` の公開面の収束) | 通知トースト・VR キーボード・触覚フィードバックまで使うオーバーレイ | 未着手 |
 | Phase 4 | Hooks・テキスト入力・API安定化 | VR 内メモ帳などの入力を伴うアプリ | 未着手 |
 | Phase 5 | Cream / FizzyPop デザインシステム完成 | テーマを選べる実用 UI アプリ | 未着手 |
 | Phase 6 | DX 向上(Storybook・manifest 自動生成・ライフサイクル) | デスクトップ常駐+VR のハイブリッドツール | 未着手 |

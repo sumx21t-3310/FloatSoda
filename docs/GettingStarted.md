@@ -25,13 +25,12 @@ SteamVR を終了するか、`VREvent_Quit` を受信すると、アプリも自
 
 ### 用途別のサンプル一覧
 
-`samples/` には目的の異なる12のプロジェクトがあります。**総合デモと低レベル API のサンプル**、および**ウィジェット1つ(または1グループ)の使い方を示すカタログ型サンプル**に分かれます。
+`samples/` のプロジェクトは、**総合デモ・最小アプリ・低レベル API・ヘッドレス描画のサンプル**(下の表)と、**ウィジェット1つ(または1グループ)の使い方を示すカタログ型サンプル**([ウィジェットカタログ](#ウィジェットカタログ)の表)に分かれます。
 
 | プロジェクト | 内容 | SteamVR |
 |---|---|---|
 | `FloatSoda.Samples.OverlayApp` | レイアウト・時計・アニメーション・カウンター・ドラッグの総合デモ。3種のオーバーレイを同時に生成する | 必要 |
 | `FloatSoda.Samples.GettingStarted` | 下の「最小構成のコード」とほぼ同じ最小アプリ | 必要 |
-| `FloatSoda.Samples.PointerRegion` | ホバー・押下・取り消しの状態を画面に出す入力デモ。`PointerRegion` と `Listener` の挙動を目で確かめられる | 必要 |
 | `FloatSoda.Samples.PrimitiveOverlay` | ウィジェット層を使わず、`FloatSoda.OVR` の低レベル API だけでオーバーレイを出す | 必要 |
 | `FloatSoda.Samples.PaintingSample` | Widget / RenderObject / Layer の各ツリーを PNG へ書き出す | **不要** |
 
@@ -39,15 +38,32 @@ SteamVR を終了するか、`VREvent_Quit` を受信すると、アプリも自
 
 ウィジェットごとの使い方を示すサンプルです。各ディレクトリの `README.md` がそのままチュートリアルで、`checks/items.jsonl` に目視確認の項目があります。`--desktop` を付けるとデスクトップウィンドウへ表示できます。
 
-| プロジェクト | 扱うウィジェット |
-|---|---|
-| `FloatSoda.Samples.Text` | `Text` / `RichText` / `TextSpan` / `TextStyle` |
-| `FloatSoda.Samples.ColoredBox` | `ColoredBox` |
-| `FloatSoda.Samples.Align` | `Align` / `Center` |
-| `FloatSoda.Samples.SizedBox` | `SizedBox` |
-| `FloatSoda.Samples.Flex` | `Flex` / `Row` / `Column` |
-| `FloatSoda.Samples.Clip` | `ClipRect` / `ClipRoundRect` / `ClipOval` / `ClipCustomPath` |
-| `FloatSoda.Samples.Image` | `Image` / `FileImageProvider` / `BoxFit` |
+| 分類 | プロジェクト | 扱うウィジェット |
+|---|---|---|
+| レイアウト | `FloatSoda.Samples.Flex` | `Flex` / `Row` / `Column` |
+| レイアウト | `FloatSoda.Samples.Expanded` | `Expanded` / `Flexible` / `Spacer` |
+| レイアウト | `FloatSoda.Samples.Wrap` | `Wrap` |
+| レイアウト | `FloatSoda.Samples.Align` | `Align` / `Center` |
+| レイアウト | `FloatSoda.Samples.Padding` | `Padding` |
+| レイアウト | `FloatSoda.Samples.Container` | `Container` |
+| レイアウト | `FloatSoda.Samples.SizedBox` | `SizedBox` |
+| レイアウト | `FloatSoda.Samples.LimitedBox` | `LimitedBox` |
+| レイアウト | `FloatSoda.Samples.ConstraintsTransformBox` | `ConstraintsTransformBox` / `UnconstrainedBox` |
+| レイアウト | `FloatSoda.Samples.Stack` | `Stack` / `Positioned` |
+| レイアウト | `FloatSoda.Samples.AspectRatio` | `AspectRatio` |
+| レイアウト | `FloatSoda.Samples.FittedBox` | `FittedBox` / `BoxFit` |
+| レイアウト | `FloatSoda.Samples.FractionallySizedBox` | `FractionallySizedBox` |
+| レイアウト | `FloatSoda.Samples.OverflowBox` | `OverflowBox` / `SizedOverflowBox` |
+| 描画 | `FloatSoda.Samples.ColoredBox` | `ColoredBox` |
+| 描画 | `FloatSoda.Samples.DecoratedBox` | `DecoratedBox` / `BoxDecoration` |
+| 描画 | `FloatSoda.Samples.Opacity` | `Opacity` |
+| 描画 | `FloatSoda.Samples.Transform` | `Transform` |
+| 描画 | `FloatSoda.Samples.Clip` | `ClipRect` / `ClipRoundRect` / `ClipOval` / `ClipCustomPath` |
+| 描画 | `FloatSoda.Samples.Text` | `Text` / `RichText` / `TextSpan` / `TextStyle` |
+| 描画 | `FloatSoda.Samples.Image` | `Image` / `FileImageProvider` / `BoxFit` |
+| 入力 | `FloatSoda.Samples.GestureDetector` | `GestureDetector` |
+| 入力 | `FloatSoda.Samples.Listener` | `Listener` |
+| 入力 | `FloatSoda.Samples.PointerRegion` | `PointerRegion`。ホバー・押下・取り消しの状態を画面に出し、`Listener` / `GestureDetector` と重ねたときのイベントの順序を確かめられる |
 
 いずれも SteamVR の起動が必要です(`--desktop` でも OpenVR を初期化するため)。
 
