@@ -8,7 +8,7 @@ body:
         提案ありがとうございます。
         FloatSoda は Flutter のウィジェットモデルを踏襲しています。**Flutter に対応する API がある場合は、
         新しい API を発明するより、既存の Flutter の概念に合わせることを優先します**
-        (判断基準は [docs/APIDesign.md](https://github.com/sumx21t-3310/FloatSoda/blob/main/docs/APIDesign.md))。
+        (判断基準は [docs/contributor/APIDesign.md](https://github.com/sumx21t-3310/FloatSoda/blob/main/docs/contributor/APIDesign.md))。
         そのため、下の「対応する Flutter API」を先に確認していただけると議論が早く進みます。
 
   - type: textarea

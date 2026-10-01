@@ -59,7 +59,7 @@ export default defineConfig({
         }),
       ],
       // サイドバーは docs/ の構造を正典にする(#188)。系統ディレクトリ(docs/user/ など)が 1 グループ。
-      // docs/ 直下のページは再編が済むまで、docs/Home.md の表の「対象読者」列でグループ化する。詳細は scripts/docs-source.mjs
+      // docs/ 直下のページ(Home.md を除く)は「導入」グループにまとめる。詳細は scripts/docs-source.mjs
       sidebar: [
         { slug: "home" },
         ...sidebarGroups().map((group) => ({

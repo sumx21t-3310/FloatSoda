@@ -65,13 +65,13 @@ RenderProxyBox・dirty layout/paint 設計・命名規約に合わせること�
 コンテキスト:
 - ブランチは origin/main (<最新mainのSHA>) から `<issue番号>-<primary-area>-<slug>` を切る(`<primary-area>` は Issue の `area:*` ラベルの主要領域)(CONTRIBUTING.md のブランチ命名規則に従う。`codex/` 等のエージェント名を含めない)。
 - 進行中の Draft PR <#番号リスト> とはファイルを競合させない。<依存回避の具体的指示>
-- 参考: docs/WidgetSystem.md、既存の類似ウィジェットの実装パターン。
+- 参考: docs/contributor/WidgetSystem.md、既存の類似ウィジェットの実装パターン。
 
 完了条件:
 1. <対象ウィジェット>が public API として動作する
 2. 各ウィジェットに単体テストがあり、既存テスト含め全テストが通る
 3. 不正入力(負数・非有限値など)の検証が既存ウィジェットと同水準
-4. docs/WidgetSystem.md の実装状況を更新
+4. docs/contributor/WidgetSystem.md の実装状況を更新
 5. コミットメッセージは以下の形式。件名は日本語、本文の最終行に
    GitHub の issue クローズキーワードを置く:
 

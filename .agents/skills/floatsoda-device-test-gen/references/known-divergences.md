@@ -1,7 +1,7 @@
 # 確認済みの Flutter 移植差異
 
 **この台帳が、確認済みの FloatSoda ↔ Flutter 差異の一次情報。** そもそも差異がいつ許されるかを
-定める設計原則は [`docs/APIDesign.md`](../../../../docs/APIDesign.md)(「判断原則: Flutter 由来の
+定める設計原則は [`docs/contributor/APIDesign.md`](../../../../docs/contributor/APIDesign.md)(「判断原則: Flutter 由来の
 observable behavior に差異を作らない」)にあり、このファイルは個別のエントリを保持する。
 差異をここ以外の場所に記録すると記録が分裂する — 必ずここに追記すること。
 
@@ -20,7 +20,7 @@ observable behavior に差異を作らない」)にあり、このファイル�
 
 ## エントリのテンプレート
 
-最初の5フィールドは、`docs/APIDesign.md` がすべての意図的差異に要求するもの(Flutter の挙動 /
+最初の5フィールドは、`docs/contributor/APIDesign.md` がすべての意図的差異に要求するもの(Flutter の挙動 /
 FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け docs)。
 **`Test` の無い差異は、次の移植で静かに巻き戻される** — `deliberate` エントリの未設定の `Test` は、
 完了した記録ではなく未処理のタスクとして扱うこと。
@@ -159,7 +159,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   (device test)で再調整すること。
 - **Test**: `tests/FloatSoda.Test/Widgets/TextTest.cs` —
   `ToRichTextKitStyle_全プロパティ未指定_既定値で描画書式を生成する`
-- **Docs**: `docs/WidgetSystem.md`(`Text` の既定書式の記載)
+- **Docs**: `docs/contributor/WidgetSystem.md`(`Text` の既定書式の記載)
 - **Observation**: 値の差異そのものは `HEADLESS`。30 が適切な値かどうかの判定は `VR`
   (レンズ越しの可読性)。
 - **Label**: deliberate
@@ -219,8 +219,8 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   フォールバックや絵文字など、優先する項目が先にある。UI の RTL ミラーリングと、ユーザー生成文字列の
   Unicode 双方向テキスト処理は別の関心事として扱う。
 - **Test**: — (not set)。型が存在しないことを固定するテストは作りにくい。移植時に `Directional`
-  系の型を足す PR は、このエントリと `docs/Localization.md` の方針を先に見直す。
-- **Docs**: `docs/Localization.md` の「6. RTL(右から左へのレイアウト)は現時点でスコープ外」(PR #265)
+  系の型を足す PR は、このエントリと `docs/contributor/Localization.md` の方針を先に見直す。
+- **Docs**: `docs/contributor/Localization.md` の「6. RTL(右から左へのレイアウト)は現時点でスコープ外」(PR #265)
 - **Observation**: `HEADLESS`(API の有無と、レイアウト結果が LTR 固定であること)
 - **Label**: deliberate — 2026-09-16 にオーナーが確定。PR #265 の Codex レビューで記録漏れを指摘された。
 
@@ -258,7 +258,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
 ## Triage 2026-09-09 — 範囲の振り分けと着手順(Phase 2 リリース後に実施)
 
 上の9件を「どの範囲のテストで固定できるか」で振り分けた記録です。エントリ本体は変更していません。方法の全体は
-[`docs/TestStrategy.md`](../../../../docs/TestStrategy.md) にあります。
+[`docs/contributor/TestStrategy.md`](../../../../docs/contributor/TestStrategy.md) にあります。
 
 **テストを書く前にラベルを決めます。** deliberate は差異を固定するテスト、port mistake は修正前に落ちる
 regression test、not ported は Issue で、unlabelled のままテストを書くとバグを仕様として固定します。
@@ -268,7 +268,7 @@ regression test、not ported は Issue で、unlabelled のままテストを書
 | 1 | HEADLESS 単体 | deliberate 候補(`AGENTS.md` が fast path として説明済み) | ラベル確定後に `UpdateChild_構造的に等しい新Widget_DidUpdateWidgetを呼ばない` を `tests/FloatSoda.Test/Elements/` に追加。参照型プロパティを in-place で変更した場合に `DidUpdateWidget` が呼ばれない点を `docs/` に書く |
 | 2 | HEADLESS 単体 | not ported | #3 と統合する。再活性プールが効くのは `GlobalKey` 付きの要素だけで、通常の `Key` では Flutter でも別親への移動で `State` は作り直される。単独では利用者に見えない |
 | 3 | HEADLESS 単体 | not ported | Issue。`GlobalKey` を移植するか、コントローラ(`ChangeNotifier` 系)を代替として文書化するかを決める。優先度は junior-coder test で LLM が `GlobalKey` を書くかどうかで決める |
-| 4 | HEADLESS 単体 | deliberate(確定済み) | **今すぐ書ける。** `ScopeType_具象Windowを差し替え_依存Elementが再構築される` を `tests/FloatSoda.Test/Widgets/WindowWidgetTest.cs` に追加。既存の `Of_FindsConcreteWindow_ViaBaseTypeLookup` は検索側だけを検証している。`Docs` も未設定なので `docs/WidgetSystem.md` に1行書く |
+| 4 | HEADLESS 単体 | deliberate(確定済み) | **今すぐ書ける。** `ScopeType_具象Windowを差し替え_依存Elementが再構築される` を `tests/FloatSoda.Test/Widgets/WindowWidgetTest.cs` に追加。既存の `Of_FindsConcreteWindow_ViaBaseTypeLookup` は検索側だけを検証している。`Docs` も未設定なので `docs/contributor/WidgetSystem.md` に1行書く |
 | 5 | HEADLESS 単体 | port mistake(確定) | **今すぐ書ける。** `Layout_制約が同じで再レイアウト境界だけ変わる_PerformLayoutを再実行しない` を `tests/FloatSoda.Test/RenderObjects/` に追加。`PerformLayout` の回数を数えるプローブは `Widgets/IndexedStackTest.cs` の方式を流用する。現状では落ちる(red)ので、修正は別コミット |
 | 6 | HEADLESS 結合 | 4件に分割 | post-frame callback は not ported として Issue(LLM は `addPostFrameCallback` を当然のように書く)。`finalizeTree` は #2 へ吸収。compositing bits は FloatSoda の Layer 構造で必要かを判断してから。semantics は非移植方針が `REVIEW.md` にあるので文書のみ |
 | 7 | HEADLESS 結合 | deliberate 候補 | Why 案: OpenVR のオーバーレイ入力は `PollNextOverlayEvent` で取り出す方式で、プッシュで受け取る仕組みが無い。量子化はプラットフォームの性質。`BeginFrame_フレーム間の複数ポインタイベント_次のBeginFrameでまとめて配信する` を `tests/FloatSoda.Test/Core/WidgetBindingTest.cs` に追加。`IEngineWindow` の test double がテストに無いので、`PointerSource` を持つ fake を同じファイルに足す |

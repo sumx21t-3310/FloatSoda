@@ -1,8 +1,8 @@
-← [Home](Home.md)
+← [Home](../Home.md)
 
 # テスト戦略
 
-このドキュメントは、FloatSoda のテストを「範囲 × 目的 × オラクル」の3軸で整理し、現在の配置と既知の穴をまとめたものです。テストの命名と「何を検証するか」の観点は [CONTRIBUTING.md](../CONTRIBUTING.md) が一次情報であり、本ページはそれに代わるものではありません。本ページは、テストの配置を決めるための地図として使います。
+このドキュメントは、FloatSoda のテストを「範囲 × 目的 × オラクル」の3軸で整理し、現在の配置と既知の穴をまとめたものです。テストの命名と「何を検証するか」の観点は [CONTRIBUTING.md](../../CONTRIBUTING.md) が一次情報であり、本ページはそれに代わるものではありません。本ページは、テストの配置を決めるための地図として使います。
 
 ## 1. 3つの軸
 
@@ -56,8 +56,8 @@
 | 機能 | 結合 | 例示 | 薄い | `WidgetBinding` を端から端まで動かすテストは、`Core/WidgetBindingTest.cs` と `Core/PointerInputIntegrationTest.cs` の2ファイルのみ |
 | 機能 | 描画 | 例示 | ある | `GetPixel` による画素の検証が15ファイル、84箇所 |
 | 機能 | 実機 | 例示 | 無い | デバイスのテスト手順は存在するが、テストハーネスは未着手 |
-| 機能 | 実機 | 差分 | 文書のみ | [known-divergences.md](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に9件。うち8件が `Test: — (not set)` |
-| 回帰 | 単体 | 例示 | ある | バグ修正ごとの regression test の追加を [REVIEW.md](../REVIEW.md) で必須としている |
+| 機能 | 実機 | 差分 | 文書のみ | [known-divergences.md](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に9件。うち8件が `Test: — (not set)` |
+| 回帰 | 単体 | 例示 | ある | バグ修正ごとの regression test の追加を [REVIEW.md](../../REVIEW.md) で必須としている |
 | 回帰 | 描画 | ゴールデン | 無い | 参照画像は0件。`GetPixel` で要件を満たしている間は優先度が低い |
 | 非機能 | 結合 | 例示(閾値) | 未着手 | `tests/FloatSoda.Test/FloatSoda.Test.csproj` は BenchmarkDotNet を参照しているが、`[Benchmark]` は0件 |
 | 非機能 | 結合 | 不変条件(並行性) | 薄い | スレッドを扱うテストは `Engine/IOTaskRunnerTest.cs` など数件のみ。レンダースレッドと Layer clone の競合は未検証 |
@@ -82,7 +82,7 @@
 
 ## 5. Flutter との差異とテストの関係
 
-差異の台帳は [known-divergences.md](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。ラベルによって記述すべきテストの方向性が逆転するため、**テストを作成する前にラベルを決定します。**
+差異の台帳は [known-divergences.md](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。ラベルによって記述すべきテストの方向性が逆転するため、**テストを作成する前にラベルを決定します。**
 
 | ラベル | 作成するテスト |
 |---|---|
@@ -95,7 +95,7 @@
 
 ## 6. 片付けの計画
 
-Phase 2 のリリース([Home](Home.md#ロードマップphase))後に着手します。順番は次のとおりです。
+Phase 2 のリリース([Home](../Home.md#ロードマップphase))後に着手します。順番は次のとおりです。
 
 1. 差異の固定テストの作成。台帳の Triage 節の順序(#4 → #5 → #1 → #7)
 2. 結合テストの拡充(dirty 伝播と入力の配送)

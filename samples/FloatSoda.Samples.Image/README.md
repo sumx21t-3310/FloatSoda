@@ -121,5 +121,5 @@ dotnet run --project samples/FloatSoda.Samples.Image
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [docs/RenderObjects.md](../../docs/RenderObjects.md) — `RenderImage` の契約
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/RenderObjects.md](../../docs/contributor/RenderObjects.md) — `RenderImage` の契約

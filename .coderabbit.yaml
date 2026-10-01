@@ -18,7 +18,7 @@ knowledge_base:
     filePatterns:
       - "REVIEW.md"
       - "CONTRIBUTING.md"
-      - "docs/APIDesign.md"
+      - "docs/contributor/APIDesign.md"
 
 reviews:
   # REVIEW.md 2章: 少数・高確度の指摘を優先し、nitpick ノイズを絞る
@@ -45,7 +45,7 @@ reviews:
           `Label: deliberate` のエントリに該当する差異は指摘しない。それ以外のラベル
           (unlabelled / port mistake / not ported)のエントリは確定した設計判断ではないので、
           関連する変更は通常どおりレビューする
-        - XML ドキュメントコメント・例外メッセージは日本語が正(docs/Localization.md)。英語化を提案しない
+        - XML ドキュメントコメント・例外メッセージは日本語が正(docs/contributor/Localization.md)。英語化を提案しない
         - public API に Skia 型(SK*)を露出させない
         - namespace と物理ディレクトリの不一致を指摘する(CONTRIBUTING.md)
     - path: "tests/**/*.cs"
@@ -58,7 +58,7 @@ reviews:
         - バグ修正 PR に regression test が無ければ指摘する
     - path: "docs/**/*.md"
       instructions: |
-        - 日本語がニュートラル言語という設計判断(docs/Localization.md)。英語化を提案しない
+        - 日本語がニュートラル言語という設計判断(docs/contributor/Localization.md)。英語化を提案しない
         - docs/ は GitHub Wiki に自動同期される一次情報。Wiki 側の編集を提案しない
     - path: ".claude/skills/**"
       instructions: |

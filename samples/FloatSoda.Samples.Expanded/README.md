@@ -115,5 +115,5 @@ dotnet run --project samples/FloatSoda.Samples.Expanded
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Wrap](../FloatSoda.Samples.Wrap) — 収まらない子を折り返す場合

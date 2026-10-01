@@ -104,5 +104,5 @@ dotnet run --project samples/FloatSoda.Samples.Text
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.ColoredBox](../FloatSoda.Samples.ColoredBox) — 背景色の付け方

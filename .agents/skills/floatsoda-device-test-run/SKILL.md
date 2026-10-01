@@ -149,7 +149,7 @@ NG/CRASH/SKIP のときにオーナーが言った理由(それ以外は空文�
 4. オーナーが確定した差異はすべて
    `.agents/skills/floatsoda-device-test-gen/references/known-divergences.md` へ、同ファイル冒頭の
    エントリテンプレートどおりに追記する(`FloatSoda` / `Flutter` / `Why` / `Test` / `Docs` /
-   `Observation` / `Label` の 7 フィールド。`docs/APIDesign.md` の記録必須 5 項目を含む)。
+   `Observation` / `Label` の 7 フィールド。`docs/contributor/APIDesign.md` の記録必須 5 項目を含む)。
    `deliberate` の差異で `Test` が未設定なら、その回帰テストを書くまでエントリは未完了として扱う。
    これで次回の列挙がより先から始められる。「deliberate」で確定した差異は、文書化されるまで
    `docs/` のギャップ。

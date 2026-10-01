@@ -80,6 +80,6 @@ dotnet run --project samples/FloatSoda.Samples.Transform
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
-- [docs/Animation.md](../../docs/Animation.md) — 変換をアニメーションさせる場合
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/Animation.md](../../docs/contributor/Animation.md) — 変換をアニメーションさせる場合
 - [FloatSoda.Samples.Opacity](../FloatSoda.Samples.Opacity) — 同じく描画だけに効く不透明度の合成

@@ -80,6 +80,6 @@ dotnet run --project samples/FloatSoda.Samples.Listener
 
 ## 関連
 
-- [docs/Input.md](../../docs/Input.md) — 入力イベントの流れ
+- [docs/contributor/Input.md](../../docs/contributor/Input.md) — 入力イベントの流れ
 - [FloatSoda.Samples.GestureDetector](../FloatSoda.Samples.GestureDetector) — タップ・ドラッグの意味付けが要る場合
 - [FloatSoda.Samples.PointerRegion](../FloatSoda.Samples.PointerRegion) — 押下に依存しないホバー状態

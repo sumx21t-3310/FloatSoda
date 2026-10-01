@@ -25,10 +25,10 @@ export const repositoryUrl = "https://github.com/sumx21t-3310/FloatSoda";
 export const HOME = "Home";
 
 /**
- * docs/ 直下のページを「対象読者」列でグループ化するときの ASCII キー(#188 の再編までの暫定)。
- * 系統ディレクトリ(user / contributor / api)と同じ語にして、_llms-txt/<key>.txt のファイル名を再編の前後で揃える
+ * docs/ 直下のページ(Home.md を除く)をまとめるグループ。#188 の C4 Lv1(導入)に当たる。
+ * key は系統ディレクトリ(user / contributor / api)と衝突しない語にする。衝突すると、そのディレクトリのグループに合流してしまう
  */
-const AUDIENCE_KEYS = { 利用者: "user", コントリビュータ: "contributor" };
+const INTRO_GROUP = { key: "intro", label: "導入" };
 
 /**
  * docs/ 配下の .md を再帰的に列挙する。要素は次の形:
@@ -156,8 +156,7 @@ export function homeSummaries() {
 /**
  * サイドバーのグループを返す(`[{ key, label, rels }]`)。key は ASCII で、_llms-txt/<key>.txt のファイル名にも使う。
  *
- * 1. docs/ 直下のページ: Home.md の表の「対象読者」列でグループ化し、表の行順を読む順にする。
- *    #188 の再編で全ページが系統ディレクトリへ移るまでの暫定で、移り終わったらこの分岐は消す
+ * 1. docs/ 直下のページ: 「導入」グループ 1 つにまとめる。並びは Home.md の表の行順、表に無いページは後ろへ
  * 2. 系統ディレクトリ(docs/user/ など): 1 ディレクトリ = 1 グループ。ラベルは <dir>/Home.md の H1、
  *    並びは入口 → 同 Home.md のリンク順 → 残りをアルファベット順。系統どうしの並びは docs/Home.md でリンクされる順
  */
@@ -175,16 +174,8 @@ export function sidebarGroups() {
 
   const topLevel = docs.filter((doc) => doc.dir === "" && doc.name !== HOME);
   if (topLevel.length > 0) {
-    const rows = homeTableRows();
-    for (const row of rows) {
-      // 「利用者 / コントリビュータ」は先頭の読者。Markdown 装飾は落とし、空セルは「その他」へ
-      const audience = row.audience.split("/")[0].replace(/[*_`]/g, "").trim();
-      if (audience) push(AUDIENCE_KEYS[audience] ?? "other", `${audience}向け`, row.name);
-      else push("other", "その他", row.name);
-    }
-    for (const doc of topLevel) {
-      if (!rows.some((row) => row.name === doc.name)) push("other", "その他", doc.rel);
-    }
+    for (const row of homeTableRows()) push(INTRO_GROUP.key, INTRO_GROUP.label, row.name);
+    for (const doc of topLevel) push(INTRO_GROUP.key, INTRO_GROUP.label, doc.rel);
   }
 
   const dirs = [...new Set(docs.filter((doc) => doc.dir !== "").map((doc) => doc.dir.split("/")[0]))];

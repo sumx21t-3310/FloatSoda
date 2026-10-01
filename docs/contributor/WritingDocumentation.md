@@ -1,4 +1,4 @@
-← [Home](Home.md)
+← [Home](../Home.md)
 
 # ドキュメント執筆ガイド
 
@@ -10,7 +10,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 | Contributor docs | FloatSoda 本体を変える・レビューする人 | **How it works / Why / Must** — どう動き、なぜそう設計され、何を守るか |
 | API Reference | 利用者・コントリビュータ・Coding Agent の全員 | **Exactly what exists** — 公開 API の正確な契約 |
 
-> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は、#188 の手順4で進めます。現行の `docs/` は Contributor 向けの詳細なリファレンスが中心です。そのため、再編では **現行ページを `contributor/` へ移し、User docs は新しく書きます**。それまでは [再編の地図](#再編の地図) で該当ページを選んでください。このガイド自体も、再編後は `docs/contributor/Documentation.md` へ移ります。種別ごとの「書くもの / 書かないもの」とテンプレートは、User 側が [4 章](#4-user-docs-の書くもの--書かないものとテンプレート)、Contributor 側が [5 章](#5-contributor-docs-の書くもの--書かないものとテンプレート)にあります。
+> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は、#188 の手順4で進めています。現行ページは Contributor 向けの詳細なリファレンスが中心なので、**ファイル名を変えずに `contributor/` へ移しました。User docs は `user/` に骨組みだけがあり、これから新しく書きます**。利用者向けの内容を探すときは、[再編の地図](#再編の地図) で該当ページを選んでください。種別ごとの「書くもの / 書かないもの」とテンプレートは、User 側が [4 章](#4-user-docs-の書くもの--書かないものとテンプレート)、Contributor 側が [5 章](#5-contributor-docs-の書くもの--書かないものとテンプレート)にあります。
 
 ## 1. どこに書くか
 
@@ -41,7 +41,7 @@ FloatSoda のドキュメントは、読者ごとに **User docs / Contributor d
 境界で迷いやすい情報は、次のように分類します。
 
 - **利用者から観測できる制約**は User docs に書き、**その制約を成立させる内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
-- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
+- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
 - **同じテーマは1つの系統で詳述**し、ほかの系統からはリンクします。概念を Guide で説明し直したり、シグネチャを Concept に並べたりしません
 
 ### User docs の範囲
@@ -67,8 +67,8 @@ User docs は、公開 API および API Reference と合わせて、**#188 の�
 | [DocumentationComments](DocumentationComments.md) | Contributor / Development | |
 | [TestStrategy](TestStrategy.md) | Contributor / Development | テストの置き場所を決める地図。配置と件数は日付付きで更新する |
 | [Localization](Localization.md) | Contributor / Design + Development | |
-| このページ | Contributor / Development | `contributor/Documentation.md` |
-| [TargetUsers](TargetUsers.md) | User(入口) | 利用者向けに書かれているので、ほぼそのまま `user/` へ |
+| このページ | Contributor / Development | |
+| [TargetUsers](../TargetUsers.md) | 導入(Lv1) | `docs/` 直下に残す。サイトでは「導入」グループに入る |
 | [GettingStarted](GettingStarted.md) | User / Tutorial | 利用者向けに書き直す |
 | [Input](Input.md) | User / Concept + Guide | 利用者向けに書き直す。実装の説明は Contributor 側へ |
 
@@ -96,13 +96,13 @@ User docs は、公開 API および API Reference と合わせて、**#188 の�
 | API の具体的な使い方 | User Guide |
 | 概念モデル(Widget、State、Layout、Input、Animation、Window / Overlay) | User Concept |
 | 完成物を作る手順 | User Tutorial とサンプル(`samples/`) |
-| ウィジェットの最小の使用例 | サンプルの README(構成は [CONTRIBUTING.md](../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
+| ウィジェットの最小の使用例 | サンプルの README(構成は [CONTRIBUTING.md](../../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
 | 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | Contributor Architecture |
 | 設計理由と採用しなかった選択肢 | Contributor Design |
-| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | Contributor Requirements。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../AGENTS.md) の規約表) |
+| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | Contributor Requirements。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../../AGENTS.md) の規約表) |
 | API 設計の原則と Flutter parity / divergence の判断基準 | [APIDesign](APIDesign.md) |
-| 確認済みの Flutter との差異 | [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) |
-| 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) |
+| 確認済みの Flutter との差異 | [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) |
+| 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../../CONTRIBUTING.md) / [REVIEW.md](../../REVIEW.md) / [RELEASING.md](../../RELEASING.md) |
 | ドキュメントの分類とサンプルの3層構成 | [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) |
 
 XML ドキュメントコメントは `internal` や `private` にも書きます([DocumentationComments](DocumentationComments.md) の適用範囲)。公開サイトの API Reference に載せるのは `public` API のみであり、`internal` 側のコメントはコントリビュータ向けの内部資料として扱います。
@@ -120,10 +120,10 @@ XML ドキュメントコメントは `internal` や `private` にも書きま�
 | アーキテクチャの境界を変更する | Contributor Architecture と Requirements |
 | 設計判断を変更する | Contributor Design。必要なら Requirements と [APIDesign](APIDesign.md) |
 | invariant を追加・変更する | Contributor Requirements とテスト |
-| Flutter との差異を導入・変更する | [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) と divergence テスト。利用者から観測できるなら User docs とサンプルの「Flutterとの違い」節 |
+| Flutter との差異を導入・変更する | [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) と divergence テスト。利用者から観測できるなら User docs とサンプルの「Flutterとの違い」節 |
 | 新しい代表ユースケースを追加する | User Guide / Tutorial と、#188 の層に沿ったサンプル |
-| サンプルを追加・変更する | サンプルの README と `checks/items.jsonl`([CONTRIBUTING.md](../CONTRIBUTING.md) の規約) |
-| ドキュメントのページを移動・改名する | リンク元のページと [Home](Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
+| サンプルを追加・変更する | サンプルの README と `checks/items.jsonl`([CONTRIBUTING.md](../../CONTRIBUTING.md) の規約) |
+| ドキュメントのページを移動・改名する | リンク元のページと [Home](../Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
 
 PR では、テンプレートの `## Documentation` 節に、変更種別と更新した文書(更新が不要と判断した場合はその理由)を記載します。レビューでは、その判断がこの表と一致しているかを確認します。
 
@@ -131,7 +131,7 @@ PR では、テンプレートの `## Documentation` 節に、変更種別と更
 
 User docs は新しく書くページが多いため、先に骨格を定めます。ページの目的に不要な節は省きます。
 
-読者は [TargetUsers](TargetUsers.md) で定義する3タイプです。**コードを書くのも読むのも LLM である**という前提を忘れず、「LLM がこの API を誤用しない」書き方を優先します。Unity の知識のみを持つ読者(Booth クリエイター)には、Unity や uGUI の語彙による読み替えを添えます。
+読者は [TargetUsers](../TargetUsers.md) で定義する3タイプです。**コードを書くのも読むのも LLM である**という前提を忘れず、「LLM がこの API を誤用しない」書き方を優先します。Unity の知識のみを持つ読者(Booth クリエイター)には、Unity や uGUI の語彙による読み替えを添えます。
 
 種別ごとに、書くものと書かないものを分けます。
 
@@ -189,7 +189,7 @@ User docs は新しく書くページが多いため、先に骨格を定めま�
 
 ## 5. Contributor docs の書くもの / 書かないものとテンプレート
 
-Contributor docs は、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
+Contributor docs は、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
 
 現行ページには複数の種別が混ざっています。例えば [RenderObjects](RenderObjects.md) の「差分更新」節は、伝播の仕組み(Architecture)と「プロパティを変更したら `MarkNeedsLayout()` / `MarkNeedsPaint()` を呼ぶ」という契約(Requirements)が同じ節にあります。再編では、混ざっている節を種別ごとに分けるか、別種別のページへリンクします。
 
@@ -237,7 +237,7 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 
 - **判断対象と背景** — 何を決めたか、どんな問題があったか(例: [UILayering](UILayering.md) の「Material ロックイン」)
 - **採用した方針と、判定可能な手順** — 「〜が自然」のような主観に流れないよう、手順や判定基準を添える(例: [APIDesign](APIDesign.md) の「.NET が標準で提供する機構を再実装しない」の3ステップ、UILayering の「2つ目のデザインシステムが、1つ目のコードをコピーせずに同じコンポーネントを作れるか」)
-- **理由と、理由にならないもの** — FloatSoda 固有の事情(Flutter / .NET / VR オーバーレイ / [TargetUsers](TargetUsers.md))に根拠を置く(例: APIDesign の「理由にならないもの」)
+- **理由と、理由にならないもの** — FloatSoda 固有の事情(Flutter / .NET / VR オーバーレイ / [TargetUsers](../TargetUsers.md))に根拠を置く(例: APIDesign の「理由にならないもの」)
 - **採用しなかった選択肢と、その理由**(例: [Localization](Localization.md) の「ニュートラル = 英語が定石だが、主客層と Booth 流通を優先した」)
 - **影響範囲と変更手続き** — この判断が効く範囲と、覆すときの手続き(例: Localization の「変更する場合は必ず issue で議論」)
 - **「コントリビュータへ」の注意書き** — 知らないと直したくなる判断には、意図的であることを明記する(例: Localization の 1 章末尾)
@@ -245,7 +245,7 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 書かないもの:
 
 - **現在の処理の流れの詳細** → Architecture
-- **Flutter との個別の差異** → [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md)。Design は判断原則だけを持つ([APIDesign](APIDesign.md) と台帳の分担と同じ)
+- **Flutter との個別の差異** → [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md)。Design は判断原則だけを持つ([APIDesign](APIDesign.md) と台帳の分担と同じ)
 - **手順** → Development
 - **議論の経過** — 決めたことと理由だけを書く。経過は Issue に残す
 
@@ -263,7 +263,7 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 
 実装を変えても**維持する条件**を書きます。読者は、変更が何を壊しうるかを確認するコントリビュータとレビュアーです。
 
-Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
+Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
 
 書くもの:
 
@@ -278,7 +278,7 @@ Requirements の独立したページはまだありません。いちばん近�
 
 - **なぜその条件が要るか** → Design。一文の理由は添えてもよいが、比較と経緯は Design に置く
 - **現在の実装がどう満たしているか** → Architecture。Requirements は実装が変わっても残る条件だけを書く
-- **実装詳細に依存する条件** — `private` フィールドの状態や呼び出し回数。テストと同じく observable behavior で書く([CONTRIBUTING.md](../CONTRIBUTING.md) の「テスト観点」)
+- **実装詳細に依存する条件** — `private` フィールドの状態や呼び出し回数。テストと同じく observable behavior で書く([CONTRIBUTING.md](../../CONTRIBUTING.md) の「テスト観点」)
 - **手順** → Development
 
 ```text
@@ -297,7 +297,7 @@ Requirements の独立したページはまだありません。いちばん近�
 
 特定の作業の**手順と規約**を書きます。読者は、その作業にこれから取りかかるコントリビュータと Coding Agent です。
 
-開発・レビュー・リリースの規約は [CONTRIBUTING.md](../CONTRIBUTING.md) / [REVIEW.md](../REVIEW.md) / [RELEASING.md](../RELEASING.md) に定められており、`docs/` 側の Development ページはそれを置き換えません。`docs/` に置くのは、特定の作業に絞った規約と手順です(例: [DocumentationComments](DocumentationComments.md)、[TestStrategy](TestStrategy.md)、このページ)。
+開発・レビュー・リリースの規約は [CONTRIBUTING.md](../../CONTRIBUTING.md) / [REVIEW.md](../../REVIEW.md) / [RELEASING.md](../../RELEASING.md) に定められており、`docs/` 側の Development ページはそれを置き換えません。`docs/` に置くのは、特定の作業に絞った規約と手順です(例: [DocumentationComments](DocumentationComments.md)、[TestStrategy](TestStrategy.md)、このページ)。
 
 書くもの:
 
@@ -330,7 +330,7 @@ FloatSoda の文書は日本語で書き、散文と箇条書きを使い分け�
 | `docs/` 配下、サンプルの README、Issue と PR の本文 | この節 |
 | XML ドキュメントコメント | [DocumentationComments](DocumentationComments.md)(敬体、日本語のみ) |
 | 例外メッセージ | [Localization](Localization.md) の「メッセージの文体」 |
-| `AGENTS.md` | 英語。[CONTRIBUTING.md](../CONTRIBUTING.md) の「エージェント向けファイルの言語」 |
+| `AGENTS.md` | 英語。[CONTRIBUTING.md](../../CONTRIBUTING.md) の「エージェント向けファイルの言語」 |
 
 ### 規約
 
@@ -340,7 +340,7 @@ FloatSoda の文書は日本語で書き、散文と箇条書きを使い分け�
 - 箇条書きと表のセルは常体で書くこと。箇条書きは Markdown のリスト項目を指し、1項目を1文または体言止めにすること。2文以上になる場合は散文へ移すこと
 - 条件と制約は箇条書きで示し、必須は「〜こと」、推奨は「〜が望ましい」で終えること
 - 規約は、読者に求める行動として書くこと。禁止そのものが要点である場合のみ禁止形を使い、続けて代わりの行動を示すこと
-- 語彙は読者の領域の語で書くこと。読者の領域は [TargetUsers](TargetUsers.md) の3ペルソナが知る Unity、Flutter、.NET、VRChat の語とする。他分野の用語を比喩として借りる代わりに、そのまま説明する。定義どおりに使う用語(不変条件、冪等、直交)はそのまま使う
+- 語彙は読者の領域の語で書くこと。読者の領域は [TargetUsers](../TargetUsers.md) の3ペルソナが知る Unity、Flutter、.NET、VRChat の語とする。他分野の用語を比喩として借りる代わりに、そのまま説明する。定義どおりに使う用語(不変条件、冪等、直交)はそのまま使う
 - 英語の慣用句は直訳せず、日本語の言い回しに置き換えること。技術用語(deploy、revert、worktree)は英語かカタカナのまま書く
 - 手順は「〜する」の形とし、実行する人の視点で書くこと。作業の経緯や結果は、手順とは別の節に置くこと
 - チェックリストの項目は、「はい」か「いいえ」で答えられる1つの事実にすること
@@ -368,9 +368,9 @@ FloatSoda の文書は日本語で書き、散文と箇条書きを使い分け�
 - [DocumentationComments](DocumentationComments.md) — XML ドキュメントコメントの規約
 - [Localization](Localization.md) — 記述言語と例外メッセージの文体
 - [APIDesign](APIDesign.md) — API 設計の原則と Flutter parity
-- [TargetUsers](TargetUsers.md) — 想定する3タイプの作り手
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — 開発・PR・テスト・サンプルの規約
-- [REVIEW.md](../REVIEW.md) — レビューの判断基準と、ツリーの不変条件の置き場所(「4. FloatSoda 固有の不変条件」)
+- [TargetUsers](../TargetUsers.md) — 想定する3タイプの作り手
+- [CONTRIBUTING.md](../../CONTRIBUTING.md) — 開発・PR・テスト・サンプルの規約
+- [REVIEW.md](../../REVIEW.md) — レビューの判断基準と、ツリーの不変条件の置き場所(「4. FloatSoda 固有の不変条件」)
 - [TestStrategy](TestStrategy.md) — テストの置き場所を決める地図
 - [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) — ドキュメント・サンプルの情報設計
 - [Issue #219](https://github.com/sumx21t-3310/FloatSoda/issues/219) — 公開サイト(`docs/` の構造がそのままサイトの構造になります)

@@ -105,5 +105,5 @@ dotnet run --project samples/FloatSoda.Samples.Stack
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Padding](../FloatSoda.Samples.Padding) — 重ねずに余白で位置を作る場合

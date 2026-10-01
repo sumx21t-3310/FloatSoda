@@ -9,7 +9,7 @@ FloatSoda は現在 **Alpha 段階** です。API は予告なく破壊的に変
 | 目的 | 置き場所 |
 |---|---|
 | コードレビューの判断基準 | [REVIEW.md](REVIEW.md) |
-| API 設計原則・Flutter parity | [docs/APIDesign.md](docs/APIDesign.md) |
+| API 設計原則・Flutter parity | [docs/contributor/APIDesign.md](docs/contributor/APIDesign.md) |
 | エージェントの入口・実行方針 | [AGENTS.md](AGENTS.md) |
 | リリース手順 | [RELEASING.md](RELEASING.md) |
 
@@ -130,7 +130,7 @@ Issue の目的を成立させるために不可避な前提変更(prerequisite 
 
 独立した設計判断や別の利用者価値を持つ変更は、同じ箇所を触る場合でも別 Issue / PR にします。
 
-**public API または observable behavior を変更する場合は、breaking change の有無を明示的に判断し、PR 本文に書いてください**(必須)。「無い」と判断した場合も、その旨を書きます。判断基準は [docs/APIDesign.md](docs/APIDesign.md) のセクション6(バージョニングと後方互換性)にあります。**Alpha であることは判定を省略する理由になりません。** breaking と判定したうえで、いま受け入れるかを別に判断します(→ 同セクション 6.4)。breaking change を伴う Issue には `breaking-change` ラベルを付けてください。
+**public API または observable behavior を変更する場合は、breaking change の有無を明示的に判断し、PR 本文に書いてください**(必須)。「無い」と判断した場合も、その旨を書きます。判断基準は [docs/contributor/APIDesign.md](docs/contributor/APIDesign.md) のセクション6(バージョニングと後方互換性)にあります。**Alpha であることは判定を省略する理由になりません。** breaking と判定したうえで、いま受け入れるかを別に判断します(→ 同セクション 6.4)。breaking change を伴う Issue には `breaking-change` ラベルを付けてください。
 
 ---
 
@@ -175,7 +175,7 @@ public void Preset_各プリセット_XYが仕様どおり(Alignment alignment, 
 
 - `[Fact(DisplayName = "…")]` は**使いません**。メソッド名と説明の二重管理になり、片方だけ更新される事故を招くためです。
 - 既存テストの一括リネームはしません。新規テストから適用し、既存は別の理由で触るついでに寄せてください。
-- この方針は「ニュートラル = 日本語」という設計判断([docs/Localization.md](docs/Localization.md))の一部です。
+- この方針は「ニュートラル = 日本語」という設計判断([docs/contributor/Localization.md](docs/contributor/Localization.md))の一部です。
 
 ### テスト観点
 
@@ -252,15 +252,15 @@ skill 名は **`<project>-<subject>-<verb>` の順**で付けます(例: `floats
 
 ## コーディング規約
 
-API設計の詳細な規約は **[docs/APIDesign.md](docs/APIDesign.md)** を参照してください。要点のみ挙げると:
+API設計の詳細な規約は **[docs/contributor/APIDesign.md](docs/contributor/APIDesign.md)** を参照してください。要点のみ挙げると:
 
 - コンストラクタ引数は使わず、`init` プロパティのみで構成する(オブジェクト初期化子ファースト)
 - 単一の子は `Child`、複数の子は `Children`(`IList<Widget>`)
 - ジオメトリ型は `readonly record struct`、Context/Theme等は `record`
-- `public` プロパティには XML ドキュメントコメントを付与する(**日本語**で書く。理由と英語化の方針は [docs/Localization.md](docs/Localization.md) を参照)
+- `public` プロパティには XML ドキュメントコメントを付与する(**日本語**で書く。理由と英語化の方針は [docs/contributor/Localization.md](docs/contributor/Localization.md) を参照)
 - イベントハンドラは `Action?` / `Action<T>?` / `Func<Task>?` で `On` プレフィックスを付ける
 - スタイル属性はコンポーネント本体ではなく別の `*Style` record に分離する
-- ユーザーに露出する例外・診断メッセージは resx でローカライズする(ニュートラル = 日本語、`en` サテライト。手順は [docs/Localization.md](docs/Localization.md))
+- ユーザーに露出する例外・診断メッセージは resx でローカライズする(ニュートラル = 日本語、`en` サテライト。手順は [docs/contributor/Localization.md](docs/contributor/Localization.md))
 
 ---
 
@@ -406,7 +406,7 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 - [ ] `dotnet test` が通る
 - [ ] 追加した `public` プロパティに XML ドキュメントコメントを付けた
 - [ ] Wiki同期対象の `docs/*.md` を直接編集した(Wiki側は編集していない)
-- [ ] 散文は敬体、箇条書きは常体で書いた(→ [docs/WritingDocumentation.md](docs/WritingDocumentation.md) の「文体」)
+- [ ] 散文は敬体、箇条書きは常体で書いた(→ [docs/contributor/WritingDocumentation.md](docs/contributor/WritingDocumentation.md) の「文体」)
 - [ ] プリミティブ層(basic.dart相当)を超える複合ウィジェットを追加していない
 - [ ] **新しいウィジェットを追加した場合**、サンプル(README + `checks/items.jsonl`)を追加した(→ [サンプルを追加する場合の規約](#サンプルを追加する場合の規約))。`items.jsonl` は [`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルで生成する
 - [ ] **新しい public API を追加した場合**、docs を更新し、ジュニアコーダーテスト([`floatsoda-junior-coder-test`](.agents/skills/floatsoda-junior-coder-test/SKILL.md))を通した

@@ -24,12 +24,12 @@
 | `docs/` | サイト | サイドバー |
 |---|---|---|
 | `Home.md` | `/home/` | 先頭の単独リンク |
-| `user/Home.md` | `/user/` | 「User Guide」グループの先頭(ラベルはこの `Home.md` の H1) |
+| `user/Home.md` | `/user/` | 「FloatSoda を使う」グループの先頭(ラベルはこの `Home.md` の H1) |
 | `user/Concepts.md` | `/user/concepts/` | 同グループ内。並びは `user/Home.md` でリンクされる順、残りはアルファベット順 |
 
 系統どうしの並びは `docs/Home.md` でリンクされる順です。ランディングの 3 入口は、`docs/user/Home.md` などが現れると自動で `/user/` へ向き、それまでは `/home/` へ送ります(API Reference は「準備中」表示)。
 
-`docs/` 直下に置かれたページは、再編が済むまでの暫定として `docs/Home.md` の「ページ一覧」表の「対象読者」列でグループ化します(`利用者向け` / `コントリビュータ向け`)。全ページが系統ディレクトリへ移ったら、この分岐は `scripts/docs-source.mjs` から消します。
+`docs/` 直下のページ(`Home.md` を除く。いまは `TargetUsers.md`)は、「導入」グループにまとめます。#188 の C4 Lv1(導入)に当たるページで、系統ディレクトリには入れません。並びは `docs/Home.md` の「ページ一覧」表の行順です。
 
 変換で行うこと(詳細はスクリプト冒頭のコメント):
 
@@ -64,7 +64,7 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 |---|---|---|
 | `/llms.txt` | 索引。全ページの素の Markdown へのリンクと一行説明、分割ファイルの一覧 | エージェントに最初に渡す |
 | `/llms-full.txt` | 全ページの全文(約 13 万文字) | 一度に読み切れる読ませ先(ChatGPT など) |
-| `/_llms-txt/<系統>.txt` | サイドバーのグループ(再編前は `user` / `contributor`、再編後は `docs/` の系統ディレクトリ名)ごとの全文。各 7 万文字以下 | 取得上限が 10 万文字前後の読ませ先(Claude.ai など) |
+| `/_llms-txt/<系統>.txt` | サイドバーのグループ(`docs/` の系統ディレクトリ名と、直下のページの `intro`)ごとの全文。各 7 万文字以下 | 取得上限が 10 万文字前後の読ませ先(Claude.ai など) |
 | `/<slug>.md` | ページ単位の素の Markdown | 上限が小さい読ませ先、または必要なページだけ読むとき |
 
 分割ファイルの単位と索引の並びは `scripts/docs-source.mjs` の `sidebarGroups()` から作るので、`docs/` の構造が変わればサイドバーと一緒に追従します。HTML しか取得できない読ませ先(2026-09-09 時点の Gemini の Web チャット)には、各ページの HTML をそのまま読ませます。
@@ -89,7 +89,7 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 | 変えたいこと | 場所 |
 |---|---|
 | サイト URL、リポジトリ URL | `scripts/docs-source.mjs`(1 箇所で定義し、Astro 設定と変換スクリプトの両方が参照する) |
-| サイドバーのグループと並び | `docs/` のディレクトリ構造と、各 `Home.md` のリンク順(直下のページは `docs/Home.md` の表の「対象読者」列と行順) |
+| サイドバーのグループと並び | `docs/` のディレクトリ構造と、各 `Home.md` のリンク順(直下のページは `docs/Home.md` の表の行順) |
 | ページの一行説明 | `docs/Home.md` の表の「内容」列 |
 | ランディングの文言 | `content/index.mdx` |
 | ランディングの導線(どのページへ送るか) | `scripts/sync-docs.mjs` の `landingData()` |

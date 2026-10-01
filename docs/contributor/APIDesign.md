@@ -1,4 +1,4 @@
-← [Home](Home.md)
+← [Home](../Home.md)
 
 # API Design Guidelines
 
@@ -126,9 +126,9 @@ FloatSoda のランタイムや対象ユーザーに存在しない機能につ�
 4. **差異を固定するテスト**（ファイルとテストメソッド名）
 5. **利用者に影響する場合のドキュメント**
 
-記録先は [`known-divergences.md`](../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳のマスター**であり、本ドキュメントは判断原則だけを持ちます。
+記録先は [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳のマスター**であり、本ドキュメントは判断原則だけを持ちます。
 
-5 について、利用者から見える差異は台帳に記録するだけでは不十分です。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](../CONTRIBUTING.md)）にも記載してください。台帳はコントリビュータ向け、docs とサンプルは利用者向けです。
+5 について、利用者から見える差異は台帳に記録するだけでは不十分です。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](../../CONTRIBUTING.md)）にも記載してください。台帳はコントリビュータ向け、docs とサンプルは利用者向けです。
 
 4 が無い差異は、次の移植で気づかずに戻されてしまいます。**テストで固定されていない差異は、記録されていないのと同じ**と考えてください。
 
@@ -155,7 +155,7 @@ Flutter を参照して移植や修正を行う場合、可能な範囲で次の
 
 ### 判断原則: 対象ユーザー・ランタイムに不要な Flutter API は移植しない
 
-Flutter の API がすべて FloatSoda に必要なわけではありません。対象ユーザー (→ [TargetUsers](TargetUsers.md)) の需要がなく、かつ FloatSoda のランタイム (Skia → OpenGL → OpenVR オーバーレイテクスチャ) に受け皿がない機能は移植しません。Flutter 由来のコードからフックだけを先に置くことはせず、削除します。
+Flutter の API がすべて FloatSoda に必要なわけではありません。対象ユーザー (→ [TargetUsers](../TargetUsers.md)) の需要がなく、かつ FloatSoda のランタイム (Skia → OpenGL → OpenVR オーバーレイテクスチャ) に受け皿がない機能は移植しません。Flutter 由来のコードからフックだけを先に置くことはせず、削除します。
 
 #### 実装しない API — Semantics (アクセシビリティツリー)
 
@@ -508,7 +508,7 @@ Alpha 段階であることは、breaking change の**判定**を省略する理
 1. まず public API / observable behavior に対して、6.1 と 6.2 の基準で breaking change に該当するかを通常どおり判定する
 2. そのうえで、Alpha 段階としてその変更を現時点で受け入れるかを別途判断する
 
-「Alpha 版だから breaking change ではない」という扱いはしません。判定の結果は PR の本文に記載し(→ [CONTRIBUTING.md](../CONTRIBUTING.md))、breaking change を伴う Issue には `breaking-change` ラベルを付与します。
+「Alpha 版だから breaking change ではない」という扱いはしません。判定の結果は PR の本文に記載し(→ [CONTRIBUTING.md](../../CONTRIBUTING.md))、breaking change を伴う Issue には `breaking-change` ラベルを付与します。
 
 ## 7. ファクトリメソッドの方針
 
@@ -881,6 +881,6 @@ public static class OVRApplications
 ## 関連ページ
 
 - [WidgetSystem](WidgetSystem.md) — この規約で実装された組み込みウィジェット
-- [Home](Home.md) — ドキュメント一覧
-- [CONTRIBUTING.md](../CONTRIBUTING.md) — 開発・コントリビューション規約(ブランチ命名、namespace、テスト観点、PR運用)
-- [REVIEW.md](../REVIEW.md) — コードレビューの判断基準。本ドキュメントの原則をレビュー基準として参照する
+- [Home](../Home.md) — ドキュメント一覧
+- [CONTRIBUTING.md](../../CONTRIBUTING.md) — 開発・コントリビューション規約(ブランチ命名、namespace、テスト観点、PR運用)
+- [REVIEW.md](../../REVIEW.md) — コードレビューの判断基準。本ドキュメントの原則をレビュー基準として参照する
