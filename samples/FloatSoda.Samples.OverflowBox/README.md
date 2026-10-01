@@ -80,6 +80,6 @@ dotnet run --project samples/FloatSoda.Samples.OverflowBox
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.FractionallySizedBox](../FloatSoda.Samples.FractionallySizedBox) — 割合で子の寸法を決める場合
 - [FloatSoda.Samples.ConstraintsTransformBox](../FloatSoda.Samples.ConstraintsTransformBox) — 制約そのものを変換する場合

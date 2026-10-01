@@ -7,7 +7,7 @@
 | 目的 | 置き場所 |
 |---|---|
 | 開発・コントリビューション規約(ブランチ命名 / namespace / skill / PR 運用 / テスト観点) | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| API 設計原則・Flutter parity | [docs/APIDesign.md](docs/APIDesign.md) |
+| API 設計原則・Flutter parity | [docs/contributor/APIDesign.md](docs/contributor/APIDesign.md) |
 | エージェントの入口・実行方針 | [AGENTS.md](AGENTS.md) |
 
 本文中の **必須** は MUST、**推奨** は SHOULD の強さで読んでください。
@@ -23,7 +23,7 @@
 1. **behavioral correctness** — 仕様どおりに動くか
 2. **tree lifecycle / state transitions** — mount / update / dispose と状態遷移が壊れていないか
 3. **incremental update correctness** — 差分更新(dirty 伝播・再構築範囲)が正しいか
-4. **public API consistency** — 既存 API・[docs/APIDesign.md](docs/APIDesign.md) と一貫しているか
+4. **public API consistency** — 既存 API・[docs/contributor/APIDesign.md](docs/contributor/APIDesign.md) と一貫しているか
 5. **test coverage** — behavioral contract を押さえたテストがあるか
 6. **documentation consistency** — docs / XML ドキュメントコメントと実挙動が一致しているか
 7. **performance** — **concrete impact のあるもののみ**
@@ -47,7 +47,7 @@ blocking にしてよいのは、重要度 1〜5 に該当し、かつ concrete 
 
 仕様が食い違ったときは、**上から順に**確認します(必須)。
 
-1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/APIDesign.md](docs/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、一次情報としては扱いません
+1. **FloatSoda で明示的に定義された差異・設計判断** — [docs/contributor/APIDesign.md](docs/contributor/APIDesign.md)、[known-divergences.md](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) の `Label: deliberate` エントリ、`docs/` 各ページの明記。known-divergences.md のそれ以外のラベル(unlabelled / port mistake / not ported)は意図が確定していないため、一次情報としては扱いません
 2. **Flutter 由来機能は、Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無いなら、Flutter の仕様が一次情報です
 3. **既存の FloatSoda 実装は根拠になりません** — 実装がそうなっていることは、それが正しいことを意味しません
 
@@ -97,7 +97,7 @@ RenderObject / Element / Widget / Layer に触れる変更では、次を確認�
 
 ## 6. Flutter parity
 
-判断基準の一次情報は [docs/APIDesign.md](docs/APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」です。レビューでは次を確認します。
+判断基準の一次情報は [docs/contributor/APIDesign.md](docs/contributor/APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」です。レビューでは次を確認します。
 
 - Flutter 由来の Widget / RenderObject に、**明示された理由のない observable behavior の差異が入っていないか**(必須)。対象は property semantics / default values / layout / paint・clipping / hit testing / child handling / Widget update behavior / invalid・degenerate input handling / dirty layout・paint conditions / Element・state lifecycle semantics。
 - 「実装しやすい」「こちらの方が安全」「こちらの方が自然」**だけ**を理由にした独自仕様になっていないか(必須)。

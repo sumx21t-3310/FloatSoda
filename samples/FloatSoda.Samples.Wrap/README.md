@@ -110,5 +110,5 @@ dotnet run --project samples/FloatSoda.Samples.Wrap
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Expanded](../FloatSoda.Samples.Expanded) — 一列のまま余剰領域を比率で分配する場合

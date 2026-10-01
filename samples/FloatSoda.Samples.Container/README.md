@@ -128,6 +128,6 @@ dotnet run --project samples/FloatSoda.Samples.Container
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Padding](../FloatSoda.Samples.Padding) — 余白単体の付き方と収縮
 - [FloatSoda.Samples.DecoratedBox](../FloatSoda.Samples.DecoratedBox) — 装飾単体の描画

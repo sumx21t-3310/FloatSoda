@@ -102,5 +102,5 @@ dotnet run --project samples/FloatSoda.Samples.Padding
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Stack](../FloatSoda.Samples.Stack) — 位置指定で子を置く場合

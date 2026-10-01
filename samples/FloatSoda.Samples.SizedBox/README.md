@@ -60,7 +60,7 @@ new SizedBoxWidget
 | 最小に縮める | 名前付きの手段はない。`Width = 0, Height = 0` を指定する | `SizedBox.shrink()` |
 | 正方形 | `Width` と `Height` に同じ値を書く | `SizedBox.square(dimension: 48)` |
 
-名前付きコンストラクタが無いのは、FloatSoda がオブジェクト初期化子ファーストの設計方針を採っているためです(→ [docs/APIDesign.md](../../docs/APIDesign.md))。
+名前付きコンストラクタが無いのは、FloatSoda がオブジェクト初期化子ファーストの設計方針を採っているためです(→ [docs/contributor/APIDesign.md](../../docs/contributor/APIDesign.md))。
 
 ## 実行
 
@@ -81,5 +81,5 @@ dotnet run --project samples/FloatSoda.Samples.SizedBox
 
 ## 関連
 
-- [docs/WidgetSystem.md](../../docs/WidgetSystem.md) — 組み込みウィジェット一覧
+- [docs/contributor/WidgetSystem.md](../../docs/contributor/WidgetSystem.md) — 組み込みウィジェット一覧
 - [FloatSoda.Samples.Flex](../FloatSoda.Samples.Flex) — 余白を挟む相手側の並べ方

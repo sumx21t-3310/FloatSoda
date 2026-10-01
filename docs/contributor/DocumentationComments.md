@@ -1,4 +1,4 @@
-← [Home](Home.md)
+← [Home](../Home.md)
 
 # ドキュメントコメント規約
 
@@ -268,4 +268,4 @@ FloatSoda のドキュメントコメントは、補助的な実装コメント�
 - [APIDesign](APIDesign.md) — API 設計規約(命名・イミュータビリティ・入力語彙)
 - [Localization](Localization.md) — 記述言語とサテライト XML の仕組み
 - [RenderObjects](RenderObjects.md) — Dirty フラグと差分レイアウト・描画の実際
-- [Home](Home.md) — ドキュメント一覧
+- [Home](../Home.md) — ドキュメント一覧

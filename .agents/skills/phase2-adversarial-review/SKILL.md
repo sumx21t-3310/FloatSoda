@@ -61,7 +61,7 @@ gh pr list --state open                  # マージ漏れの Draft PR が残っ
 
 | 軸 | slug | 確認項目の一次情報 |
 |---|---|---|
-| Flutter parity | `parity` | REVIEW.md 6章 + docs/APIDesign.md「判断原則」 |
+| Flutter parity | `parity` | REVIEW.md 6章 + docs/contributor/APIDesign.md「判断原則」 |
 | ツリーライフサイクル | `lifecycle` | REVIEW.md 4章「ツリーの所有権とライフサイクル」 |
 | 差分更新 | `incremental` | REVIEW.md 4章「差分更新」 |
 | Layer / スレッド | `layer` | REVIEW.md 4章「Layer」 |

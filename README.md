@@ -115,7 +115,7 @@ sequenceDiagram
     end
 ```
 
-> 詳細は [docs/Architecture.md](docs/Architecture.md) を参照。
+> 詳細は [docs/contributor/Architecture.md](docs/contributor/Architecture.md) を参照。
 
 ## 実装済みの Widget
 
@@ -188,18 +188,18 @@ sequenceDiagram
 |---|---|
 | [docs/Home.md](docs/Home.md) | ドキュメントトップ・全体像・実装状況サマリ |
 | [docs/TargetUsers.md](docs/TargetUsers.md) | 想定する3タイプの作り手と読み進め方 |
-| [docs/GettingStarted.md](docs/GettingStarted.md) | クイックスタートガイド |
-| [docs/Architecture.md](docs/Architecture.md) | アーキテクチャ概要・フレームパイプライン・スレッドモデル |
-| [docs/WidgetSystem.md](docs/WidgetSystem.md) | ウィジェット/エレメントシステム・組み込みウィジェット一覧 |
-| [docs/UILayering.md](docs/UILayering.md) | UI層の3層パッケージ構成(ヘッドレス / デザインシステム)。設計方針であり未提供 |
-| [docs/Animation.md](docs/Animation.md) | AnimationController・Ticker・Curves によるアニメーション |
-| [docs/BuildPipeline.md](docs/BuildPipeline.md) | BuildOwner による Widget 差分更新の仕組み |
-| [docs/RenderObjects.md](docs/RenderObjects.md) | RenderObject ツリーのリファレンス |
-| [docs/OVRIntegration.md](docs/OVRIntegration.md) | OpenVR インテグレーションリファレンス |
-| [docs/Input.md](docs/Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) |
-| [docs/APIDesign.md](docs/APIDesign.md) | API 設計規約 |
-| [docs/DocumentationComments.md](docs/DocumentationComments.md) | ドキュメントコメント規約 |
-| [docs/Localization.md](docs/Localization.md) | ローカライゼーション方針(日本語デフォルト) |
+| [docs/contributor/GettingStarted.md](docs/contributor/GettingStarted.md) | クイックスタートガイド |
+| [docs/contributor/Architecture.md](docs/contributor/Architecture.md) | アーキテクチャ概要・フレームパイプライン・スレッドモデル |
+| [docs/contributor/WidgetSystem.md](docs/contributor/WidgetSystem.md) | ウィジェット/エレメントシステム・組み込みウィジェット一覧 |
+| [docs/contributor/UILayering.md](docs/contributor/UILayering.md) | UI層の3層パッケージ構成(ヘッドレス / デザインシステム)。設計方針であり未提供 |
+| [docs/contributor/Animation.md](docs/contributor/Animation.md) | AnimationController・Ticker・Curves によるアニメーション |
+| [docs/contributor/BuildPipeline.md](docs/contributor/BuildPipeline.md) | BuildOwner による Widget 差分更新の仕組み |
+| [docs/contributor/RenderObjects.md](docs/contributor/RenderObjects.md) | RenderObject ツリーのリファレンス |
+| [docs/contributor/OVRIntegration.md](docs/contributor/OVRIntegration.md) | OpenVR インテグレーションリファレンス |
+| [docs/contributor/Input.md](docs/contributor/Input.md) | アクション入力(コントローラーのボタン・トリガー・スティック) |
+| [docs/contributor/APIDesign.md](docs/contributor/APIDesign.md) | API 設計規約 |
+| [docs/contributor/DocumentationComments.md](docs/contributor/DocumentationComments.md) | ドキュメントコメント規約 |
+| [docs/contributor/Localization.md](docs/contributor/Localization.md) | ローカライゼーション方針(日本語デフォルト) |
 
 コントリビュータ向けの規約はリポジトリルートにあります(公開サイトと Wiki には載りません)。
 
