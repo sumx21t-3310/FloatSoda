@@ -4,8 +4,9 @@
  *
  * 検査内容:
  * 0. ランディング(サイト専用ページ)が生成されている
- * 1. docs/ の全ページ(サブディレクトリ込み)が HTML と素の Markdown の両方で生成されている
- * 2. llms.txt / llms-full.txt が存在し、llms-full.txt に全ページのタイトルが含まれる
+ * 1. docs/ の全ページ(サブディレクトリ込み)と Widget カタログの全ページが、HTML と素の Markdown の両方で生成されている
+ * 2. llms.txt / llms-full.txt が存在し、llms-full.txt に全ページのタイトルが含まれる。
+ *    分割ファイル(_llms-txt/*.txt)は、各 LLMS_SET_LIMIT 文字以下で、全ページをどれか 1 つに含む
  * 3. HTML 内のサイト内リンク(href="/…")の遷移先ページとアンカー(#…)が実在する
  * 4. LLM 向けのテキスト(llms-*.txt と素の Markdown)が BOM なしの正しい UTF-8 である
  *    (astro preview は charset を付けずに配信するのでブラウザでは化けて見える。本番の GitHub Pages は
@@ -14,12 +15,13 @@
 import fs from "node:fs";
 import path from "node:path";
 import {
-  docsDir,
-  firstHeading,
+  LLMS_SET_LIMIT,
   listDocs,
   llmsCustomSets,
   llmsPageLinks,
+  sidebarGroups,
   slugOf,
+  titleOf,
   websiteDir,
 } from "./docs-source.mjs";
 
@@ -60,11 +62,11 @@ function* htmlFiles(dir) {
 // 0. ランディング(website/content/index.mdx 由来)
 if (!fs.existsSync(path.join(distDir, "index.html"))) failures.push("landing page missing: index.html");
 
-// 1. ページの存在
-const docs = listDocs();
-for (const doc of docs) {
-  const slug = slugOf(doc.rel);
-  if (!fs.existsSync(pageFile(slug))) failures.push(`page missing: /${slug}/ (docs/${doc.rel}.md)`);
+// 1. ページの存在(docs/ のページと、サイドバーに載る Widget カタログのページ)
+const pageRels = [...new Set([...listDocs().map((doc) => doc.rel), ...sidebarGroups().flatMap((group) => group.rels)])];
+for (const rel of pageRels) {
+  const slug = slugOf(rel);
+  if (!fs.existsSync(pageFile(slug))) failures.push(`page missing: /${slug}/ (${rel})`);
   if (!fs.existsSync(path.join(distDir, `${slug}.md`))) failures.push(`raw markdown missing: /${slug}.md`);
 }
 
@@ -76,14 +78,21 @@ for (const file of ["llms.txt", "llms-full.txt"]) {
 const llmsFullPath = path.join(distDir, "llms-full.txt");
 if (fs.existsSync(llmsFullPath)) {
   const llmsFull = fs.readFileSync(llmsFullPath, "utf8");
-  for (const doc of docs) {
-    const title = firstHeading(fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8"));
-    if (title && !llmsFull.includes(title)) failures.push(`llms-full.txt lacks page: ${doc.rel} ("${title}")`);
+  for (const rel of pageRels) {
+    const title = titleOf(rel);
+    if (title && !llmsFull.includes(title)) failures.push(`llms-full.txt lacks page: ${rel} ("${title}")`);
   }
 }
 
-// 2b. 系統ごとの分割ファイル(_llms-txt/<key>.txt。starlight-llms-txt の customSets の出力先)に、その系統の全ページが入っている
-for (const set of llmsCustomSets()) {
+// 2b. 分割ファイル(_llms-txt/<label>.txt。starlight-llms-txt の customSets の出力先)が上限以下で、受け持つページが入っている。
+//     サイドバーの全ページが、どれか 1 つの分割ファイルに入っている
+const sets = llmsCustomSets();
+const setSizes = [];
+const covered = new Map(sets.flatMap((set) => set.paths.map((slug) => [slug, set.label])));
+for (const rel of sidebarGroups().flatMap((group) => group.rels)) {
+  if (!covered.has(slugOf(rel))) failures.push(`no _llms-txt/*.txt contains page: ${rel}`);
+}
+for (const set of sets) {
   const relPath = `_llms-txt/${set.label}.txt`;
   const file = path.join(distDir, relPath);
   if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
@@ -91,9 +100,12 @@ for (const set of llmsCustomSets()) {
     continue;
   }
   const body = fs.readFileSync(file, "utf8");
+  const chars = [...body].length;
+  setSizes.push(`${relPath}=${chars}`);
+  if (chars > LLMS_SET_LIMIT) failures.push(`${relPath} has ${chars} characters (limit ${LLMS_SET_LIMIT})`);
   for (const slug of set.paths) {
-    const doc = docs.find((d) => slugOf(d.rel) === slug);
-    const title = doc && firstHeading(fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8"));
+    const rel = pageRels.find((r) => slugOf(r) === slug);
+    const title = rel && titleOf(rel);
     if (title && !body.includes(title)) failures.push(`${relPath} lacks page: ${slug} ("${title}")`);
   }
 }
@@ -166,9 +178,11 @@ for (const file of textFiles(distDir)) {
   }
 }
 
+console.log(`verify-dist: _llms-txt sizes (characters): ${setSizes.join(", ")}`);
+
 if (failures.length > 0) {
   console.error(`verify-dist: ${failures.length} problem(s)`);
   for (const failure of failures) console.error(`  - ${failure}`);
   process.exit(1);
 }
-console.log(`verify-dist: OK (${docs.length} pages, ${linkCount} internal links, ${textCount} UTF-8 text files checked)`);
+console.log(`verify-dist: OK (${pageRels.length} pages, ${linkCount} internal links, ${textCount} UTF-8 text files checked)`);

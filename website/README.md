@@ -2,13 +2,14 @@
 
 `https://floatsoda.sumx21t.com` で公開するドキュメントサイトです。[Astro Starlight](https://starlight.astro.build/) で組み、LLM 向けに `llms.txt`(索引)/ `llms-full.txt`(全文)/ `_llms-txt/<系統>.txt`(系統ごとの分割)と各ページの素の Markdown も配信します(Issue #219)。
 
-## ソースは `docs/` と、ランディングだけ
+## ソースは `docs/` とサンプルの README、ランディングだけ
 
-ドキュメントのページは、リポジトリ直下の `docs/` 配下の Markdown(サブディレクトリ込み)から**ビルドのたびに生成**します。このディレクトリが持つ本文は、サイト専用の入口(ランディング)だけです。
+ドキュメントのページは、リポジトリ直下の `docs/` 配下の Markdown(サブディレクトリ込み)と、サンプルの README から**ビルドのたびに生成**します。このディレクトリが持つ本文は、サイト専用の入口(ランディング)だけです。
 
 | 場所 | 役割 | Git 管理 |
 |---|---|---|
 | `../docs/**/*.md` | ドキュメントの唯一のソース。ページを直すときはここを編集する | あり |
+| `../samples/FloatSoda.Samples.<Name>/README.md` | Widget カタログのページのソース([Widget カタログ](#widget-カタログはサンプルの-readme-から作る)) | あり |
 | `content/index.mdx` | ランディング(`/`)の本文と hero。案内と導線だけを書き、事実情報は `docs/` へリンクする | あり |
 | `src/pages/index.astro` | ランディングを Starlight の `StarlightPage` で描画する。docs コレクションの外なので、サイドバーと `llms-*.txt` には入らない | あり |
 | `scripts/sync-docs.mjs` | `docs/` → Starlight 形式への変換と、ランディングの導線データの生成(`npm run build` / `npm run dev` の前に自動実行) | あり |
@@ -44,6 +45,26 @@
 
 同じ「`docs/` を読み取り専用ソースにする」型は、GitHub Wiki 同期(`scripts/sync-docs-to-wiki.js`)と共通です。Wiki 同期は移行期間中そのまま残します。
 
+### Widget カタログはサンプルの README から作る
+
+「FloatSoda を使う」グループの中に、「Widget カタログ」の入れ子のグループを置きます。中身は #188 の層1サンプルの README で、`docs/` には複製しません(#219 の完了条件7)。Wiki 同期は `docs/` だけを読むため、カタログは Wiki に載りません。
+
+| ソース | サイト |
+|---|---|
+| `samples/FloatSoda.Samples.Padding/README.md` | `/user/catalog/padding/` |
+| (生成する一覧) | `/user/catalog/` |
+
+カタログに載るのは、`samples/FloatSoda.Samples.<Name>/` に `README.md` と `<Name>Demo.cs` の両方があるサンプルです。サンプルを足すと、サイドバーと一覧に自動で加わります。一覧の「これは何か」の列には、README の「## これは何か」の最初の文を使います。
+
+変換では、`docs/` のページと同じ処理に加えて、次のことを行います。
+
+- `../../docs/contributor/WidgetSystem.md` のような `docs/` へのリンクをサイト内パスへ、`../FloatSoda.Samples.Stack` のようなサンプルへのリンクをカタログのページへ書き換える。それ以外のリポジトリ内のリンクは GitHub の URL にする
+- リンク先がリポジトリに無ければ、変換を失敗させる。`docs/` のページを移動・改名したら、サンプルの README のリンクも直す
+- ページの末尾に、サンプルのコード一式(GitHub のディレクトリ)へのリンクを足す
+- `editUrl` は README の編集ページにする
+
+`docs/` のページからも、`../../samples/FloatSoda.Samples.Padding`(`docs/user/` のページからの例)のようにサンプルのディレクトリへリンクすると、サイトではカタログのページへ、`../../samples/` へのリンクはカタログの一覧へ書き換わります。GitHub で読んだときも、同じリンクでサンプルが開きます。
+
 ## コマンド
 
 ```bash
@@ -58,16 +79,24 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 
 ## LLM 向け出力
 
-読む側の取得上限に合わせて、4 つの粒度で配信します。どれも `docs/` から生成され、内容は同じです。
+読む側の取得上限に合わせて、4 つの粒度で配信します。どれも `docs/` とサンプルの README から生成され、内容は同じです。
 
 | ファイル | 中身 | 使いどころ |
 |---|---|---|
 | `/llms.txt` | 索引。全ページの素の Markdown へのリンクと一行説明、分割ファイルの一覧 | エージェントに最初に渡す |
-| `/llms-full.txt` | 全ページの全文(約 13 万文字) | 一度に読み切れる読ませ先(ChatGPT など) |
-| `/_llms-txt/<系統>.txt` | サイドバーのグループ(`docs/` の系統ディレクトリ名と、直下のページの `intro`)ごとの全文。各 7 万文字以下 | 取得上限が 10 万文字前後の読ませ先(Claude.ai など) |
+| `/llms-full.txt` | 全ページの全文 | 一度に読み切れる読ませ先(ChatGPT など) |
+| `/_llms-txt/<系統>.txt` | サイドバーのグループ(`docs/` の系統ディレクトリ名と、直下のページの `intro`)ごとの全文。大きいグループは `<系統>-1.txt`、`<系統>-2.txt` … に分ける。各 7 万文字以下 | 取得上限が 10 万文字前後の読ませ先(Claude.ai など) |
 | `/<slug>.md` | ページ単位の素の Markdown | 上限が小さい読ませ先、または必要なページだけ読むとき |
 
-分割ファイルの単位と索引の並びは `scripts/docs-source.mjs` の `sidebarGroups()` から作るので、`docs/` の構造が変わればサイドバーと一緒に追従します。HTML しか取得できない読ませ先(2026-09-09 時点の Gemini の Web チャット)には、各ページの HTML をそのまま読ませます。
+分割ファイルの単位と索引の並びは `scripts/docs-source.mjs` の `sidebarGroups()` から作るので、`docs/` の構造が変わればサイドバーと一緒に追従します。
+
+分割ファイルは、`llmsCustomSets()` が次の順に決めます。文字数はページの元ファイルで数え、1 ファイル 6 万文字を目安に詰めます。出力にはページのタイトルと一行説明が足されるため、上限の 7 万文字より小さい目安にしています。
+
+1. グループ全体が目安に収まれば、分けずに `<系統>.txt` にする
+2. 収まらなければ、グループの中のディレクトリ(`contributor/experiments/`、`contributor/framework/core/` など。カタログは 1 つ)を単位に、サイドバーの順で前から詰める。目安に収まるディレクトリは、1 つのファイルに入れる
+3. 1 つのディレクトリだけで目安を超えるときは、そのディレクトリをページの順に分ける
+
+`npm run verify` は、各ファイルの文字数(コードポイント数)が 7 万以下であることと、サイドバーの全ページがどれかのファイルに入っていることを確かめ、各ファイルの文字数を表示します。HTML しか取得できない読ませ先(2026-09-09 時点の Gemini の Web チャット)には、各ページの HTML をそのまま読ませます。
 
 `npm run preview`(`astro preview`)は `llms.txt` や `/<slug>.md` を charset なしの `text/plain` で返すため、ブラウザで開くと日本語が化けて見えます。ファイル自体は UTF-8 で、本番の GitHub Pages は `text/plain; charset=utf-8` を付けて配信します。ローカルで中身を確かめるときは `npm run verify`(UTF-8 の検査を含む)か、`curl http://localhost:4321/llms.txt` を使ってください。
 
@@ -90,7 +119,9 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 |---|---|
 | サイト URL、リポジトリ URL | `scripts/docs-source.mjs`(1 箇所で定義し、Astro 設定と変換スクリプトの両方が参照する) |
 | サイドバーのグループと並び | `docs/` のディレクトリ構造と、各 `Home.md` のリンク順(直下のページは `docs/Home.md` の表の行順) |
-| ページの一行説明 | `docs/Home.md` の表の「内容」列 |
+| ページの一行説明 | `docs/Home.md` の表の「内容」列(カタログのページは、README の「## これは何か」の最初の文) |
+| Widget カタログの置き場所(系統とディレクトリ名)、載せるサンプルの条件 | `scripts/docs-source.mjs` の `CATALOG` と `listCatalog()` |
+| 分割ファイルの上限と目安 | `scripts/docs-source.mjs` の `LLMS_SET_LIMIT` と `LLMS_SET_BUDGET` |
 | ランディングの文言 | `content/index.mdx` |
 | ランディングの導線(どのページへ送るか) | `scripts/sync-docs.mjs` の `landingData()` |
 | サイト名、`llms.txt` のプロジェクト説明、mermaid、配色 | `astro.config.mjs` |
