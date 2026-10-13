@@ -1,7 +1,5 @@
 # OverflowBox
 
-## これは何か
-
 `OverflowBox` は、自身の寸法とは無関係に、子へ任意の制約(`MinWidth` / `MaxWidth` / `MinHeight` / `MaxHeight`)を渡すウィジェットです。Flutter の `OverflowBox` に対応します。子が自身より大きくなることを許すため、はみ出しが起きえます。はみ出しはクリップされず、そのまま描かれます。
 
 指定しなかった値には、親から受け取った制約がそのまま使われます。

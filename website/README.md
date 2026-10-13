@@ -54,7 +54,7 @@
 | `samples/FloatSoda.Samples.Padding/README.md` | `/user/catalog/padding/` |
 | (生成する一覧) | `/user/catalog/` |
 
-カタログに載るのは、`samples/FloatSoda.Samples.<Name>/` に `README.md` と `<Name>Demo.cs` の両方があるサンプルです。サンプルを足すと、サイドバーと一覧に自動で加わります。一覧の「これは何か」の列には、README の「## これは何か」の最初の文を使います。
+カタログに載るのは、`samples/FloatSoda.Samples.<Name>/` に `README.md` と `<Name>Demo.cs` の両方があるサンプルです。サンプルを足すと、サイドバーと一覧に自動で加わります。一覧の「概要」の列には、README の H1 の直後の段落の最初の文を使います。
 
 変換では、`docs/` のページと同じ処理に加えて、次のことを行います。
 
@@ -119,7 +119,7 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 |---|---|
 | サイト URL、リポジトリ URL | `scripts/docs-source.mjs`(1 箇所で定義し、Astro 設定と変換スクリプトの両方が参照する) |
 | サイドバーのグループと並び | `docs/` のディレクトリ構造と、各 `Home.md` のリンク順(直下のページは `docs/Home.md` の表の行順) |
-| ページの一行説明 | `docs/Home.md` の表の「内容」列(カタログのページは、README の「## これは何か」の最初の文) |
+| ページの一行説明 | `docs/Home.md` の表の「内容」列(カタログのページは、README の H1 の直後の段落の最初の文) |
 | Widget カタログの置き場所(系統とディレクトリ名)、載せるサンプルの条件 | `scripts/docs-source.mjs` の `CATALOG` と `listCatalog()` |
 | 分割ファイルの上限と目安 | `scripts/docs-source.mjs` の `LLMS_SET_LIMIT` と `LLMS_SET_BUDGET` |
 | ランディングの文言 | `content/index.mdx` |

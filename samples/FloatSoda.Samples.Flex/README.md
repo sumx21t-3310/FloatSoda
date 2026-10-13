@@ -1,7 +1,5 @@
 # Flex
 
-## これは何か
-
 `Flex` は複数の子を1方向に並べるウィジェットです。Flutter の `Flex` に対応します。
 
 `Row` は `Flex` に `Axis.Horizontal` を、`Column` は `Axis.Vertical` を固定したラッパーです。方向が固定でよければ `Row` / `Column` のほうが読みやすくなります。

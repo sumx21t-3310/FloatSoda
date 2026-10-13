@@ -1,7 +1,5 @@
 # SizedBox
 
-## これは何か
-
 `SizedBox` は子に固定の寸法を与えるウィジェットです。Flutter の `SizedBox` に対応します。
 
 子を持たない `SizedBox` は、その寸法ぶんの空白として働きます。`Row` / `Column` の要素間隔はこれで作ります。

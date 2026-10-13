@@ -1,7 +1,5 @@
 # DecoratedBox
 
-## これは何か
-
 `DecoratedBox` は、子の背面または前面へボックス装飾(背景色・角丸・ボーダー)を描くウィジェットです。Flutter の `DecoratedBox` に対応します。
 
 装飾の内容は `BoxDecoration` で指定します。装飾は自身のレイアウト寸法いっぱいに描かれるため、寸法は `SizedBox` などで子側が決めます。

@@ -1,7 +1,5 @@
 # FittedBox
 
-## これは何か
-
 `FittedBox` は、子を自然な大きさでレイアウトしたうえで、その**描画を**自身の領域へ拡大縮小して収めるウィジェットです。Flutter の `FittedBox` に対応します。
 
 制約を変換して子の寸法を変えるのではなく、子はあくまで自然な大きさのまま、描画だけを変形する点が特徴です。収め方は画像の `BoxFit` と同じ語彙(`Contain` / `Cover` / `Fill` / `FitWidth` / `FitHeight` / `None` / `ScaleDown`)で指定します。

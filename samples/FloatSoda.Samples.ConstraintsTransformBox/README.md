@@ -1,7 +1,5 @@
 # ConstraintsTransformBox
 
-## これは何か
-
 `ConstraintsTransformBox` は、親から受け取った制約を任意の変換で書き換えてから子へ渡すウィジェットです。Flutter の `ConstraintsTransformBox` に対応します。
 
 `UnconstrainedBox` はそのいちばんよく使う形 — 制約を取り除いて子を自然な大きさにする — を切り出した薄いラッパーです。

@@ -1,7 +1,5 @@
 # LimitedBox
 
-## これは何か
-
 `LimitedBox` は、親から上限を受け取らなかった(unbounded な)軸にだけ、`MaxWidth` / `MaxHeight` を上限として適用するウィジェットです。Flutter の `LimitedBox` に対応します。
 
 普段の bounded なレイアウトの中では何もしません。制約が無限になる場所 — 将来のスクロール領域や、制約を取り除く `UnconstrainedBox` の中 — で「無限に広がられては困る」子に安全な上限を与えるためのウィジェットです。

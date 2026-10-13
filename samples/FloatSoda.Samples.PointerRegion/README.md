@@ -1,7 +1,5 @@
 # PointerRegion
 
-## これは何か
-
 `PointerRegion` は、マウスや VR レーザーなどのポインターが子の領域へ出入りしたこと(Enter / Exit)を通知するウィジェットです。Flutter の `MouseRegion` に対応します。押下に依存しないホバー状態 — ボタンの「指さしたら光る」など — を作るために使います。
 
 このサンプルは1枚の的(まと)に `PointerRegion` + `Listener` + `GestureDetector` を重ね、Enter / Exit / Down / Up / Cancel / Tap がどの順で届くかを1画面で確認できるようにしています。

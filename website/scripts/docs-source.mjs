@@ -177,15 +177,15 @@ export function titleOf(rel) {
   return firstHeading(readDoc(rel)) ?? rel.split("/").pop();
 }
 
-/** カタログのページの一行説明: README の「## これは何か」の最初の段落の 1 文目。無ければ undefined */
+/** カタログのページの一行説明: README の H1 の直後の段落の 1 文目。H1 の直後が見出しなら undefined */
 export function catalogSummary(rel) {
   if (rel === CATALOG_HOME) return "ウィジェットごとの紹介と最小の使用例。サンプルの README から作る";
-  const section = readDoc(rel).replace(/\r\n/g, "\n").split(/^## これは何か\s*$/m)[1];
-  const paragraph = section
+  const afterTitle = readDoc(rel).replace(/\r\n/g, "\n").split(/^# .*$/m)[1];
+  const paragraph = afterTitle
     ?.split(/\n\s*\n/)
     .map((block) => block.trim())
-    .find((block) => block && !block.startsWith("#"));
-  if (!paragraph) return undefined;
+    .find((block) => block);
+  if (!paragraph || paragraph.startsWith("#")) return undefined;
   const plain = paragraph
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/[*_]/g, "")
@@ -207,7 +207,7 @@ export function catalogHomeMarkdown() {
     "",
     "1 ページで 1 つのウィジェット群を紹介し、最小の使用例を載せています。各ページは、リポジトリの `samples/` にあるサンプルの README から作っています。",
     "",
-    "| ウィジェット | これは何か |",
+    "| ウィジェット | 概要 |",
     "|---|---|",
     ...rows,
     "",

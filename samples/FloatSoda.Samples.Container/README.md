@@ -1,7 +1,5 @@
 # Container
 
-## これは何か
-
 `Container` は配置・余白・装飾・寸法・変換を1つのウィジェットへまとめた合成ウィジェットです。Flutter の `Container` に対応します。
 
 指定したプロパティに対応するウィジェットだけを、内側から Child → `Align` → `Padding` → `DecoratedBox` → `SizedBox` → `Transform` の順で重ねます。個別のウィジェットを入れ子にするのと同じ結果を、1つのオブジェクト初期化子で書けます。

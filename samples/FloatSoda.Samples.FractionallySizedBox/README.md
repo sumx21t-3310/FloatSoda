@@ -1,7 +1,5 @@
 # FractionallySizedBox
 
-## これは何か
-
 `FractionallySizedBox` は、親から使える最大寸法に対する**割合**で子の寸法を決めるウィジェットです。Flutter の `FractionallySizedBox` に対応します。
 
 「親の半分の幅」のような相対指定ができます。係数を指定しなかった軸は、親の制約がそのまま子へ渡ります。

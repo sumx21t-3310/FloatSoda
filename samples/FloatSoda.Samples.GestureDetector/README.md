@@ -1,7 +1,5 @@
 # GestureDetector
 
-## これは何か
-
 `GestureDetector` は、生のポインターイベントへ意味付けをして、タップやドラッグ(Pan)として通知するウィジェットです。Flutter の `GestureDetector` に対応します。
 
 「押して、動かさずに離したらタップ」「押して動かしたらドラッグ」といった判定はジェスチャ認識器が行い、コールバックには成立した結果だけが届きます。生のイベントが要る場合は [Listener](../FloatSoda.Samples.Listener) を使います。

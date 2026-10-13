@@ -1,7 +1,5 @@
 # Listener
 
-## これは何か
-
 `Listener` は、子のヒット領域で発生した低レベルのポインターイベント(Down / Up / Move / Enter / Exit / Cancel)をそのまま通知するウィジェットです。Flutter の `Listener` に対応します。
 
 「押して離したらタップ」のような意味付けはしません。意味付けが必要なら [GestureDetector](../FloatSoda.Samples.GestureDetector) を使い、`Listener` は生のイベントが要る場面(独自のジェスチャ判定、デバッグ、座標の記録など)に使います。
