@@ -9,6 +9,11 @@
  *   docs/user/Home.md       → /user/        系統(User Guide)の入口
  *   docs/user/Concepts.md   → /user/concepts/
  * 系統ディレクトリが 1 つのサイドバーグループになり、LLM 向けの分割ファイル(_llms-txt/<key>.txt)の単位にもなる。
+ *
+ * docs/ の外から取り込むページは、Widget カタログだけ(#188 の層1サンプル。#219 の完了条件7):
+ *   samples/FloatSoda.Samples.Padding/README.md → /user/catalog/padding/
+ *   (一覧ページ。README から生成する)          → /user/catalog/
+ * 「FloatSoda を使う」グループの中の入れ子のグループになる。Wiki 同期(scripts/sync-docs-to-wiki.js)は docs/ だけを読むので、Wiki には載らない。
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,6 +22,7 @@ import { fileURLToPath } from "node:url";
 export const websiteDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 export const repoRoot = path.dirname(websiteDir);
 export const docsDir = path.join(repoRoot, "docs");
+export const samplesDir = path.join(repoRoot, "samples");
 
 export const siteUrl = "https://floatsoda.sumx21t.com";
 export const repositoryUrl = "https://github.com/sumx21t-3310/FloatSoda";
@@ -29,6 +35,15 @@ export const HOME = "Home";
  * key は系統ディレクトリ(user / contributor / api)と衝突しない語にする。衝突すると、そのディレクトリのグループに合流してしまう
  */
 const INTRO_GROUP = { key: "intro", label: "導入" };
+
+/**
+ * Widget カタログ。層1サンプル(samples/FloatSoda.Samples.<Name>/ に README.md と <Name>Demo.cs があるもの)を、
+ * dir の系統グループの中に、label の入れ子グループとして並べる。ページの rel は "<dir>/<name>/<Name>"、一覧は "<dir>/<name>/Home"
+ */
+export const CATALOG = { dir: "user", name: "catalog", label: "Widget カタログ" };
+const SAMPLE_PREFIX = "FloatSoda.Samples.";
+const CATALOG_PREFIX = `${CATALOG.dir}/${CATALOG.name}/`;
+export const CATALOG_HOME = `${CATALOG_PREFIX}${HOME}`;
 
 /**
  * docs/ 配下の .md を再帰的に列挙する。要素は次の形:
@@ -107,13 +122,101 @@ export function firstHeading(markdown) {
   return null;
 }
 
-function readDoc(rel) {
-  return fs.readFileSync(path.join(docsDir, `${rel}.md`), "utf8");
+/**
+ * Widget カタログに載せるサンプルを、名前の順に返す。要素は次の形:
+ *   rel    … カタログ内のページ。例: "user/catalog/Padding"
+ *   name   … サンプル名。例: "Padding"
+ *   sample … samples/ 直下のディレクトリ名。例: "FloatSoda.Samples.Padding"
+ *   source … リポジトリからの相対パス。例: "samples/FloatSoda.Samples.Padding/README.md"
+ */
+export function listCatalog() {
+  if (!fs.existsSync(samplesDir)) return [];
+  return fs
+    .readdirSync(samplesDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith(SAMPLE_PREFIX))
+    .map((entry) => ({ sample: entry.name, name: entry.name.slice(SAMPLE_PREFIX.length) }))
+    .filter(
+      ({ sample, name }) =>
+        fs.existsSync(path.join(samplesDir, sample, "README.md")) &&
+        fs.existsSync(path.join(samplesDir, sample, `${name}Demo.cs`)),
+    )
+    .map(({ sample, name }) => ({
+      rel: `${CATALOG_PREFIX}${name}`,
+      name,
+      sample,
+      source: `samples/${sample}/README.md`,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** rel が Widget カタログのページ(一覧を含む)か */
+export function isCatalogRel(rel) {
+  return rel.startsWith(CATALOG_PREFIX);
+}
+
+/** rel の本文のファイル(リポジトリからの相対パス)。カタログの一覧は生成するので null */
+export function sourceOf(rel) {
+  if (rel === CATALOG_HOME) return null;
+  if (isCatalogRel(rel)) {
+    const entry = listCatalog().find((item) => item.rel === rel);
+    if (!entry) throw new Error(`Widget カタログに ${rel} がありません`);
+    return entry.source;
+  }
+  return `docs/${rel}.md`;
+}
+
+/** rel の本文(Markdown)。カタログの一覧は catalogHomeMarkdown() で作る */
+export function readDoc(rel) {
+  const source = sourceOf(rel);
+  return source ? fs.readFileSync(path.join(repoRoot, source), "utf8") : catalogHomeMarkdown();
 }
 
 /** ページのタイトル(先頭の H1)。無ければファイル名 */
 export function titleOf(rel) {
+  if (rel === CATALOG_HOME) return CATALOG.label;
   return firstHeading(readDoc(rel)) ?? rel.split("/").pop();
+}
+
+/** カタログのページの一行説明: README の「## これは何か」の最初の段落の 1 文目。無ければ undefined */
+export function catalogSummary(rel) {
+  if (rel === CATALOG_HOME) return "ウィジェットごとの紹介と最小の使用例。サンプルの README から作る";
+  const section = readDoc(rel).replace(/\r\n/g, "\n").split(/^## これは何か\s*$/m)[1];
+  const paragraph = section
+    ?.split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .find((block) => block && !block.startsWith("#"));
+  if (!paragraph) return undefined;
+  const plain = paragraph
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[*_]/g, "")
+    .replace(/\s+/g, " ");
+  const end = plain.indexOf("。");
+  return end < 0 ? plain : plain.slice(0, end + 1);
+}
+
+/**
+ * カタログの一覧ページの本文(H1 を含む Markdown)。手で書く一覧は置かず、サンプルの README から毎回作る。
+ * リンクはサイト内パス(/user/catalog/padding/)
+ */
+export function catalogHomeMarkdown() {
+  const rows = listCatalog().map(
+    (item) => `| [${item.name}](${hrefOf(item.rel)}) | ${(catalogSummary(item.rel) ?? "").replace(/\|/g, "\\|")} |`,
+  );
+  return [
+    `# ${CATALOG.label}`,
+    "",
+    "1 ページで 1 つのウィジェット群を紹介し、最小の使用例を載せています。各ページは、リポジトリの `samples/` にあるサンプルの README から作っています。",
+    "",
+    "| ウィジェット | これは何か |",
+    "|---|---|",
+    ...rows,
+    "",
+  ].join("\n");
+}
+
+/** ページの一行説明(description)。直下のページは docs/Home.md の表、カタログは README から。無ければ undefined */
+export function descriptionOf(rel) {
+  return isCatalogRel(rel) ? catalogSummary(rel)?.replace(/`/g, "") : homeSummaries().get(rel);
 }
 
 /** Home.md 本文からリンク先(docs/ からの相対パス、拡張子なし)を出現順に返す。重複なし */
@@ -202,20 +305,115 @@ export function sidebarGroups() {
     for (const doc of pages) push(key, label, doc.rel);
   }
 
+  // Widget カタログ: 系統グループの末尾に、一覧 → サンプル名の順で足す。sidebarItems() が入れ子のグループにする
+  const catalog = listCatalog();
+  if (catalog.length > 0) {
+    const key = CATALOG.dir.toLowerCase();
+    const label = groups.find((g) => g.key === key)?.label ?? CATALOG.dir;
+    push(key, label, CATALOG_HOME);
+    for (const item of catalog) push(key, label, item.rel);
+  }
+
   return groups;
+}
+
+/** Starlight のサイドバーの items。カタログのページは、CATALOG.label の入れ子のグループ(初期状態は閉じる)にまとめる */
+export function sidebarItems(group) {
+  const items = group.rels.filter((rel) => !isCatalogRel(rel)).map((rel) => ({ slug: slugOf(rel) }));
+  const catalog = group.rels.filter(isCatalogRel);
+  if (catalog.length > 0) {
+    items.push({ label: CATALOG.label, collapsed: true, items: catalog.map((rel) => ({ slug: slugOf(rel) })) });
+  }
+  return items;
+}
+
+/** 分割ファイル(_llms-txt/<label>.txt)1 つの文字数(コードポイント数)の上限。scripts/verify-dist.mjs が出力で確かめる */
+export const LLMS_SET_LIMIT = 70_000;
+
+/**
+ * 分けるときの目安。ページの元ファイルの文字数で詰める。出力にはページごとのタイトルと description、
+ * ファイル先頭の <SYSTEM> 行が足されるので、上限より小さくして余白を残す
+ */
+const LLMS_SET_BUDGET = 60_000;
+
+/** ページの元ファイルの文字数(コードポイント数) */
+function sizeOf(rel) {
+  return [...readDoc(rel)].length;
+}
+
+/**
+ * ページの「束」: 系統ディレクトリからの相対ディレクトリ(例: contributor の "framework/core"、直下は "")。
+ * カタログはまとめて 1 束
+ */
+function bundleOf(rel) {
+  if (isCatalogRel(rel)) return CATALOG_PREFIX;
+  return rel.split("/").slice(1, -1).join("/");
+}
+
+/**
+ * 1 つのグループのページを、1 ファイル LLMS_SET_BUDGET 文字以下に分ける。戻り値はページ(rel)の配列の配列。
+ * 1. グループ全体が収まれば、分けない
+ * 2. 収まらなければ、束(ディレクトリ)ごとに、サイドバーの順で前から詰める。収まる束は分けずに 1 ファイルへ入れる
+ * 3. 1 つの束だけで収まらなければ、その束はページの順で、いまのファイルの続きから詰めて分ける
+ * 1 ページだけで上限を超えるときは、そのページだけのファイルになり、verify-dist が失敗する
+ */
+function packGroup(rels) {
+  const total = rels.reduce((sum, rel) => sum + sizeOf(rel), 0);
+  if (total <= LLMS_SET_BUDGET) return [rels];
+
+  const bundles = [];
+  for (const rel of rels) {
+    const key = bundleOf(rel);
+    let bundle = bundles.find((b) => b.key === key);
+    if (!bundle) {
+      bundle = { key, rels: [] };
+      bundles.push(bundle);
+    }
+    bundle.rels.push(rel);
+  }
+
+  const parts = [];
+  let current = [];
+  let currentSize = 0;
+  const flush = () => {
+    if (current.length > 0) parts.push(current);
+    current = [];
+    currentSize = 0;
+  };
+  const add = (rel, size) => {
+    if (currentSize + size > LLMS_SET_BUDGET) flush();
+    current.push(rel);
+    currentSize += size;
+  };
+  for (const bundle of bundles) {
+    const size = bundle.rels.reduce((sum, rel) => sum + sizeOf(rel), 0);
+    // 収まる束は、いまのファイルに入りきらなければ次のファイルから始める。収まらない束は、いまのファイルの続きからページ単位で詰める
+    if (size <= LLMS_SET_BUDGET && currentSize + size > LLMS_SET_BUDGET) flush();
+    for (const rel of bundle.rels) add(rel, sizeOf(rel));
+  }
+  flush();
+  return parts;
 }
 
 /**
  * starlight-llms-txt の customSets。サイドバーのグループ(系統)ごとに _llms-txt/<key>.txt を出す。
- * llms-full.txt(約 13 万文字)を読み切れない取得経路でも、系統単位なら 1 回で読める(各 7 万文字以下)。
- * label がそのままファイル名になるので ASCII の key を使い、人間向けの名前は description に書く
+ * llms-full.txt を読み切れない取得経路でも、1 回で読める大きさにする(各 LLMS_SET_LIMIT 文字以下)。
+ * グループが大きければ packGroup() で分け、_llms-txt/<key>-1.txt、<key>-2.txt … とする。
+ * label がそのままファイル名になるので ASCII の key を使い、人間向けの名前と含むページは description に書く
  */
 export function llmsCustomSets() {
-  return sidebarGroups().map((group) => ({
-    label: group.key,
-    description: `${group.label}のページ(${group.rels.map((rel) => rel.split("/").pop()).join(" / ")})`,
-    paths: group.rels.map(slugOf),
-  }));
+  return sidebarGroups().flatMap((group) => {
+    const parts = packGroup(group.rels);
+    return parts.map((rels, index) => {
+      const names = rels.map((rel) => (rel.includes("/") ? rel.split("/").slice(1).join("/") : rel));
+      const part = parts.length > 1 ? ` ${index + 1}/${parts.length}` : "";
+      return {
+        label: parts.length > 1 ? `${group.key}-${index + 1}` : group.key,
+        description: `${group.label}のページ${part}(${names.join(" / ")})`,
+        paths: rels.map(slugOf),
+      };
+    });
+  });
 }
 
 /**
@@ -223,11 +421,10 @@ export function llmsCustomSets() {
  * 取得上限が小さい経路でも、必要なページだけを取りに行けるようにする。並びはサイドバーと同じ
  */
 export function llmsPageLinks() {
-  const summaries = homeSummaries();
   const rels = [HOME, ...sidebarGroups().flatMap((group) => group.rels)];
   return rels.map((rel) => ({
     label: titleOf(rel),
     url: `${siteUrl}/${slugOf(rel)}.md`,
-    description: summaries.get(rel),
+    description: descriptionOf(rel),
   }));
 }

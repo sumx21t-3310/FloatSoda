@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * docs/ 配下の Markdown(サブディレクトリ込み)を Starlight のコンテンツへ変換する。
+ * docs/ 配下の Markdown(サブディレクトリ込み)と、Widget カタログ(層1サンプルの README)を Starlight のコンテンツへ変換する。
  * `npm run build` / `npm run dev` の前に自動実行される(package.json の prebuild / predev)。
  *
- * docs/ が唯一のソースで、生成先はどちらも Git 管理外(website/.gitignore):
+ * docs/ と samples/*\/README.md が唯一のソースで、生成先はどちらも Git 管理外(website/.gitignore):
  * - src/content/docs/<path>.md … Starlight が読むページ(docs/user/Home.md は user/index.md になる)
  * - public/<slug>.md           … LLM 向けの素の Markdown(https://<site>/<slug>.md で配信)
  *
@@ -14,21 +14,29 @@
  * 変換内容:
  * - 先頭の H1 を frontmatter の title にし、本文からは除く(Starlight がタイトルを描画する)
  * - 「← [Home](Home.md)」「← [Home](../Home.md)」のナビ行と、その直前の水平線を除く(サイドバーが担う)
- * - 相対 .md リンク(同じ階層も別の階層も)をサイト内パスへ、docs/ の外を指すリンクを GitHub の URL へ書き換える
- * - editUrl(GitHub の編集ページ)と lastUpdated(docs/ 側の最終コミット日時)を付ける
+ * - 相対 .md リンク(同じ階層も別の階層も)をサイト内パスへ、サンプルのディレクトリへのリンク(../FloatSoda.Samples.X)を
+ *   カタログのページへ、それ以外のリポジトリ内を指すリンクを GitHub の URL へ書き換える
+ * - サンプルの README だけは、リンク先がリポジトリに無ければ例外にする(docs/ のページの移動・改名を検出する)
+ * - editUrl(GitHub の編集ページ)と lastUpdated(ソース側の最終コミット日時)を付ける
+ * - カタログのページの末尾に、サンプルのソース一式(GitHub)へのリンクを足す
  * - コードフェンスの中は一切変更しない
  */
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import {
+  CATALOG_HOME,
   HOME,
+  catalogHomeMarkdown,
   contentPathOf,
-  docsDir,
+  descriptionOf,
   homeSummaries,
   hrefOf,
   hrefOfName,
+  isCatalogRel,
+  listCatalog,
   listDocs,
+  readDoc,
   repoRoot,
   repositoryUrl,
   siteUrl,
@@ -42,32 +50,59 @@ const publicDir = path.join(websiteDir, "public");
 const landingFile = path.join(websiteDir, "src", "generated", "landing.json");
 const docs = listDocs();
 const rels = new Set(docs.map((doc) => doc.rel));
+const catalog = listCatalog();
 const summaries = homeSummaries();
 
 const FENCE = /^\s*(```|~~~)/;
 const HOME_NAV = /^←\s*\[[^\]]*\]\((?:\.\.\/)*Home\.md\)\s*$/;
 const LINK = /(!?)\[([^\]]*)\]\(([^)\s]+)((?:\s+"[^"]*")?)\)/g;
+/** samples/ 直下のサンプルのディレクトリ(末尾の "/" や "/README.md" を含む) */
+const SAMPLE_LINK = /^samples\/([^/]+?)(?:\/(?:README\.md)?)?$/i;
 
-/** Markdown 中のリンクをサイト向けに書き換える(1 行ぶん)。selfDir はそのページの docs/ 内ディレクトリ */
-function rewriteLinks(line, selfDir) {
+/** リポジトリ内のパスの GitHub URL。ディレクトリは tree、ファイルは blob */
+function githubUrl(repoPath) {
+  const full = path.join(repoRoot, repoPath);
+  const kind = fs.existsSync(full) && fs.statSync(full).isDirectory() ? "tree" : "blob";
+  return `${repositoryUrl}/${kind}/main/${repoPath}`;
+}
+
+/**
+ * リポジトリ内のパス(正規化済み)を、サイト内パスか GitHub の URL に書き換える。
+ * strict のときは、リンク先がリポジトリに無ければ例外にする
+ */
+function resolveTarget(resolved, strict, origin) {
+  const page = resolved.match(/^docs\/(.+)\.md$/i);
+  if (page && rels.has(page[1])) return hrefOf(page[1]);
+
+  const trimmed = resolved.replace(/\/$/, "");
+  if (trimmed === "samples") return hrefOf(CATALOG_HOME);
+  const sample = trimmed.match(SAMPLE_LINK);
+  const entry = sample && catalog.find((item) => item.sample === sample[1]);
+  if (entry) return hrefOf(entry.rel);
+
+  if (strict && !fs.existsSync(path.join(repoRoot, resolved))) {
+    throw new Error(`${origin}: リンク先 ${resolved} がリポジトリにありません(ページの移動・改名なら、リンクを直してください)`);
+  }
+  // docs/ の外(../CONTRIBUTING.md など)や、docs/ 内の .md 以外はリポジトリの GitHub ページへ
+  return githubUrl(resolved);
+}
+
+/**
+ * Markdown 中のリンクをサイト向けに書き換える(1 行ぶん)。
+ * baseDir はそのページのリポジトリ内ディレクトリ(例: "docs/user"、"samples/FloatSoda.Samples.Padding")
+ */
+function rewriteLinks(line, baseDir, strict, origin) {
   return line.replace(LINK, (match, bang, text, target, title) => {
     if (bang === "!") return match; // 画像はそのまま
     if (/^[a-z][a-z0-9+.-]*:/i.test(target)) return match; // http: などの絶対 URL
     if (target.startsWith("#")) return match; // ページ内アンカー
+    if (target.startsWith("/")) return match; // サイト内の絶対パス(カタログの一覧が使う)
 
     const hashIndex = target.indexOf("#");
     const file = hashIndex < 0 ? target : target.slice(0, hashIndex);
     const anchor = hashIndex < 0 ? "" : target.slice(hashIndex);
-    const resolved = path.posix.normalize(path.posix.join("docs", selfDir, file));
-
-    if (resolved.startsWith("docs/")) {
-      const page = resolved.slice("docs/".length).match(/^(.+)\.md$/i);
-      if (page && rels.has(page[1])) {
-        return `[${text}](${hrefOf(page[1])}${anchor}${title})`;
-      }
-    }
-    // docs/ の外(../CONTRIBUTING.md など)や、docs/ 内の .md 以外はリポジトリの GitHub ページへ
-    return `[${text}](${repositoryUrl}/blob/main/${resolved}${anchor}${title})`;
+    const resolved = path.posix.normalize(path.posix.join(baseDir, file));
+    return `[${text}](${resolveTarget(resolved, strict, origin)}${anchor}${title})`;
   });
 }
 
@@ -89,10 +124,10 @@ function describe(body) {
   return undefined;
 }
 
-/** docs/ 側ファイルの最終コミット日時(ISO 8601)。Git が使えなければ undefined */
-function lastCommitDate(rel) {
+/** リポジトリ内のファイルの最終コミット日時(ISO 8601)。Git が使えなければ undefined */
+function lastCommitDate(repoPath) {
   try {
-    const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", `docs/${rel}.md`], {
+    const out = execFileSync("git", ["log", "-1", "--format=%cI", "--", repoPath], {
       cwd: repoRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
@@ -103,8 +138,14 @@ function lastCommitDate(rel) {
   }
 }
 
-/** 1 ページぶんを変換する */
-function transform(doc, source) {
+/**
+ * 1 ページぶんを変換する。
+ *   source  … Markdown の本文
+ *   origin  … ソースのリポジトリ内パス(エラーメッセージと editUrl 用。生成するページは null)
+ *   baseDir … 相対リンクの起点(リポジトリ内ディレクトリ)
+ *   strict  … リンク先の実在を確かめるか
+ */
+function transform({ source, origin, baseDir, strict }) {
   const lines = source.replace(/\r\n/g, "\n").split("\n");
   const body = [];
   let title;
@@ -129,22 +170,27 @@ function transform(doc, source) {
       while (body.length > 0 && /^(\s*|-{3,}\s*)$/.test(body[body.length - 1])) body.pop();
       continue;
     }
-    body.push(rewriteLinks(line, doc.dir));
+    body.push(rewriteLinks(line, baseDir, strict, origin));
   }
 
   if (title === undefined) {
-    throw new Error(`docs/${doc.rel}.md: 先頭の H1(ページタイトル)が見つかりません`);
+    throw new Error(`${origin}: 先頭の H1(ページタイトル)が見つかりません`);
   }
   const text = `${body.join("\n").replace(/^\n+/, "").replace(/\n{3,}/g, "\n\n").trimEnd()}\n`;
-  return { title, description: summaries.get(doc.rel) ?? describe(text), body: text };
+  return { title, body: text };
 }
 
-function frontmatter(doc, page) {
+/** origin が null(生成するページ)なら、編集リンクと更新日時を付けない */
+function frontmatter(page, origin) {
   const fields = [`title: ${JSON.stringify(page.title)}`];
   if (page.description) fields.push(`description: ${JSON.stringify(page.description)}`);
-  fields.push(`editUrl: ${JSON.stringify(`${repositoryUrl}/edit/main/docs/${doc.rel}.md`)}`);
-  const date = lastCommitDate(doc.rel);
-  if (date) fields.push(`lastUpdated: ${date}`);
+  if (origin) {
+    fields.push(`editUrl: ${JSON.stringify(`${repositoryUrl}/edit/main/${origin}`)}`);
+    const date = lastCommitDate(origin);
+    if (date) fields.push(`lastUpdated: ${date}`);
+  } else {
+    fields.push("editUrl: false");
+  }
   return `---\n${fields.join("\n")}\n---\n\n`;
 }
 
@@ -165,6 +211,15 @@ function clearGenerated(dir) {
 function writeFile(file, content) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, content);
+}
+
+/** Starlight のページと、LLM 向けの素の Markdown を書き出す */
+function writePage(rel, page, origin) {
+  writeFile(path.join(contentDir, `${contentPathOf(rel)}.md`), frontmatter(page, origin) + page.body);
+
+  // LLM 向けの素の Markdown。サイト内リンクは絶対 URL にして、単体で読んでも辿れるようにする
+  const raw = `# ${page.title}\n\n${page.body}`.replace(/\]\(\//g, `](${siteUrl}/`);
+  writeFile(path.join(publicDir, `${slugOf(rel)}.md`), raw);
 }
 
 /**
@@ -199,23 +254,33 @@ function main() {
   clearGenerated(publicDir);
 
   for (const doc of docs) {
-    const slug = slugOf(doc.rel);
-    if (slug === "index") {
-      throw new Error(
-        `docs/${doc.rel}.md はサイトのトップ(/)と衝突します。トップはランディング(website/content/index.mdx)が担います`,
-      );
+    const origin = `docs/${doc.rel}.md`;
+    if (slugOf(doc.rel) === "index") {
+      throw new Error(`${origin} はサイトのトップ(/)と衝突します。トップはランディング(website/content/index.mdx)が担います`);
     }
-    const source = fs.readFileSync(path.join(docsDir, `${doc.rel}.md`), "utf8");
-    const page = transform(doc, source);
-
-    writeFile(path.join(contentDir, `${contentPathOf(doc.rel)}.md`), frontmatter(doc, page) + page.body);
-
-    // LLM 向けの素の Markdown。サイト内リンクは絶対 URL にして、単体で読んでも辿れるようにする
-    const raw = `# ${page.title}\n\n${page.body}`.replace(/\]\(\//g, `](${siteUrl}/`);
-    writeFile(path.join(publicDir, `${slug}.md`), raw);
+    if (isCatalogRel(doc.rel) || slugOf(doc.rel) === slugOf(CATALOG_HOME)) {
+      throw new Error(`${origin} は Widget カタログ(${hrefOf(CATALOG_HOME)})と衝突します。カタログは samples/ の README から生成します`);
+    }
+    const page = transform({ source: readDoc(doc.rel), origin, baseDir: `docs/${doc.dir}`.replace(/\/$/, ""), strict: false });
+    page.description = summaries.get(doc.rel) ?? describe(page.body);
+    writePage(doc.rel, page, origin);
   }
+
+  // Widget カタログ: 一覧は README から生成し、各ページは README をそのまま変換する
+  if (catalog.length > 0) {
+    const home = transform({ source: catalogHomeMarkdown(), origin: null, baseDir: "samples", strict: true });
+    home.description = descriptionOf(CATALOG_HOME);
+    writePage(CATALOG_HOME, home, null);
+  }
+  for (const item of catalog) {
+    const page = transform({ source: readDoc(item.rel), origin: item.source, baseDir: `samples/${item.sample}`, strict: true });
+    page.description = descriptionOf(item.rel);
+    page.body += `\nこのサンプルのコード一式は [samples/${item.sample}](${githubUrl(`samples/${item.sample}`)}) にあります。\n`;
+    writePage(item.rel, page, item.source);
+  }
+
   writeFile(landingFile, `${JSON.stringify(landingData(), null, 2)}\n`);
-  console.log(`sync-docs: ${docs.length} pages generated from docs/`);
+  console.log(`sync-docs: ${docs.length} pages generated from docs/, ${catalog.length} catalog pages from samples/`);
 }
 
 main();

@@ -9,8 +9,8 @@ import {
   repoRoot,
   repositoryUrl,
   sidebarGroups,
+  sidebarItems,
   siteUrl,
-  slugOf,
 } from "./scripts/docs-source.mjs";
 
 export default defineConfig({
@@ -40,8 +40,8 @@ export default defineConfig({
           description:
             "SteamVR Overlay を Flutter のような宣言的 UI で作る .NET 10 / C# 14 向けフレームワーク。UI はすべて C# コードで書き、シーンや外部アセットを持たない",
           details:
-            "ドキュメントは日本語で書かれている。全文は llms-full.txt、系統ごとの分割は Documentation Sets に列挙した _llms-txt/<系統>.txt、各ページの素の Markdown は Optional の一覧(https://floatsoda.sumx21t.com/<page>.md)から取得できる。取得できる文字数に上限がある場合は、系統ごとのファイルかページ単位を使う。ソースは GitHub リポジトリの docs/ で、XML ドキュメントコメントと合わせて事実情報の正典になる",
-          // 系統ごとの分割ファイル(/_llms-txt/user.txt など。パスはプラグインの仕様)。取得上限のある LLM でも 1 回で読める大きさにする
+            "ドキュメントは日本語で書かれている。全文は llms-full.txt、系統ごとの分割は Documentation Sets に列挙した _llms-txt/<系統>.txt(大きい系統は <系統>-1.txt、<系統>-2.txt … に分かれる。どれも 7 万文字以下)、各ページの素の Markdown は Optional の一覧(https://floatsoda.sumx21t.com/<page>.md)から取得できる。取得できる文字数に上限がある場合は、系統ごとのファイルかページ単位を使う。ソースは GitHub リポジトリの docs/ で、XML ドキュメントコメントと合わせて事実情報の正典になる",
+          // 系統ごとの分割ファイル(/_llms-txt/user.txt など。パスはプラグインの仕様)。取得上限のある LLM でも 1 回で読める大きさに分ける(docs-source.mjs の LLMS_SET_LIMIT)
           customSets: llmsCustomSets(),
           // 全ページの索引。ページ単位で /<slug>.md を取りに行けるようにする
           optionalLinks: [
@@ -59,12 +59,13 @@ export default defineConfig({
         }),
       ],
       // サイドバーは docs/ の構造を正典にする(#188)。系統ディレクトリ(docs/user/ など)が 1 グループ。
-      // docs/ 直下のページ(Home.md を除く)は「導入」グループにまとめる。詳細は scripts/docs-source.mjs
+      // docs/ 直下のページ(Home.md を除く)は「導入」グループにまとめる。Widget カタログ(samples/ の README)は
+      // 「FloatSoda を使う」グループの中の入れ子のグループにする。詳細は scripts/docs-source.mjs
       sidebar: [
         { slug: "home" },
         ...sidebarGroups().map((group) => ({
           label: group.label,
-          items: group.rels.map((rel) => ({ slug: slugOf(rel) })),
+          items: sidebarItems(group),
         })),
       ],
     }),
