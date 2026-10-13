@@ -106,7 +106,7 @@ context.PushClipRect(childOffset, clipRect, Clip.Antialias, (ctx, off) =>
 | レイヤー | 役割 |
 |---|---|
 | `ContainerLayer` | 子レイヤーをまとめるノード |
-| `PictureLayer` | `SKPicture`(Skia の記録済み描画コマンド)を保持するリーフ |
+| `PictureLayer` | `SKPicture`(Skia の記録済み描画コマンド)を保持する末端の Layer |
 | `ClipRectLayer` / `ClipRoundRectLayer` / `ClipPathLayer` | 矩形・角丸・パスのクリッピング |
 | `OpacityLayer` | アルファ合成 |
 | `TransformLayer` | 変換行列を適用 |

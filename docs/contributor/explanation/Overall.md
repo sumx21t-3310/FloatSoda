@@ -138,7 +138,7 @@ flowchart TD
 
 ### ヒットテスト: Down の位置で当たった RenderObject を決める
 
-`WidgetBinding` は、`Down` を受けると、その位置で `RenderView` からヒットテストをします。ヒットテストは、子を先に調べてから自分を足すため、ヒットパスは葉に近い RenderObject から並びます。パスの最後には `RenderView` と `WidgetBinding` 自身が入ります。
+`WidgetBinding` は、`Down` を受けると、その位置で `RenderView` からヒットテストをします。ヒットテストは、子を先に調べてから自分を足すため、ヒットパスは末端に近い RenderObject から並びます。パスの最後には `RenderView` と `WidgetBinding` 自身が入ります。
 
 ヒットパスはポインターごとに保存します。`Move` と `Up` は、そのときの位置ではなく、`Down` のときのパスへ届けます。押したまま Widget の外へ動かしても、押し始めた Widget がイベントを受け取り続けます。
 

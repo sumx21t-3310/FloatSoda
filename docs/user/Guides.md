@@ -127,7 +127,7 @@ public class CheckBoxRowState : State<CheckBoxRow>
 
 ## 画面全体の色をまとめて切り替える
 
-色を `InheritedWidget` に持たせて画面の根元に置き、下の Widget はそこから色を読みます。根元の色を変えると、色を読んだ Widget がすべて作り直されます。
+色を `InheritedWidget` に持たせて、色を読む Widget より親の位置に置きます。子の Widget はそこから色を読みます。親の色を変えると、色を読んだ Widget がすべて作り直されます。
 
 まず、色を配る Widget を定義します。
 
@@ -154,7 +154,7 @@ public sealed record AppTheme : InheritedWidget
 
 `Of` は、いちばん近い祖先の `AppTheme` を探し、呼んだ Widget を「色を読んだ側」として登録します。`UpdateShouldNotify` が `true` を返すと、登録された Widget が作り直されます。
 
-次に、色を読む Widget と、色を切り替える根元の Widget を書きます。
+次に、色を読む Widget と、色を切り替える親の Widget を書きます。
 
 ```csharp
 using FloatSoda.Elements;
