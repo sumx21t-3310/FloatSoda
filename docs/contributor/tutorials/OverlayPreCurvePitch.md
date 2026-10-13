@@ -1,4 +1,4 @@
-# プラットフォーム: 貢献までの流れ
+# OpenVR の API を1つ包んで PR を出す
 
 このページでは、プラットフォームの層で OpenVR の API を1つ包み、PR を出すまでを一本道で進めます。題材は [#103](https://github.com/sumx21t-3310/FloatSoda/issues/103)(`OverlayPreCurvePitch` ケーパビリティクラスを追加する)です。曲面オーバーレイの曲げる軸を傾ける API で、生バインディングはすでにあり、同じ形の `OverlayCurvature` を手本にできます。
 
@@ -13,7 +13,7 @@
 - .NET 10 SDK が入っていて、リポジトリをクローン済みであること
 - `dotnet build` が手元で通ること
 - 実機で確かめるために、SteamVR と HMD が使えること
-- [プラットフォーム: 仕組みと理由](Explanation.md) の「オーバーレイと能力オブジェクト」を読んでいること
+- [プラットフォームの仕組みと理由](../explanation/Platform.md) の「オーバーレイと能力オブジェクト」を読んでいること
 
 ## Step 1: Issue を読み、ブランチを切る
 
@@ -91,7 +91,7 @@ public OverlayPreCurvePitch PreCurvePitch { get; } = new(identity.Handle);
 dotnet build
 ```
 
-ビルドが成功すれば、このステップは終わりです。※要確認: この Tutorial の書き手は、Step 3 と Step 4 のコードでビルドを通していません。
+ビルドが成功すれば、このステップは終わりです。※要確認: このページの書き手は、Step 3 と Step 4 のコードでビルドを通していません。
 
 ## Step 5: 実機で確かめる
 
@@ -109,7 +109,7 @@ dotnet build
 4. HMD をかぶってオーバーレイの曲がり方を見てから、2行目の値を `0f` にして実行し直し、曲がり方が変わることを確かめる
 5. 足した2行を消し、`git status` で `PrimitiveOverlay` に変更が残っていないことを確かめる
 
-曲がり方がどう変わって見えるかは ※要確認 です。この Tutorial の書き手は実機で確かめていません。
+曲がり方がどう変わって見えるかは ※要確認 です。このページの書き手は実機で確かめていません。
 
 確かめる手順をあとに残したいときは、[`floatsoda-device-test-gen`](../../../.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルでハーネスのシナリオにし、[`floatsoda-device-test-run`](../../../.agents/skills/floatsoda-device-test-run/SKILL.md) スキルで実行します。
 
@@ -123,6 +123,6 @@ PR の本文は `.github/PULL_REQUEST_TEMPLATE.md` に沿って書き、breaking
 
 ## 次に読むもの
 
-- [プラットフォーム: 作業の手順](HowTo.md) — API を包む規約と、例外を足す手順
-- [プラットフォーム: 仕組みと理由](Explanation.md) — テクスチャ転送、スレッド、入力の流れ
-- [プラットフォーム: 守ること](Reference.md) — `internal` の契約
+- [OpenVR の API を包む](../how-to/WrapOpenVRApi.md) — API を包む規約と、例外を足す手順
+- [プラットフォームの仕組みと理由](../explanation/Platform.md) — テクスチャ転送、スレッド、入力の流れ
+- [プラットフォームで守ること](../reference/Platform.md) — `internal` の契約

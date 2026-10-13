@@ -96,10 +96,10 @@ key=True 並べ替えた後: 左 #ff0000ff / 右 #ffff0000
 
 `State` は Widget ではなく Element が持ちます。フレームごとに新しい Widget の並びが来ると、FloatSoda は古い Element と新しい Widget を組み合わせ、Element を使い回します。組み合わせてよいかは `Widget.CanUpdate` が決め、型が同じで `Key` が等しければ使い回します。`Key` がないと、どちらの `Tile` も型が同じで `Key` も `null` 同士なので、同じ位置の Element がそのまま使われます。そのため、`Red` を覚えた `State` は左の位置に残り、`Blue` の Widget を受け取ります。`InitState` は Element が最初に組み立てられるときに1回だけ呼ばれるので、覚えた色は変わりません。
 
-`Key` をつけると、複数の子を持つ Element は、古い子を `Key` で探して新しい Widget と組み合わせます。`ValueKey<string>("Blue")` の Widget は、もともと `Blue` の Widget を持っていた Element と組み合わさり、Element ごと左へ移ります。Widget と Element の役割と、並びの差分の取り方は、[フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) の Widget と Element の節で説明します。
+`Key` をつけると、複数の子を持つ Element は、古い子を `Key` で探して新しい Widget と組み合わせます。`ValueKey<string>("Blue")` の Widget は、もともと `Blue` の Widget を持っていた Element と組み合わさり、Element ごと左へ移ります。Widget と Element の役割と、並びの差分の取り方は、[三つのツリーの仕組みと理由](../explanation/Trees.md) の Widget と Element の節で説明します。
 
 ## 関連
 
-- [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) — Widget と Element、並びの差分
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — Widget と Element、並びの差分
 - [State](../../concepts/State.md) — 利用者から見た `State`
 - [実験の一覧](Home.md)

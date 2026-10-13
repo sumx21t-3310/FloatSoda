@@ -79,10 +79,10 @@ each: 重なった部分 (100,100) = #bf5400ab
 
 `OpacityLayer` は、子をいったん別の描画先へ不透明のまま描き、最後にその描画先全体を指定した不透明度で重ねます(`OpacityLayer.Paint` の `SKCanvas.SaveLayer`)。A では、赤の上に青を描いた時点で、重なった部分は青だけになります。そのあとで全体が半透明になるので、赤は透けません。B では、赤と青がそれぞれ半透明になってから重なるので、青を通して下の赤が見えます。
 
-Layer ツリーの組み方と描き方は、[描画: 仕組みと理由](../rendering/Explanation.md) の Layer ツリーの節で説明します。
+Layer ツリーの組み方と描き方は、[描画の仕組みと理由](../explanation/Rendering.md) の Layer ツリーの節で説明します。
 
 ## 関連
 
-- [描画: 仕組みと理由](../rendering/Explanation.md) — Layer ツリーの種類と、描画の流れ
+- [描画の仕組みと理由](../explanation/Rendering.md) — Layer ツリーの種類と、描画の流れ
 - [`src/FloatSoda.Rendering/Layers/`](https://github.com/sumx21t-3310/FloatSoda/tree/main/src/FloatSoda.Rendering/Layers) — Layer の種類の一覧は、このディレクトリにある
 - [実験の一覧](Home.md)

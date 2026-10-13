@@ -1,6 +1,6 @@
-# フレームワーク(三つのツリー): 仕組みと理由
+# 三つのツリーの仕組みと理由
 
-FloatSoda は、Flutter と同じ Widget・Element・RenderObject の三つのツリーで UI を組み立てます。Widget は毎回作り直す設計図、Element はフレームをまたいで残るノード、RenderObject はレイアウトと描画とヒットテストを担うノードです。このページでは、Widget の変更が RenderObject に届くまでの流れ、レイアウトと描画の差分更新、ポインタ入力がジェスチャになるまでの流れを説明します。フレームの1周の中でこれらがいつ呼ばれるかは [コアの Explanation](../core/Explanation.md) にあります。
+FloatSoda は、Flutter と同じ Widget・Element・RenderObject の三つのツリーで UI を組み立てます。Widget は毎回作り直す設計図、Element はフレームをまたいで残るノード、RenderObject はレイアウトと描画とヒットテストを担うノードです。このページでは、Widget の変更が RenderObject に届くまでの流れ、レイアウトと描画の差分更新、ポインタ入力がジェスチャになるまでの流れを説明します。フレームの1周の中でこれらがいつ呼ばれるかは [コアの仕組みと理由](Core.md) にあります。
 
 ## 実装状況
 
@@ -13,7 +13,7 @@ Widget・Element・RenderObject の基盤と、差分ビルド、差分レイア
 | `FloatSoda.Hooks` | `HookWidget` と `HookElement` だけがあり、ビルドループとつながっていない。`HookExtension` の各メソッドは `NotImplementedException` を投げる(追跡: [#72](https://github.com/sumx21t-3310/FloatSoda/issues/72)) |
 | `GlobalKey` と、外した Element の再利用 | ない(台帳の #2、#3) |
 
-台帳は、Flutter との差異を記録した [`known-divergences.md`](../../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。
+台帳は、Flutter との差異を記録した [`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。
 
 ## 責務と境界
 
@@ -40,7 +40,7 @@ Widget・Element・RenderObject の基盤と、差分ビルド、差分レイア
 | `GestureRecognizer`、`GestureArenaManager`、`PointerRouter` | `src/FloatSoda/Gesture/` | ポインタイベントの列をタップやパンとして解釈する |
 | `WidgetBitmapRenderer`、`RenderObjectBitmapRenderer` | `src/FloatSoda.Testing/` | ツリーをヘッドレスでビットマップへ描く |
 
-Widget の基底クラスごとの対応する Element は、[WidgetSystem](../../WidgetSystem.md) の「Widget の階層」にあります。組み込みの Widget と RenderObject は、`src/FloatSoda/Widgets/` と `src/FloatSoda/RenderObjects/` の下にあります。
+Widget の基底クラスごとの対応する Element は、[WidgetSystem](../WidgetSystem.md) の「Widget の階層」にあります。組み込みの Widget と RenderObject は、`src/FloatSoda/Widgets/` と `src/FloatSoda/RenderObjects/` の下にあります。
 
 ## 処理の流れ
 
@@ -99,7 +99,7 @@ Widget ツリーのルートは、`RenderObjectToWidgetAdapter`(Widget)と `Rend
 
 `MarkNeedsPaint()` は、`IsRepaintBoundary` が `true` のノードまで親方向へ伝わり、そのノードが `RenderPipeline.NodesNeedingPaint` に登録されます。境界になるのは、ルートの `RenderView` と、`RepaintBoundary` Widget の実体の `RenderRepaintBoundary` です。
 
-`FlushPaint` は、境界のノードごとに `PaintingContext.RepaintCompositedChild` を呼びます。`Paint(PaintingContext, Offset)` は Skia の描画コマンドを `PictureLayer` に記録し、クリップや不透明度は `PushClipRect` や `PushOpacity` で子の Layer に分けます。Layer ツリーのその先は [描画の Explanation](../../rendering/Explanation.md) にあります。
+`FlushPaint` は、境界のノードごとに `PaintingContext.RepaintCompositedChild` を呼びます。`Paint(PaintingContext, Offset)` は Skia の描画コマンドを `PictureLayer` に記録し、クリップや不透明度は `PushClipRect` や `PushOpacity` で子の Layer に分けます。Layer ツリーのその先は [描画の仕組みと理由](Rendering.md) にあります。
 
 ### intrinsic 測定
 
@@ -136,7 +136,7 @@ intrinsic 測定は、制約を渡す前に「子が本来必要とするサイ�
 | `RenderAbsorbPointer` | 自分を当たりにして、子を調べない |
 | `RenderIgnorePointer` | 自分も子も当たりにしない |
 
-`Behaviour` の既定値と、その理由は [WidgetSystem](../../WidgetSystem.md) の「ヒットテストの振る舞い」にあります。
+`Behaviour` の既定値と、その理由は [WidgetSystem](../WidgetSystem.md) の「ヒットテストの振る舞い」にあります。
 
 ### ホバー
 
@@ -152,7 +152,7 @@ intrinsic 測定は、制約を渡す前に「子が本来必要とするサイ�
 4. 認識器は自分のジェスチャだと判断した時点で勝利を宣言し、締め切り前の宣言は締め切りの時点で確定する(たとえばパンは、指が一定距離を越えて動いた時点で宣言する)
 5. 誰も宣言しないまま `Up` が届くと、アリーナの最初の参加者を勝者にする(`Sweep`)
 
-認識器の作り方と、`RawGestureDetector` の使い方は [WidgetSystem](../../WidgetSystem.md) の「認識器を自分で組む」にあります。
+認識器の作り方と、`RawGestureDetector` の使い方は [WidgetSystem](../WidgetSystem.md) の「認識器を自分で組む」にあります。
 
 ### Hooks
 
@@ -171,18 +171,18 @@ intrinsic 測定は、制約を渡す前に「子が本来必要とするサイ�
 
 FloatSoda には、外した Element を同じフレームの中で再利用する仕組み(Flutter の inactive element のプール)がありません。そのため `Deactivate` が終わりで、`Key` 付きの部分木を別の親へ移すと `State` は作り直されます(台帳の #2)。
 
-RenderObject の親子のつながりは、`SingleChildContainer<T>` と `MultiChildrenCollection<T>` を通して張ります。この2つは、子の代入のたびに adopt と drop を、パイプラインへの接続のたびに attach と detach を子へ伝えます。外部の購読も attach と detach に合わせます。たとえば `RenderAnimatedOpacity` は、attach で `IAnimation<double>.Changed` を購読し、detach で解除します。守る条件は [三つのツリーの Reference](Reference.md) にあります。
+RenderObject の親子のつながりは、`SingleChildContainer<T>` と `MultiChildrenCollection<T>` を通して張ります。この2つは、子の代入のたびに adopt と drop を、パイプラインへの接続のたびに attach と detach を子へ伝えます。外部の購読も attach と detach に合わせます。たとえば `RenderAnimatedOpacity` は、attach で `IAnimation<double>.Changed` を購読し、detach で解除します。守る条件は [三つのツリーで守ること](../reference/Trees.md) にあります。
 
 ## なぜそう設計したか
 
 | 判断 | 理由 | 出典 |
 |---|---|---|
-| Widget を不変の `record` にする | 毎回作り直しても、`==` で前回との違いを判定できるため | [WidgetSystem](../../WidgetSystem.md) の「三ツリーの役割」 |
-| dirty な Element を親から先に再ビルドする | 親の再ビルドで子も更新される場合に、子を別に再ビルドする無駄を省くため。Flutter と同じ戦略 | [BuildPipeline](../../BuildPipeline.md) |
+| Widget を不変の `record` にする | 毎回作り直しても、`==` で前回との違いを判定できるため | [WidgetSystem](../WidgetSystem.md) の「三ツリーの役割」 |
+| dirty な Element を親から先に再ビルドする | 親の再ビルドで子も更新される場合に、子を別に再ビルドする無駄を省くため。Flutter と同じ戦略 | [BuildPipeline](../BuildPipeline.md) |
 | `Move` と `Up` を `Down` のヒットテスト結果へ届ける | 押し始めた対象が、指が外へ出てもイベントを受け取り続けるため | `WidgetBinding.HandlePointerEvent` のコメント |
-| 認識器の生成と、コールバックの設定を別のデリゲートに分ける | Widget を作り直しても認識器を保ち、押している途中のジェスチャを途切れさせないため | [WidgetSystem](../../WidgetSystem.md) の「認識器を自分で組む」 |
+| 認識器の生成と、コールバックの設定を別のデリゲートに分ける | Widget を作り直しても認識器を保ち、押している途中のジェスチャを途切れさせないため | [WidgetSystem](../WidgetSystem.md) の「認識器を自分で組む」 |
 | `GestureDetector` と `Listener` の `Behaviour` の既定値を `DeferToChild`、`PointerRegion` を `Opaque` にする | 押せる範囲を子の描画範囲に合わせ、ホバーは隙間で点滅させないため | WidgetSystem の「ヒットテストの振る舞い」 |
-| Semantics の dirty フラグとフックを持たない | 対象ユーザーとランタイムに受け皿がないため | [APIDesign](../../APIDesign.md) の「実装しない API — Semantics」 |
+| Semantics の dirty フラグとフックを持たない | 対象ユーザーとランタイムに受け皿がないため | [APIDesign](../APIDesign.md) の「実装しない API — Semantics」 |
 
 ## Flutter との対応
 
@@ -199,7 +199,7 @@ RenderObject の親子のつながりは、`SingleChildContainer<T>` と `MultiC
 
 ## テストでの駆動
 
-三つのツリーは、SteamVR も GPU も使わずにテストできます。手順は [三つのツリーの HowTo](HowTo.md) の「ヘッドレスでテストする」にあります。
+三つのツリーは、SteamVR も GPU も使わずにテストできます。手順は [Flutter のウィジェットを移植する](../how-to/PortWidget.md) の「ヘッドレスでテストする」にあります。
 
 - **ビルドとレイアウト** — `RenderView` と `RenderPipeline` を作り、`RenderObjectToWidgetAdapter.AttachToRenderTree` で Widget を接続して、`BuildScope` と `FlushLayout` を呼ぶ(`tests/FloatSoda.Test/Widgets/PaddingTest.cs`)
 - **描画** — `WidgetBitmapRenderer` か `RenderObjectBitmapRenderer` でビットマップへ描き、画素を確かめる(`tests/FloatSoda.Test/Widgets/ColoredBoxTest.cs`)
@@ -208,7 +208,7 @@ RenderObject の親子のつながりは、`SingleChildContainer<T>` と `MultiC
 
 ## 関連
 
-- [三つのツリーの Reference](Reference.md) — 変更後も守る条件
-- [三つのツリーの HowTo](HowTo.md) — ウィジェットの移植、カスタムクリッパー、ヘッドレスのテスト
-- [コアの Explanation](../core/Explanation.md) — フレームの中で各段が呼ばれる順序
-- [WidgetSystem](../../WidgetSystem.md)、[BuildPipeline](../../BuildPipeline.md)、[RenderObjects](../../RenderObjects.md) — 元になった現行ページ
+- [三つのツリーで守ること](../reference/Trees.md) — 変更後も守る条件
+- [Flutter のウィジェットを移植する](../how-to/PortWidget.md) — ウィジェットの移植、カスタムクリッパー、ヘッドレスのテスト
+- [コアの仕組みと理由](Core.md) — フレームの中で各段が呼ばれる順序
+- [WidgetSystem](../WidgetSystem.md)、[BuildPipeline](../BuildPipeline.md)、[RenderObjects](../RenderObjects.md) — 元になった現行ページ

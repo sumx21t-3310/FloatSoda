@@ -1,4 +1,4 @@
-# 全体: 仕組みと理由
+# 全体の仕組みと理由
 
 FloatSoda 全体がいまどう動き、なぜその設計にしたかを、層をまたぐ範囲で説明します。アセンブリの分け方、1フレームの流れ、スレッドの分担、SteamVR のポインターが Widget のジェスチャになるまでの流れ、API とローカライズの判断原則を扱います。各層の内部は、その層の「仕組みと理由」のページで詳しく説明します。
 
@@ -73,10 +73,10 @@ graph TD
 
 | 段階 | 説明するページ |
 |---|---|
-| Build | [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) |
-| Layout と Paint | [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md)、[フレームワーク(コア): 仕組みと理由](../framework/core/Explanation.md) |
-| Layer ツリーの描画 | [描画: 仕組みと理由](../rendering/Explanation.md) |
-| テクスチャの転送とレンダースレッド | [プラットフォーム: 仕組みと理由](../platform/Explanation.md) |
+| Build | [三つのツリーの仕組みと理由](Trees.md) |
+| Layout と Paint | [三つのツリーの仕組みと理由](Trees.md)、[コアの仕組みと理由](Core.md) |
+| Layer ツリーの描画 | [描画の仕組みと理由](Rendering.md) |
+| テクスチャの転送とレンダースレッド | [プラットフォームの仕組みと理由](Platform.md) |
 
 ## 所有権とスレッド
 
@@ -154,7 +154,7 @@ flowchart TD
 - `Up` — まだ勝者が決まっていなければ、最初に参加した認識器を勝者にする
 - `Cancel` — アリーナを取り消し、残っている認識器を全部負けにする
 
-勝った認識器が、`OnTap` のような Widget のコールバックを呼びます。ジェスチャとヒットテストの内部は [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) で、SteamVR とオーバーレイの入力は [プラットフォーム: 仕組みと理由](../platform/Explanation.md) で説明します。
+勝った認識器が、`OnTap` のような Widget のコールバックを呼びます。ジェスチャとヒットテストの内部は [三つのツリーの仕組みと理由](Trees.md) で、SteamVR とオーバーレイの入力は [プラットフォームの仕組みと理由](Platform.md) で説明します。
 
 ## なぜそう設計したか
 
@@ -194,12 +194,12 @@ FloatSoda は、Flutter の三つのツリーと、ウィジェットやレイ�
 - 入力は、テスト用の `IRawPointerSource` から `RawPointerEvent` を発火し、`PointerController.Flush()` で `WidgetBinding` へ流す。例は `tests/FloatSoda.Test/Core/PointerInputIntegrationTest.cs` にある
 - 描画結果は、`FloatSoda.Testing` の `WidgetBitmapRenderer` と `RenderObjectBitmapRenderer` でビットマップにして確かめる
 
-SteamVR のイベントの届き方、コントローラーの座標、レンダースレッドの GL コンテキストは、実機でしか確かめられません。手順は [全体: 作業の手順](HowTo.md#実機で確かめる) にあります。
+SteamVR のイベントの届き方、コントローラーの座標、レンダースレッドの GL コンテキストは、実機でしか確かめられません。手順は [作業の手順](../how-to/Home.md#実機で確かめる) にあります。
 
 ## 関連
 
-- [全体: 守ること](Reference.md) — 層をまたいで維持する条件
+- [守ること](../reference/Home.md) — 層をまたいで維持する条件
 - [Architecture](../Architecture.md) — アセンブリ構成、ツリー構造、レンダリングライフサイクル、スレッドモデル(再編前のページ)
 - [APIDesign](../APIDesign.md) — API 設計の規約と判断原則
 - [Localization](../Localization.md) — ローカライズの仕組みと手順
-- [FloatSoda を変える](../Home.md) — 層ごとの「仕組みと理由」
+- [FloatSoda を変える](../Home.md) — 部分ごとの「仕組みと理由」

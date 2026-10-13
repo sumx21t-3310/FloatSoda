@@ -1,17 +1,16 @@
-# フレームワーク(アニメーション): 作業の手順
+# アニメーションの部品を移植する
 
-アニメーションの層でよく行う作業の手順と規約をまとめます。いまの対象は、Flutter のアニメーションの部品を移植する作業です。部品は、`Curve`、`ISimulation` の実装、値を受け取って描き直す `*Transition` の Widget の3種類です。初めて移植するときは、`Curve` を1つ移植する [アニメーションの Tutorial](Tutorial.md) から始めると、手順の意味をつかみやすくなります。
-
+アニメーションの層でよく行う作業の手順と規約を
 このページに書くのは、作業の順序だけです。規約の本文は、次の置き場所にあります。
 
 | 知りたいこと | 置き場所 |
 |---|---|
-| アニメーションで守る条件 | [アニメーションの Reference](Reference.md) |
-| Flutter との差異を作ってよい条件と、記録する5点 | [APIDesign](../../APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」 |
+| アニメーションで守る条件 | [アニメーションで守ること](../reference/Animation.md) |
+| Flutter との差異を作ってよい条件と、記録する5点 | [APIDesign](../APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」 |
 | 兄弟の型を同じファイルに置く規約 | APIDesign の「2.5 ファイル構成 — 兄弟ウィジェットは同じファイルに置く」 |
 | 通知を `event` で書く規約 | APIDesign の「3.6 リスナーパターンを実装せず `event` を使う」 |
-| テストの命名と観点、PR の流れ | [CONTRIBUTING.md](../../../../CONTRIBUTING.md) |
-| Widget と RenderObject を移植する手順 | [三つのツリーの HowTo](../trees/HowTo.md) |
+| テストの命名と観点、PR の流れ | [CONTRIBUTING.md](../../../CONTRIBUTING.md) |
+| Widget と RenderObject を移植する手順 | [Flutter のウィジェットを移植する](PortWidget.md) |
 
 ## 規約
 
@@ -65,7 +64,7 @@ grep -rnE "^(abstract |base |final |sealed )*class Split\b" ~/code_reading/flutt
 
 **`ISimulation`** は、`X(time)`(値)、`Dx(time)`(1秒あたりの変化量)、`IsDone(time)`(終わったか)を実装します。`time` はシミュレーションの開始からの秒数です。作った実装は `AnimationController.AnimateWith` に渡して動かします。
 
-**`*Transition` の Widget** は、`IAnimation<T>` を受け取る Widget と、それを購読する RenderObject の組で作ります。実例は `FadeTransition` と `RenderAnimatedOpacity` です。Widget と RenderObject の書き方は、[三つのツリーの HowTo](../trees/HowTo.md) の「Flutter のウィジェットを移植する」に従います。
+**`*Transition` の Widget** は、`IAnimation<T>` を受け取る Widget と、それを購読する RenderObject の組で作ります。実例は `FadeTransition` と `RenderAnimatedOpacity` です。Widget と RenderObject の書き方は、[Flutter のウィジェットを移植する](PortWidget.md) の「Flutter のウィジェットを移植する」に従います。
 
 `dotnet build` がエラーなしで通れば、この手順は終わりです。
 
@@ -79,13 +78,13 @@ grep -rnE "^(abstract |base |final |sealed )*class Split\b" ~/code_reading/flutt
 | `ISimulation` | `X`、`Dx`、`IsDone` を時刻ごとに確かめる。`AnimationController.AnimateWith` と `FakeFrameScheduler` で、値が進むことも確かめる |
 | `*Transition` | `FakeFrameScheduler` で `AnimationController` を進め、RenderObject の dirty の状態と描画の結果を確かめる(`tests/FloatSoda.Test/RenderObjects/RenderAnimatedOpacityTest.cs`) |
 
-`FakeFrameScheduler` の使い方は、[アニメーションの Explanation](Explanation.md) の「テストでの駆動」にあります。
+`FakeFrameScheduler` の使い方は、[アニメーションの仕組みと理由](../explanation/Animation.md) の「テストでの駆動」にあります。
 
 `dotnet test tests/FloatSoda.Test --filter "FullyQualifiedName~FloatSoda.Test.Animation"` がすべて通れば、この手順は終わりです。
 
 ### 手順5: 差異を記録して PR を出す
 
-Flutter と違う挙動を作った場合は、APIDesign の「差異が必要な場合の記録義務」の5点を、台帳([`known-divergences.md`](../../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md))に追記します。CONTRIBUTING.md の「ブランチ・PRフロー」にある CI と同じコマンドを実行し、すべて通ったら PR を出します。新しい `public` API を足す PR は、マージの前にジュニアコーダーテストを通します(CONTRIBUTING.md の「新しい public API を追加する場合の受け入れ条件」)。
+Flutter と違う挙動を作った場合は、APIDesign の「差異が必要な場合の記録義務」の5点を、台帳([`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md))に追記します。CONTRIBUTING.md の「ブランチ・PRフロー」にある CI と同じコマンドを実行し、すべて通ったら PR を出します。新しい `public` API を足す PR は、マージの前にジュニアコーダーテストを通します(CONTRIBUTING.md の「新しい public API を追加する場合の受け入れ条件」)。
 
 ## 規約が守られる場所
 
@@ -94,11 +93,10 @@ Flutter と違う挙動を作った場合は、APIDesign の「差異が必要�
 | `Curve` の端点 | `CurveTest.cs` の `Transform_PreservesEndpoints`。ただし、`EndpointCurves` に足した型だけを確かめる |
 | `Curve` の `ToString()` が終わること | `tests/FloatSoda.Test/RecordToStringTest.cs` |
 | ビルドとテストが通ること | CI(`.github/workflows/ci.yml`) |
-| `Attach` と `Detach` での購読、値が変わったときだけの `MarkNeedsPaint` | レビュー([REVIEW.md](../../../../REVIEW.md) の「4」と「5. テスト」) |
+| `Attach` と `Detach` での購読、値が変わったときだけの `MarkNeedsPaint` | レビュー([REVIEW.md](../../../REVIEW.md) の「4」と「5. テスト」) |
 | Flutter の公式テストへの対応 | レビュー(REVIEW.md の「5. テスト」) |
 
 ## 関連
 
-- [アニメーションの Tutorial](Tutorial.md) — `Curve` を1つ移植して PR を出すまでの一本道
-- [アニメーションの Reference](Reference.md) — アニメーションで守る条件
-- [アニメーションの Explanation](Explanation.md) — `WidgetTicker`、`AnimationController`、`Curve` の仕組み
+- [アニメーションで守ること](../reference/Animation.md) — アニメーションで守る条件
+- [アニメーションの仕組みと理由](../explanation/Animation.md) — `WidgetTicker`、`AnimationController`、`Curve` の仕組み

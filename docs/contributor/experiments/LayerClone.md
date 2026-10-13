@@ -96,10 +96,10 @@ clone=True: 描いた 6182 回 / 空の絵 0 回 / 例外 0 回
 
 Clone すると、別のスレッドは、渡された時点の子のリストを持つ別のツリーを読みます。メインスレッドが次のフレームで元のツリーを書き換えても、渡したツリーは変わりません。記録済みの `SKPicture` は複製せずに共有しますが、メインスレッドは描き直すたびに新しい `PictureLayer` と `SKPicture` を作るので、渡した `SKPicture` を書き換えません。
 
-Clone して渡す設計の本体は、[描画: 仕組みと理由](../rendering/Explanation.md) の「Clone して渡す理由」で説明します。新しい Layer 型を足すときに守る条件は、[REVIEW.md](../../../REVIEW.md) の「Layer」にあります。
+Clone して渡す設計の本体は、[描画の仕組みと理由](../explanation/Rendering.md) の「Clone して渡す理由」で説明します。新しい Layer 型を足すときに守る条件は、[REVIEW.md](../../../REVIEW.md) の「Layer」にあります。
 
 ## 関連
 
-- [描画: 仕組みと理由](../rendering/Explanation.md) — Layer ツリーと、Clone して渡す理由
+- [描画の仕組みと理由](../explanation/Rendering.md) — Layer ツリーと、Clone して渡す理由
 - [REVIEW.md](../../../REVIEW.md) — 「4. FloatSoda 固有の不変条件」の「Layer」
 - [実験の一覧](Home.md)

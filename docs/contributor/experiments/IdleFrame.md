@@ -97,11 +97,11 @@ frame 5: Paint 0 回
 
 1フレームの仕事は、作り直しや描き直しが要ると印を付けられたものだけを処理します。`BuildOwner.BuildScope` は、作り直しの待ちリストが空なら何もせずに戻ります。`RenderPipeline.FlushLayout` と `FlushPaint` も、レイアウトと描き直しの待ちリストにあるものだけを処理します。何も変わらないフレームでは、どのリストも空なので、`Paint` は呼ばれません。アプリを動かすときは、`WidgetBinding.DrawFrame` が、描き直しの予約がないフレームでレイアウトと描画を飛ばします。
 
-`SetState` を呼ぶと、その `State` の Element が作り直しの待ちリストに入ります。作り直しで `Square` の色が変わると、`UpdateRenderObject` が `MarkNeedsPaint` を呼び、`RenderSquare` に描き直しの印が付きます。印は、いちばん近い再描画の境界(この実験ではルートの `RenderView`)まで上がります。そのため、境界の中にある左右の四角が両方とも描き直されます。この差分更新の流れは、[フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) の差分更新の節で説明します。
+`SetState` を呼ぶと、その `State` の Element が作り直しの待ちリストに入ります。作り直しで `Square` の色が変わると、`UpdateRenderObject` が `MarkNeedsPaint` を呼び、`RenderSquare` に描き直しの印が付きます。印は、いちばん近い再描画の境界(この実験ではルートの `RenderView`)まで上がります。そのため、境界の中にある左右の四角が両方とも描き直されます。この差分更新の流れは、[三つのツリーの仕組みと理由](../explanation/Trees.md) の差分更新の節で説明します。
 
 ## 関連
 
-- [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) — 差分ビルドと差分更新
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — 差分ビルドと差分更新
 - [1フレームで、どこが描き直されているの?](RepaintRegion.md) — 描き直す範囲を `RepaintBoundary` で狭める実験
 - [State](../../concepts/State.md) — 利用者から見た `SetState`
 - [実験の一覧](Home.md)

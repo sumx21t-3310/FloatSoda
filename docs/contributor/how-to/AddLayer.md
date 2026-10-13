@@ -1,6 +1,6 @@
-# 描画: 作業の手順
+# Layer を足す
 
-このページは、描画の層(`FloatSoda.Rendering`)でよく行う2つの作業、Layer を足す作業と、描画結果をビットマップで確かめる作業の手順です。Layer がどう動くかは [描画: 仕組みと理由](Explanation.md) に、変更の前後で守る条件は [描画: 守ること](Reference.md) にあります。
+このページは、描画の層(`FloatSoda.Rendering`)でよく行う2つの作業、Layer を足す作業と、描画結果をビットマップで確かめる作業の手順です。Layer がどう動くかは [描画の仕組みと理由](../explanation/Rendering.md) に、変更の前後で守る条件は [描画で守ること](../reference/Rendering.md) にあります。
 
 | 知りたいこと | 置き場所 |
 |---|---|
@@ -8,7 +8,7 @@
 | Layer の不変条件(Clone) | [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 |
 | XML ドキュメントコメントの書き方 | [DocumentationComments](../DocumentationComments.md) |
 | Flutter に合わせるか、差異にするかの判断 | [APIDesign](../APIDesign.md) |
-| 初めて Layer を足すときの一本道 | [描画: 貢献までの流れ](Tutorial.md) |
+| 初めて Layer を足すときの一本道 | [Layer を1つ足して PR を出す](../tutorials/ShaderMaskLayer.md) |
 
 ## Layer を足す
 
@@ -66,6 +66,6 @@ RenderObject や Widget から描いて確かめるときは、`FloatSoda.Testin
 
 ## 関連
 
-- [描画: 貢献までの流れ](Tutorial.md) — 実在の Layer を1つ足して PR を出すまで
-- [描画: 守ること](Reference.md) — 検証方法と、未設定の条件
-- [描画: 仕組みと理由](Explanation.md) — Clone してから渡す理由
+- [Layer を1つ足して PR を出す](../tutorials/ShaderMaskLayer.md) — 実在の Layer を1つ足して PR を出すまで
+- [描画で守ること](../reference/Rendering.md) — 検証方法と、未設定の条件
+- [描画の仕組みと理由](../explanation/Rendering.md) — Clone してから渡す理由

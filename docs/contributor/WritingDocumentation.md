@@ -32,16 +32,16 @@ FloatSoda のドキュメントは、入口の **導入** と、読者の目的�
    書ける   — 特定の目的を達成する手順                     → ユーザー向け / 〜するには(How-to)
    書けない — 内部の仕組み・理由・守ること・変更の手順     → コントリビューター向け(4 へ)
 
-4. コントリビューター向けは、層と種別で置き場所を決める
-   層   — 全体 / プラットフォーム / 描画 / フレームワーク(コア・三つのツリー・アニメーション)/ UI
-   種別 — その層で貢献するまでの流れ                       → Tutorial
-          特定の作業の手順                                 → How-to
-          変更後も維持する条件                             → Reference
-          いまどう動くか、なぜそう設計したか               → Explanation
-   動作原理を動かして確かめる問い                           → 実験
+4. コントリビューター向けは、種別でディレクトリを決め、その中のトピックを選ぶ
+   種別 — 題材を1つ決め、PR を出すまでの一本道           → tutorials/(貢献までの流れ)
+          特定の作業の手順                               → how-to/(作業の手順)
+          変更後も維持する条件                           → reference/(守ること)
+          いまどう動くか、なぜそう設計したか             → explanation/(仕組みと理由)
+   動作原理を動かして確かめる問い                         → experiments/(実験)
+   トピック — 既存のページに入るなら、そのページに足す。入らないときだけ新しいページを作る
 ```
 
-例えば「`SetState` を呼ぶと、その Widget から下が作り直される」は、外から観測できるのでコンセプトに置きます。「`BuildOwner` が dirty な Element を `Depth` 順に作り直す」は内部の仕組みなので、コントリビューター向けのフレームワーク(三つのツリー)の Explanation に置きます。
+例えば「`SetState` を呼ぶと、その Widget から下が作り直される」は、外から観測できるのでコンセプトに置きます。「`BuildOwner` が dirty な Element を `Depth` 順に作り直す」は内部の仕組みなので、コントリビューター向けの [三つのツリーの仕組みと理由](explanation/Trees.md) に置きます。
 
 境界で迷いやすい情報は、次のように分類します。
 
@@ -81,42 +81,56 @@ FloatSoda のドキュメントは、入口の **導入** と、読者の目的�
 | 導入 | — | `docs/` 直下 | Home、TargetUsers |
 | コンセプト | 知る | `docs/concepts/` | Overview(宣言的 UI の考え方、三つのツリーを利用者から見た姿、各トピックへの地図)、Widget、State、Layout、Input、Animation、Window、Threading。色は Widget の1節 |
 | ユーザー向け | 使う | `docs/user/` | 作りながら学ぶ(GettingStarted、ミニアプリ)、Widget カタログ、〜するには |
-| コントリビューター向け | 変える | `docs/contributor/` | 実験(`experiments/`)と、層ごとの Tutorial / HowTo / Reference / Explanation |
+| コントリビューター向け | 変える | `docs/contributor/` | 実験(`experiments/`)と、種別ごとのディレクトリ(`tutorials/`、`how-to/`、`reference/`、`explanation/`) |
 | API Reference | 調べる | `docs/api/` | 入口だけ。本体は XML ドキュメントコメントから作る([#219](https://github.com/sumx21t-3310/FloatSoda/issues/219)) |
 
 - ユーザー向けの小見出しに、Diátaxis の種別名は出さない
-- Widget カタログは、層1サンプルの `samples/*/README.md` をサイトの生成時に取り込む。Wiki には載せない。取り込むには `website/scripts/docs-source.mjs` の変更が要る([#219](https://github.com/sumx21t-3310/FloatSoda/issues/219) の完了条件7)
-- コントリビューター向けの層のディレクトリは `overall/`、`platform/`、`rendering/`、`framework/core/`、`framework/trees/`、`framework/animation/`、`ui/` とする。中身がないマスにも骨組みを置く(7層 × 4種別 = 28ページ)。サイトの生成がこの深さのディレクトリを扱えるかは ※要確認
-- `docs/assets/logo-sketch.png` は `samples/FloatSoda.Samples.Image` の素材で、ドキュメントのページからは参照していない。サイトと Wiki は `.md` だけを扱うため、どちらにも出ない
-- コントリビューター向けの Home は、層 × 種別の表を入口にし、読む順番を「面白がる(実験)→ 貢献する(全体の Tutorial)→ 調べる(Explanation・Reference)→ 提案する」で示す
+- Widget カタログは、層1サンプルの `samples/*/README.md` をサイトの生成時に取り込む。Wiki には載せない([#219](https://github.com/sumx21t-3310/FloatSoda/issues/219) の完了条件7)
+- コントリビューター向けは、Diátaxis の種別でディレクトリを切り、書くことがあるトピックだけをページにする。中身のないページを先に置かない。Diátaxis 自身が、空の4分類の構造を先に作ることを避けるよう勧めているため([Workflow](https://diataxis.fr/how-to-use-diataxis/) の「Don't worry about structure」)- `docs/assets/logo-sketch.png` は `samples/FloatSoda.Samples.Image` の素材で、ドキュメントのページからは参照していない。サイトと Wiki は `.md` だけを扱うため、どちらにも出ない
+- コントリビューター向けの Home は、種別ごとのページの一覧を入口にし、読む順番を「面白がる(実験)→ 貢献する(最初の PR の流れ)→ 調べる(仕組みと理由・守ること)→ 提案する」で示す
 
-**コントリビューター向けの層**
+**コントリビューター向けのトピックの単位**
 
-層は `src/` のプロジェクトと 1対1 にしません。
+トピックは、次の部分ごとに立てます。部分は `src/` のプロジェクトと 1対1 にしません。書くことがない部分には、ページを置きません。
 
-| 層 | 入るプロジェクト・名前空間 |
+| 部分 | 入るプロジェクト・名前空間 |
 |---|---|
-| 全体 | なし(層をまたぐ話。API 設計、ローカライズ、docs、テスト方針、リリース、入力の流れ) |
+| 全体 | なし(部分をまたぐ話。API 設計、ローカライズ、docs、テスト方針、リリース、入力の流れ) |
 | プラットフォーム | `FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR` |
 | 描画 | `FloatSoda.Rendering` |
-| フレームワーク(コア) | `FloatSoda` の `FloatSodaApp` と Generic Host まわり、`Core`、`Geometrics`、`Painting` |
-| フレームワーク(三つのツリー) | `FloatSoda` の `Widgets`、`Elements`、`RenderObjects`、`Gesture`。`FloatSoda.Hooks`、`FloatSoda.Testing` |
-| フレームワーク(アニメーション) | `FloatSoda` の `Animation` |
-| UI | `FloatSoda.UI`、`FloatSoda.UI.Cream`、`FloatSoda.UI.FizzyPop` |
+| コア | `FloatSoda` の `FloatSodaApp` と Generic Host まわり、`Core`、`Geometrics`、`Painting` |
+| 三つのツリー | `FloatSoda` の `Widgets`、`Elements`、`RenderObjects`、`Gesture`。`FloatSoda.Hooks`、`FloatSoda.Testing` |
+| アニメーション | `FloatSoda` の `Animation` |
+| UI | `FloatSoda.UI`、`FloatSoda.UI.Cream`、`FloatSoda.UI.FizzyPop`。実装ができるまでページを置かない |
 
-**層ごとの種別と、今のページの行き先**
+**種別ごとのページと、今のページの行き先**
 
-「新」は、今どこにもなく新しく書くものです。印のないものは、今のページの節から移します。
+「新」は、今のページになく新しく書いたものです。印のないものは、今のページの節から移します。
 
-| 層 | Tutorial(貢献までの流れ) | How-to | Reference | Explanation |
-|---|---|---|---|---|
-| 全体 | 1つの PR を出し切る(題材は docs の小さな修正) | Issue を書く・ブランチを切る(CONTRIBUTING.md へリンク)、[DocumentationComments](DocumentationComments.md)、このページ、[TestStrategy](TestStrategy.md)、新 ADR を書く、実機で確かめる(device-test のスキルへリンク)、リリースする(RELEASING.md へリンク) | [Requirements](Requirements.md)(REVIEW.md の 4 章へリンク)、[APIDesign](APIDesign.md) の 2 章、Flutter との差異の台帳 | [Architecture](Architecture.md)(アセンブリ構成、フレームパイプライン、スレッドモデル)、APIDesign の 1 章、[Localization](Localization.md)、新 入力の流れ(SteamVR のポインタ → ヒットテスト → ジェスチャ) |
-| プラットフォーム | 新 OpenVR の API を1つ包んで PR を出す | 新 OpenVR の API を調べて包む、新 例外を足す | [OVRIntegration](OVRIntegration.md) の「例外体系」「オーバーレイプロパティ」のうち `internal` の契約(`public` の分は API Reference) | OVRIntegration(初期化、オーバーレイの種類、VREventDispatcher)、Architecture のスレッドとレンダースレッドの部分、[Input](Input.md) の実装の部分、新 テクスチャ転送と FramePacer |
-| 描画 | 新 Layer の種類を1つ足して PR を出す | 新 Layer を足す(Clone の実装を含む)、新 描画結果をビットマップで確かめる | REVIEW.md の「Layer」の不変条件。Layer の一覧は書かずに `Layers/` へリンクする | Architecture のレイヤーツリーの部分、[RenderObjects](RenderObjects.md) の「PaintingContext とレイヤーツリー」、新 Clone して渡す理由 |
-| フレームワーク(コア) | 新 ジオメトリの値型を1つ足して PR を出す | 新 値型を足す(`record struct` と `PrintMembers` の注意) | `RenderPipeline` の契約、値型の規約(APIDesign の 2 章から) | Architecture のフレームパイプラインのうち `WidgetBinding`・`RenderPipeline` の部分、新 アプリの起動と Generic Host |
-| フレームワーク(三つのツリー) | 新 Flutter のウィジェットを1つ移植して PR を出す | 新 ウィジェットを移植する(flutter-widget-source スキル、テスト観点、層1サンプル、差異の記録)、RenderObjects の「カスタムクリッパーの実装」、新 ヘッドレスでテストする(`FloatSoda.Testing`) | REVIEW.md の「ツリーの所有権とライフサイクル」「差分更新」、RenderObjects の「基本契約」。組み込み RenderObject の一覧は書かずにコードへリンクする | [WidgetSystem](WidgetSystem.md)、[BuildPipeline](BuildPipeline.md)、RenderObjects の「制約フロー」「差分更新」「intrinsic 測定」、新 ジェスチャとヒットテスト、Hooks |
-| フレームワーク(アニメーション) | 新 Flutter の `Curve` を1つ移植して PR を出す | 新 アニメーションの部品を移植する | (骨組み) | [Animation](Animation.md)、新 `Ticker` とフレームの関係 |
-| UI | (骨組み) | (骨組み) | [UILayering](UILayering.md) の2つのルールと判定基準 | UILayering の「なぜ3層に分けるか」 |
+| ページ | 移す元 |
+|---|---|
+| [docs の小さな修正で PR を出す](tutorials/FirstPullRequest.md) | 新 |
+| [Layer を1つ足して PR を出す](tutorials/ShaderMaskLayer.md) | 新(題材は [#154](https://github.com/sumx21t-3310/FloatSoda/issues/154)) |
+| [OpenVR の API を1つ包んで PR を出す](tutorials/OverlayPreCurvePitch.md) | 新(題材は [#103](https://github.com/sumx21t-3310/FloatSoda/issues/103)) |
+| [作業の手順](how-to/Home.md)(入口) | Issue を書く・ブランチを切る(CONTRIBUTING.md へリンク)、[DocumentationComments](DocumentationComments.md)、このページ、[TestStrategy](TestStrategy.md)、ADR を書く(置き場所は未定)、実機で確かめる、リリースする(RELEASING.md へリンク) |
+| [OpenVR の API を包む](how-to/WrapOpenVRApi.md) | 新(例外を足す手順を含む) |
+| [Layer を足す](how-to/AddLayer.md) | 新(描画結果をビットマップで確かめる手順を含む) |
+| [ジオメトリの値型を足す](how-to/AddValueType.md) | 新 |
+| [Flutter のウィジェットを移植する](how-to/PortWidget.md) | 新、[RenderObjects](RenderObjects.md) の「カスタムクリッパーの実装」、新 ヘッドレスでテストする |
+| [アニメーションの部品を移植する](how-to/PortAnimation.md) | 新 |
+| [守ること](reference/Home.md)(入口) | [Requirements](Requirements.md)(REVIEW.md の 4 章へリンク)、[APIDesign](APIDesign.md) の 2 章、Flutter との差異の台帳 |
+| [プラットフォームで守ること](reference/Platform.md) | [OVRIntegration](OVRIntegration.md) の「例外体系」「オーバーレイプロパティ」のうち `internal` の契約 |
+| [描画で守ること](reference/Rendering.md) | REVIEW.md の「Layer」の不変条件 |
+| [コアで守ること](reference/Core.md) | `RenderPipeline` の契約、APIDesign の値型の規約 |
+| [三つのツリーで守ること](reference/Trees.md) | REVIEW.md の「ツリーの所有権とライフサイクル」「差分更新」、RenderObjects の「基本契約」 |
+| [アニメーションで守ること](reference/Animation.md) | 新 |
+| [全体の仕組みと理由](explanation/Overall.md) | [Architecture](Architecture.md)(アセンブリ構成、フレームパイプライン、スレッドモデル)、APIDesign の 1 章、[Localization](Localization.md)、新 入力の流れ |
+| [プラットフォームの仕組みと理由](explanation/Platform.md) | OVRIntegration(初期化、オーバーレイの種類、VREventDispatcher)、Architecture のレンダースレッドの部分、[Input](Input.md) の実装の部分、新 テクスチャ転送と FramePacer |
+| [描画の仕組みと理由](explanation/Rendering.md) | Architecture のレイヤーツリーの部分、RenderObjects の「PaintingContext とレイヤーツリー」、新 Clone して渡す理由 |
+| [コアの仕組みと理由](explanation/Core.md) | Architecture のフレームパイプラインのうち `WidgetBinding`・`RenderPipeline` の部分、新 アプリの起動と Generic Host |
+| [三つのツリーの仕組みと理由](explanation/Trees.md) | [WidgetSystem](WidgetSystem.md)、[BuildPipeline](BuildPipeline.md)、RenderObjects の「制約フロー」「差分更新」「intrinsic 測定」、新 ジェスチャとヒットテスト、Hooks |
+| [アニメーションの仕組みと理由](explanation/Animation.md) | [Animation](Animation.md)、新 `Ticker` とフレームの関係 |
+| (UI のページはまだない) | [UILayering](UILayering.md)。UI の実装ができたら、守ることと仕組みと理由に分けて移す |
 
 コントリビューター向け以外へ移るものは、次のとおりです。
 
@@ -135,7 +149,7 @@ FloatSoda のドキュメントは、入口の **導入** と、読者の目的�
 
 書き方は [5 章の「実験」](#実験)にあります。どの候補も、動かせるかは ※要確認 です。プラットフォームの実験は HMD が要る見込みで、`--desktop` の表示で代わりになるかも ※要確認 です。
 
-| 層 | 問い | やること | 見えるもの / 壊して直す一手 |
+| 部分 | 問い | やること | 見えるもの / 壊して直す一手 |
 |---|---|---|---|
 | プラットフォーム | SteamVR へのテクスチャ転送はどうなっているの? | フレームごとに色が変わる絵を出し、`FramePacer` の目標フレームレートを下げる | オーバーレイがカクつく。戻すとなめらかになる |
 | プラットフォーム | オーバーレイの大きさは何で決まるの? | 同じ 340px の絵を、Dpm を変えて出す | 34cm の幅になったり、手のひらほどになったりする |
@@ -158,9 +172,9 @@ FloatSoda のドキュメントは、入口の **導入** と、読者の目的�
 | 概念モデル(Widget、State、Layout、Input、Animation、Window、Threading) | コンセプト |
 | 完成物を作る手順 | ユーザー向けの「作りながら学ぶ」とサンプル(`samples/`) |
 | ウィジェットの最小の使用例 | サンプルの README。サイトの Widget カタログに取り込む(構成は [CONTRIBUTING.md](../../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
-| 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | コントリビューター向けの、該当する層の Explanation |
-| 設計理由と採用しなかった選択肢 | コントリビューター向けの、該当する層の Explanation(理由の部分) |
-| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | コントリビューター向けの、該当する層の Reference。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../../AGENTS.md) の規約表) |
+| 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | コントリビューター向けの「仕組みと理由」(`explanation/`)の、該当するページ |
+| 設計理由と採用しなかった選択肢 | コントリビューター向けの「仕組みと理由」(`explanation/`)の、該当するページの理由の部分 |
+| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | コントリビューター向けの「守ること」(`reference/`)の、該当するページ。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../../AGENTS.md) の規約表) |
 | API 設計の原則と Flutter parity / divergence の判断基準 | [APIDesign](APIDesign.md) |
 | 確認済みの Flutter との差異 | [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) |
 | 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../../CONTRIBUTING.md) / [REVIEW.md](../../REVIEW.md) / [RELEASING.md](../../RELEASING.md) |
@@ -251,7 +265,7 @@ Widget カタログのテンプレートは、[CONTRIBUTING.md](../../CONTRIBUTI
 
 ## 5. コントリビューター向けの書くもの / 書かないものとテンプレート
 
-コントリビューター向けは、層ごとに Tutorial / How-to / Reference / Explanation の4種別で書き、動作原理を確かめる実験を別に置きます(層と種別の決め方は [1 章](#1-どこに書くか))。この章の Architecture / Design / Requirements / Development のテンプレートは、次のとおり4種別に対応します。
+コントリビューター向けは、Tutorial / How-to / Reference / Explanation の4種別のディレクトリに、書くことがあるトピックだけをページとして置き、動作原理を確かめる実験を別に置きます(種別とトピックの決め方は [1 章](#1-どこに書くか))。この章の Architecture / Design / Requirements / Development のテンプレートは、次のとおり4種別に対応します。
 
 | テンプレート | 種別 |
 |---|---|
@@ -260,7 +274,7 @@ Widget カタログのテンプレートは、[CONTRIBUTING.md](../../CONTRIBUTI
 | [Requirements](#requirements) | Reference |
 | [Development](#development) | How-to |
 | [貢献までの流れ](#貢献までの流れ) | Tutorial |
-| [実験](#実験) | 実験(層の4種別の外に置く) |
+| [実験](#実験) | 実験(4種別の外に置く) |
 
 コントリビューター向けは、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
 
@@ -336,7 +350,7 @@ Widget カタログのテンプレートは、[CONTRIBUTING.md](../../CONTRIBUTI
 
 実装を変えても**維持する条件**を書きます。読者は、変更が何を壊しうるかを確認するコントリビュータとレビュアーです。
 
-Requirements は、層ごとの Reference に書きます。今は [Requirements](Requirements.md) の骨組みだけがあります。いちばん近い実物は、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
+Requirements は、「守ること」(`reference/`)のトピックごとのページに書きます。今は [Requirements](Requirements.md) の骨組みだけがあります。いちばん近い実物は、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
 
 書くもの:
 
@@ -396,18 +410,18 @@ Requirements は、層ごとの Reference に書きます。今は [Requirements
 
 ### 貢献までの流れ
 
-その層で**最初の PR を出すまで**の一本道を書きます。種別は Tutorial です。読者は、その層を初めて触り、手を動かしながら貢献のしかたを覚えたいコントリビュータです。
+題材を1つ決め、**PR を出すまで**の一本道を書きます。種別は Tutorial です。読者は、その部分を初めて触り、手を動かしながら貢献のしかたを覚えたいコントリビュータです。
 
 書くもの:
 
-- **小さな題材** — 1つの PR で終わる大きさにする。全体の層は docs の小さな修正、三つのツリーの層は Flutter のウィジェットを1つ移植する、のように層ごとに1つ選ぶ(題材の一覧は [再編の地図](#再編の地図))
+- **小さな題材** — 1つの PR で終わる大きさにする。題材は、実在する Issue から選ぶ。部分ごとにそろえるために、取り込む予定のない題材を作らない
 - **手順** — 読者が上から順に実行すると PR が出せる形にする
 - **規約へのリンク** — ブランチ名、テスト観点、PR の書き方は [CONTRIBUTING.md](../../CONTRIBUTING.md) の該当する節へリンクする
 
 書かないもの:
 
 - **規約の再掲** — CONTRIBUTING.md の本文を写さない。写すと、片方だけが更新されて食い違う
-- **仕組みの説明** → その層の Explanation。手順の途中では一文で触れてリンクする
+- **仕組みの説明** → 該当する「仕組みと理由」のページ。手順の途中では一文で触れてリンクする
 
 ```text
 # 〜して PR を出す
@@ -428,19 +442,19 @@ FloatSoda の**動作原理の問い**を、動かして確かめます。読者
 - **問いのタイトル** — 「〜はどうなっているの?」のように、動作原理の問いにする(例: 「SteamVR へのテクスチャ転送はどうなっているの?」)
 - **目に見える結果** — どの実験も、目に見える絵か数で終える。最初の絵が見えるまでのコードは50行以内を目安にする(数値は仮の値で、書きながら見直す)
 - **壊して直す一手** — わざと壊すと結果が変わり、直すと戻る操作を1つ入れる
-- **なぜそうなるか** — 今見た結果の理由を1〜2段落で書き、仕組みの本体はその層の Explanation の節へリンクする
+- **なぜそうなるか** — 今見た結果の理由を1〜2段落で書き、仕組みの本体は該当する「仕組みと理由」のページの節へリンクする
 
 書かないもの:
 
-- **仕組みの本体** → その層の Explanation。同じ説明を実験と Explanation の2か所に書かない
-- **ほかの層に依存する手順** — 実験は層ごとに独立させ、どの実験からでも始められるようにする
+- **仕組みの本体** → 該当する「仕組みと理由」のページ。同じ説明を実験と「仕組みと理由」の2か所に書かない
+- **ほかの実験に依存する手順** — 実験は1つずつ独立させ、どの実験からでも始められるようにする
 
 ```text
 # 〜はどうなっているの?
 ## 試すこと       — 動かすコード。最初の絵まで50行以内を目安
 ## 見えるもの
 ## 壊して直す
-## なぜそうなるか — 1〜2段落。続きは層の Explanation へリンク
+## なぜそうなるか — 1〜2段落。続きは「仕組みと理由」のページへリンク
 ## 関連
 ```
 

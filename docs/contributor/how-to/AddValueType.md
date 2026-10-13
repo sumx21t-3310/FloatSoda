@@ -1,15 +1,14 @@
-# フレームワーク(コア): 作業の手順
+# ジオメトリの値型を足す
 
-コアの層でよく行う作業の手順と規約をまとめます。いまの対象は、ジオメトリの値型を1つ足す作業です。初めて値型を足すときは、題材を決めて一本道で進める [コアの Tutorial](Tutorial.md) から始めると、手順の意味をつかみやすくなります。
-
+コアの層でよく行う作業の手順と規約を
 このページに書くのは、値型を足す作業に絞った手順だけです。隣り合う規約の置き場所は次のとおりです。
 
 | 知りたいこと | 置き場所 |
 |---|---|
-| 値型の設計規約と、その理由 | [APIDesign](../../APIDesign.md) の「7. ファクトリメソッドの方針」「8」「8.5」 |
-| 値型で維持する条件と、破ったときに起きること | [コアの Reference](Reference.md) |
-| namespace とディレクトリ、テストの命名と観点、PR のスコープ | [CONTRIBUTING.md](../../../../CONTRIBUTING.md) |
-| XML ドキュメントコメントの書き方 | [DocumentationComments](../../DocumentationComments.md) |
+| 値型の設計規約と、その理由 | [APIDesign](../APIDesign.md) の「7. ファクトリメソッドの方針」「8」「8.5」 |
+| 値型で維持する条件と、破ったときに起きること | [コアで守ること](../reference/Core.md) |
+| namespace とディレクトリ、テストの命名と観点、PR のスコープ | [CONTRIBUTING.md](../../../CONTRIBUTING.md) |
+| XML ドキュメントコメントの書き方 | [DocumentationComments](../DocumentationComments.md) |
 
 ## 規約
 
@@ -109,11 +108,10 @@ CONTRIBUTING.md の「ブランチ・PRフロー」にあるコマンドを、�
 | `PrintMembers` の書き忘れ | `tests/FloatSoda.Test/RecordToStringTest.cs` |
 | ビルドとテストが通ること | CI(`.github/workflows/ci.yml`) |
 | `readonly record struct`、`double`、Skia 型を出さないこと | レビュー。機械の検査はない |
-| namespace とディレクトリの一致 | レビュー([REVIEW.md](../../../../REVIEW.md) の「7. namespace / ディレクトリ」) |
+| namespace とディレクトリの一致 | レビュー([REVIEW.md](../../../REVIEW.md) の「7. namespace / ディレクトリ」) |
 | Flutter の公式テストに対応するケース | レビュー(REVIEW.md の「5. テスト」) |
 
 ## 関連
 
-- [コアの Tutorial](Tutorial.md) — 値型を1つ足して PR を出すまでの一本道
-- [コアの Reference](Reference.md) — 値型と `RenderPipeline` で守る条件
-- [APIDesign](../../APIDesign.md) — 値型の設計規約と理由
+- [コアで守ること](../reference/Core.md) — 値型と `RenderPipeline` で守る条件
+- [APIDesign](../APIDesign.md) — 値型の設計規約と理由

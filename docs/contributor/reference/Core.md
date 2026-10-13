@@ -1,8 +1,8 @@
-# フレームワーク(コア): 守ること
+# コアで守ること
 
-コアの層で、実装を変えても維持する条件をまとめます。対象は、dirty な RenderObject を消化する `RenderPipeline` と、`Geometrics` などのジオメトリの値型の2つです。仕組みの説明は [コアの Explanation](Explanation.md) にあります。
+コアの層で、実装を変えても維持する条件をまとめます。対象は、dirty な RenderObject を消化する `RenderPipeline` と、`Geometrics` などのジオメトリの値型の2つです。仕組みの説明は [コアの仕組みと理由](../explanation/Core.md) にあります。
 
-`MarkNeedsLayout` / `MarkNeedsPaint` の伝播と境界ノードの登録の条件は、[REVIEW.md](../../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」の「差分更新」に置いてあります。このページでは複製せず、4 章にない条件だけを書きます。
+`MarkNeedsLayout` / `MarkNeedsPaint` の伝播と境界ノードの登録の条件は、[REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」の「差分更新」に置いてあります。このページでは複製せず、4 章にない条件だけを書きます。
 
 > ※要確認 — `RenderPipeline` の条件は、現在の実装と XML ドキュメントコメントから読み取ったものです。固定するテストがなく、契約として採るかはまだ決まっていません。
 
@@ -26,7 +26,7 @@
 
 ### ジオメトリの値型
 
-- `readonly record struct` で定義すること([APIDesign](../../APIDesign.md) の「8. ジオメトリオブジェクトには `record struct` を使う」)
+- `readonly record struct` で定義すること([APIDesign](../APIDesign.md) の「8. ジオメトリオブジェクトには `record struct` を使う」)
 - 公開 API の実数は `double` にし、`float` は SkiaSharp・OpenVR・OpenGL へ渡す境界でだけ使うこと(APIDesign の「8.5」)
 - SkiaSharp の型を公開 API に出さないこと(APIDesign の「8.5」)
 - 自分と同じ型を返す計算プロパティを持つ型には、`PrintMembers` を書くこと(APIDesign の「自分と同じ型を返す計算プロパティには `PrintMembers` を書く」)
@@ -43,7 +43,7 @@
 
 ## Observable behavior
 
-- Widget にも RenderObject にも変更がないフレームでは、レイアウトも描画も実行されない([BuildPipeline](../../BuildPipeline.md) の「WidgetBinding.DrawFrame」)
+- Widget にも RenderObject にも変更がないフレームでは、レイアウトも描画も実行されない([BuildPipeline](../BuildPipeline.md) の「WidgetBinding.DrawFrame」)
 - 最初のフレームでは、`RenderView.PrepareInitialFrame` によって、ツリー全体がレイアウトされ描画される
 - ツリーから外したノードは、外す前に dirty リストへ登録されていても、レイアウトも描画もされない
 - ジオメトリの値型は、`with` 式で一部だけ変えた新しい値を作れる
@@ -75,13 +75,13 @@
 | `FlushLayout` の `Depth` 順と、空になるまでの繰り返し | `PipelineOwner.flushLayout` と同じく、浅い順に処理し、空になるまで繰り返す。Flutter は、処理の途中で新しいノードが登録されると、残りと合わせて並べ直す点が違う |
 | `FlushPaint` の処理順 | Flutter の `PipelineOwner.flushPaint` は深い順(子が先)に処理する。FloatSoda は浅い順で、逆になっている。観測できる違いがあるかは ※要確認 で、台帳には未記載 |
 | `FlushPaint` 中に登録されたノード | Flutter は、`flushPaint` の終了時にリストが空であることを assert で確かめる。FloatSoda は次の `FlushPaint` に回す |
-| ジオメトリの値型を `record struct` で書くこと | C# の表現の違いで、挙動の差異ではない([REVIEW.md](../../../../REVIEW.md) の「6. Flutter parity」) |
+| ジオメトリの値型を `record struct` で書くこと | C# の表現の違いで、挙動の差異ではない([REVIEW.md](../../../REVIEW.md) の「6. Flutter parity」) |
 
 Flutter の参照先は `packages/flutter/lib/src/rendering/object.dart` の `flushLayout` と `flushPaint` です(ローカル参照クローンの `8a9f61cfd67`)。
 
 ## 関連
 
-- [コアの Explanation](Explanation.md) — `RenderPipeline` と `WidgetBinding` がどう動くか
-- [コアの HowTo](HowTo.md) — 値型を足す手順
-- [REVIEW.md](../../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 — ツリーの所有権・ライフサイクル・差分更新・Layer の条件
-- [APIDesign](../../APIDesign.md) — 値型の規約の理由と例
+- [コアの仕組みと理由](../explanation/Core.md) — `RenderPipeline` と `WidgetBinding` がどう動くか
+- [ジオメトリの値型を足す](../how-to/AddValueType.md) — 値型を足す手順
+- [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 — ツリーの所有権・ライフサイクル・差分更新・Layer の条件
+- [APIDesign](../APIDesign.md) — 値型の規約の理由と例

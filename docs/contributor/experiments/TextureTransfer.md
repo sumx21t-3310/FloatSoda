@@ -96,10 +96,10 @@ dotnet run TextureTransfer.cs -- --fps 5
 
 FloatSoda は、目標フレームレートに合わせて回るフレームごとに、変化があれば絵を作り直して SteamVR へ渡します。メインスレッドは、Widget の作り直し・レイアウト・描画をして Layer ツリーを作り、レンダースレッドへ渡します。レンダースレッドは、Layer ツリーを OpenGL のテクスチャへ描き、そのテクスチャを `SetOverlayTexture` で SteamVR へ渡します(`OverlayWindow.Present`)。メインスレッドとレンダースレッドの両方が、`FloatSodaOptions.TargetFrameRate` から作った `FramePacer` で、次のフレームまで待ちます。
 
-目標フレームレートを 5 にすると、SteamVR へ渡すテクスチャも1秒に5枚になります。SteamVR は、次のテクスチャが届くまで前のテクスチャを表示し続けるので、オーバーレイの中身は5回しか変わりません(※要確認)。テクスチャ転送と `FramePacer` の本体は、[プラットフォーム: 仕組みと理由](../platform/Explanation.md) のテクスチャ転送と FramePacer の節で説明します。
+目標フレームレートを 5 にすると、SteamVR へ渡すテクスチャも1秒に5枚になります。SteamVR は、次のテクスチャが届くまで前のテクスチャを表示し続けるので、オーバーレイの中身は5回しか変わりません(※要確認)。テクスチャ転送と `FramePacer` の本体は、[プラットフォームの仕組みと理由](../explanation/Platform.md) のテクスチャ転送と FramePacer の節で説明します。
 
 ## 関連
 
-- [プラットフォーム: 仕組みと理由](../platform/Explanation.md) — テクスチャ転送と `FramePacer`、レンダースレッド
+- [プラットフォームの仕組みと理由](../explanation/Platform.md) — テクスチャ転送と `FramePacer`、レンダースレッド
 - [なぜ Layer ツリーは Clone してからレンダースレッドへ渡すの?](LayerClone.md) — メインスレッドからレンダースレッドへの受け渡し
 - [実験の一覧](Home.md)

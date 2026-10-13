@@ -1,18 +1,17 @@
-# フレームワーク(三つのツリー): 作業の手順
+# Flutter のウィジェットを移植する
 
-三つのツリーの層でよく行う3つの作業の手順をまとめます。Flutter のウィジェットを移植する、カスタムクリッパーを実装する、ヘッドレスでテストする、の3つです。初めてウィジェットを移植するときは、題材を決めて一本道で進める [三つのツリーの Tutorial](Tutorial.md) から始めると、手順の意味をつかみやすくなります。
-
+三つのツリーの層でよく行う3つの作業の手順を
 このページに書くのは、作業の順序だけです。規約の本文は、次の置き場所にあります。
 
 | 知りたいこと | 置き場所 |
 |---|---|
-| コアに受け入れるウィジェットの範囲 | [CONTRIBUTING.md](../../../../CONTRIBUTING.md) の「受け入れ範囲」 |
+| コアに受け入れるウィジェットの範囲 | [CONTRIBUTING.md](../../../CONTRIBUTING.md) の「受け入れ範囲」 |
 | テストの命名と観点 | CONTRIBUTING.md の「テストの命名」「テスト観点」 |
 | 層1サンプルの構成と README の型 | CONTRIBUTING.md の「サンプルを追加する場合の規約」 |
-| Flutter との差異を作ってよい条件と、記録する5点 | [APIDesign](../../APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」 |
-| 確認済みの Flutter との差異 | [`known-divergences.md`](../../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md)(以下、台帳) |
+| Flutter との差異を作ってよい条件と、記録する5点 | [APIDesign](../APIDesign.md) の「判断原則: Flutter 由来の observable behavior に差異を作らない」 |
+| 確認済みの Flutter との差異 | [`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md)(以下、台帳) |
 | ウィジェットの API の形 | APIDesign の「2. コンポーネントAPI設計ガイドライン」「3. プロパティ命名規則」 |
-| ツリーで守る条件 | [三つのツリーの Reference](Reference.md) と [REVIEW.md](../../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 |
+| ツリーで守る条件 | [三つのツリーで守ること](../reference/Trees.md) と [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 |
 
 ## 規約
 
@@ -72,7 +71,7 @@ public EdgeInsets Padding
 }
 ```
 
-レイアウトが変わる値なら `MarkNeedsLayout`、見た目だけが変わる値なら `MarkNeedsPaint` を呼びます。Flutter のコードにある Semantics の呼び出し(`markNeedsSemanticsUpdate` など)は削ります。`PerformLayout`、`Paint`、`HitTestChildren` で守る条件は、[三つのツリーの Reference](Reference.md) にあります。
+レイアウトが変わる値なら `MarkNeedsLayout`、見た目だけが変わる値なら `MarkNeedsPaint` を呼びます。Flutter のコードにある Semantics の呼び出し(`markNeedsSemanticsUpdate` など)は削ります。`PerformLayout`、`Paint`、`HitTestChildren` で守る条件は、[三つのツリーで守ること](../reference/Trees.md) にあります。
 
 ### 手順5: Widget を書く
 
@@ -92,7 +91,7 @@ public record Padding : SingleChildRenderObjectWidget<RenderPadding>
 }
 ```
 
-この形は `src/FloatSoda/Widgets/Layout/Padding.cs` から XML ドキュメントコメントを除いて抜き出したものです。`public` なメンバーには、日本語の XML ドキュメントコメントを付けます([DocumentationComments](../../DocumentationComments.md))。
+この形は `src/FloatSoda/Widgets/Layout/Padding.cs` から XML ドキュメントコメントを除いて抜き出したものです。`public` なメンバーには、日本語の XML ドキュメントコメントを付けます([DocumentationComments](../DocumentationComments.md))。
 
 `dotnet build` がエラーなしで通れば、この手順は終わりです。
 
@@ -234,13 +233,12 @@ pipeline.FlushLayout();
 |---|---|
 | ビルドとテストが通ること | CI(`.github/workflows/ci.yml`) |
 | ファイルスコープの namespace | `.editorconfig` の `IDE0161` がビルド時に強制する |
-| 受け入れ範囲、Flutter のテストへの対応、差異の記録 | レビュー([REVIEW.md](../../../../REVIEW.md) の「5. テスト」「6. Flutter parity」) |
+| 受け入れ範囲、Flutter のテストへの対応、差異の記録 | レビュー([REVIEW.md](../../../REVIEW.md) の「5. テスト」「6. Flutter parity」) |
 | 不要な `MarkNeedsLayout` / `MarkNeedsPaint` | レビュー(REVIEW.md の「4」の「差分更新」) |
 | サンプルを足したこと、ジュニアコーダーテストを通したこと | PR を出す前のチェックリスト(CONTRIBUTING.md の「PRを出す前のチェックリスト」) |
 
 ## 関連
 
-- [三つのツリーの Tutorial](Tutorial.md) — ウィジェットを1つ移植して PR を出すまでの一本道
-- [三つのツリーの Reference](Reference.md) — RenderObject とツリーで守る条件
-- [三つのツリーの Explanation](Explanation.md) — 三つのツリーの仕組み
-- [RenderObjects](../../RenderObjects.md) — 現行の RenderObject のページ
+- [三つのツリーで守ること](../reference/Trees.md) — RenderObject とツリーで守る条件
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — 三つのツリーの仕組み
+- [RenderObjects](../RenderObjects.md) — 現行の RenderObject のページ

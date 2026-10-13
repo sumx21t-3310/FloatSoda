@@ -1,8 +1,8 @@
-# フレームワーク(三つのツリー): 守ること
+# 三つのツリーで守ること
 
-三つのツリーで、実装を変えても維持する条件をまとめます。仕組みの説明は [三つのツリーの Explanation](Explanation.md) にあります。
+三つのツリーで、実装を変えても維持する条件をまとめます。仕組みの説明は [三つのツリーの仕組みと理由](../explanation/Trees.md) にあります。
 
-ツリーの所有権・ライフサイクル・差分更新の条件は、[REVIEW.md](../../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」に置いてあります。このページでは複製せず、4 章のどの条件がどこに効くかを示し、4 章にない条件だけを書きます。
+ツリーの所有権・ライフサイクル・差分更新の条件は、[REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」に置いてあります。このページでは複製せず、4 章のどの条件がどこに効くかを示し、4 章にない条件だけを書きます。
 
 | 4 章の節 | 効く対象 |
 |---|---|
@@ -26,7 +26,7 @@
 
 - `Paint(PaintingContext, Offset)` は、受け取った `offset` を原点にして `context.Canvas` へ記録すること
 - クリップと不透明度は、`context.PushClipRect` や `context.PushOpacity` などで子の Layer に分けること
-- Flutter から移植するときは、Semantics のフック(`markNeedsSemanticsUpdate` など)を削ること([APIDesign](../../APIDesign.md) の「実装しない API — Semantics」)
+- Flutter から移植するときは、Semantics のフック(`markNeedsSemanticsUpdate` など)を削ること([APIDesign](../APIDesign.md) の「実装しない API — Semantics」)
 
 ### RenderObject のヒットテスト
 
@@ -80,7 +80,7 @@
 
 ## Flutter との関係
 
-ここに挙げた条件は、Flutter の `RenderObject` と `RenderBox` の契約と同じ側に立ちます。Flutter と違う挙動は、台帳([`known-divergences.md`](../../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md))の次のエントリにあります。
+ここに挙げた条件は、Flutter の `RenderObject` と `RenderBox` の契約と同じ側に立ちます。Flutter と違う挙動は、台帳([`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md))の次のエントリにあります。
 
 | 条件に関わる差異 | 台帳 |
 |---|---|
@@ -91,7 +91,7 @@
 
 ## 関連
 
-- [REVIEW.md](../../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 — 所有権・ライフサイクル・差分更新・Layer の条件
-- [三つのツリーの Explanation](Explanation.md) — 条件の背景にある仕組み
-- [三つのツリーの HowTo](HowTo.md) — 移植とテストの手順
-- [コアの Reference](../core/Reference.md) — `RenderPipeline` で守る条件
+- [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」 — 所有権・ライフサイクル・差分更新・Layer の条件
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — 条件の背景にある仕組み
+- [Flutter のウィジェットを移植する](../how-to/PortWidget.md) — 移植とテストの手順
+- [コアで守ること](Core.md) — `RenderPipeline` で守る条件

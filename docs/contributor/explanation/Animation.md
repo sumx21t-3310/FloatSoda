@@ -1,4 +1,4 @@
-# フレームワーク(アニメーション): 仕組みと理由
+# アニメーションの仕組みと理由
 
 FloatSoda のアニメーションは、Flutter のアニメーション基盤と同じ3段の仕組みで動きます。`WidgetTicker` がフレームごとに経過時間を届け、`AnimationController` がその時間を値に変え、値の変化を購読した RenderObject だけが描き直されます。このページでは、値が画面に届くまでの流れ、`WidgetTicker` とフレームの関係、持ち主と寿命、設計の理由を説明します。
 
@@ -69,7 +69,7 @@ WidgetBinding.BeginFrame(elapsed)
 - `BeginFrame` は登録の一覧を写し取って消してから呼ぶので、呼ばれている最中に登録し直した処理は次のフレームで呼ばれる
 - 1つの `WidgetTicker` は、1フレームに多くても1回しか tick しない
 - フレームの中の順序はポインタ入力 → フレームコールバック → `DrawFrame` なので、tick の中で変えた値は同じフレームの描画に反映される
-- 渡される時刻は、アプリの開始からの単調な経過時間で、1フレームの中ではすべてのウィンドウで同じ値になる([コアの Explanation](../core/Explanation.md))
+- 渡される時刻は、アプリの開始からの単調な経過時間で、1フレームの中ではすべてのウィンドウで同じ値になる([コアの仕組みと理由](Core.md))
 - フレームコールバックは、メインループのスレッドで呼ばれる(契約として明文化するかは、追跡: [#282](https://github.com/sumx21t-3310/FloatSoda/issues/282))
 
 `WidgetTicker` は、最初の tick で受け取った時刻を基準点(`StartTime`)にし、それ以降は基準点からの差を届けます。`Start` したフレームではなく、次の tick が経過時間 0 になります。
@@ -105,7 +105,7 @@ tick の間隔は、メインループの1周の間隔と同じです。メイ�
 
 | 判断 | 理由 | 出典 |
 |---|---|---|
-| 値の変化を RenderObject が直接購読し、描画だけを更新する | 毎フレーム値が変わっても、Widget の再ビルドとレイアウトを走らせないため | 現行の [Animation](../../Animation.md) |
+| 値の変化を RenderObject が直接購読し、描画だけを更新する | 毎フレーム値が変わっても、Widget の再ビルドとレイアウトを走らせないため | 現行の [Animation](../Animation.md) |
 | `WidgetTicker` に時計を持たせず、`IFrameScheduler` から時刻を受け取る | フレームごとのタイムスタンプを受け取るため。テストでは `IFrameScheduler` を偽物に差し替えられる | `IFrameScheduler` の XML ドキュメントコメント |
 | `Forward(from:)` で途中から始めるとき、残りの割合で `Duration` を縮める | 途中から再開しても、進む速さを変えないため | `AnimationController.AnimateTo` のコメント |
 | `Curve` は端点(`t` が 0 と 1)をそのまま返す | 計算の誤差で端点の値がずれないようにするため。Flutter と同じ | `Curve.Transform` のコメント |
@@ -123,7 +123,7 @@ tick の間隔は、メインループの1周の間隔と同じです。メイ�
 | `ICurve`、`Curve`、`Curves` | `ParametricCurve<double>`、`Curve`、`Curves`。`Curves` の係数は Flutter と同じ |
 | `FadeTransition`、`RenderAnimatedOpacity` | `FadeTransition`、`RenderAnimatedOpacity` |
 
-通知を `addListener` ではなく C# の `event` で受け取るのは、表現の違いで、挙動の差異ではありません([APIDesign](../../APIDesign.md) の「3.6 リスナーパターンを実装せず `event` を使う」)。Flutter にあって FloatSoda にないものは次のとおりです。
+通知を `addListener` ではなく C# の `event` で受け取るのは、表現の違いで、挙動の差異ではありません([APIDesign](../APIDesign.md) の「3.6 リスナーパターンを実装せず `event` を使う」)。Flutter にあって FloatSoda にないものは次のとおりです。
 
 - `State` の破棄時に動いている `Ticker` を見つけてエラーにする仕組み(追跡: [#282](https://github.com/sumx21t-3310/FloatSoda/issues/282))
 - `TickerMode`、`TickerFuture`、`absorbTicker`(#282 では、需要が出てから扱うとしている)
@@ -152,7 +152,7 @@ scheduler.Pump(TimeSpan.FromSeconds(0.5));     // Value は 0.5
 
 ## 関連
 
-- [アニメーションの Reference](Reference.md) — アニメーションで守る条件
-- [アニメーションの HowTo](HowTo.md) — アニメーションの部品を移植する手順
-- [コアの Explanation](../core/Explanation.md) — フレームの1周と時刻の作り方
-- [Animation](../../Animation.md) — 元になった現行ページ
+- [アニメーションで守ること](../reference/Animation.md) — アニメーションで守る条件
+- [アニメーションの部品を移植する](../how-to/PortAnimation.md) — アニメーションの部品を移植する手順
+- [コアの仕組みと理由](Core.md) — フレームの1周と時刻の作り方
+- [Animation](../Animation.md) — 元になった現行ページ

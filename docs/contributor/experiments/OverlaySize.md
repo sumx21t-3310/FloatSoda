@@ -85,10 +85,10 @@ dotnet run OverlaySize.cs -- --dpm 4000
 
 SteamVR のオーバーレイは、ピクセル数ではなく、VR 空間での幅(m)で大きさが決まります。FloatSoda は、ウィンドウの大きさが決まるたびに、幅のピクセル数を `Dpm` で割った値を、オーバーレイの幅として SteamVR へ渡します(`OverlayWindow.Resize` と `Dpm.ToMeters`)。高さは渡しません。高さは、テクスチャの縦横の比から決まります(※要確認)。
 
-そのため、同じピクセル数の絵でも、`Dpm` を4倍にすると幅は4分の1になります。オーバーレイの種類と大きさの本体は、[プラットフォーム: 仕組みと理由](../platform/Explanation.md) のオーバーレイの種類の節で説明します。利用者から見た大きさの決め方は、[Window](../../concepts/Window.md) にあります。
+そのため、同じピクセル数の絵でも、`Dpm` を4倍にすると幅は4分の1になります。オーバーレイの種類と大きさの本体は、[プラットフォームの仕組みと理由](../explanation/Platform.md) のオーバーレイの種類の節で説明します。利用者から見た大きさの決め方は、[Window](../../concepts/Window.md) にあります。
 
 ## 関連
 
-- [プラットフォーム: 仕組みと理由](../platform/Explanation.md) — オーバーレイの種類と、幅の渡し方
+- [プラットフォームの仕組みと理由](../explanation/Platform.md) — オーバーレイの種類と、幅の渡し方
 - [Window](../../concepts/Window.md) — 利用者から見たオーバーレイの種類と大きさ
 - [実験の一覧](Home.md)

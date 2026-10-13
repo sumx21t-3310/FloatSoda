@@ -318,18 +318,28 @@ export function sidebarGroups() {
 }
 
 /**
- * #188 の再編で層のディレクトリへ移す前のページを、系統グループの末尾にまとめる入れ子のグループ。
+ * #188 の再編で種別のディレクトリへ移す前のページを、系統グループの末尾にまとめる入れ子のグループ。
  * dir 直下の Home.md 以外のページが対象。移し終えて直下が Home.md だけになると、グループは出なくなる
  */
 const LEGACY_GROUP = { dir: "contributor", label: "移行前のページ" };
+
+/**
+ * Home.md を持たないディレクトリの、サイドバーでのグループ名。Diátaxis の種別名はサイトの見出しに出さない
+ * (docs/contributor/WritingDocumentation.md の 1 章)ため、読者向けの名前に置き換える。表に無いディレクトリはディレクトリ名のまま
+ */
+const DIR_LABELS = {
+  tutorials: "貢献までの流れ",
+  "how-to": "作業の手順",
+  reference: "守ること",
+  explanation: "仕組みと理由",
+};
 
 /**
  * Starlight のサイドバーの items。系統グループの中を、docs/ のディレクトリの形で入れ子にする(初期状態は閉じる)。
  *
  * - 系統ディレクトリ直下のページは、そのまま並べる。ただし LEGACY_GROUP の系統では、Home.md 以外を末尾の入れ子にまとめる
  * - 深いディレクトリは、ディレクトリ 1 つ = 入れ子のグループ 1 つ。並びは group.rels の順(各 Home.md のリンク順)を保つ
- * - グループ名は、Home.md があればその H1。無ければページのタイトルの「<層>: 」の部分。グループの中のページ名からは、その部分を外す
- * - ページを直接持たないディレクトリ(framework/ など)は、子のグループ名が「<名前>(<子>)」でそろうとき、名前を親、かっこの中を子のグループ名にする
+ * - グループ名は、Home.md があればその H1、無ければ DIR_LABELS
  * - Widget カタログのページは、CATALOG.label の入れ子のグループにまとめる
  */
 export function sidebarItems(group) {
@@ -367,42 +377,12 @@ export function sidebarItems(group) {
   return items;
 }
 
-const LAYER_TITLE = /^(.+?): (.+)$/;
-const SUBLAYER_LABEL = /^(.+?)\((.+)\)$/;
-
-/** ページを直接持つディレクトリのグループ名。Home.md があればその H1、無ければ「<層>: 」の部分 */
-function layerLabel(node) {
-  const pages = node.items.filter((item) => item.rel);
-  const home = pages.find(({ rel }) => rel.endsWith(`/${HOME}`));
-  if (home) return titleOf(home.rel);
-  const prefixes = new Set(pages.map(({ rel }) => titleOf(rel).match(LAYER_TITLE)?.[1]));
-  return prefixes.size === 1 && !prefixes.has(undefined) ? [...prefixes][0] : node.dir;
-}
-
 /** ページ 1 つ、または入れ子のグループ 1 つ(子の items を含む)を作る */
 function toSidebarEntry(node) {
   if (node.rel) return { slug: slugOf(node.rel) };
-
-  const label = layerLabel(node);
-  const children = node.items.map((item) => {
-    if (item.rel) {
-      const match = titleOf(item.rel).match(LAYER_TITLE);
-      return match && match[1] === label ? { slug: slugOf(item.rel), label: match[2] } : { slug: slugOf(item.rel) };
-    }
-    return toSidebarEntry(item);
-  });
-
-  // ページを直接持たず、子のグループ名が「<名前>(<子>)」でそろうときは、名前を親、かっこの中を子のグループ名にする
-  const subgroups = children.filter((child) => child.items);
-  if (subgroups.length === children.length) {
-    const matches = subgroups.map((child) => child.label.match(SUBLAYER_LABEL));
-    const heads = new Set(matches.map((match) => match?.[1]));
-    if (heads.size === 1 && !heads.has(undefined)) {
-      subgroups.forEach((child, i) => (child.label = matches[i][2]));
-      return { label: [...heads][0], collapsed: true, items: children };
-    }
-  }
-  return { label, collapsed: true, items: children };
+  const home = node.items.find((item) => item.rel?.endsWith(`/${HOME}`));
+  const label = home ? titleOf(home.rel) : (DIR_LABELS[node.dir] ?? node.dir);
+  return { label, collapsed: true, items: node.items.map(toSidebarEntry) };
 }
 
 /** 分割ファイル(_llms-txt/<label>.txt)1 つの文字数(コードポイント数)の上限。scripts/verify-dist.mjs が出力で確かめる */

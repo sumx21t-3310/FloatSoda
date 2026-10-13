@@ -1,6 +1,6 @@
-# プラットフォーム: 守ること
+# プラットフォームで守ること
 
-このページは、プラットフォームの層(`FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR`)を変えても維持する条件のうち、`internal` の契約と、1つの型に収まらない条件の一覧です。`public` の型とメンバーの契約(引数、戻り値、例外、スレッドの制約)は XML ドキュメントコメントにあり、API Reference として公開されます。条件がなぜ要るかは [プラットフォーム: 仕組みと理由](Explanation.md) にあります。
+このページは、プラットフォームの層(`FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR`)を変えても維持する条件のうち、`internal` の契約と、1つの型に収まらない条件の一覧です。`public` の型とメンバーの契約(引数、戻り値、例外、スレッドの制約)は XML ドキュメントコメントにあり、API Reference として公開されます。条件がなぜ要るかは [プラットフォームの仕組みと理由](../explanation/Platform.md) にあります。
 
 ## 適用範囲
 
@@ -81,6 +81,6 @@ SteamVR が要る条件は、[`floatsoda-device-test-gen`](../../../.agents/skil
 
 ## 関連
 
-- [プラットフォーム: 仕組みと理由](Explanation.md) — スレッドの分担と、入力の流れ
-- [プラットフォーム: 作業の手順](HowTo.md) — OpenVR の API を包む、例外を足す
+- [プラットフォームの仕組みと理由](../explanation/Platform.md) — スレッドの分担と、入力の流れ
+- [OpenVR の API を包む](../how-to/WrapOpenVRApi.md) — OpenVR の API を包む、例外を足す
 - [Localization](../Localization.md) — 例外メッセージの追加手順

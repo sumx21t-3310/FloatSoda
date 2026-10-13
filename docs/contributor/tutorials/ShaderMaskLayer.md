@@ -1,4 +1,4 @@
-# 描画: 貢献までの流れ
+# Layer を1つ足して PR を出す
 
 このページでは、描画の層(`FloatSoda.Rendering`)に Layer の種類を1つ足して、PR を出すまでを一本道で進めます。題材は、子の描画結果にシェーダーをマスクとして重ねる `ShaderMaskLayer` です。[#154](https://github.com/sumx21t-3310/FloatSoda/issues/154)(ShaderMask を実装する)が対象に挙げている Layer で、Widget と RenderObject を待たずに単独で作れます。
 
@@ -12,13 +12,13 @@
 
 - .NET 10 SDK が入っていて、リポジトリをクローン済みであること
 - `dotnet test tests/FloatSoda.Rendering.Test` が手元で通ること
-- [描画: 仕組みと理由](Explanation.md) の「なぜ Clone してからレンダースレッドへ渡すのか」を読んでいること
+- [描画の仕組みと理由](../explanation/Rendering.md) の「なぜ Clone してからレンダースレッドへ渡すのか」を読んでいること
 
-SteamVR と HMD は要りません。この Tutorial のテストは、CPU 上のビットマップへ描いて確かめます。
+SteamVR と HMD は要りません。このページのテストは、CPU 上のビットマップへ描いて確かめます。
 
 ## Step 1: Issue を読み、ブランチを切る
 
-[#154](https://github.com/sumx21t-3310/FloatSoda/issues/154) を開き、「対象」と「完了条件」を読みます。この Tutorial で作るのは、対象のうち「`ShaderMaskLayer` または同等の Layer ツリー処理」の部分です。
+[#154](https://github.com/sumx21t-3310/FloatSoda/issues/154) を開き、「対象」と「完了条件」を読みます。このページで作るのは、対象のうち「`ShaderMaskLayer` または同等の Layer ツリー処理」の部分です。
 
 ブランチ名は、Issue 番号と、Issue の `area:*` ラベルから決めます([CONTRIBUTING.md](../../../CONTRIBUTING.md) の「ブランチ名」)。#154 のラベルは `area:widget` です。
 
@@ -250,6 +250,6 @@ PR の本文は `.github/PULL_REQUEST_TEMPLATE.md` に沿って書きます。�
 
 ## 次に読むもの
 
-- [描画: 作業の手順](HowTo.md) — Layer を足す手順の規約と、`PaintingContext` へ `Push*` を足すとき
-- [描画: 守ること](Reference.md) — Layer の不変条件と、まだテストで固定していない条件
-- [描画: 仕組みと理由](Explanation.md) — Layer ツリーがレンダースレッドで描かれるまで
+- [Layer を足す](../how-to/AddLayer.md) — Layer を足す手順の規約と、`PaintingContext` へ `Push*` を足すとき
+- [描画で守ること](../reference/Rendering.md) — Layer の不変条件と、まだテストで固定していない条件
+- [描画の仕組みと理由](../explanation/Rendering.md) — Layer ツリーがレンダースレッドで描かれるまで

@@ -1,6 +1,6 @@
-# 描画: 仕組みと理由
+# 描画の仕組みと理由
 
-描画の層(`FloatSoda.Rendering`)は、RenderObject ツリーの Paint が記録した結果を Layer ツリーとして受け取り、レンダースレッドで Skia のキャンバスへ合成する層です。このページでは、Layer ツリーがどう作られ、どう描かれるかと、メインスレッドが Layer ツリーを Clone してから渡す理由を説明します。変更の前後で守る条件は [描画: 守ること](Reference.md) にあります。
+描画の層(`FloatSoda.Rendering`)は、RenderObject ツリーの Paint が記録した結果を Layer ツリーとして受け取り、レンダースレッドで Skia のキャンバスへ合成する層です。このページでは、Layer ツリーがどう作られ、どう描かれるかと、メインスレッドが Layer ツリーを Clone してから渡す理由を説明します。変更の前後で守る条件は [描画で守ること](../reference/Rendering.md) にあります。
 
 ## 実装状況
 
@@ -13,7 +13,7 @@ Layer ツリーの組み立て、Clone、レンダースレッドでの描画は
 | 担うもの | 担わないもの(置き場所) |
 |---|---|
 | Layer の型と、その Layout・Paint・Clone([`Layers/`](../../../src/FloatSoda.Rendering/Layers)) | Paint の記録と Layer ツリーの組み立て(`FloatSoda` の `PaintingContext`) |
-| Layer ツリーを1枚のキャンバスへ描く `LayerRenderer` | 描画先のクリアとフラッシュ、OpenVR へのテクスチャ転送(`FloatSoda.Engine`。[プラットフォーム: 仕組みと理由](../platform/Explanation.md)) |
+| Layer ツリーを1枚のキャンバスへ描く `LayerRenderer` | 描画先のクリアとフラッシュ、OpenVR へのテクスチャ転送(`FloatSoda.Engine`。[プラットフォームの仕組みと理由](Platform.md)) |
 | CPU 上のビットマップへ描く `LayerBitmapRenderer` と、PNG への保存(`SKBitmapExtensions.Save`) | RenderObject や Widget をビットマップへ描くこと(`FloatSoda.Testing`) |
 
 ## 関係するコンポーネント
@@ -55,7 +55,7 @@ sequenceDiagram
     LR->>LR: Layout(PaintBounds を計算) → Paint(上から順に描く)
 ```
 
-Paint の記録の仕組み(`PaintChild` と RepaintBoundary の扱い)は、フレームワーク(三つのツリー)の層で扱います。レンダースレッドがテクスチャを OpenVR へ渡すまでの流れは、[プラットフォーム: 仕組みと理由](../platform/Explanation.md) にあります。
+Paint の記録の仕組み(`PaintChild` と RepaintBoundary の扱い)は、[三つのツリーの仕組みと理由](Trees.md) で扱います。レンダースレッドがテクスチャを OpenVR へ渡すまでの流れは、[プラットフォームの仕組みと理由](Platform.md) にあります。
 
 ## 所有権・ライフサイクル
 
@@ -83,7 +83,7 @@ Layer の持ち主は、メインスレッド側とレンダースレッド側�
 
 Clone は、Layer のオブジェクトと子のリストを新しく作り、記録済みの描画命令(`SKPicture`)は参照を共有します。記録をやり直すたびに新しい `PictureLayer` と `SKPicture` が作られるため、確定した `SKPicture` をメインスレッドが書き換えることはありません。そのため、Clone の手間は Layer の数に比例し、描画命令の量にはよりません。
 
-この方式で守る条件は2つです。1つは、Layer 型の `Clone()` が、その型に足したプロパティをすべて写すことです。もう1つは、Clone 後に共有するオブジェクト(`SKPicture`、`SKPath`、`SKRoundRect` など)を、メインスレッドが書き換えも破棄もしないことです。なお、REVIEW.md は共有しないオブジェクトの例に `SKPicture` を挙げており、いまの実装と食い違っています(※要確認)。条件の一次情報は [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」の「Layer」で、[描画: 守ること](Reference.md) から参照しています。Clone を外すと何が起きるかは、[実験: なぜ Layer ツリーは Clone してからレンダースレッドへ渡すの?](../experiments/LayerClone.md) で動かして確かめられます。
+この方式で守る条件は2つです。1つは、Layer 型の `Clone()` が、その型に足したプロパティをすべて写すことです。もう1つは、Clone 後に共有するオブジェクト(`SKPicture`、`SKPath`、`SKRoundRect` など)を、メインスレッドが書き換えも破棄もしないことです。なお、REVIEW.md は共有しないオブジェクトの例に `SKPicture` を挙げており、いまの実装と食い違っています(※要確認)。条件の一次情報は [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」の「Layer」で、[描画で守ること](../reference/Rendering.md) から参照しています。Clone を外すと何が起きるかは、[実験: なぜ Layer ツリーは Clone してからレンダースレッドへ渡すの?](../experiments/LayerClone.md) で動かして確かめられます。
 
 ## Flutter との対応
 
@@ -93,12 +93,12 @@ Layer の名前(`ContainerLayer`、`PictureLayer`、`OpacityLayer`、`TransformL
 
 ## テストでの駆動
 
-Layer は、OpenGL も SteamVR もなしで、CPU 上のビットマップへ描いて確かめられます。`LayerBitmapRenderer.Render(root, size)` が返す `SKBitmap` のピクセルを `GetPixel` で読めば、描画結果をテストで判定できます。実例は [`tests/FloatSoda.Rendering.Test/Layers/LayerTest.cs`](../../../tests/FloatSoda.Rendering.Test/Layers/LayerTest.cs) にあり、手順は [描画: 作業の手順](HowTo.md) にあります。
+Layer は、OpenGL も SteamVR もなしで、CPU 上のビットマップへ描いて確かめられます。`LayerBitmapRenderer.Render(root, size)` が返す `SKBitmap` のピクセルを `GetPixel` で読めば、描画結果をテストで判定できます。実例は [`tests/FloatSoda.Rendering.Test/Layers/LayerTest.cs`](../../../tests/FloatSoda.Rendering.Test/Layers/LayerTest.cs) にあり、手順は [Layer を足す](../how-to/AddLayer.md) にあります。
 
 ## 関連
 
-- [描画: 守ること](Reference.md) — Layer の不変条件と検証方法
-- [描画: 作業の手順](HowTo.md) — Layer を足す、描画結果をビットマップで確かめる
-- [プラットフォーム: 仕組みと理由](../platform/Explanation.md) — レンダースレッドとテクスチャ転送
+- [描画で守ること](../reference/Rendering.md) — Layer の不変条件と検証方法
+- [Layer を足す](../how-to/AddLayer.md) — Layer を足す、描画結果をビットマップで確かめる
+- [プラットフォームの仕組みと理由](Platform.md) — レンダースレッドとテクスチャ転送
 - [実験: 半透明の子が重なると、どう混ざるの?](../experiments/OpacityBlend.md)
 - [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」

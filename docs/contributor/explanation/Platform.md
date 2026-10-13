@@ -1,6 +1,6 @@
-# プラットフォーム: 仕組みと理由
+# プラットフォームの仕組みと理由
 
-プラットフォームの層は、FloatSoda が描いた絵を SteamVR のオーバーレイとして表示し、SteamVR からのイベントと入力を受け取る層です。対象は `FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR` の3つのプロジェクトです。このページでは、OpenVR の初期化、オーバーレイ、イベントと入力、2つのスレッド、テクスチャ転送と `FramePacer` が、いまどう動き、なぜそうしたかを説明します。変更の前後で守る条件は [プラットフォーム: 守ること](Reference.md) にあります。
+プラットフォームの層は、FloatSoda が描いた絵を SteamVR のオーバーレイとして表示し、SteamVR からのイベントと入力を受け取る層です。対象は `FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR` の3つのプロジェクトです。このページでは、OpenVR の初期化、オーバーレイ、イベントと入力、2つのスレッド、テクスチャ転送と `FramePacer` が、いまどう動き、なぜそうしたかを説明します。変更の前後で守る条件は [プラットフォームで守ること](../reference/Platform.md) にあります。
 
 ## 実装状況
 
@@ -81,7 +81,7 @@
 
 レイアウトの結果でウィンドウのサイズが変わると、メインスレッドは `IEngineWindow.Resize` をレンダースレッドへ投入します。`OverlayWindow.Resize` は、GL テクスチャとサーフェスを作り直し、オーバーレイの物理幅を「ピクセル幅 ÷ `Dpm`」に設定します。デスクトップ表示(`DesktopWindow`)では、`SetOverlayTexture` の代わりに、GL テクスチャを GLFW ウィンドウの画面へコピーして表示します。
 
-この流れは、[実験: SteamVR へのテクスチャ転送はどうなっているの?](../experiments/TextureTransfer.md) で動かして確かめられます。Layer ツリーの描き方は [描画: 仕組みと理由](../rendering/Explanation.md) にあります。
+この流れは、[実験: SteamVR へのテクスチャ転送はどうなっているの?](../experiments/TextureTransfer.md) で動かして確かめられます。Layer ツリーの描き方は [描画の仕組みと理由](Rendering.md) にあります。
 
 ### FramePacer
 
@@ -157,7 +157,7 @@ OpenVR の仕様では、オーバーレイのマウス座標の原点は左下�
 
 この層は、Flutter のエンジンと embedder(各プラットフォームへの組み込み部分)が担う範囲に当たります。Flutter のフレームワーク(Dart)には対応する型がないため、Flutter の API には合わせていません。メインスレッドで Layer ツリーを作り、別のスレッドで描く分担は、Flutter の UI スレッドとラスタースレッドの分担と同じです。
 
-ポインタ入力は、メインループがフレームごとに1回まとめて読み出します。Flutter はフレームと関係なくポインタイベントを配るので、この点は Flutter と違います([`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリ 7)。違いは [描画: 仕組みと理由](../rendering/Explanation.md) の「Flutter との対応」にあります。
+ポインタ入力は、メインループがフレームごとに1回まとめて読み出します。Flutter はフレームと関係なくポインタイベントを配るので、この点は Flutter と違います([`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリ 7)。違いは [描画の仕組みと理由](Rendering.md) の「Flutter との対応」にあります。
 
 ## テストでの駆動
 
@@ -171,8 +171,8 @@ OpenVR と GL を呼ばない部分は、ヘッドレスのテストで確かめ
 
 ## 関連
 
-- [プラットフォーム: 守ること](Reference.md) — `internal` の契約
-- [プラットフォーム: 作業の手順](HowTo.md) — OpenVR の API を包む、例外を足す
-- [描画: 仕組みと理由](../rendering/Explanation.md) — Layer ツリーと Clone
+- [プラットフォームで守ること](../reference/Platform.md) — `internal` の契約
+- [OpenVR の API を包む](../how-to/WrapOpenVRApi.md) — OpenVR の API を包む、例外を足す
+- [描画の仕組みと理由](Rendering.md) — Layer ツリーと Clone
 - [実験: オーバーレイの大きさは何で決まるの?](../experiments/OverlaySize.md)
 - [OVRIntegration](../OVRIntegration.md) — 再編前のページ

@@ -1,6 +1,6 @@
-# 描画: 守ること
+# 描画で守ること
 
-このページは、描画の層(`FloatSoda.Rendering`)を変えても維持する条件の一覧です。変更が何を壊しうるかを確かめるときと、レビューで確認するときに使います。条件がなぜ要るかは [描画: 仕組みと理由](Explanation.md) にあります。
+このページは、描画の層(`FloatSoda.Rendering`)を変えても維持する条件の一覧です。変更が何を壊しうるかを確かめるときと、レビューで確認するときに使います。条件がなぜ要るかは [描画の仕組みと理由](../explanation/Rendering.md) にあります。
 
 ## 適用範囲
 
@@ -66,6 +66,6 @@ Layer の種類と名前は、Flutter の `layer.dart` に合わせています�
 
 ## 関連
 
-- [描画: 仕組みと理由](Explanation.md) — Clone してから渡す理由
-- [描画: 作業の手順](HowTo.md) — Layer を足すときの手順
+- [描画の仕組みと理由](../explanation/Rendering.md) — Clone してから渡す理由
+- [Layer を足す](../how-to/AddLayer.md) — Layer を足すときの手順
 - [REVIEW.md](../../../REVIEW.md) の「4. FloatSoda 固有の不変条件」

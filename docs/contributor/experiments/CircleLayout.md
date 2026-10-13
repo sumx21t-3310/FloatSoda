@@ -99,11 +99,11 @@ dotnet run CircleLayout.cs -- --forget
 
 子の大きさを決めるのは子自身で、親は制約を渡すだけです。親が `child.Layout(制約)` を呼ぶと、子は `PerformLayout` の中で、制約の範囲に収まる大きさを自分の `Size` に書きます。この実験の `RenderColoredBox` は子を持たないので、制約が許すいちばん小さい大きさを選びます。`BoxConstraints.Tight(16, 16)` は 16 以外を許さないので、16px 四方になります。`Layout` を呼ばなければ、子の `Size` は初期値の空のままです。
 
-位置は親が決めます。親は、子の `ParentData`(ここでは `BoxParentData.Offset`)に位置を書き、`Paint` でその位置を足して子を描きます。子は、自分がどこに置かれるかを知りません。この「制約は親から子へ下り、大きさは子から親へ上がり、位置は親が決める」流れの本体は、[フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) の制約とレイアウトの節で説明します。利用者から見た制約の考え方は、[Layout](../../concepts/Layout.md) にあります。
+位置は親が決めます。親は、子の `ParentData`(ここでは `BoxParentData.Offset`)に位置を書き、`Paint` でその位置を足して子を描きます。子は、自分がどこに置かれるかを知りません。この「制約は親から子へ下り、大きさは子から親へ上がり、位置は親が決める」流れの本体は、[三つのツリーの仕組みと理由](../explanation/Trees.md) の制約とレイアウトの節で説明します。利用者から見た制約の考え方は、[Layout](../../concepts/Layout.md) にあります。
 
 ## 関連
 
-- [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) — 制約とレイアウトの流れ
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — 制約とレイアウトの流れ
 - [Layout](../../concepts/Layout.md) — 利用者から見た制約・サイズ・配置
 - [`src/FloatSoda/RenderObjects/Layout/`](https://github.com/sumx21t-3310/FloatSoda/tree/main/src/FloatSoda/RenderObjects/Layout) — 組み込みのレイアウト用 RenderObject は、このディレクトリにある
 - [実験の一覧](Home.md)

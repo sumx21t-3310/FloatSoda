@@ -98,10 +98,10 @@ dotnet run InheritedRebuild.cs -- --no-depend
 
 `DependOnInheritedWidgetOfExactType<Theme>()` を呼ぶと、呼んだ子は、いちばん近い `Theme` の Element に「依存している子」として登録されます。`Theme` が新しい Widget に変わり、`UpdateShouldNotify` が `true` を返すと、`Theme` の Element は登録された子にだけ作り直しの印を付けます。`Bystander` は登録されていないので、印が付きません。
 
-`Theme` の下の Widget は、2フレーム目でも1フレーム目と同じもの(`children`)を渡しています。Element は、新しい Widget が前と同じなら、その下を作り直さずに済ませます。そのため、`Theme` が変わっても、下の子が作り直されるのは依存を登録した子だけです。この差分ビルドの仕組みは、[フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) の差分ビルドの節で説明します。
+`Theme` の下の Widget は、2フレーム目でも1フレーム目と同じもの(`children`)を渡しています。Element は、新しい Widget が前と同じなら、その下を作り直さずに済ませます。そのため、`Theme` が変わっても、下の子が作り直されるのは依存を登録した子だけです。この差分ビルドの仕組みは、[三つのツリーの仕組みと理由](../explanation/Trees.md) の差分ビルドの節で説明します。
 
 ## 関連
 
-- [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) — 差分ビルドと `BuildOwner`
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — 差分ビルドと `BuildOwner`
 - [State](../../concepts/State.md) — 利用者から見た `InheritedWidget`
 - [実験の一覧](Home.md)

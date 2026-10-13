@@ -1,6 +1,6 @@
-# フレームワーク(アニメーション): 守ること
+# アニメーションで守ること
 
-アニメーションの層で、実装を変えても維持する条件をまとめます。仕組みの説明は [アニメーションの Explanation](Explanation.md) にあります。
+アニメーションの層で、実装を変えても維持する条件をまとめます。仕組みの説明は [アニメーションの仕組みと理由](../explanation/Animation.md) にあります。
 
 > ※要確認 — このページの条件は、現在の実装と、それを固定しているテストから読み取ったものです。`WidgetTicker` の契約(コールバックのスレッド、マウント前の `Start`、破棄し忘れの扱い)は、追跡: [#282](https://github.com/sumx21t-3310/FloatSoda/issues/282) で明文化する途中です。#282 で決まったら、このページを合わせます。
 
@@ -81,12 +81,12 @@
 | `Value` を範囲に収める | 同じ。Flutter の `AnimationController` も `lowerBound` と `upperBound` に収める |
 | `Muted` のあいだも基準点を保つ | 同じ。Flutter の `Ticker.muted` も経過時間を進め続ける |
 | 動いている `Ticker` を残したまま `State` を破棄したとき | Flutter はエラーにする。FloatSoda は検出しない(追跡: [#282](https://github.com/sumx21t-3310/FloatSoda/issues/282)) |
-| 通知を C# の `event` で受け取る | 表現の違いで、挙動の差異ではない([APIDesign](../../APIDesign.md) の「3.6」) |
+| 通知を C# の `event` で受け取る | 表現の違いで、挙動の差異ではない([APIDesign](../APIDesign.md) の「3.6」) |
 
-台帳([`known-divergences.md`](../../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md))に、アニメーションのエントリはまだありません。
+台帳([`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md))に、アニメーションのエントリはまだありません。
 
 ## 関連
 
-- [アニメーションの Explanation](Explanation.md) — 条件の背景にある仕組み
-- [アニメーションの HowTo](HowTo.md) — アニメーションの部品を移植する手順
-- [三つのツリーの Reference](../trees/Reference.md) — RenderObject の購読と attach / detach の条件
+- [アニメーションの仕組みと理由](../explanation/Animation.md) — 条件の背景にある仕組み
+- [アニメーションの部品を移植する](../how-to/PortAnimation.md) — アニメーションの部品を移植する手順
+- [三つのツリーで守ること](Trees.md) — RenderObject の購読と attach / detach の条件

@@ -1,6 +1,6 @@
-# プラットフォーム: 作業の手順
+# OpenVR の API を包む
 
-このページは、プラットフォームの層(`FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR`)でよく行う2つの作業、OpenVR の API を調べて包む作業と、OpenVR のエラーに対応する例外を足す作業の手順です。層の仕組みは [プラットフォーム: 仕組みと理由](Explanation.md) に、変更の前後で守る条件は [プラットフォーム: 守ること](Reference.md) にあります。
+このページは、プラットフォームの層(`FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR`)でよく行う2つの作業、OpenVR の API を調べて包む作業と、OpenVR のエラーに対応する例外を足す作業の手順です。層の仕組みは [プラットフォームの仕組みと理由](../explanation/Platform.md) に、変更の前後で守る条件は [プラットフォームで守ること](../reference/Platform.md) にあります。
 
 | 知りたいこと | 置き場所 |
 |---|---|
@@ -9,7 +9,7 @@
 | breaking change の判定 | [APIDesign](../APIDesign.md) の「6. バージョニングと後方互換性」 |
 | XML ドキュメントコメントの書き方 | [DocumentationComments](../DocumentationComments.md) |
 | 例外メッセージの追加手順と文体 | [Localization](../Localization.md) の「3. 例外メッセージ」 |
-| 初めて API を包むときの一本道 | [プラットフォーム: 貢献までの流れ](Tutorial.md) |
+| 初めて API を包むときの一本道 | [OpenVR の API を1つ包んで PR を出す](../tutorials/OverlayPreCurvePitch.md) |
 
 ## OpenVR の API を調べて包む
 
@@ -80,6 +80,6 @@ OpenVR のインターフェースを新しく包み、そのインターフェ�
 
 ## 関連
 
-- [プラットフォーム: 貢献までの流れ](Tutorial.md) — 実在の API を1つ包んで PR を出すまで
-- [プラットフォーム: 守ること](Reference.md) — 例外メッセージのキーとスレッドの条件
-- [プラットフォーム: 仕組みと理由](Explanation.md) — 能力オブジェクトと、起動を止めない失敗
+- [OpenVR の API を1つ包んで PR を出す](../tutorials/OverlayPreCurvePitch.md) — 実在の API を1つ包んで PR を出すまで
+- [プラットフォームで守ること](../reference/Platform.md) — 例外メッセージのキーとスレッドの条件
+- [プラットフォームの仕組みと理由](../explanation/Platform.md) — 能力オブジェクトと、起動を止めない失敗

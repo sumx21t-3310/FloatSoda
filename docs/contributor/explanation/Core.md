@@ -1,6 +1,6 @@
-# フレームワーク(コア): 仕組みと理由
+# コアの仕組みと理由
 
-コアの層は、アプリの起動から、1フレーム分の処理を順番どおりに呼ぶところまでを受け持ちます。中心になるのは、ウィンドウごとにフレームを回す `WidgetBinding` と、dirty な RenderObject を消化する `RenderPipeline` です。このページでは、起動の流れ、1フレームの流れ、それぞれの持ち主と寿命、設計の理由を説明します。Widget・Element・RenderObject の中身は [三つのツリーの Explanation](../trees/Explanation.md) にあります。
+コアの層は、アプリの起動から、1フレーム分の処理を順番どおりに呼ぶところまでを受け持ちます。中心になるのは、ウィンドウごとにフレームを回す `WidgetBinding` と、dirty な RenderObject を消化する `RenderPipeline` です。このページでは、起動の流れ、1フレームの流れ、それぞれの持ち主と寿命、設計の理由を説明します。Widget・Element・RenderObject の中身は [三つのツリーの仕組みと理由](Trees.md) にあります。
 
 ## 実装状況
 
@@ -13,7 +13,7 @@
 | `await` の続き | メインスレッドへ戻らない(追跡: [#281](https://github.com/sumx21t-3310/FloatSoda/issues/281)) |
 | 公開 API の Skia 型 | `WidgetBinding.Size` の `SKSizeI` などが残っている(追跡: [#131](https://github.com/sumx21t-3310/FloatSoda/issues/131)) |
 
-台帳は、Flutter との差異を記録した [`known-divergences.md`](../../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。
+台帳は、Flutter との差異を記録した [`known-divergences.md`](../../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。
 
 ## 責務と境界
 
@@ -76,7 +76,7 @@ OpenVR の初期化のうち、アプリの識別(`Identify`)とアクション�
 `BeginFrame` の中身は、次の3段です。
 
 1. **入力** — ウィンドウの入力源からポインタイベントを取り出し、ヒットテストして配送する(`FlushPointerEvents`)
-2. **フレームコールバック** — `ScheduleFrameCallback` で登録された処理を呼ぶ段で、`WidgetTicker` もここで時刻を受け取る([アニメーションの Explanation](../animation/Explanation.md))
+2. **フレームコールバック** — `ScheduleFrameCallback` で登録された処理を呼ぶ段で、`WidgetTicker` もここで時刻を受け取る([アニメーションの仕組みと理由](Animation.md))
 3. **描画** — `DrawFrame` を呼ぶ
 
 `DrawFrame` は、ビルドを毎フレーム確かめ、レイアウトから先は必要なときだけ実行します。
@@ -107,7 +107,7 @@ sequenceDiagram
 
 ### RenderPipeline が dirty なノードを消化する順序
 
-`RenderPipeline` は、`NodesNeedingLayout` と `NodesNeedingPaint` の2つのリストを持ちます。RenderObject は、`MarkNeedsLayout` と `MarkNeedsPaint` で、最も近い境界のノードをこのリストへ登録します(伝播の仕組みは [三つのツリーの Explanation](../trees/Explanation.md))。
+`RenderPipeline` は、`NodesNeedingLayout` と `NodesNeedingPaint` の2つのリストを持ちます。RenderObject は、`MarkNeedsLayout` と `MarkNeedsPaint` で、最も近い境界のノードをこのリストへ登録します(伝播の仕組みは [三つのツリーの仕組みと理由](Trees.md))。
 
 - `FlushLayout` は、リストを `Depth` の小さい順(親が先)に `LayoutWithoutResize` し、処理中に登録されたノードも、リストが空になるまで同じ呼び出しの中で処理する
 - `FlushPaint` は、開始時点のリストだけを `Depth` 順に `PaintingContext.RepaintCompositedChild` で描き直し、処理中に登録されたノードは次の `FlushPaint` に回す
@@ -127,7 +127,7 @@ sequenceDiagram
 
 エンジンのウィンドウはレンダースレッドで非同期に作られます。そのため、作られるまでのフレームでは、`DrawFrame` がレイアウトから先を実行しません。ポインタの入力源も、ウィンドウが作られたことを観測したフレームから接続されます。
 
-`WidgetBinding` と `RenderPipeline` を触るのは、メインスレッドだけです。例外は `NeedsVisualUpdate` で、バックグラウンドで完了したタスクからも書き込まれるため、フィールドを `volatile` にしています。スレッド全体の分担は [Architecture](../../Architecture.md) の「スレッドモデル」にあります。
+`WidgetBinding` と `RenderPipeline` を触るのは、メインスレッドだけです。例外は `NeedsVisualUpdate` で、バックグラウンドで完了したタスクからも書き込まれるため、フィールドを `volatile` にしています。スレッド全体の分担は [Architecture](../Architecture.md) の「スレッドモデル」にあります。
 
 ## なぜそう設計したか
 
@@ -135,10 +135,10 @@ sequenceDiagram
 
 | 判断 | 理由 | 出典 |
 |---|---|---|
-| 変更がないフレームでは、レイアウトと描画を飛ばす | 変わった部分だけを処理するため。Flutter と同じ戦略 | [BuildPipeline](../../BuildPipeline.md) |
+| 変更がないフレームでは、レイアウトと描画を飛ばす | 変わった部分だけを処理するため。Flutter と同じ戦略 | [BuildPipeline](../BuildPipeline.md) |
 | 経過時間を1フレームに1回だけ取り、全ウィンドウに同じ値を配る | 同じフレームのすべてのウィンドウに、同一のタイムスタンプを渡すため | `FloatSodaApp.DrawFrame` のコメント |
 | 経過時間を、壁時計ではなく `TimeProvider` の単調なタイムスタンプから取る | テストで `FakeTimeProvider` などに差し替えられるようにするため | `FloatSodaApp` のフィールドのコメント |
-| Layer ツリーを `Clone` してからレンダースレッドへ渡す | メインスレッドとレンダースレッドが、同じ可変オブジェクトを共有しないようにするため | [REVIEW.md](../../../../REVIEW.md) の「Layer」 |
+| Layer ツリーを `Clone` してからレンダースレッドへ渡す | メインスレッドとレンダースレッドが、同じ可変オブジェクトを共有しないようにするため | [REVIEW.md](../../../REVIEW.md) の「Layer」 |
 | アプリの識別とアクション入力の初期化の失敗を、起動の失敗にしない | 表示は続けられるため | `FloatSodaApp.Initialize` のコメント |
 
 次の判断は、理由を書いた一次情報を見つけられませんでした。
@@ -162,11 +162,11 @@ sequenceDiagram
 
 - **フレームコールバック** — レンダースレッドを `Start` しないまま `WidgetBinding` を `EnsureInitialized` すると、ウィンドウを作らずに `BeginFrame(TimeSpan)` へ任意の時刻を渡せる(`tests/FloatSoda.Test/Core/WidgetBindingTest.cs`)
 - **ビルドとレイアウト** — `RenderView` と `RenderPipeline` を直接作り、`RenderObjectToWidgetAdapter.AttachToRenderTree` でルートの Widget を接続してから、`BuildScope` と `FlushLayout` を呼ぶ(`tests/FloatSoda.Test/Widgets/PaddingTest.cs`)
-- **描画結果** — `FloatSoda.Testing` の `WidgetBitmapRenderer` でビットマップへ描き、画素を確かめる([三つのツリーの HowTo](../trees/HowTo.md))
+- **描画結果** — `FloatSoda.Testing` の `WidgetBitmapRenderer` でビットマップへ描き、画素を確かめる([Flutter のウィジェットを移植する](../how-to/PortWidget.md))
 
 ## 関連
 
-- [コアの Reference](Reference.md) — `RenderPipeline` と値型で守る条件
-- [三つのツリーの Explanation](../trees/Explanation.md) — ビルド・レイアウト・描画・ヒットテストの中身
-- [アニメーションの Explanation](../animation/Explanation.md) — フレームコールバックと `WidgetTicker`
-- [Architecture](../../Architecture.md) — アセンブリ構成とスレッドモデル
+- [コアで守ること](../reference/Core.md) — `RenderPipeline` と値型で守る条件
+- [三つのツリーの仕組みと理由](Trees.md) — ビルド・レイアウト・描画・ヒットテストの中身
+- [アニメーションの仕組みと理由](Animation.md) — フレームコールバックと `WidgetTicker`
+- [Architecture](../Architecture.md) — アセンブリ構成とスレッドモデル

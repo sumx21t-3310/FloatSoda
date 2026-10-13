@@ -111,11 +111,11 @@ boundary=True: 描き直した面積 2500 px
 
 描き直しの印は、印を付けた RenderObject から親へ向かって、いちばん近い再描画の境界まで上がります。描き直しは、その境界の中をまとめて描く単位で行います。`RepaintBoundary` がないと、いちばん近い境界はルートの `RenderView` です。そのため、右の四角の色が変わるだけで、`RenderView` の中の全部が新しい絵に記録し直されます。
 
-`RepaintBoundary` は、その位置に新しい境界を作ります。右の四角に付いた印は `RepaintBoundary` で止まり、描き直しはその中だけで行われます。境界ごとに自分の Layer を持つので、描き直さなかった左の四角は、前のフレームの絵(`PictureLayer`)をそのまま使います。この差分更新の流れは、[フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) の差分更新の節で説明します。
+`RepaintBoundary` は、その位置に新しい境界を作ります。右の四角に付いた印は `RepaintBoundary` で止まり、描き直しはその中だけで行われます。境界ごとに自分の Layer を持つので、描き直さなかった左の四角は、前のフレームの絵(`PictureLayer`)をそのまま使います。この差分更新の流れは、[三つのツリーの仕組みと理由](../explanation/Trees.md) の差分更新の節で説明します。
 
 ## 関連
 
-- [フレームワーク(三つのツリー): 仕組みと理由](../framework/trees/Explanation.md) — 差分更新と再描画の境界
+- [三つのツリーの仕組みと理由](../explanation/Trees.md) — 差分更新と再描画の境界
 - [何も変わらないフレームは何をしているの?](IdleFrame.md) — 描き直しが起きないフレームを数える実験
-- [描画: 仕組みと理由](../rendering/Explanation.md) — Layer ツリー
+- [描画の仕組みと理由](../explanation/Rendering.md) — Layer ツリー
 - [実験の一覧](Home.md)
