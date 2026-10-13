@@ -8,7 +8,8 @@
 
 | 入口 | 読者 |
 |---|---|
-| [FloatSoda を使う](user/Home.md) | FloatSoda でアプリを作る人。**骨組みのみで、本文はこれから書きます** |
+| [コンセプト](concepts/Home.md) | FloatSoda が何であり、どう振る舞うかを知りたい人(利用者とコントリビュータの両方)。**設計シートのみで、本文はこれから書きます** |
+| [FloatSoda を使う](user/Home.md) | FloatSoda でアプリを作る人。**設計シートのみで、本文はこれから書きます** |
 | [FloatSoda を変える](contributor/Home.md) | FloatSoda 本体を変更・レビューする人 |
 | [API Reference](api/Home.md) | 公開 API の契約を調べる人。**準備中** |
 

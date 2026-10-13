@@ -1,14 +1,24 @@
-# Tutorials — 作りながら学ぶ
+# ミニアプリを作る
 
-> **骨組み** — [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) 手順4の骨組みです。本文はまだありません。
+> **骨組み** — 本文はまだありません。下は本文を書くための設計シートです(追跡: [#188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。書き方は [WritingDocumentation](../contributor/WritingDocumentation.md) にあります。
 
-各チュートリアルは [WritingDocumentation 4 章](../contributor/WritingDocumentation.md#tutorial) の Tutorial テンプレートに沿って書きます。
+## 設計シート
 
-## 最初のオーバーレイを作る
-
-- [GettingStarted](GettingStarted.md)
-
-## ミニアプリを作る
-
-- 層3(統合ミニアプリ型)サンプルと合わせて書く。Phase 2 の完了後に #261 で扱う
-- 候補: 電卓、カラーピッカー、オーバーレイの設定パネル
+- 分類: 説明型 / tutorial
+- 読み手: FloatSoda でオーバーレイを作る人(TargetUsers の3タイプ。コードを書くのは LLM のことが多い) / GettingStarted を終えた / 公開 API だけで、本番に近い小さなアプリを1つ作りたい
+- テーマ: 公開 API だけで、固定画面のミニアプリを1つ作るまで
+- Why: 複数の Widget と状態と入力を組み合わせる練習がないと、自分のアプリに進めないため
+- What: 層3(統合ミニアプリ型)サンプルと同じアプリが完成すること
+- How: 一本道の手順で書き、完成形は層3サンプルへリンクする(#261)
+- 要素:
+  - 題材の候補: 電卓、カラーピッカー、オーバーレイの設定パネル(#188 の層3)
+  - 別のプロジェクトから FloatSoda を参照する(#188 の層3の条件)
+  - スクロールを使わない固定画面にする(#188 の層3の条件)
+- 見出し(案):
+  - 作るもの
+  - 前提
+  - Step 1 …
+  - 完成
+  - 次に読むもの
+- ※要確認:
+  - 題材(#261 で決める)

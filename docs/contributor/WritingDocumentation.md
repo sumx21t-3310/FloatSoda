@@ -2,89 +2,150 @@
 
 # ドキュメント執筆ガイド
 
-FloatSoda のドキュメントは、読者ごとに **User docs / Contributor docs / API Reference** の3系統に分かれています(情報設計の一次情報は [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。本ページは、新しい情報を書くときに「どの系統のどのページに書くか」「どこが一次情報か」「変更時に何を更新するか」を決めるための入口です。書き方の規約はそれぞれの置き場所に置いているため、ここには再掲しません。
+FloatSoda のドキュメントは、入口の **導入** と、読者の目的ごとの **コンセプト / ユーザー向け / コントリビューター向け / API Reference** に分かれています(情報設計の一次情報は [Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。本ページは、新しい情報を書くときに「どの区分のどのページに書くか」「どこが一次情報か」「変更時に何を更新するか」を決めるための入口です。書き方の規約はそれぞれの置き場所に置いているため、ここには再掲しません。
 
-| 系統 | 読者 | 答える問い |
+| 区分 | 読者 | 答える問い |
 |---|---|---|
-| User docs | FloatSoda でアプリを作る人 | **What / How** — 何であり、どう使うか |
-| Contributor docs | FloatSoda 本体を変える・レビューする人 | **How it works / Why / Must** — どう動き、なぜそう設計され、何を守るか |
+| 導入 | 初めて来た人 | FloatSoda とは何で、だれ向けか |
+| コンセプト | 利用者とコントリビュータの両方 | **What** — 公開 API から見て何であり、どう振る舞い、どんな制約があるか |
+| ユーザー向け | FloatSoda でアプリを作る人 | **How** — 目的をどう果たすか |
+| コントリビューター向け | FloatSoda 本体を変える・レビューする人 | **How it works / Why / Must** — どう動き、なぜそう設計され、何を守るか |
 | API Reference | 利用者・コントリビュータ・Coding Agent の全員 | **Exactly what exists** — 公開 API の正確な契約 |
 
-> **実装状況** — 系統ごとのディレクトリ(`docs/user/`、`docs/contributor/`、`docs/api/`)への再編は、#188 の手順4で進めています。現行ページは Contributor 向けの詳細なリファレンスが中心なので、**ファイル名を変えずに `contributor/` へ移しました。User docs は `user/` に骨組みだけがあり、これから新しく書きます**。利用者向けの内容を探すときは、[再編の地図](#再編の地図) で該当ページを選んでください。種別ごとの「書くもの / 書かないもの」とテンプレートは、User 側が [4 章](#4-user-docs-の書くもの--書かないものとテンプレート)、Contributor 側が [5 章](#5-contributor-docs-の書くもの--書かないものとテンプレート)にあります。
+> **実装状況** — この区分への再編は、#188 の手順4で進めています。現行ページは、**ファイル名を変えずに `contributor/` へ移しました。コンセプトとユーザー向けは骨組みだけがあり、これから新しく書きます**。目指すページ構成と、今のページの行き先は、[再編の地図](#再編の地図) にあります。種類ごとの「書くもの / 書かないもの」とテンプレートは、コンセプトとユーザー向けが [4 章](#4-コンセプトとユーザー向けの書くもの--書かないものとテンプレート)、コントリビューター向けが [5 章](#5-コントリビューター向けの書くもの--書かないものとテンプレート)にあります。
 
 ## 1. どこに書くか
 
-書こうとしている情報について、3つの問いに順に答えます。1問目では、どのズームまで見れば理解できる情報かを C4 Model のレベルに当てはめます。2問目は Lv3 の情報だけに使い、読者が何をしたいかで割ります。3問目では、系統の中の種別を Diátaxis で決めます。C4 と Diátaxis は書き手の判定基準です。サイトの見出しには出さず、読者には「導入する / 使う / 変える / 調べる」の区分で示します。Lv ごとの FloatSoda での中身は、[Issue #188](https://github.com/sumx21t-3310/FloatSoda/issues/188) の「情報の置き場所を決める順序」の表を一次情報とします。
+書こうとしている情報について、次の問いに順に答えます。中心になるのは3問目の「公開 API の外から観測できることだけで書けるか」です。外から観測できる説明はコンセプトに、目的を果たす道筋はユーザー向けに、内部の仕組み・理由・守ることはコントリビューター向けに置きます。Diátaxis の種別名は書き手の判定基準です。サイトの見出しには出さず、読者には「知る / 使う / 変える / 調べる」の区分で示します。
 
 ```text
-1. どのズームまで見れば理解できる情報か
-   Lv1  アプリと SteamVR・VRChat・HMD の関係、3ペルソナ          → 導入(Home、TargetUsers)
-   Lv2  参照するパッケージ、スレッド、ウィンドウ種別               → User
-   Lv3  三ツリー、BuildOwner、RenderPipeline、Layer、入力の流れ    → 2 へ
-   Lv4  型・メンバー・引数・戻り値・例外・nullability の契約       → XML ドキュメントコメント(API Reference の原稿)
+1. 型・メンバー・引数・戻り値・例外・nullability の契約か
+   はい → XML ドキュメントコメント(API Reference の原稿)
 
-2. Lv3 の情報は、読者が何をしたいかで割る
-   使う   — 正しく使うために必要                                   → User
-   変える — 変更とレビューに必要                                   → Contributor
-   調べる — 型どうしの対応関係                                     → XML ドキュメントコメントの <seealso>
+2. FloatSoda とは何で、だれ向けかの説明か(アプリと SteamVR・VRChat・HMD の関係、3ペルソナ)
+   はい → 導入(Home、TargetUsers)
 
-3. 系統の中の種別を Diátaxis で決める
-   完成物を作りながら学ぶ道筋                                       → User / Tutorial
-   特定の目的を達成する手順                                         → User / Guide(How-to)
-   概念を理解するための説明                                         → User / Concept(Explanation)
-   いまどう動いているか                                             → Contributor / Architecture(Explanation)
-   なぜそう設計したか                                               → Contributor / Design(Explanation)
-   変更後も何を維持するか                                           → Contributor / Requirements(Reference)
-   どう変更・レビュー・公開するか                                   → Contributor / Development(How-to)
+3. 公開 API の外から観測できることだけで書けるか
+   書ける   — 何であり、どう振る舞い、どんな制約があるか   → コンセプト
+   書ける   — 完成物を作りながら学ぶ道筋                   → ユーザー向け / 作りながら学ぶ(Tutorial)
+   書ける   — 1つの Widget の紹介と最小の使用例            → ユーザー向け / Widget カタログ(サンプルの README)
+   書ける   — 特定の目的を達成する手順                     → ユーザー向け / 〜するには(How-to)
+   書けない — 内部の仕組み・理由・守ること・変更の手順     → コントリビューター向け(4 へ)
+
+4. コントリビューター向けは、層と種別で置き場所を決める
+   層   — 全体 / プラットフォーム / 描画 / フレームワーク(コア・三つのツリー・アニメーション)/ UI
+   種別 — その層で貢献するまでの流れ                       → Tutorial
+          特定の作業の手順                                 → How-to
+          変更後も維持する条件                             → Reference
+          いまどう動くか、なぜそう設計したか               → Explanation
+   動作原理を動かして確かめる問い                           → 実験
 ```
+
+例えば「`SetState` を呼ぶと、その Widget から下が作り直される」は、外から観測できるのでコンセプトに置きます。「`BuildOwner` が dirty な Element を `Depth` 順に作り直す」は内部の仕組みなので、コントリビューター向けのフレームワーク(三つのツリー)の Explanation に置きます。
 
 境界で迷いやすい情報は、次のように分類します。
 
-- **利用者から観測できる制約**は User docs に書き、**その制約を成立させる内部要件**は Contributor docs に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」は User docs、「`WorldSpaceWindow` の入力を Controller Ray → HitTest として接続する」は Contributor docs、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
-- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に置きます。利用者から見える差異は、該当する User docs のページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
-- **同じテーマは1つの系統で詳述**し、ほかの系統からはリンクします。概念を Guide で説明し直したり、シグネチャを Concept に並べたりしません
+- **利用者から観測できる制約**はコンセプトに、**その制約を成立させる内部要件**はコントリビューター向けに、**制約を避けて目的を果たす手順**はユーザー向けの「〜するには」に書きます。例: 「`WorldSpaceWindow` では現在ポインタ入力を使えない」はコンセプト、「`WorldSpaceWindow` の入力を Controller Ray → HitTest として接続する」はコントリビューター向け、`WorldSpaceWindow` のプロパティ・型・例外契約は API Reference
+- **Flutter との差異**は、判断原則を [APIDesign](APIDesign.md) に、確認済み差異の台帳を [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) に置きます。利用者から見える差異は、該当するコンセプトのページと、対応するサンプルの「Flutterとの違い」節にも記載します(記録ルールは [APIDesign](APIDesign.md))
+- **同じテーマは1か所で詳述**し、ほかの区分からはリンクします。コンセプトの説明を「〜するには」で繰り返したり、シグネチャをコンセプトに並べたりしません
 
-### User docs の範囲
+コンセプトとユーザー向けの境界は、見出しの形で見分けられます。コンセプトの見出しは名詞(何であり、どう振る舞うか)、ユーザー向けの見出しは「〜する」(達成したい目的)になります。
 
-User docs は、公開 API および API Reference と合わせて、**#188 の層3(統合ミニアプリ型)のサンプルをジュニアコーダーテストで書ける範囲**を扱います。これが「どこまで書くか」の合格ラインです。テストで不足が判明した概念や制約は、User docs または API Reference の不足として回収します(手順は #188)。内部実装を知らないとコードを書けない箇所が見つかった場合、それは User docs の不足を意味します。
+| トピック | コンセプト | ユーザー向け(〜するには) |
+|---|---|---|
+| Widget | Widget は設計図で、作り直しても安い(不変の `record`) | 項目を縦に並べて表示する |
+| Widget | 組み込み Widget の種類の地図(レイアウト・描画・入力)。一覧は API Reference へリンクする | 角を丸めて影を付ける |
+| State | `SetState` を呼ぶと、その Widget から下が作り直される | チェックボックスの状態を持つ |
+| State | `InheritedWidget` は上から下へ値を配り、依存した子だけを作り直す | 画面全体の色をまとめて切り替える |
+| Layout | 制約は親から子へ下り、サイズは子から親へ上がる | Row の中でテキストをはみ出させない |
+| Layout | `Expanded` は余った幅を flex の比で分ける | 左右に寄せて間を空ける |
+| Input | ポインタ入力はダッシュボードオーバーレイだけで使える(制約) | `WorldSpaceWindow` で操作したいときの回り道 ※要確認(回り道があるか) |
+| Input | ヒットテストは前面の子から順に当たりを探す | ボタンの押せる範囲を広げる |
+| Animation | `Ticker` がフレームごとに値を進め、`Curve` が進み方を変える | フェードインさせる |
+| Window | オーバーレイの3種類の違い。物理的な大きさは Dpm で決まる | 34cm の幅で表示する([Issue #151](https://github.com/sumx21t-3310/FloatSoda/issues/151)) |
+| Widget(色の節) | FloatSoda の `Color` と SkiaSharp の `SKColor` の関係([Issue #251](https://github.com/sumx21t-3310/FloatSoda/issues/251)) | 16進の色コードで色を指定する |
+| Threading | `await` の続きはメインスレッドへ戻らない(制約。追跡: [#281](https://github.com/sumx21t-3310/FloatSoda/issues/281)) | バックグラウンドで取った結果を画面に出す |
+
+### コンセプトとユーザー向けの範囲
+
+コンセプトとユーザー向けは、公開 API および API Reference と合わせて、**#188 の層3(統合ミニアプリ型)のサンプルをジュニアコーダーテストで書ける範囲**を扱います。これが「どこまで書くか」の合格ラインです。テストで不足が判明した概念や制約は、コンセプト、ユーザー向け、API Reference のどれかの不足として回収します(手順は #188)。内部実装を知らないとコードを書けない箇所が見つかった場合、それはコンセプトかユーザー向けの不足を意味します。
 
 ### 再編の地図
 
-再編(#188 手順4)の出発点です。現行ページは内部の仕組みの説明が中心です。そのため、User 向けの部分だけを抜き出して新しいページに書き、本体は `contributor/` へ移します。種別は再編時に実物で確定します。
+#188 の再編(手順4)で目指すページ構成と、今のページの行き先です。再編が終わったら、この節は消します(追跡: [#188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。サイトのサイドバーは `docs/` のディレクトリから作られるため、再編が終わったあとは、ディレクトリがページ構成の一次情報になります。
 
-**現行ページの行き先**
+**サイドバーのグループ**
 
-| 現行ページ | 行き先 | 備考 |
-|---|---|---|
-| [Architecture](Architecture.md) | Contributor / Architecture | 利用者向けの全体像は User の「Widget」へ書き下ろす |
-| [BuildPipeline](BuildPipeline.md) | Contributor / Architecture | |
-| [RenderObjects](RenderObjects.md) | Contributor / Architecture | 制約モデルの利用者向け説明は User の「Layout」へ |
-| [WidgetSystem](WidgetSystem.md) | Contributor / Architecture | 組み込みウィジェット一覧と「押せるボタンを作る」は User 側へ |
-| [Animation](Animation.md) | Contributor / Architecture | 使い方は User の「Animation」へ |
-| [OVRIntegration](OVRIntegration.md) | Contributor / Architecture | オーバーレイ種別と制約は User の「Window / Overlay」へ |
-| [UILayering](UILayering.md) | Contributor / Design | 設計方針(未提供) |
-| [APIDesign](APIDesign.md) | Contributor / Design + Requirements | |
-| [DocumentationComments](DocumentationComments.md) | Contributor / Development | |
-| [TestStrategy](TestStrategy.md) | Contributor / Development | テストの置き場所を決める地図。配置と件数は日付付きで更新する |
-| [Localization](Localization.md) | Contributor / Design + Development | |
-| このページ | Contributor / Development | |
-| [TargetUsers](../TargetUsers.md) | 導入(Lv1) | `docs/` 直下に残す。サイトでは「導入」グループに入る |
-| [GettingStarted](GettingStarted.md) | User / Tutorial | 利用者向けに書き直す |
-| [Input](Input.md) | User / Concept + Guide | 利用者向けに書き直す。実装の説明は Contributor 側へ |
+| グループ | 読者の目的 | ディレクトリ | ページ |
+|---|---|---|---|
+| 導入 | — | `docs/` 直下 | Home、TargetUsers |
+| コンセプト | 知る | `docs/concepts/` | Overview(宣言的 UI の考え方、三つのツリーを利用者から見た姿、各トピックへの地図)、Widget、State、Layout、Input、Animation、Window、Threading。色は Widget の1節 |
+| ユーザー向け | 使う | `docs/user/` | 作りながら学ぶ(GettingStarted、ミニアプリ)、Widget カタログ、〜するには |
+| コントリビューター向け | 変える | `docs/contributor/` | 実験(`experiments/`)と、層ごとの Tutorial / HowTo / Reference / Explanation |
+| API Reference | 調べる | `docs/api/` | 入口だけ。本体は XML ドキュメントコメントから作る([#219](https://github.com/sumx21t-3310/FloatSoda/issues/219)) |
 
-**新しい User ページと元ネタ**(#188 の Concept の列挙に沿う)
+- ユーザー向けの小見出しに、Diátaxis の種別名は出さない
+- Widget カタログは、層1サンプルの `samples/*/README.md` をサイトの生成時に取り込む。Wiki には載せない。取り込むには `website/scripts/docs-source.mjs` の変更が要る([#219](https://github.com/sumx21t-3310/FloatSoda/issues/219) の完了条件7)
+- コントリビューター向けの層のディレクトリは `overall/`、`platform/`、`rendering/`、`framework/core/`、`framework/trees/`、`framework/animation/`、`ui/` とする。中身がないマスにも骨組みを置く(7層 × 4種別 = 28ページ)。サイトの生成がこの深さのディレクトリを扱えるかは ※要確認
+- `docs/assets/logo-sketch.png` は `samples/FloatSoda.Samples.Image` の素材で、ドキュメントのページからは参照していない。サイトと Wiki は `.md` だけを扱うため、どちらにも出ない
+- コントリビューター向けの Home は、層 × 種別の表を入口にし、読む順番を「面白がる(実験)→ 貢献する(全体の Tutorial)→ 調べる(Explanation・Reference)→ 提案する」で示す
 
-| User ページ | 種別 | 元ネタ(利用者が観測できる制約と使い方を抜き出す) |
-|---|---|---|
-| Widget(宣言的 UI と Widget ツリー) | Concept | WidgetSystem の組み込み一覧と「押せるボタンを作る」、Architecture の全体像、層1サンプル |
-| State(`SetState`、`InheritedWidget`) | Concept | WidgetSystem、BuildPipeline のうち利用者から観測できる再ビルドの挙動 |
-| Layout(制約・サイズ・配置) | Concept | RenderObjects の制約モデル、層1サンプル(レイアウト基本・制約変換系) |
-| Input(ポインタ・ジェスチャ・アクション入力) | Concept + Guide | Input、WidgetSystem の「ジェスチャとヒットテスト」、層1サンプル(入力系)。ダッシュボード限定の制約を明記する |
-| Animation | Concept | Animation |
-| Window / Overlay(ダッシュボード・ワールド座標・デバイス追従) | Concept + Guide | OVRIntegration、Home の実装状況(表示専用の制約)、[Issue #151](https://github.com/sumx21t-3310/FloatSoda/issues/151)(物理サイズの発見性) |
-| 〜するには(各種) | Guide | 層2(Cookbook 型)サンプル |
-| GettingStarted | Tutorial | 現行 GettingStarted、`samples/FloatSoda.Samples.GettingStarted` |
-| ミニアプリを作る | Tutorial | 層3(統合ミニアプリ型)サンプル(Phase 2 完了後) |
+**コントリビューター向けの層**
+
+層は `src/` のプロジェクトと 1対1 にしません。
+
+| 層 | 入るプロジェクト・名前空間 |
+|---|---|
+| 全体 | なし(層をまたぐ話。API 設計、ローカライズ、docs、テスト方針、リリース、入力の流れ) |
+| プラットフォーム | `FloatSoda.Abstractions`、`FloatSoda.Engine`、`FloatSoda.OVR` |
+| 描画 | `FloatSoda.Rendering` |
+| フレームワーク(コア) | `FloatSoda` の `FloatSodaApp` と Generic Host まわり、`Core`、`Geometrics`、`Painting` |
+| フレームワーク(三つのツリー) | `FloatSoda` の `Widgets`、`Elements`、`RenderObjects`、`Gesture`。`FloatSoda.Hooks`、`FloatSoda.Testing` |
+| フレームワーク(アニメーション) | `FloatSoda` の `Animation` |
+| UI | `FloatSoda.UI`、`FloatSoda.UI.Cream`、`FloatSoda.UI.FizzyPop` |
+
+**層ごとの種別と、今のページの行き先**
+
+「新」は、今どこにもなく新しく書くものです。印のないものは、今のページの節から移します。
+
+| 層 | Tutorial(貢献までの流れ) | How-to | Reference | Explanation |
+|---|---|---|---|---|
+| 全体 | 1つの PR を出し切る(題材は docs の小さな修正) | Issue を書く・ブランチを切る(CONTRIBUTING.md へリンク)、[DocumentationComments](DocumentationComments.md)、このページ、[TestStrategy](TestStrategy.md)、新 ADR を書く、実機で確かめる(device-test のスキルへリンク)、リリースする(RELEASING.md へリンク) | [Requirements](Requirements.md)(REVIEW.md の 4 章へリンク)、[APIDesign](APIDesign.md) の 2 章、Flutter との差異の台帳 | [Architecture](Architecture.md)(アセンブリ構成、フレームパイプライン、スレッドモデル)、APIDesign の 1 章、[Localization](Localization.md)、新 入力の流れ(SteamVR のポインタ → ヒットテスト → ジェスチャ) |
+| プラットフォーム | 新 OpenVR の API を1つ包んで PR を出す | 新 OpenVR の API を調べて包む、新 例外を足す | [OVRIntegration](OVRIntegration.md) の「例外体系」「オーバーレイプロパティ」のうち `internal` の契約(`public` の分は API Reference) | OVRIntegration(初期化、オーバーレイの種類、VREventDispatcher)、Architecture のスレッドとレンダースレッドの部分、[Input](Input.md) の実装の部分、新 テクスチャ転送と FramePacer |
+| 描画 | 新 Layer の種類を1つ足して PR を出す | 新 Layer を足す(Clone の実装を含む)、新 描画結果をビットマップで確かめる | REVIEW.md の「Layer」の不変条件。Layer の一覧は書かずに `Layers/` へリンクする | Architecture のレイヤーツリーの部分、[RenderObjects](RenderObjects.md) の「PaintingContext とレイヤーツリー」、新 Clone して渡す理由 |
+| フレームワーク(コア) | 新 ジオメトリの値型を1つ足して PR を出す | 新 値型を足す(`record struct` と `PrintMembers` の注意) | `RenderPipeline` の契約、値型の規約(APIDesign の 2 章から) | Architecture のフレームパイプラインのうち `WidgetBinding`・`RenderPipeline` の部分、新 アプリの起動と Generic Host |
+| フレームワーク(三つのツリー) | 新 Flutter のウィジェットを1つ移植して PR を出す | 新 ウィジェットを移植する(flutter-widget-source スキル、テスト観点、層1サンプル、差異の記録)、RenderObjects の「カスタムクリッパーの実装」、新 ヘッドレスでテストする(`FloatSoda.Testing`) | REVIEW.md の「ツリーの所有権とライフサイクル」「差分更新」、RenderObjects の「基本契約」。組み込み RenderObject の一覧は書かずにコードへリンクする | [WidgetSystem](WidgetSystem.md)、[BuildPipeline](BuildPipeline.md)、RenderObjects の「制約フロー」「差分更新」「intrinsic 測定」、新 ジェスチャとヒットテスト、Hooks |
+| フレームワーク(アニメーション) | 新 Flutter の `Curve` を1つ移植して PR を出す | 新 アニメーションの部品を移植する | (骨組み) | [Animation](Animation.md)、新 `Ticker` とフレームの関係 |
+| UI | (骨組み) | (骨組み) | [UILayering](UILayering.md) の2つのルールと判定基準 | UILayering の「なぜ3層に分けるか」 |
+
+コントリビューター向け以外へ移るものは、次のとおりです。
+
+| 今のページ・節 | 行き先 |
+|---|---|
+| [TargetUsers](../TargetUsers.md) | 導入(`docs/` 直下に残す) |
+| [GettingStarted](GettingStarted.md) | ユーザー向けの「作りながら学ぶ」(利用者向けに書き直す) |
+| WidgetSystem の組み込みウィジェット一覧 | コンセプトの Widget(種類の地図)と Widget カタログ |
+| WidgetSystem の「押せるボタンを作る」 | ユーザー向けの「〜するには」 |
+| RenderObjects の制約モデル | コンセプトの Layout |
+| Animation の使い方 | コンセプトの Animation と、ユーザー向けの「〜するには」 |
+| OVRIntegration のオーバーレイ種別と制約 | コンセプトの Window |
+| Input | コンセプトの Input と、ユーザー向けの「〜するには」 |
+
+**実験の候補**
+
+書き方は [5 章の「実験」](#実験)にあります。どの候補も、動かせるかは ※要確認 です。プラットフォームの実験は HMD が要る見込みで、`--desktop` の表示で代わりになるかも ※要確認 です。
+
+| 層 | 問い | やること | 見えるもの / 壊して直す一手 |
+|---|---|---|---|
+| プラットフォーム | SteamVR へのテクスチャ転送はどうなっているの? | フレームごとに色が変わる絵を出し、`FramePacer` の目標フレームレートを下げる | オーバーレイがカクつく。戻すとなめらかになる |
+| プラットフォーム | オーバーレイの大きさは何で決まるの? | 同じ 340px の絵を、Dpm を変えて出す | 34cm の幅になったり、手のひらほどになったりする |
+| 描画 | 半透明の子が重なると、どう混ざるの? | 半透明の四角を2枚重ね、`OpacityLayer` を親にかける場合と子ごとにかける場合を比べる | 重なった部分の色が変わる |
+| 描画 | なぜ Layer ツリーは Clone してからレンダースレッドへ渡すの? | 渡したあとで元のツリーを書き換える | Clone を外すと絵が崩れる |
+| フレームワーク | 親はどうやって子の大きさと位置を決めるの? | 子を円に並べる RenderObject を書く | 時計の文字盤ができる。制約を渡し忘れると、子が消えるか伸びきる |
+| フレームワーク | 1フレームで、どこが描き直されているの? | 描き直された範囲に色を付ける | `RepaintBoundary` を足すと、色の付く範囲が縮む |
+| フレームワーク | 何も変わらないフレームは何をしているの? | `Paint` が呼ばれた回数を数える | 変化がないと 0 回。`SetState` を1回呼ぶと、そこだけ増える |
+| フレームワーク | `Key` をつけると何が変わるの? | 状態を持つ子のリストを並べ替える | `Key` がないと、状態が別の子に付いていく。`Key` をつけると直る |
+| フレームワーク | `InheritedWidget` を変えると、誰が作り直されるの? | 各 Widget の `Build` の回数を数える | 依存している子だけ回数が増える |
 
 ## 2. 情報ごとの置き場所
 
@@ -93,13 +154,13 @@ User docs は、公開 API および API Reference と合わせて、**#188 の�
 | 情報 | 置き場所 |
 |---|---|
 | API のシグネチャ・引数・戻り値・例外・nullability・副作用・スレッド制約 | XML ドキュメントコメント(規約は [DocumentationComments](DocumentationComments.md)) |
-| API の具体的な使い方 | User Guide |
-| 概念モデル(Widget、State、Layout、Input、Animation、Window / Overlay) | User Concept |
-| 完成物を作る手順 | User Tutorial とサンプル(`samples/`) |
-| ウィジェットの最小の使用例 | サンプルの README(構成は [CONTRIBUTING.md](../../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
-| 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | Contributor Architecture |
-| 設計理由と採用しなかった選択肢 | Contributor Design |
-| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | Contributor Requirements。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../../AGENTS.md) の規約表) |
+| API の具体的な使い方 | ユーザー向けの「〜するには」 |
+| 概念モデル(Widget、State、Layout、Input、Animation、Window、Threading) | コンセプト |
+| 完成物を作る手順 | ユーザー向けの「作りながら学ぶ」とサンプル(`samples/`) |
+| ウィジェットの最小の使用例 | サンプルの README。サイトの Widget カタログに取り込む(構成は [CONTRIBUTING.md](../../CONTRIBUTING.md) の「サンプルを追加する場合の規約」) |
+| 内部の動作(ツリー、Build / Layout / Paint、入力、スレッド) | コントリビューター向けの、該当する層の Explanation |
+| 設計理由と採用しなかった選択肢 | コントリビューター向けの、該当する層の Explanation(理由の部分) |
+| invariant、observable behavior、ライフサイクル・所有権・スレッドの必須条件 | コントリビューター向けの、該当する層の Reference。ただし、ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は [REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」([AGENTS.md](../../AGENTS.md) の規約表) |
 | API 設計の原則と Flutter parity / divergence の判断基準 | [APIDesign](APIDesign.md) |
 | 確認済みの Flutter との差異 | [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) |
 | 開発・レビュー・リリースの手順 | [CONTRIBUTING.md](../../CONTRIBUTING.md) / [REVIEW.md](../../REVIEW.md) / [RELEASING.md](../../RELEASING.md) |
@@ -113,23 +174,23 @@ XML ドキュメントコメントは `internal` や `private` にも書きま�
 
 | 変更 | 更新対象 |
 |---|---|
-| public API を追加・変更する | XML ドキュメントコメント。利用者の使い方が増えるなら User Guide と Catalog 型サンプル |
-| observable behavior を変更する | User docs とテスト。API 契約に影響するなら XML ドキュメントコメント |
-| 公開制約・既知の制限を変更する | User docs。必要なら XML ドキュメントコメント |
-| 内部アルゴリズムだけを変更する | Contributor Architecture の説明が変わる場合のみ |
-| アーキテクチャの境界を変更する | Contributor Architecture と Requirements |
-| 設計判断を変更する | Contributor Design。必要なら Requirements と [APIDesign](APIDesign.md) |
-| invariant を追加・変更する | Contributor Requirements とテスト |
-| Flutter との差異を導入・変更する | [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) と divergence テスト。利用者から観測できるなら User docs とサンプルの「Flutterとの違い」節 |
-| 新しい代表ユースケースを追加する | User Guide / Tutorial と、#188 の層に沿ったサンプル |
+| public API を追加・変更する | XML ドキュメントコメント。利用者の使い方が増えるなら、ユーザー向けの「〜するには」と Widget カタログのサンプル |
+| observable behavior を変更する | コンセプトとテスト。API 契約に影響するなら XML ドキュメントコメント |
+| 公開制約・既知の制限を変更する | コンセプト。必要なら XML ドキュメントコメント |
+| 内部アルゴリズムだけを変更する | コントリビューター向けの Explanation の説明が変わる場合のみ |
+| アーキテクチャの境界を変更する | コントリビューター向けの Explanation と Reference |
+| 設計判断を変更する | コントリビューター向けの Explanation(理由の部分)。必要なら Reference と [APIDesign](APIDesign.md) |
+| invariant を追加・変更する | コントリビューター向けの Reference とテスト |
+| Flutter との差異を導入・変更する | [`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) と divergence テスト。利用者から観測できるなら、コンセプトとサンプルの「Flutterとの違い」節 |
+| 新しい代表ユースケースを追加する | ユーザー向けの「〜するには」/「作りながら学ぶ」と、#188 の層に沿ったサンプル |
 | サンプルを追加・変更する | サンプルの README と `checks/items.jsonl`([CONTRIBUTING.md](../../CONTRIBUTING.md) の規約) |
 | ドキュメントのページを移動・改名する | リンク元のページと [Home](../Home.md) の「ページ一覧」表(公開サイトの検査がリンク切れを検出します) |
 
 PR では、テンプレートの `## Documentation` 節に、変更種別と更新した文書(更新が不要と判断した場合はその理由)を記載します。レビューでは、その判断がこの表と一致しているかを確認します。
 
-## 4. User docs の書くもの / 書かないものとテンプレート
+## 4. コンセプトとユーザー向けの書くもの / 書かないものとテンプレート
 
-User docs は新しく書くページが多いため、先に骨格を定めます。ページの目的に不要な節は省きます。
+コンセプトとユーザー向けは新しく書くページが多いため、先に骨格を定めます。ページの目的に不要な節は省きます。テンプレートの名前(Concept、Guide、Tutorial)は書き手向けの呼び名で、サイトの見出しには「コンセプト」「〜するには」「作りながら学ぶ」と出します。
 
 読者は [TargetUsers](../TargetUsers.md) で定義する3タイプです。**コードを書くのも読むのも LLM である**という前提を忘れず、「LLM がこの API を誤用しない」書き方を優先します。Unity の知識のみを持つ読者(Booth クリエイター)には、Unity や uGUI の語彙による読み替えを添えます。
 
@@ -137,15 +198,16 @@ User docs は新しく書くページが多いため、先に骨格を定めま�
 
 | 種別 | 書くもの | 書かないもの |
 |---|---|---|
-| Concept | 概念の目的、利用者から見たモデル、ほかの概念との関係、利用に必要な最低限の仕組み、最小例、観測できる制約 | `private` / `internal` の実装、内部アルゴリズム、設計判断の経緯、API メンバーの一覧 |
-| Guide | 「〜するには」への答え。目的に必要な手順と API の組み合わせ | Concept の説明のやり直し、シグネチャや引数の契約(API Reference へ) |
-| Tutorial | 具体的な完成物を作る一本道の学習体験 | API の網羅 |
+| Concept(コンセプト) | 概念の目的、利用者から見たモデル、ほかの概念との関係、利用に必要な最低限の仕組み、最小例、観測できる制約 | `private` / `internal` の実装、内部アルゴリズム、設計判断の経緯、API メンバーの一覧 |
+| Widget カタログ(ユーザー向け) | 1つのウィジェット群の紹介と最小の使用例。サンプルの README として書く | 手で書いたウィジェットの一覧(サンプルの README から取り込む)、API メンバーの一覧 |
+| Guide(ユーザー向けの「〜するには」) | 「〜するには」への答え。目的に必要な手順と API の組み合わせ | コンセプトの説明のやり直し、シグネチャや引数の契約(API Reference へ) |
+| Tutorial(ユーザー向けの「作りながら学ぶ」) | 具体的な完成物を作る一本道の学習体験 | API の網羅 |
 
-サンプルは #188 の3層と対応します。
+Widget カタログのテンプレートは、[CONTRIBUTING.md](../../CONTRIBUTING.md) の「サンプルを追加する場合の規約」にある README の構成です。サンプルは #188 の3層と対応します。
 
-| 種別 | 対応するサンプル |
+| 種類 | 対応するサンプル |
 |---|---|
-| Concept | 層1: Widget カタログ型(1サンプル = 1ウィジェット群の最小デモ) |
+| Widget カタログ(コンセプトの最小例からもリンクする) | 層1: Widget カタログ型(1サンプル = 1ウィジェット群の最小デモ) |
 | Guide | 層2: Cookbook 型(複数の Widget / API を組み合わせる) |
 | Tutorial | 層3: 統合ミニアプリ型(公開 API だけで本番に近い形を作る) |
 
@@ -156,7 +218,7 @@ User docs は新しく書くページが多いため、先に骨格を定めま�
 ## 概要                        — 何であり、何を解決するか
 ## いつ使うか
 ## 基本モデル                  — 利用者から見た仕組み。内部実装は書かない
-## 最小例                      — 対応する層1(カタログ型)サンプルへのリンクと、必要なら最小の断片
+## 最小例                      — 対応する Widget カタログのページへのリンクと、必要なら最小の断片
 ## Unity / uGUI からの読み替え — 対応する概念と、違う点
 ## 制約と未実装                — 利用者から観測できる制限。使えるようになる Phase を添える
 ## 関連ページ
@@ -187,9 +249,20 @@ User docs は新しく書くページが多いため、先に骨格を定めま�
 
 サンプルコードは `samples/` をマスターとし、本文には必要最小限の断片のみを載せます。ドキュメント用に完全な実装を別途記述することはしません。
 
-## 5. Contributor docs の書くもの / 書かないものとテンプレート
+## 5. コントリビューター向けの書くもの / 書かないものとテンプレート
 
-Contributor docs は、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
+コントリビューター向けは、層ごとに Tutorial / How-to / Reference / Explanation の4種別で書き、動作原理を確かめる実験を別に置きます(層と種別の決め方は [1 章](#1-どこに書くか))。この章の Architecture / Design / Requirements / Development のテンプレートは、次のとおり4種別に対応します。
+
+| テンプレート | 種別 |
+|---|---|
+| [Architecture](#architecture) | Explanation(いまどう動くか) |
+| [Design](#design) | Explanation(なぜそう設計したか) |
+| [Requirements](#requirements) | Reference |
+| [Development](#development) | How-to |
+| [貢献までの流れ](#貢献までの流れ) | Tutorial |
+| [実験](#実験) | 実験(層の4種別の外に置く) |
+
+コントリビューター向けは、現行の `docs/` のページを `contributor/` へ移して作ります。ここに書く「書くもの / 書かないもの」とテンプレートは、[再編の地図](#再編の地図)で行き先が決まっている現行ページと、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[`known-divergences.md`](../../.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) のエントリから逆算したものです。種別ごとに、いちばん近い実物のページを例として挙げます。新しいページを書くときも、既存のページを移すときも、その例に寄せてください。
 
 現行ページには複数の種別が混ざっています。例えば [RenderObjects](RenderObjects.md) の「差分更新」節は、伝播の仕組み(Architecture)と「プロパティを変更したら `MarkNeedsLayout()` / `MarkNeedsPaint()` を呼ぶ」という契約(Requirements)が同じ節にあります。再編では、混ざっている節を種別ごとに分けるか、別種別のページへリンクします。
 
@@ -211,7 +284,7 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 
 - **なぜその設計にしたか** → Design。「Flutter と同じ戦略」と一言添えるのはよいが、比較した選択肢と理由は Design に置く(例: RenderObjects の Semantics の注記は、理由を書かずに APIDesign へリンクしている)
 - **変更後も守る条件の列挙** → Requirements。Architecture には現在の仕組みを書き、満たすべき条件は Requirements に書く
-- **利用者向けの使い方と注意** → User docs。「intrinsic 測定はコストに注意」のような利用者向けの注意は、再編で User 側へ抜き出す
+- **利用者向けの使い方と注意** → コンセプトかユーザー向け。「intrinsic 測定はコストに注意」のような利用者向けの注意は、再編でコンセプトへ抜き出す
 - **API のシグネチャと引数の契約** → XML ドキュメントコメント。組み込みの一覧表は API Reference と重なるため、再編で整理する
 
 コントリビュータ向けサンプル(#188 の分類で `PaintingSample` / `PrimitiveOverlay`)は、Architecture の実例として本文からリンクできます。
@@ -263,7 +336,7 @@ Contributor docs は、現行の `docs/` のページを `contributor/` へ移�
 
 実装を変えても**維持する条件**を書きます。読者は、変更が何を壊しうるかを確認するコントリビュータとレビュアーです。
 
-Requirements の独立したページはまだありません。いちばん近い実物は、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
+Requirements は、層ごとの Reference に書きます。今は [Requirements](Requirements.md) の骨組みだけがあります。いちばん近い実物は、[REVIEW.md](../../REVIEW.md) の「4. FloatSoda 固有の不変条件」、[APIDesign](APIDesign.md) の「差異が必要な場合の記録義務」、台帳のエントリ(`Test` 欄で検証方法と対になる)です。テンプレートはこれらの形から逆算したものです。ツリーの不変条件(所有権・ライフサイクル・差分更新・Layer)の置き場所は REVIEW.md の 4 章のままです([AGENTS.md](../../AGENTS.md) の規約表)。再編で Requirements のページを作るときは、4 章を複製せずにリンクします。4 章に無い条件(observable behavior、failure mode、検証方法、Flutter との関係)は Requirements 側に書きます。
 
 書くもの:
 
@@ -318,6 +391,56 @@ Requirements の独立したページはまだありません。いちばん近�
 ## 規約               — 必須 / 推奨を明示
 ## 手順               — 順番どおりに実行できる形
 ## 規約が守られる場所 — CI、テンプレート、lint、verify
+## 関連
+```
+
+### 貢献までの流れ
+
+その層で**最初の PR を出すまで**の一本道を書きます。種別は Tutorial です。読者は、その層を初めて触り、手を動かしながら貢献のしかたを覚えたいコントリビュータです。
+
+書くもの:
+
+- **小さな題材** — 1つの PR で終わる大きさにする。全体の層は docs の小さな修正、三つのツリーの層は Flutter のウィジェットを1つ移植する、のように層ごとに1つ選ぶ(題材の一覧は [再編の地図](#再編の地図))
+- **手順** — 読者が上から順に実行すると PR が出せる形にする
+- **規約へのリンク** — ブランチ名、テスト観点、PR の書き方は [CONTRIBUTING.md](../../CONTRIBUTING.md) の該当する節へリンクする
+
+書かないもの:
+
+- **規約の再掲** — CONTRIBUTING.md の本文を写さない。写すと、片方だけが更新されて食い違う
+- **仕組みの説明** → その層の Explanation。手順の途中では一文で触れてリンクする
+
+```text
+# 〜して PR を出す
+## 作るもの
+## 前提
+## Step 1 …
+## Step 2 …
+## PR を出す   — CONTRIBUTING.md の該当する節へリンク
+## 次に読むもの
+```
+
+### 実験
+
+FloatSoda の**動作原理の問い**を、動かして確かめます。読者は、FloatSoda の内部に興味を持ち始めた人です。実験の目的は、コントリビュータになってもらう入口として、面白いと思ってもらうことです。
+
+書くもの:
+
+- **問いのタイトル** — 「〜はどうなっているの?」のように、動作原理の問いにする(例: 「SteamVR へのテクスチャ転送はどうなっているの?」)
+- **目に見える結果** — どの実験も、目に見える絵か数で終える。最初の絵が見えるまでのコードは50行以内を目安にする(数値は仮の値で、書きながら見直す)
+- **壊して直す一手** — わざと壊すと結果が変わり、直すと戻る操作を1つ入れる
+- **なぜそうなるか** — 今見た結果の理由を1〜2段落で書き、仕組みの本体はその層の Explanation の節へリンクする
+
+書かないもの:
+
+- **仕組みの本体** → その層の Explanation。同じ説明を実験と Explanation の2か所に書かない
+- **ほかの層に依存する手順** — 実験は層ごとに独立させ、どの実験からでも始められるようにする
+
+```text
+# 〜はどうなっているの?
+## 試すこと       — 動かすコード。最初の絵まで50行以内を目安
+## 見えるもの
+## 壊して直す
+## なぜそうなるか — 1〜2段落。続きは層の Explanation へリンク
 ## 関連
 ```
 
