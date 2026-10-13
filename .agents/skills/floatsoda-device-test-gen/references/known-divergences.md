@@ -253,6 +253,60 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
 - **Observation**: `HEADLESS`
 - **Label**: not ported(#275)— `ImageHandle` の貸し借りの形は LRU を足しても変わらないので、public API を壊さずに追加できる。
 
+## 16. 破棄した `GestureRecognizer` が、ポインタの route とジェスチャアリーナに残る
+
+- **FloatSoda**: `src/FloatSoda/Gesture/GestureRecognizer.cs:69` の `Dispose()` が空で、`TapGestureRecognizer` と
+  `PanGestureRecognizer` も上書きしない。`RawGestureDetectorState` は `src/FloatSoda/Widgets/Gesture/GestureDetector.cs:132`、
+  `:149-153` で `Dispose()` を呼ぶが、`PointerRouter` の route とアリーナへの参加が残る。押下中に `GestureDetector` を外すと、
+  指を離したときに外したウィジェットの `OnTap` が呼ばれる。入れ子で内側だけを外すと、外した内側が外側に勝つ。
+- **Flutter**: `OneSequenceGestureRecognizer.dispose` が `resolve(GestureDisposition.rejected)` を呼び、追跡中のポインタの
+  route をすべて外す(`gestures/recognizer.dart:485-493`)。
+- **Test**: — (not set)
+- **Docs**: — (not set)
+- **Observation**: `HEADLESS`
+- **Label**: port mistake(#297)
+
+## 17. `RenderTransform` のヒットテストが、変換前の大きさで範囲を切り、変換をヒットパスへ積まない
+
+- **FloatSoda**: `RenderTransform`(`src/FloatSoda/RenderObjects/Painting/RenderTransform.cs`)は `HitTest` を上書きせず、
+  継承した `src/FloatSoda/RenderObjects/RenderBox.cs:136-140` の `Size.Contains` が変換前の大きさで範囲を切る。
+  `HitTestChildren`(`RenderTransform.cs:84-98`)は子へ逆変換した座標を渡すだけで、`HitTestResult` に変換を積まない。
+  拡大や回転ではみ出した見た目の部分を押しても反応せず、`PointerEvent.Transform` は平行移動だけになる。
+  `src/FloatSoda/RenderObjects/Layout/RenderRotatedBox.cs:61-65` も、変換を積まない同じ形(再現は未実施)。
+- **Flutter**: `RenderTransform.hitTest` は範囲を確かめずに `hitTestChildren` を呼び、`hitTestChildren` は
+  `result.addWithPaintTransform` で変換を積む(`rendering/proxy_box.dart:2714-2733`)。
+- **Test**: — (not set)
+- **Docs**: — (not set)
+- **Observation**: `HEADLESS`
+- **Label**: port mistake(#298)
+
+## 18. クリップ系の RenderObject が、ヒットテストでクリップの形を見ない
+
+- **FloatSoda**: `src/FloatSoda/RenderObjects/Painting/RenderCustomClip.cs:33-102` の基底クラスと4つの派生クラス(`:107`、
+  `:133`、`:171`、`:208`)は、どれも `HitTest` を上書きせず、箱の範囲だけで判定する。`ClipOval` の楕円の外の角や、
+  `Clipper` で切り落とした領域を押しても、子が反応する。
+- **Flutter**: `RenderClipOval.hitTest` は `clipper` の有無によらず楕円の外を除く(`rendering/proxy_box.dart:1921-1935`)。
+  `RenderClipRect` / `RenderClipRRect` / `RenderClipPath` は、`clipper` があるときに `_clip.contains` の外を除く
+  (`:1628-1638`、`:1733-1743`、`:2009-2019`)。`clipper` の無い `ClipRRect` の角は、Flutter でも反応する。
+- **Test**: — (not set)
+- **Docs**: — (not set)
+- **Observation**: `HEADLESS`
+- **Label**: port mistake(#299)— RenderObject は移植済みで、`hitTest` の上書きだけが持ち込まれていない。
+
+## 19. `FlushPaint` が、汚れた再描画境界を浅い順(親が先)に処理する
+
+- **FloatSoda**: `src/FloatSoda/Core/RenderPipeline.cs:57` が `NodesNeedingPaint.OrderBy(x => x.Depth)` で浅い順に処理する
+  (XML ドキュメントコメントも「祖先から子孫の順に」)。親子がともに汚れたときは、親の `CompositeChild`
+  (`src/FloatSoda/RenderObjects/PaintingContext.cs:246-257`)が子を先に描き直すので、描き直しの回数と結果は Flutter と同じ。
+  違うのは、祖先関係のない境界どうしの `Paint` の呼び出し順だけ。深い境界の `Paint` が書いた共有の値を、別のサブツリーの
+  浅い境界が読むと、浅い境界は1フレーム古い値で描く(一時的なテストで確認)。
+- **Flutter**: `PipelineOwner.flushPaint` は深い順(`b.depth - a.depth`)に処理する(`rendering/object.dart:1318-1319`)。
+  Flutter は flutter/flutter#98219 で浅い順に変えたが、Paint の順序に依存するテストが壊れたため flutter/flutter#98520 で元に戻した。
+- **Test**: — (not set)
+- **Docs**: — (not set)
+- **Observation**: `HEADLESS`
+- **Label**: unlabelled — FloatSoda 自身の描画結果には違いが出ない。Flutter に揃えるか、性能を理由に浅い順を残すかは未判断。
+
 ---
 
 ## Triage 2026-09-09 — 範囲の振り分けと着手順(Phase 2 リリース後に実施)
