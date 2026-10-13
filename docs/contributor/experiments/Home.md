@@ -2,7 +2,7 @@
 
 FloatSoda の動作原理の問いを、動かして確かめるページです。どの実験からでも始められます。書き方は [WritingDocumentation の「実験」](../WritingDocumentation.md#実験) にあります。
 
-> **骨組み** — 本文はまだありません。下は本文を書くための設計シートです(追跡: [#188](https://github.com/sumx21t-3310/FloatSoda/issues/188))。書き方は [WritingDocumentation](../WritingDocumentation.md) にあります。
+どの実験も、1つの `.cs` ファイルをリポジトリのルートに置き、`dotnet run` で動かします。.NET 10 SDK と、FloatSoda のリポジトリの clone が要ります。プラットフォームの2つの実験は SteamVR と HMD が要ります。ほかの実験は SteamVR なしで動きます。
 
 ## 実験の一覧
 
