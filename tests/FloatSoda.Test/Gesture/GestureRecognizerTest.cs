@@ -133,4 +133,38 @@ public class GestureRecognizerTest
         Assert.Equal(0, tapped);
         Assert.Equal(1, canceled);
     }
+
+    [Fact]
+    public void Dispose_ドラッグ中に破棄_以降のOnPanUpdateを呼ばない()
+    {
+        var harness = new Harness();
+        var updates = 0;
+        var pan = harness.Add(new PanGestureRecognizer { OnPanUpdate = _ => updates++ });
+
+        harness.Down(new Offset(0, 0));
+        harness.Move(new Offset(30, 0));
+        Assert.Equal(1, updates);
+
+        pan.Dispose();
+        harness.Move(new Offset(60, 0));
+
+        Assert.Equal(1, updates);
+    }
+
+    [Fact]
+    public void Dispose_押下中に破棄_OnTapCancelを呼びOnTapを呼ばない()
+    {
+        var harness = new Harness();
+        var tapped = 0;
+        var canceled = 0;
+        var tap = harness.Add(new TapGestureRecognizer { OnTap = () => tapped++, OnTapCancel = () => canceled++ });
+        harness.Add(new PanGestureRecognizer());
+
+        harness.Down(new Offset(5, 5));
+        tap.Dispose();
+        harness.Up(new Offset(5, 5));
+
+        Assert.Equal(0, tapped);
+        Assert.Equal(1, canceled);
+    }
 }

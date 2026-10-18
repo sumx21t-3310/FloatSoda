@@ -81,6 +81,18 @@ public class RenderTransform : RenderProxyBox
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// 変換前の<see cref="RenderBox.Size"/>では範囲を切らず、自身もヒット経路へ追加しません。
+    /// 拡大や回転ではみ出した見た目の部分も、子のヒットテストへ渡します。
+    /// Flutter の <c>RenderTransform.hitTest</c> に合わせています。
+    /// </remarks>
+    public override bool HitTest(HitTestResult result, Offset position) => HitTestChildren(result, position);
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <see cref="TransformHitTests"/>が<see langword="true"/>の場合は、変換を<paramref name="result"/>へ積んでから子を判定します。
+    /// そのため、子へ届く<see cref="FloatSoda.Abstractions.Input.PointerEvent.Transform"/>に拡大や回転が反映されます。
+    /// </remarks>
     public override bool HitTestChildren(HitTestResult result, Offset position)
     {
         if (!TransformHitTests)
@@ -88,13 +100,10 @@ public class RenderTransform : RenderProxyBox
             return base.HitTestChildren(result, position);
         }
 
-        if (!Matrix3x2.Invert(GetEffectiveTransform(), out var inverse))
-        {
-            return false;
-        }
-
-        var transformed = Vector2.Transform(new Vector2((float)position.X, (float)position.Y), inverse);
-        return Child?.HitTest(result, new Offset(transformed.X, transformed.Y)) ?? false;
+        return result.AddWithPaintTransform(
+            GetEffectiveTransform(),
+            position,
+            (r, transformed) => Child?.HitTest(r, transformed) ?? false);
     }
 
     private Matrix3x2 GetEffectiveTransform()

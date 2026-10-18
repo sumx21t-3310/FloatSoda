@@ -1,6 +1,7 @@
 ﻿using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.Geometrics;
+using FloatSoda.Gesture;
 using SkiaSharp;
 
 namespace FloatSoda.RenderObjects.Painting;
@@ -110,6 +111,18 @@ public class RenderClipRect : RenderCustomClip<SKRect>
     protected override SKRect DefaultClip => SKRect.Create(Offset.Zero, Size);
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <see cref="RenderCustomClip{T}.Clipper"/>が設定されている場合、クリップ領域の外の位置はヒットしません。
+    /// 設定されていない場合のクリップ領域は自身の範囲と同じなので、通常の判定と変わりません。
+    /// </remarks>
+    public override bool HitTest(HitTestResult result, Offset position)
+    {
+        if (Clipper != null && !Clip.Contains((float)position.X, (float)position.Y)) return false;
+
+        return base.HitTest(result, position);
+    }
+
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
     {
         if (Child != null)
@@ -143,6 +156,23 @@ public class RenderClipRoundRect : RenderCustomClip<SKRoundRect>
 
     /// <inheritdoc/>
     protected override SKRoundRect DefaultClip => BorderRadius.ToRoundRect(SKRect.Create(Offset.Zero, Size));
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <see cref="RenderCustomClip{T}.Clipper"/>が設定されている場合、角丸矩形の外の位置はヒットしません。
+    /// 設定されていない場合は角の外も含めて自身の範囲でヒットします。Flutter の <c>RenderClipRRect</c> に合わせています。
+    /// </remarks>
+    public override bool HitTest(HitTestResult result, Offset position)
+    {
+        if (Clipper != null)
+        {
+            using var path = new SKPath();
+            path.AddRoundRect(Clip);
+            if (!path.Contains((float)position.X, (float)position.Y)) return false;
+        }
+
+        return base.HitTest(result, position);
+    }
 
     /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
@@ -182,6 +212,18 @@ public class RenderClipPath : RenderCustomClip<SKPath>
     }
 
     /// <inheritdoc/>
+    /// <remarks>
+    /// <see cref="RenderCustomClip{T}.Clipper"/>が設定されている場合、パスの外の位置はヒットしません。
+    /// 設定されていない場合のクリップ領域は自身の範囲と同じなので、通常の判定と変わりません。
+    /// </remarks>
+    public override bool HitTest(HitTestResult result, Offset position)
+    {
+        if (Clipper != null && !Clip.Contains((float)position.X, (float)position.Y)) return false;
+
+        return base.HitTest(result, position);
+    }
+
+    /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)
     {
         if (Child != null)
@@ -209,6 +251,21 @@ public class RenderClipOval : RenderCustomClip<SKRect>
 {
     /// <inheritdoc/>
     protected override SKRect DefaultClip => SKRect.Create(Offset.Zero, Size);
+
+    /// <inheritdoc/>
+    /// <remarks>
+    /// <see cref="RenderCustomClip{T}.Clipper"/>の有無にかかわらず、クリップ領域に内接する楕円の外の位置はヒットしません。
+    /// Flutter の <c>RenderClipOval</c> に合わせています。
+    /// </remarks>
+    public override bool HitTest(HitTestResult result, Offset position)
+    {
+        var clip = Clip;
+        var dx = (position.X - clip.MidX) / clip.Width;
+        var dy = (position.Y - clip.MidY) / clip.Height;
+        if ((dx * dx) + (dy * dy) > 0.25) return false;
+
+        return base.HitTest(result, position);
+    }
 
     /// <inheritdoc/>
     public override void Paint(PaintingContext context, Offset offset)

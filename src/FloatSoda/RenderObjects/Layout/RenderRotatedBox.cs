@@ -59,11 +59,10 @@ public class RenderRotatedBox : RenderProxyBox
 
     /// <inheritdoc/>
     public override bool HitTestChildren(HitTestResult result, Offset position)
-    {
-        if (!Matrix3x2.Invert(GetTransform(), out var inverse)) return false;
-        var transformed = Vector2.Transform(new Vector2((float)position.X, (float)position.Y), inverse);
-        return Child?.HitTest(result, new Offset(transformed.X, transformed.Y)) ?? false;
-    }
+        => result.AddWithPaintTransform(
+            GetTransform(),
+            position,
+            (r, transformed) => Child?.HitTest(r, transformed) ?? false);
 
     private Matrix3x2 GetTransform() => QuarterTurns switch
     {

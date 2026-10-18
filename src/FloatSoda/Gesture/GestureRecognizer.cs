@@ -16,6 +16,9 @@ public abstract class GestureRecognizer : IGestureArenaMember, IDisposable
     /// <summary>後続イベントを購読するルータ。<see cref="Bind"/> で注入される。</summary>
     protected PointerRouter Router { get; private set; } = null!;
 
+    /// <summary>ルータへ購読を登録し、まだ解除していないポインターの識別子。</summary>
+    private readonly HashSet<int> _trackedPointers = [];
+
     /// <summary>ウィンドウの共有アリーナ／ルータを注入する。生成直後に一度だけ呼ばれる。</summary>
     /// <param name="arena">認識器が参加するウィンドウ単位のジェスチャアリーナ。</param>
     /// <param name="router">後続のポインターイベントを配送するルータ。</param>
@@ -35,7 +38,7 @@ public abstract class GestureRecognizer : IGestureArenaMember, IDisposable
     {
         if (downEvent.Phase != PointerEventPhase.Down) return;
 
-        Router.AddRoute(downEvent.PointerId, HandleEvent);
+        if (_trackedPointers.Add(downEvent.PointerId)) Router.AddRoute(downEvent.PointerId, HandleEvent);
         Arena.Add(downEvent.PointerId, this);
         AddAllowedPointer(downEvent);
     }
@@ -49,7 +52,9 @@ public abstract class GestureRecognizer : IGestureArenaMember, IDisposable
     /// <summary>このポインターの購読を解除する（勝敗確定後の後始末）。</summary>
     /// <param name="pointer">購読を解除するポインター識別子。</param>
     protected void StopTrackingPointer(int pointer)
-        => Router.RemoveRoute(pointer, HandleEvent);
+    {
+        if (_trackedPointers.Remove(pointer)) Router.RemoveRoute(pointer, HandleEvent);
+    }
 
     /// <summary>Down 受理時にサブクラスが初期状態を作る。</summary>
     /// <param name="downEvent">受理したDownフェーズのポインターイベント。</param>
@@ -65,6 +70,20 @@ public abstract class GestureRecognizer : IGestureArenaMember, IDisposable
     /// <inheritdoc />
     public abstract void RejectGesture(int pointer);
 
-    /// <inheritdoc />
-    public virtual void Dispose() { }
+    /// <summary>
+    /// 追跡中のすべてのポインターについてアリーナへ辞退を宣言し、ルータの購読を解除します。
+    /// </summary>
+    /// <remarks>
+    /// 押下中に破棄された認識器が、後続の Up でコールバックを呼んだり、アリーナに残って
+    /// ほかの認識器の勝利を妨げたりしないようにします。Flutter の
+    /// <c>OneSequenceGestureRecognizer.dispose</c> に相当します。
+    /// </remarks>
+    public virtual void Dispose()
+    {
+        foreach (var pointer in _trackedPointers.ToArray())
+        {
+            Resolve(pointer, GestureDisposition.Rejected);
+            StopTrackingPointer(pointer);
+        }
+    }
 }

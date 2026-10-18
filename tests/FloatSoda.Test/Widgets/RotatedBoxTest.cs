@@ -93,6 +93,26 @@ public class RotatedBoxTest
     }
 
     [Fact]
+    public void HitTestChildren_90度回転_子のエントリに回転を含む変換を積む()
+    {
+        var child = new RenderColoredBox
+        {
+            Child = new RenderConstrainedBox { AdditionalConstraints = BoxConstraints.Tight(40, 20) }
+        };
+        var rotated = new RenderRotatedBox { QuarterTurns = 1, Child = child };
+        rotated.Layout(BoxConstraints.Loose(100, 100));
+        var result = new HitTestResult();
+
+        Assert.True(rotated.HitTest(result, new Offset(15, 5)));
+
+        // 子の (x, y) は親の (20 - y, x) に描かれるので、親の (15, 5) は子の (5, 5)
+        var entry = Assert.Single(result.Path, e => ReferenceEquals(e.Target, child));
+        var local = System.Numerics.Vector2.Transform(new System.Numerics.Vector2(15, 5), entry.Transform!.Value);
+        Assert.Equal(5f, local.X, 3);
+        Assert.Equal(5f, local.Y, 3);
+    }
+
+    [Fact]
     public void QuarterTurns_更新時_LayoutDirtyにして寸法を更新する()
     {
         var rotated = new RenderRotatedBox
