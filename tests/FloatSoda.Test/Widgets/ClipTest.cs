@@ -97,6 +97,47 @@ public class ClipTest
         Assert.Equal(["tap"], log);
     }
 
+    [Fact]
+    public void HitTest_ClipRoundRectとClipperで角の円の内側を押す_子が反応する()
+    {
+        var log = new List<string>();
+
+        // 半径 40 の左上の角の円の中心は (40,40)。(15,15) までの距離は約 35 なので円の内側
+        Tap(new ClipRoundRect { Clipper = new RoundedFull(), Child = Tappable(log) }, 15, 15);
+
+        Assert.Equal(["tap"], log);
+    }
+
+    [Fact]
+    public void Clip_ポインターを何度も動かす_ClipperのGetClipを呼び直さない()
+    {
+        var clipper = new CountingLeftHalf();
+        var binding = new WidgetBinding(new RenderView());
+        binding.AttachRootWidget(new ClipRect { Clipper = clipper, Child = Tappable([]) });
+        binding.FlushBuildAndLayout();
+
+        binding.HandlePointerEvent(new PointerEvent(1, PointerEventPhase.Add, new Offset(10, 10)));
+        for (var x = 10; x < 20; x++)
+        {
+            binding.HandlePointerEvent(new PointerEvent(1, PointerEventPhase.Move, new Offset(x, 10)));
+        }
+
+        Assert.Equal(1, clipper.GetClipCount);
+    }
+
+    private sealed class CountingLeftHalf : CustomClipper<SKRect>
+    {
+        public int GetClipCount { get; private set; }
+
+        public override SKRect GetClip(SKSize size)
+        {
+            GetClipCount++;
+            return new SKRect(0, 0, size.Width / 2, size.Height);
+        }
+
+        public override bool ShouldReclip(CustomClipper<SKRect> oldClipper) => false;
+    }
+
     private sealed class LeftHalf : CustomClipper<SKRect>
     {
         public override SKRect GetClip(SKSize size) => new(0, 0, size.Width / 2, size.Height);
