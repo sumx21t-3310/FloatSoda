@@ -7,6 +7,8 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-30
+
 ### Added
 
 - `Color.FromArgb(uint)` / `Color.FromArgb(a, r, g, b)` / `Color.FromRgbo(r, g, b, opacity)` を追加。Flutter の `Color(int)` / `Color.fromARGB` / `Color.fromRGBO` に当たる。`FromArgb(uint)` は `0xAARRGGBB` の並び順で読む。`FromRgbo` は `opacity` が 0.0〜1.0 の範囲の外か `NaN` のとき `ArgumentOutOfRangeException` を投げる(#367)
@@ -16,13 +18,30 @@
 
 ### Changed (Breaking)
 
+- `Flex` / `Row` / `Column` の既定の配置を、`MainAxisAlignment.Center` / `CrossAxisAlignment.Start` から、Flutter と同じ `MainAxisAlignment.Start` / `CrossAxisAlignment.Center` へ変更。従来の配置が必要なら、両プロパティを指定する(#359)
+- `ClipRect` の `ClipBehavior` の既定値を、`Clip.Antialias` から、Flutter と同じ `Clip.HardEdge` へ変更(#359)
+- `Image` / `RenderImage` の `Fit` の既定値を、`BoxFit.Contain` から、Flutter と同じ `BoxFit.ScaleDown` へ変更。領域より小さい画像は、原寸のまま表示される。従来どおり拡大するなら `Fit = BoxFit.Contain` を指定する(#359)
+- `IgnorePointer` / `RenderIgnorePointer` の `Ignoring` の既定値を、`false` から、Flutter と同じ `true` へ変更。`Ignoring` を省略した `IgnorePointer` は、子への入力を無視する(#359)
+- `ColoredBox.Color` を `required` に変更。`Color` を省略した `ColoredBox` はコンパイルエラーになるため、色を指定する(#359)
+- `Align` / `RenderPositionedBox` の `WidthFactor` / `HeightFactor` に負数か NaN を渡すと、`ArgumentOutOfRangeException` を投げるようにした(#359)
+- 親の再ビルドで、値が等しい別インスタンスの Widget を渡したときも、子の Element を更新するようにした。そのため `Builder` などの `Build` が呼び直される。更新を省くのは、Flutter と同じく同じインスタンスを渡したときだけになる(#362)
 - `Color` のコンストラクターで、`Red` / `Green` / `Blue` を必須にした。`new Color(Red: 255)` のように成分を省いた呼び出しは、白ではなくコンパイルエラーになる。`Alpha` の既定値 255 は変わらない(#367)
 - `HSVColor` / `HSLColor` を公開 API から外した(`internal` にした)。どちらも変換が `NotImplementedException` を投げるだけだった(#367)
 - `RenderColoredBox.Color` と、`FloatSoda.UI.Cream.ButtonStyle` / `FloatSoda.UI.FizzyPop.ButtonStyle` の `BackgroundColor` / `PressedBackgroundColor` / `DisabledBackgroundColor` の型を、`SKColor` から `Color` に変えた。`SKColor` からの暗黙変換は残っているため、`SKColors.Red` の代入はそのまま通る(#367)
 - `Container` の `Decoration` に `Border` があるとき、ボーダーの太さを `Padding` に加算するようにした。`Padding` を省略しても、子がボーダーの内側に収まる。Flutter の `Container` と同じ挙動で、`Border` 付きの `Container` では子のレイアウト領域がボーダーの太さぶん狭くなる(#267)
 
+### Changed
+
+- Flutter と同じく、`IntrinsicWidth.StepWidth` に 0 を指定できるようにした。0 は `null` と同じく、幅を丸めないことを表す(#359)
+
 ### Fixed
 
+- `ClipBehavior` に `Clip.None` を指定した `ClipRect` / `ClipRoundRect` / `ClipOval` / `ClipCustomPath` が、子を切り抜いていた問題を修正。Flutter と同じく、切り抜かずに描画する(#359)
+- `ClipRoundRect` の `BorderRadius` を変えても、角丸のクリップが描き直されない問題を修正(#359)
+- `Image` を包んだ `GestureDetector` / `Listener` で、画像を押しても反応しない問題を修正。Flutter と同じく、画像の領域内なら常にヒットする(#359)
+- 祖先と子孫が同じフレームで再ビルドを予約すると、子孫の `Build` が2回呼ばれる問題を修正(#362)
+- `PostTaskRunner` を `Stop()` で正常に止めたときも、`ObjectDisposedException` のエラーログが残る問題を修正(#216)
+- `PostTaskRunner` の `Stop()` で終了待ちがタイムアウトしたあと、`Start()` で再開すると、新しいスレッドの更新ループまで止まる問題を修正(#216)
 - `VRSettingsException` / `VRNotificationException` / `VRScreenshotException` / `VRCompositorException` / `TrackedPropertyException` の `ThrowIfError` が、対応表にないエラー値で `ArgumentOutOfRangeException` を投げていた問題を修正。対応表にない値でも、各クラスの型付き例外を「予期しない〜エラー」のメッセージで投げる。`EVRSettingsError.AccessDenied` と `EVRNotificationError.ServiceUnavailable` には専用のメッセージを追加した(#295)
 - 指やポインタを押している最中に `GestureDetector` をツリーから外すと、離したときに外したウィジェットの `OnTap` が呼ばれる問題を修正。入れ子の `GestureDetector` で内側だけを外したとき、外側のタップが失われる問題もあわせて修正。破棄した認識器がジェスチャアリーナに残り、後続のイベントも受け取り続けていた(#297)
 - `Transform` で拡大や回転をかけた子の、レイアウト上の大きさからはみ出した見た目の部分を押しても反応しない問題を修正。子へ届く `PointerEvent.Transform` に拡大や回転が入らない問題もあわせて修正。`RotatedBox` の `PointerEvent.Transform` も回転を含むようにした(#298)
@@ -154,7 +173,8 @@
 - メインスレッドとレンダースレッドのレイヤークローンによる分離
 - NuGetパッケージのメタデータ整備・リリース自動化(Directory.Build.props / CHANGELOG / Trusted Publishingによるリリースワークフロー)
 
-[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.4.0...main
+[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.5.0...main
+[0.5.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.5.0
 [0.4.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.4.0
 [0.3.1]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.3.1
 [0.3.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.3.0
