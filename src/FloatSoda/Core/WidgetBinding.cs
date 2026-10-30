@@ -169,7 +169,11 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         RenderViewElement = new RenderObjectToWidgetAdapter
         {
             Child = rootWidget,
-            Container = Pipeline.RenderView,
+            Container =
+                Pipeline?.RenderView
+                ?? throw new InvalidOperationException(
+                    "EnsureInitialized が呼ばれる前に AttachRootWidget が呼ばれました。"
+                ),
         }.AttachToRenderTree(
             BuildOwner,
             RenderViewElement as RenderObjectToWidgetElement<RenderView>

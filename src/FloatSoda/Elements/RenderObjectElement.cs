@@ -304,7 +304,7 @@ public abstract class RenderObjectElement<T> : RenderObjectElement
     /// </summary>
     public override void PerformRebuild()
     {
-        WidgetCascaded?.UpdateRenderObject(RenderObject as T);
+        WidgetCascaded?.UpdateRenderObject((T)RenderObject!);
         Dirty = false;
     }
 }

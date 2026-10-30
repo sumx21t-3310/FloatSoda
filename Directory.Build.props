@@ -11,7 +11,7 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
-        <WarningsAsErrors>$(WarningsAsErrors);RCS1248;RS0016;RS0017</WarningsAsErrors>
+        <WarningsAsErrors>$(WarningsAsErrors);RCS1248;RS0016;RS0017;nullable</WarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup>

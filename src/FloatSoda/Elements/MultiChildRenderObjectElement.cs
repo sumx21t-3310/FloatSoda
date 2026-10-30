@@ -55,9 +55,9 @@ public class MultiChildRenderObjectElement<T> : RenderObjectElement<T>
     public override void VisitChildren(Action<Element> visitor) => Children.ForEach(visitor);
 
     /// <inheritdoc/>
-    public override void InsertRenderObjectChild(RenderObject child)
+    public override void InsertRenderObjectChild(RenderObject? child)
     {
-        if (RenderObject is IHasMultiChildrenRenderObject ro)
+        if (child is not null && RenderObject is IHasMultiChildrenRenderObject ro)
             ro.AddChild(child);
     }
 
