@@ -1,1 +1,3 @@
 #nullable enable
+*REMOVED*override FloatSoda.Elements.MultiChildRenderObjectElement<T>.InsertRenderObjectChild(FloatSoda.RenderObjects.RenderObject! child) -> void
+override FloatSoda.Elements.MultiChildRenderObjectElement<T>.InsertRenderObjectChild(FloatSoda.RenderObjects.RenderObject? child) -> void
