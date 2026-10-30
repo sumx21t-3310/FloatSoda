@@ -6,7 +6,7 @@ namespace FloatSoda.Hooks;
 
 public abstract record HookWidget : Widget
 {
-    public Widget Child { get; init; }
+    public required Widget Child { get; init; }
 
     // 現在ビルド中のElementを追跡するためのスレッドローカル（または引数経由）の仕組み
     // ここでは単純化のため、Build時にContextから取得する設計にします
