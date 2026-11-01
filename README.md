@@ -99,8 +99,6 @@ cd MyOverlayApp
 dotnet add package FloatSoda
 ```
 
-<!-- ※要確認: `dotnet add package FloatSoda` が新規プロジェクトで通ること。docs/guide/3-prepare/set-up-environment.md にも同じ ※要確認 がある -->
-
 作ったアプリを動かす PC に要るものと、つまずいたときの対処は、リファレンスの[動作環境](docs/reference/requirements.md)とガイドの[開発環境を用意する](docs/guide/3-prepare/set-up-environment.md)にあります。
 
 ## ドキュメント
