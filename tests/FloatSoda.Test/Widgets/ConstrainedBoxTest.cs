@@ -98,6 +98,56 @@ public class ConstrainedBoxTest
     }
 
     [Fact]
+    public void PerformLayout_子なしで親制約を固定から緩和_最小サイズへ縮む()
+    {
+        var renderObject = new RenderConstrainedBox
+        {
+            AdditionalConstraints = BoxConstraints.TightFor(),
+        };
+        renderObject.Layout(BoxConstraints.Tight(100, 100));
+        Assert.Equal(new SKSize(100, 100), renderObject.Size);
+
+        renderObject.Layout(BoxConstraints.Loose(300, 300));
+
+        Assert.Equal(new SKSize(0, 0), renderObject.Size);
+        Assert.Equal(renderObject.GetDryLayout(BoxConstraints.Loose(300, 300)), renderObject.Size);
+    }
+
+    [Fact]
+    public void PerformLayout_子なしで追加制約を固定から解除_最小サイズへ縮む()
+    {
+        var renderObject = new RenderConstrainedBox
+        {
+            AdditionalConstraints = BoxConstraints.TightFor(100, 100),
+        };
+        renderObject.Layout(BoxConstraints.Loose(300, 300));
+        Assert.Equal(new SKSize(100, 100), renderObject.Size);
+
+        renderObject.AdditionalConstraints = BoxConstraints.TightFor();
+        renderObject.Layout(BoxConstraints.Loose(300, 300));
+
+        Assert.Equal(new SKSize(0, 0), renderObject.Size);
+    }
+
+    [Fact]
+    public void WidgetUpdate_子なしのSizedBoxの寸法指定を解除_最小サイズへ縮む()
+    {
+        var (pipeline, view, root) = Mount(new SizedBox { Width = 100, Height = 100 });
+        pipeline.FlushLayout();
+        Assert.Equal(new SKSize(100, 100), view.Size);
+
+        new RenderObjectToWidgetAdapter
+        {
+            Container = view,
+            Child = new SizedBox(),
+        }.AttachToRenderTree(root.Owner!, root);
+        root.Owner!.BuildScope();
+        pipeline.FlushLayout();
+
+        Assert.Equal(new SKSize(0, 0), view.Size);
+    }
+
+    [Fact]
     public void PerformLayout_最小値が最大値を超える追加制約_ArgumentExceptionを投げる()
     {
         var renderObject = new RenderConstrainedBox

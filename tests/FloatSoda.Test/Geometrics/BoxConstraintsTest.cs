@@ -74,6 +74,47 @@ public class BoxConstraintsTest
     }
 
     [Fact]
+    public void Expand_引数なし_両軸の最小値と最大値が無限になる()
+    {
+        var c = BoxConstraints.Expand();
+
+        Assert.Equal(double.PositiveInfinity, c.MinWidth);
+        Assert.Equal(double.PositiveInfinity, c.MaxWidth);
+        Assert.Equal(double.PositiveInfinity, c.MinHeight);
+        Assert.Equal(double.PositiveInfinity, c.MaxHeight);
+    }
+
+    [Fact]
+    public void Expand_幅だけ指定_幅を固定し高さは無限になる()
+    {
+        var c = BoxConstraints.Expand(width: 100);
+
+        Assert.Equal(100, c.MinWidth);
+        Assert.Equal(100, c.MaxWidth);
+        Assert.Equal(double.PositiveInfinity, c.MinHeight);
+        Assert.Equal(double.PositiveInfinity, c.MaxHeight);
+    }
+
+    [Fact]
+    public void Expand_高さだけ指定_高さを固定し幅は無限になる()
+    {
+        var c = BoxConstraints.Expand(height: 80);
+
+        Assert.Equal(double.PositiveInfinity, c.MinWidth);
+        Assert.Equal(double.PositiveInfinity, c.MaxWidth);
+        Assert.Equal(80, c.MinHeight);
+        Assert.Equal(80, c.MaxHeight);
+    }
+
+    [Fact]
+    public void Expand_有限の親制約へEnforce_親の最大値に固定される()
+    {
+        var c = BoxConstraints.Expand().Enforce(BoxConstraints.Loose(300, 200));
+
+        Assert.Equal(BoxConstraints.Tight(300, 200), c);
+    }
+
+    [Fact]
     public void Loose_SetsMinToZero()
     {
         var c = BoxConstraints.Loose(500, 300);
