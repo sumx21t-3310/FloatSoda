@@ -32,10 +32,6 @@ Conventions have one canonical home each. **Read the canon before acting on a co
 | Code review criteria — priorities, finding bar, FloatSoda tree invariants | `REVIEW.md` |
 | API design principles and Flutter parity (including when a divergence is allowed and how to record it) | `API_DESIGN.md` |
 | Release procedure | `RELEASING.md` |
-| Where a piece of documentation goes, and which docs a change must update (Documentation Impact Matrix) | `WRITING_DOCUMENTATION.md` |
-| Writing style of `docs/`, sample READMEs, and Issue / PR bodies | `CONTRIBUTING.md` 「ドキュメントのトンマナ」 |
-| XML documentation comments | `DOCUMENTATION_COMMENTS.md` |
-| Default language (Japanese) and exception messages | `LOCALIZATION.md` |
 
 Three that catch agents out most often:
 
@@ -103,40 +99,115 @@ Tests use xunit. `FloatSoda.Test` tests geometry types, RenderObjects, and Widge
 
 ### Test naming
 
-Test method names follow **`MemberName_条件_期待結果`** (member name in English, condition and expected result in Japanese). What to test — boundaries, invalid inputs, lifecycle, incremental behavior, a regression test for every bug fix, and Flutter's own branches and tests for Flutter-derived widgets — is a separate convention. Both live in `CONTRIBUTING.md` (「テストの命名」「テスト観点」).
+Test method names follow **`MemberName_条件_期待結果`**: the leading member name stays English, the condition and expected result are written in **Japanese**. Test class names stay English (they mirror the type under test).
+
+```csharp
+[Fact]
+public void ComputeOffset_親子が同サイズ_原点を返す() { ... }
+
+[Fact]
+public void BorderSide_Widthが負_ArgumentOutOfRangeExceptionを投げる() { ... }
+```
+
+Do not use `[Fact(DisplayName = "…")]` — it duplicates the intent and drifts. Do not bulk-rename existing tests; apply this to new tests only. Full rules: `CONTRIBUTING.md`.
+
+**What to test** — normal behavior, boundary/degenerate and invalid inputs, state transitions, tree lifecycle, incremental behavior, and a regression test for every bug fix — is a separate convention, also in `CONTRIBUTING.md`. For Flutter-derived widgets it requires checking Flutter's own branches and tests, not just imagining cases.
 
 ## Project Structure
 
 | Project | Role |
 |---|---|
 | `src/FloatSoda.Abstractions` | Shared engine contracts, geometry types, input events, and frame pacing |
-| `src/FloatSoda.Rendering` | Skia Layer tree, shared Layer renderer, and bitmap rendering |
-| `src/FloatSoda.Engine` | Platform layer: GLFW/OpenGL window, renderer, and the render-thread task runner |
-| `src/FloatSoda.OVR` | OpenVR wrappers, overlay types, and VR event dispatch |
-| `src/FloatSoda` | Framework core: Widget / Element / RenderObject trees and the frame pipeline |
+| `src/FloatSoda.Rendering` | Skia layer tree, shared Layer renderer, and bitmap rendering |
+| `src/FloatSoda.Engine` | Platform layer: GLFW/OpenGL (`GLView`), `Renderer`, `OverlayWindow`, `RenderThreadRunner`, `FramePacer` |
+| `src/FloatSoda.OVR` | OpenVR wrappers, overlay types (`DashboardOverlay`, `WorldSpaceOverlay`, `DeviceTrackedOverlay`), `VREventDispatcher`, and exception types |
+| `src/FloatSoda` | Framework core: RenderObject tree, Widget/Element system, `RenderPipeline`, `FloatSodaApp` |
 | `src/FloatSoda.Testing` | Headless Widget and RenderObject bitmap renderers for tests and tooling |
-| `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets, no visuals |
-| `src/FloatSoda.UI.Cream` / `src/FloatSoda.UI.FizzyPop` | The two design systems: state → visual mapping only |
-| `src/FloatSoda.Hooks` | R3-based hooks for widgets |
-| `samples/` | Runnable samples, one directory per sample (most require SteamVR running) |
-| `tests/` | xunit tests: `FloatSoda.Test` (geometry, RenderObjects, Widgets) and `FloatSoda.Rendering.Test` (Layer tree) |
-| `docs/` | Source of the docs site, one directory per site tab. Every `.md` under it becomes a site page, so do not put scratch files there |
-| `website/` | Docs site (Astro Starlight) generated from `docs/`. Edit `docs/`, never `website/src/content/docs/` — see `website/README.md` |
+| `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets (`ButtonBase`, `InteractionState`), no visuals — see `docs/contributor/2-understand/ui-layer.md`. **Planned for Phase 5, not yet usable** |
+| `src/FloatSoda.UI.Cream` | Design system #1: retro creamy colors, flat design (`Button`, `ButtonStyle`, `CreamTheme`). **Planned for Phase 5, not yet usable** |
+| `src/FloatSoda.UI.FizzyPop` | Design system #2: translucency / glassmorphism (`Button`, `ButtonStyle`, `FizzyPopTheme`). **Planned for Phase 5, not yet usable** |
+| `src/FloatSoda.Hooks` | R3-based `HookWidget` / `HookElement`; partially implemented, not yet integrated with the build loop |
+| `samples/FloatSoda.Samples.OverlayApp` | Runnable sample (requires SteamVR running) |
+| `tests/FloatSoda.Test` | xunit tests for geometry types, RenderObjects, and Widgets |
+| `tests/FloatSoda.Rendering.Test` | xunit tests for the Layer tree |
+| `docs/` | Developer documentation, being rebuilt under #219: one directory per site tab (`tutorials/`, `guide/`, `reference/`, `contributor/`), each with a `Home.md` entry page. Built into the docs site (the primary and only publication target) by `.github/workflows/docs-site.yml` — every `.md` under `docs/` becomes a site page, so do not put scratch files there. The GitHub Wiki is no longer synced (#319) |
+| `website/` | Docs site (Astro Starlight) published at `https://floatsoda.sumx21t.com` with `llms.txt` / `llms-full.txt` for LLM readers. Every docs page is generated from `docs/` at build time by `scripts/sync-docs.mjs`, so edit `docs/`, never `website/src/content/docs/`. The site's structure follows the `docs/` directory tree: each tab directory (`docs/tutorials/`, `docs/guide/`, `docs/reference/`, `docs/contributor/`) becomes one sidebar group and one landing entry; the API reference tab is generated, not written under `docs/`. The only site-authored content is the landing page `website/content/index.mdx`, which carries a short introduction (problem → solution → offer → audience → action) plus navigation. Anything that goes stale when the code changes (current limitations, versions, counts) stays in `docs/` and is only linked from the landing page. See `website/README.md` |
 
-**How far each project is implemented changes often, so it is not recorded here.** Read the source, and for the UI layers read 「実装の進み具合の追い方」 in `docs/contributor/2-understand/ui-layer.md`.
+### UI Layering Rules (see `docs/contributor/2-understand/ui-layer.md`)
 
-Where new UI code goes — core, `FloatSoda.UI`, or a design system — is decided by the rules in 「2つの規約と、判定基準」 in `docs/contributor/2-understand/ui-layer.md`. Read it before adding any widget outside the core.
+The UI is split into three layers: `FloatSoda` (core + primitive widgets; anything touching Skia/render-tree types), `FloatSoda.UI` (headless behavior: interaction state machines, typed builder slots), and two parallel design systems `FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop` (state→visual mapping only). **Only the core layer ships today** — the upper two are skeletons planned for Phase 5, marked `IsPackable=false`, and `ButtonBase` is not yet wired to `GestureDetector`. The rules below still bind: they decide where new code goes when that work lands. Two rules: (1) behavior/state machines always go in `FloatSoda.UI`, never in a design system; (2) `FloatSoda.UI` widgets must work without any design-system `InheritedWidget` (themes' `Of()` returns null and components fall back to defaults). Litmus test: each design system must be buildable without copying code from the other. Design systems never reference each other.
 
-## Architecture
+## Architecture: Three Trees
 
-FloatSoda mirrors Flutter's Widget / Element / RenderObject trees and adds a Layer tree that is cloned and handed to a separate render thread. The canon for how this works is the contributor docs, not this file:
+FloatSoda mirrors Flutter's three-tree model. The RenderObject and Layer trees are fully implemented; the Widget/Element tree has incremental (dirty-list) rebuilds working for `StatelessWidget`, `StatefulWidget`, and `InheritedWidget`, including keyed multi-child list diffing:
 
-| What you need | Canon |
-|---|---|
-| One frame end to end: build → layout → paint → Layer clone → render thread → SteamVR | `docs/contributor/2-understand/frame-to-steamvr.md` |
-| Widget / Element / RenderObject trees, dirty lists, relayout and repaint boundaries | `docs/contributor/2-understand/framework-layer.md` |
-| Layer types, `Clone()`, bitmap rendering | `docs/contributor/2-understand/rendering-layer.md` |
-| GLFW/OpenGL and the render thread | `docs/contributor/2-understand/engine-layer.md` |
-| OpenVR overlays | `docs/contributor/2-understand/ovr-layer.md` |
-| Input | `docs/contributor/2-understand/framework-input.md` |
-| Tree invariants a change must keep (ownership, lifecycle, incremental updates, Layer) | `REVIEW.md` 「4. FloatSoda 固有の不変条件」 |
+### 1. RenderObject Tree (`src/FloatSoda/RenderObjects/`)
+
+The low-level layout-and-paint tree with incremental updates. Property changes call `MarkNeedsLayout()` / `MarkNeedsPaint()`, which propagate to the nearest relayout/repaint boundary and register that node on `RenderPipeline.NodesNeedingLayout` / `NodesNeedingPaint`. Each frame:
+1. `RenderPipeline.FlushLayout()` → processes dirty nodes in `Depth` order via `LayoutWithoutResize()`
+2. `RenderPipeline.FlushPaint()` → repaints dirty nodes via `PaintingContext.RepaintCompositedChild()`, recording Skia draw calls into `PictureLayer`s inside a `ContainerLayer` tree
+
+`RenderView.PrepareInitialFrame()` seeds both lists for the first frame. Frames with no dirty nodes skip layout/paint entirely.
+
+Key classes:
+- `RenderObject` — abstract base; subclasses implement `PerformLayout()` + `Paint(PaintingContext, Offset)`; `Layout(BoxConstraints)` is the non-virtual entry point that handles relayout boundaries
+- `RenderBox` — adds `SKSize Size`; most layout objects extend this
+- `RenderProxyBox` — single-child passthrough base (delegates layout/paint to child)
+- `SingleChildContainer<T>` / `MultiChildrenCollection<T>` — composition helpers for child holding (adopt/drop on assignment, attach/detach/visit forwarding)
+- `RenderImage` — renders an `SKImage` loaded via `FileImageProvider`
+
+### 2. Layer Tree (`src/FloatSoda.Rendering/Layers/`)
+
+Produced by the RenderObject tree's paint phase. Represents composited draw operations sent to the render thread:
+- `ContainerLayer` — node with child layers
+- `PictureLayer` — leaf holding an `SKPicture` (recorded Skia commands)
+- `ClipRectLayer`, `ClipRoundRectLayer`, `ClipPathLayer`, `OpacityLayer`, `TransformLayer` — compositing effects
+
+The layer tree is **cloned** (`ILayer.Clone()`) before being handed to the render thread to avoid data races.
+
+### 3. Widget/Element Tree (`src/FloatSoda/Widgets/`, `src/FloatSoda/Elements/`) — Core implemented
+
+Flutter-style declarative layer built on top of the RenderObject tree. `StatelessWidget` / `StatefulWidget` / `InheritedWidget` / `ParentDataWidget<T>` and their elements are all wired, including incremental rebuilds via `BuildOwner` and keyed two-ended list diffing in `MultiChildRenderObjectElement`. Layout, painting, and input widgets have all landed — `Padding`, `Container`, `Stack`, `Wrap`, `Expanded`, `AspectRatio`, `Opacity`, `Transform`, `GestureDetector`, `Listener`, and the rest are `public` and working. Remaining gaps: scrolling widgets (`ListView`, `GridView`, `SingleChildScrollView`) and `Components.Icon` / `Components.Image` are still `internal` stubs; and pointer coordinates only reach dashboard overlays, so `GestureDetector` callbacks never fire on `WorldSpaceWindow` / `DeviceTrackedWindow` (`Button`/`Icon` now live in the design-system layer; see UI Layering Rules above):
+- `Widget` — immutable `abstract record`; declares `CreateElement()` and holds an optional `Key`. `Widget.CanUpdate` is Flutter-style (same runtime type + equal `Key`); a fast-path reference-equality check (`ReferenceEquals`, as in Flutter) in `Element.UpdateChild` short-circuits only the same widget instance before that — a value-equal new instance still goes through `Update`
+- `RenderObjectWidget<T>` — widget that owns a `RenderObject`; declares `CreateRenderObject()` / `UpdateRenderObject(T)`
+- `StatelessWidget` — `Build()` is called by `StatelessElement`; usable today
+- `StatefulWidget<T>` / `State<T>` — state lifecycle wired via `StatefulElement`; `State.SetState()` mutates state and calls `Element.MarkNeedsBuild()` to schedule a rebuild
+- `InheritedWidget` / `InheritedElement` — context propagation with dependent tracking; descendants registered via `DependOnInheritedWidget` are notified on change
+- `Element` — mutable tree node; `Mount()` / `UpdateChild()` / `InflateWidget()` / `MarkNeedsBuild()` / `Rebuild()`
+- `BuildOwner` — per-window rebuild scheduler; holds the dirty-element list, `BuildScope()` rebuilds dirty elements in `Depth` order (parents first)
+- `RenderObjectElement` — element that attaches its `RenderObject` into the render tree; `UpdateChildren()` implements the keyed two-ended list-diff for multi-child widgets
+- `RenderObjectToWidgetAdapter` — bridges the widget tree root to a `RenderView`; `AttachToRenderTree(owner, element)` mounts on first call and schedules a rebuild (via `NewWidget` + `MarkNeedsBuild`) on re-attach
+- `WidgetBinding` — per-window coordinator; owns the `BuildOwner`; `DrawFrame()` runs `BuildOwner.BuildScope()` then flushes layout/paint only when `NeedsVisualUpdate` is set
+- `src/FloatSoda.Hooks` — R3-based `HookWidget` / `HookElement` (`UseState` via `ReactiveProperty`), partially implemented, not yet integrated with the build loop; the `HookExtension` helpers (`UseState`/`UseEffect`/`UseMemo`/etc.) still throw `NotImplementedException`
+
+## Frame Pipeline
+
+```
+FloatSodaApp.Run() [main thread, STA]
+  └─ PollEvents()          — VREvent_Quit etc.
+  └─ DrawFrame()           — per WidgetBinding (window)
+       └─ BuildOwner.BuildScope()        — rebuild dirty Elements → UpdateRenderObject
+       └─ (skip rest unless NeedsVisualUpdate)
+       └─ RenderPipeline.FlushLayout()   — layout dirty RenderObjects (Depth order)
+       └─ RenderPipeline.FlushPaint()    — repaint dirty RenderObjects → Layer tree
+       └─ RenderThreadRunner.PostRender(layer.Clone())
+            └─ [render thread] OverlayWindow.Update()
+                 └─ Renderer.Render(layer)
+                      └─ GLView.Clear() → layer.Layout(ctx) → layer.Paint(ctx) → GLView.Flush()
+                 └─ OpenVR SetRenderTexture(GL texture handle)
+  └─ FramePacer.WaitForNextFrame()
+```
+
+The render thread runs in `RenderThreadRunner` (a `ThreadRunner` subclass) and owns the GLFW/GL context. Work is posted via `ConcurrentQueue<Action>` (`_pendingTasks`). Window creation is also deferred through this queue so all GL calls stay on the same thread.
+
+## API Design Conventions (from `API_DESIGN.md`)
+
+- **Object-initializer first**: no constructor arguments on components — use `init` properties only.
+- **Single child** → `Child` property; **multiple children** → `Children` (`IList<Widget>`).
+- **Geometry types** → `readonly record struct` (e.g. `Offset`, `Size`, `Rect`, `EdgeInsets`, `BoxConstraints`).
+- **Context/theme objects** → `record` (reference type, supports `with`-expression propagation).
+- **Static factory methods** follow the naming table: `All(v)`, `Symmetric(h,v)`, `Only(...)`, `Zero`/`Empty`, `FromXxx(...)`.
+- All `public` properties get XML doc comments (`/// <summary>…</summary>`).
+- Properties use `init` accessors to enforce immutability; use `required` for mandatory fields.
+- Event handlers are typed `Action?` / `Action<T>?` / `Func<Task>?` with an `On` prefix (e.g. `OnClick`, `OnChanged`).
+- Style attributes live in a separate `*Style` record (e.g. `ButtonStyle`), not on the component itself.
