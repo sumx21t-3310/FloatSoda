@@ -1,7 +1,11 @@
 ﻿using System.Numerics;
+using FloatSoda.Core;
+using FloatSoda.Elements;
 using FloatSoda.Geometrics;
 using FloatSoda.Painting;
+using FloatSoda.RenderObjects;
 using FloatSoda.Testing;
+using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;
@@ -12,6 +16,15 @@ public class ContainerTest
 {
     private static readonly WidgetBitmapRenderer Renderer = new();
     private static readonly SKSizeI Size = new(100, 100);
+
+    // WidgetBitmapRenderer のルートは無限の制約を渡すため、有限の制約が要るテストはこれで包む。
+    private static SizedBox Bounded(Widget child) =>
+        new()
+        {
+            Width = 100,
+            Height = 100,
+            Child = child,
+        };
 
     [Fact]
     public void Container_WidthとHeightとColorとAlignmentを指定_指定サイズの色付き領域に子が配置される()
@@ -200,6 +213,171 @@ public class ContainerTest
         // 余白ウィジェットが合成されないため、子の赤が背景の青を端まで覆う。
         Assert.Equal(SKColors.Red, bitmap.GetPixel(1, 1));
         Assert.Equal(SKColors.Red, bitmap.GetPixel(58, 58));
+    }
+
+    [Fact]
+    public void Container_Childなしで緩い有限制約_最大サイズまで広がる()
+    {
+        var widget = Bounded(
+            new Align
+            {
+                Alignment = Alignment.TopLeft,
+                Child = new Container { Color = new Color(0, 0, 255) },
+            }
+        );
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(0, 0));
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(99, 99));
+    }
+
+    [Fact]
+    public void Container_Childなしで無限の制約_0になる()
+    {
+        // RenderView のルートは無限の制約を渡すため、ビューの大きさで両軸を確かめる。
+        var view = new RenderView();
+        var pipeline = new RenderPipeline { OnNeedVisualUpdate = () => { }, RenderView = view };
+        view.PrepareInitialFrame();
+        new RenderObjectToWidgetAdapter
+        {
+            Container = view,
+            Child = new Container { Color = new Color(0, 0, 255) },
+        }.AttachToRenderTree(new BuildOwner(() => { }), null);
+
+        pipeline.FlushLayout();
+
+        Assert.Equal(new SKSize(0, 0), view.Size);
+    }
+
+    [Fact]
+    public void Container_ChildなしでPaddingを指定して無限の制約_余白の大きさになる()
+    {
+        var widget = Bounded(
+            new OverflowBox
+            {
+                MinWidth = 0,
+                MinHeight = 0,
+                MaxWidth = double.PositiveInfinity,
+                MaxHeight = double.PositiveInfinity,
+                Child = new Container
+                {
+                    Color = new Color(0, 0, 255),
+                    Padding = EdgeInsets.All(10),
+                },
+            }
+        );
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        // 20x20 の領域が OverflowBox の中央(40〜60)に置かれる。
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(41, 41));
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(58, 58));
+        Assert.Equal(0, bitmap.GetPixel(38, 38).Alpha);
+        Assert.Equal(0, bitmap.GetPixel(61, 61).Alpha);
+    }
+
+    [Fact]
+    public void Container_ChildなしでColumnの中_主軸の高さが0になる()
+    {
+        var widget = Bounded(
+            new Column
+            {
+                Children =
+                {
+                    new Container { Color = new Color(0, 0, 255) },
+                    new SizedBox
+                    {
+                        Width = 10,
+                        Height = 10,
+                        Child = new ColoredBox { Color = new Color(255, 0, 0) },
+                    },
+                },
+            }
+        );
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        // 主軸の高さが0なので、後ろの赤は上端から始まる。
+        Assert.Equal(SKColors.Red, bitmap.GetPixel(50, 5));
+    }
+
+    [Fact]
+    public void Container_ChildなしでWidthとHeightを指定_指定サイズになる()
+    {
+        var widget = new Align
+        {
+            Alignment = Alignment.TopLeft,
+            Child = new Container
+            {
+                Width = 40,
+                Height = 30,
+                Color = new Color(0, 0, 255),
+            },
+        };
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(39, 29));
+        Assert.Equal(0, bitmap.GetPixel(41, 29).Alpha);
+        Assert.Equal(0, bitmap.GetPixel(39, 31).Alpha);
+    }
+
+    [Fact]
+    public void Container_ChildなしでWidthだけを指定_幅は指定値で高さは最大まで広がる()
+    {
+        var widget = Bounded(
+            new Align
+            {
+                Alignment = Alignment.TopLeft,
+                Child = new Container { Width = 40, Color = new Color(0, 0, 255) },
+            }
+        );
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(39, 99));
+        Assert.Equal(0, bitmap.GetPixel(41, 50).Alpha);
+    }
+
+    [Fact]
+    public void Container_ChildなしでAlignmentを指定_Alignmentを無視して最大サイズまで広がる()
+    {
+        var widget = Bounded(
+            new Align
+            {
+                Alignment = Alignment.TopLeft,
+                Child = new Container
+                {
+                    Alignment = Alignment.BottomRight,
+                    Color = new Color(0, 0, 255),
+                },
+            }
+        );
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(0, 0));
+        Assert.Equal(SKColors.Blue, bitmap.GetPixel(99, 99));
+    }
+
+    [Fact]
+    public void Container_ChildなしでIntrinsicWidthの中_幅が0になる()
+    {
+        var widget = Bounded(
+            new Align
+            {
+                Alignment = Alignment.TopLeft,
+                Child = new IntrinsicWidth
+                {
+                    Child = new Container { Color = new Color(0, 0, 255) },
+                },
+            }
+        );
+
+        using var bitmap = Renderer.Render(widget, Size);
+
+        Assert.Equal(0, bitmap.GetPixel(0, 50).Alpha);
     }
 
     [Theory]

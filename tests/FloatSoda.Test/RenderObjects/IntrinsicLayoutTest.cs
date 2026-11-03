@@ -212,6 +212,90 @@ public class IntrinsicLayoutTest
         return flex;
     }
 
+    [Fact]
+    public void GetIntrinsicDimension_ConstrainedBoxのExpandで子がない_0を返す()
+    {
+        var box = new RenderConstrainedBox { AdditionalConstraints = BoxConstraints.Expand() };
+
+        Assert.Equal(0, box.GetMinIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(0, box.GetMaxIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(0, box.GetMinIntrinsicHeight(double.PositiveInfinity));
+        Assert.Equal(0, box.GetMaxIntrinsicHeight(double.PositiveInfinity));
+    }
+
+    [Fact]
+    public void GetIntrinsicDimension_ConstrainedBoxのExpandで子がある_子の固有サイズを返す()
+    {
+        var box = new RenderConstrainedBox
+        {
+            AdditionalConstraints = BoxConstraints.Expand(),
+            Child = new TestIntrinsicBox(53, 17),
+        };
+
+        Assert.Equal(53, box.GetMinIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(53, box.GetMaxIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(17, box.GetMinIntrinsicHeight(double.PositiveInfinity));
+        Assert.Equal(17, box.GetMaxIntrinsicHeight(double.PositiveInfinity));
+    }
+
+    [Fact]
+    public void GetIntrinsicDimension_ConstrainedBoxのExpandで片軸を固定_固定した軸は指定値を返す()
+    {
+        var box = new RenderConstrainedBox
+        {
+            AdditionalConstraints = BoxConstraints.Expand(width: 40),
+        };
+
+        Assert.Equal(40, box.GetMinIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(40, box.GetMaxIntrinsicWidth(double.PositiveInfinity));
+        Assert.Equal(0, box.GetMinIntrinsicHeight(40));
+        Assert.Equal(0, box.GetMaxIntrinsicHeight(40));
+    }
+
+    [Fact]
+    public void GetIntrinsicDimension_ConstrainedBoxのExpandで子がある_交差軸の値をそのまま子へ渡す()
+    {
+        var child = new RecordingIntrinsicBox();
+        var box = new RenderConstrainedBox
+        {
+            AdditionalConstraints = BoxConstraints.Expand(),
+            Child = child,
+        };
+
+        box.GetMinIntrinsicWidth(30);
+        Assert.Equal(30, child.LastQueriedDimension);
+
+        box.GetMinIntrinsicHeight(70);
+        Assert.Equal(70, child.LastQueriedDimension);
+    }
+
+    private sealed class RecordingIntrinsicBox : RenderBox
+    {
+        public double LastQueriedDimension { get; private set; }
+
+        public override void PerformLayout() => Size = Constraints.Smallest;
+
+        protected override double ComputeMinIntrinsicWidth(double availableHeight) =>
+            Record(availableHeight);
+
+        protected override double ComputeMaxIntrinsicWidth(double availableHeight) =>
+            Record(availableHeight);
+
+        protected override double ComputeMinIntrinsicHeight(double availableWidth) =>
+            Record(availableWidth);
+
+        protected override double ComputeMaxIntrinsicHeight(double availableWidth) =>
+            Record(availableWidth);
+
+        public override void Paint(PaintingContext context, Offset offset) { }
+
+        private double Record(double dimension)
+        {
+            LastQueriedDimension = dimension;
+            return 0;
+        }
+    }
+
     private sealed class TestIntrinsicBox(double width, double height) : RenderBox
     {
         public override void PerformLayout() => Size = Constraints.Constrain(width, height);

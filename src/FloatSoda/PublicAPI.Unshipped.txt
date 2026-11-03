@@ -125,3 +125,4 @@ override FloatSoda.RenderObjects.RenderView.Paint(FloatSoda.RenderObjects.Painti
 virtual FloatSoda.RenderObjects.RenderBox.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Geometory.Offset position) -> bool
 virtual FloatSoda.RenderObjects.RenderBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Geometory.Offset position) -> bool
 virtual FloatSoda.RenderObjects.RenderBox.HitTestSelf(FloatSoda.Geometory.Offset position) -> bool
+static FloatSoda.Geometrics.BoxConstraints.Expand(double? width = null, double? height = null) -> FloatSoda.Geometrics.BoxConstraints
