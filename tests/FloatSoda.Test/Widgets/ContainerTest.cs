@@ -1,6 +1,9 @@
 ﻿using System.Numerics;
+using FloatSoda.Core;
+using FloatSoda.Elements;
 using FloatSoda.Geometrics;
 using FloatSoda.Painting;
+using FloatSoda.RenderObjects;
 using FloatSoda.Testing;
 using FloatSoda.Widgets;
 using FloatSoda.Widgets.Layout;
@@ -232,20 +235,19 @@ public class ContainerTest
     [Fact]
     public void Container_Childなしで無限の制約_0になる()
     {
-        var widget = Bounded(
-            new OverflowBox
-            {
-                MinWidth = 0,
-                MinHeight = 0,
-                MaxWidth = double.PositiveInfinity,
-                MaxHeight = double.PositiveInfinity,
-                Child = new Container { Color = new Color(0, 0, 255) },
-            }
-        );
+        // RenderView のルートは無限の制約を渡すため、ビューの大きさで両軸を確かめる。
+        var view = new RenderView();
+        var pipeline = new RenderPipeline { OnNeedVisualUpdate = () => { }, RenderView = view };
+        view.PrepareInitialFrame();
+        new RenderObjectToWidgetAdapter
+        {
+            Container = view,
+            Child = new Container { Color = new Color(0, 0, 255) },
+        }.AttachToRenderTree(new BuildOwner(() => { }), null);
 
-        using var bitmap = Renderer.Render(widget, Size);
+        pipeline.FlushLayout();
 
-        Assert.Equal(0, bitmap.GetPixel(50, 50).Alpha);
+        Assert.Equal(new SKSize(0, 0), view.Size);
     }
 
     [Fact]
