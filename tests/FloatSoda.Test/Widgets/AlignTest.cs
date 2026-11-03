@@ -34,4 +34,10 @@ public class AlignTest
         Assert.Equal(value, renderObject.WidthFactor);
         Assert.Equal(value, renderObject.HeightFactor);
     }
+
+    [Fact]
+    public void WidthFactor_負数を指定_ArgumentOutOfRangeExceptionを投げる()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Align { WidthFactor = -1 });
+    }
 }

@@ -1,5 +1,5 @@
-﻿using FloatSoda.Abstractions.Geometries;
-using FloatSoda.Core;
+﻿using FloatSoda.Core;
+using FloatSoda.Geometory;
 using FloatSoda.Painting;
 using SkiaSharp;
 using Topten.RichTextKit;

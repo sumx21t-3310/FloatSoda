@@ -47,7 +47,7 @@ app.CreateWindow(useDesktop
 await host.RunAsync();
 ```
 
-`Dpm` は `FloatSoda.Abstractions.Geometries` の名前空間にあります。`--desktop` を付けて起動すると窓に出て、付けないと従来どおりダッシュボードに出ます。`--desktop` はこのアプリで処理する引数なので、`Host.CreateApplicationBuilder` に渡す引数から取り除きます。このコードは、[GestureDetector のサンプル](../../../../samples/FloatSoda.Samples.GestureDetector/Program.cs)と同じ形です。
+`Dpm` は `FloatSoda.Abstractions.Geometries` の名前空間にあります。`--desktop` を付けて起動すると窓に出て、付けないと従来どおりダッシュボードに出ます。`--desktop` はこのアプリで処理する引数なので、`Host.CreateApplicationBuilder` に渡す引数から取り除きます。このコードは、[GestureDetector のサンプル](../../../../samples/Widgets/FloatSoda.Samples.GestureDetector/Program.cs)と同じ形です。
 
 ```powershell
 dotnet run -- --desktop
@@ -95,7 +95,7 @@ using var handle = await provider.ResolveAsync();
 using var bitmap = renderer.Render(imageRoot, new SKSizeI(400, 300));
 ```
 
-`FloatSoda.Samples.PaintingSample` も、ウィジェットのツリーを PNG に書き出します。コードは[PaintingSample の Program.cs](../../../../samples/FloatSoda.Samples.PaintingSample/Program.cs)にあります。
+`FloatSoda.Samples.PaintingSample` も、ウィジェットのツリーを PNG に書き出します。コードは[PaintingSample の Program.cs](../../../../samples/Showcase/FloatSoda.Samples.PaintingSample/Program.cs)にあります。
 
 <!-- ※要確認: `FloatSoda.Testing` が NuGet で配布されているか(csproj に PackageId はある。公開の有無は NuGet で確かめる) -->
 

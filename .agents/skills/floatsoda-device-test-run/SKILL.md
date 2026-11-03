@@ -1,7 +1,7 @@
 ---
 name: floatsoda-device-test-run
 description: >-
-  FloatSoda の実機実行すべてを運転する — カタログサンプル(samples/FloatSoda.Samples.*)か
+  FloatSoda の実機実行すべてを運転する — カタログサンプル(samples/*/FloatSoda.Samples.*)か
   floatsoda-device-test-gen が作ったハーネスシナリオを、実 HMD 上で1つずつ起動し、オーナーに
   見るべき点を伝え、項目ごとに yes/no の判定を取り、記録し、止め、次へ進み、最後に落ちたものを
   トリアージする。音声セッション(オーナーは HMD を被ったまま声で答える)を前提に設計しているが、
@@ -20,7 +20,7 @@ description: >-
 
 | 対象 | 出どころ | 判定項目 |
 |---|---|---|
-| カタログサンプル `samples/FloatSoda.Samples.<Name>` | Issue #188 の層1。各サンプルは結合テストのシナリオも兼ねる: 「docs に書いてあるとおりに書いたら、実際にそう表示されるか」(`CONTRIBUTING.md` サンプルを追加する場合の規約) | `samples/<Name>/checks/items.jsonl`(サンプルごとに `floatsoda-device-test-gen` が機械生成、3〜7項目) |
+| カタログサンプル `samples/<Group>/FloatSoda.Samples.<Name>` | Issue #188 の層1。各サンプルは結合テストのシナリオも兼ねる: 「docs に書いてあるとおりに書いたら、実際にそう表示されるか」(`CONTRIBUTING.md` サンプルを追加する場合の規約) | `samples/<Group>/FloatSoda.Samples.<Name>/checks/items.jsonl`(サンプルごとに `floatsoda-device-test-gen` が機械生成、3〜7項目) |
 | ハーネスシナリオ `tests/FloatSoda.DeviceTest --scenario <Id>` | `floatsoda-device-test-gen` が作る(列挙 → 振り分け → 構築)。各シナリオは自分の期待結果を持つ | シナリオごとに1項目: 期待結果を yes/no の質問に言い換えたもの(ハーネスシナリオの扱いはこの変更の対象外) |
 
 `floatsoda-device-test-gen` との分担は producer / runner。あちらは**何が**壊れうるかを決めて
@@ -40,7 +40,7 @@ description: >-
 **音声セッション(Codex Voice モードなど):** このスキルを読み込む*前に*音声モードでチャットを
 始めること — テキストモードで始めたチャットは音声ディクテーションになるだけで、会話スレッドに
 ならない。巡回(手順1)は音声スレッド本体で回す: ターンテイキングと割り込みが要る。
-トリアージ(手順2)は別タスクへ委任してよい。共有状態である `samples/<Name>/checks/results/*.jsonl`
+トリアージ(手順2)は別タスクへ委任してよい。共有状態である `samples/<Group>/FloatSoda.Samples.<Name>/checks/results/*.jsonl`
 のパスを渡す。
 
 ## 地上ルール
@@ -62,11 +62,11 @@ description: >-
 ### 0. 準備(ヘッドセットを外した状態)
 
 1. `dotnet build FloatSoda.slnx` — 0 エラー。サンプルは
-   `samples/FloatSoda.Samples.<Name>/bin/Debug/net10.0/FloatSoda.Samples.<Name>.exe` にビルドされる。
+   `samples/<Group>/FloatSoda.Samples.<Name>/bin/Debug/net10.0/FloatSoda.Samples.<Name>.exe` にビルドされる。
 2. SteamVR が動いていることを確認する(`vrserver` / `vrmonitor` プロセス)。自分では起動しない。
    オーナーが起動する。
-3. 巡回対象サンプルそれぞれの `samples/<Name>/checks/items.jsonl` を読む。結果は
-   `samples/<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` に記録するので
+3. 巡回対象サンプルそれぞれの `samples/<Group>/FloatSoda.Samples.<Name>/checks/items.jsonl` を読む。結果は
+   `samples/<Group>/FloatSoda.Samples.<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` に記録するので
    (詳細は手順1)、この時点ではファイルを作らなくてよい。巡回の開始時刻(ISO 8601、秒まで)を
    `run_id`、`git rev-parse --short HEAD` を `commit` として控えておく。巡回中の全行で同じ値を使う。
 4. 任意で、読み取り専用のスタック監視を横で回す(`vr-stack-watch -Watch`、オーナーのマシンに
@@ -82,7 +82,7 @@ description: >-
 
 順序: まずカタログサンプル(レイアウト → 制約 → 描画 → 入力系は最後)、次にハーネスシナリオを
 列挙時の順で。1回の巡回で複数サンプルを回るので、結果は対象サンプルごとに対応する
-`samples/<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` へ追記する
+`samples/<Group>/FloatSoda.Samples.<Name>/checks/results/<hmd>-<gpu>-<platform>-<mode>-<yyyy-MM-dd>.jsonl` へ追記する
 (存在しなければこの時点で作る)。ファイル名の `<hmd>` `<gpu>` `<platform>` はオーナーの環境から
 取得する(例: Virtual Desktop の接続先デバイス名、`Get-CimInstance Win32_VideoController` の
 GPU 名、Windows ビルド番号)。`<mode>` は `desktop` か `dashboard` — その対象を `--desktop` で
@@ -154,7 +154,7 @@ NG/CRASH/SKIP のときにオーナーが言った理由(それ以外は空文�
    これで次回の列挙がより先から始められる。「deliberate」で確定した差異は、文書化されるまで
    `docs/` のギャップ。
 5. NG が `items.jsonl` 側の誤り(サンプルが変わった、項目が間違っていた)と分かったら、
-   該当サンプルの `samples/<Name>/checks/items.jsonl` を、それ以外を何も変えない PR で直す
+   該当サンプルの `samples/<Group>/FloatSoda.Samples.<Name>/checks/items.jsonl` を、それ以外を何も変えない PR で直す
    (`floatsoda-device-test-gen` の手順6と同じ生成ルールに従う)。
 
 ## 報告形式

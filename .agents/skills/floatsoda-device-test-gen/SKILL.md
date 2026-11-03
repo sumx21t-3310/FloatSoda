@@ -160,9 +160,9 @@ VR で実際に落ちたシナリオも、根本原因を確定と呼ぶ前に�
 
 ### 6. カタログサンプルの目視チェック項目を生成する
 
-対象は `samples/FloatSoda.Samples.*` のカタログサンプル(ハーネスシナリオとは別物)。各サンプルの
+対象は `samples/*/FloatSoda.Samples.*` のカタログサンプル(ハーネスシナリオとは別物)。各サンプルの
 Demo.cs を読み、目視で区別できるデモケース(色分け・比較ペア・プロパティ違いのセルなど)を漏れなく
-抽出し、`samples/<Name>/checks/items.jsonl` に書き出す。
+抽出し、`samples/<Group>/FloatSoda.Samples.<Name>/checks/items.jsonl` に書き出す。
 
 **items.jsonl のスキーマ**(1行1項目、JSON Lines):
 ```json

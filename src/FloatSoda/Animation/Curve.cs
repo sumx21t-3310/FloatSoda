@@ -1,5 +1,5 @@
 using System.Diagnostics;
-using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Geometory;
 
 namespace FloatSoda.Animation;
 

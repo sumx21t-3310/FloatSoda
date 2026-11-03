@@ -83,7 +83,7 @@ FloatSoda targets three personas. Use them as the yardstick for API design, docs
 
 ```bash
 # Run the sample overlay app
-dotnet run --project samples/FloatSoda.Samples.OverlayApp
+dotnet run --project samples/Showcase/FloatSoda.Samples.OverlayApp
 
 # Build the whole solution
 dotnet build
@@ -118,7 +118,7 @@ Test method names follow **`MemberName_条件_期待結果`** (member name in En
 | `src/FloatSoda.UI` | Headless UI layer: behavior-only widgets, no visuals |
 | `src/FloatSoda.UI.Cream` / `src/FloatSoda.UI.FizzyPop` | The two design systems: state → visual mapping only |
 | `src/FloatSoda.Hooks` | R3-based hooks for widgets |
-| `samples/` | Runnable samples, one directory per sample (most require SteamVR running) |
+| `samples/` | Runnable samples, one directory per sample, grouped under `Widgets/`, `Showcase/`, and `Experiments/` (most require SteamVR running) |
 | `tests/` | xunit tests: `FloatSoda.Test` (geometry, RenderObjects, Widgets) and `FloatSoda.Rendering.Test` (Layer tree) |
 | `docs/` | Source of the docs site, one directory per site tab. Every `.md` under it becomes a site page, so do not put scratch files there |
 | `website/` | Docs site (Astro Starlight) generated from `docs/`. Edit `docs/`, never `website/src/content/docs/` — see `website/README.md` |

@@ -51,8 +51,8 @@ Remove-Item publish\*.pdb
 
 **できた?** `publish` フォルダーに、`.exe` と必要なファイルが並んでいる。
 
-<!-- ※要確認: .pdb の大きさの割合は、samples/FloatSoda.Samples.GettingStarted を上のコマンドで publish した出力で測った(.pdb 2つで約 105 MB、出力全体で約 210 MB)。依存ライブラリの版で変わる。出力に .pdb が残ることを確かめた後で削除しても exe が動くかは、実機で確かめていない -->
-<!-- ※要確認: 上の publish コマンドで exe とネイティブライブラリが出力されることは、samples/FloatSoda.Samples.GettingStarted で確かめた(ビルドと出力のファイル一覧まで)。出力した exe を実際に起動して、オーバーレイが出ることは確かめていない。単一ファイルの公開(PublishSingleFile)は、確かめていないため手順に含めない -->
+<!-- ※要確認: .pdb の大きさの割合は、samples/Showcase/FloatSoda.Samples.GettingStarted を上のコマンドで publish した出力で測った(.pdb 2つで約 105 MB、出力全体で約 210 MB)。依存ライブラリの版で変わる。出力に .pdb が残ることを確かめた後で削除しても exe が動くかは、実機で確かめていない -->
+<!-- ※要確認: 上の publish コマンドで exe とネイティブライブラリが出力されることは、samples/Showcase/FloatSoda.Samples.GettingStarted で確かめた(ビルドと出力のファイル一覧まで)。出力した exe を実際に起動して、オーバーレイが出ることは確かめていない。単一ファイルの公開(PublishSingleFile)は、確かめていないため手順に含めない -->
 
 ## 手順2: 開発環境のない PC で動かして確かめる
 

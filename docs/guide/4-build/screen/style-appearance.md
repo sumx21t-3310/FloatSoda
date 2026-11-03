@@ -42,7 +42,7 @@ new Text("タイトル")
 Style = new TextStyle { Font = new SystemFontProvider("Meiryo") }
 ```
 
-<!-- ※要確認: 日本語のフォントの指定が必要になる条件と、指定したフォントで日本語が出ること。samples/FloatSoda.Samples.Text で確かめる。実機で確かめる -->
+<!-- ※要確認: 日本語のフォントの指定が必要になる条件と、指定したフォントで日本語が出ること。samples/Widgets/FloatSoda.Samples.Text で確かめる。実機で確かめる -->
 
 **できた?** HMD の中で、文字の色と大きさが変わっていれば、手順1は完了です。
 

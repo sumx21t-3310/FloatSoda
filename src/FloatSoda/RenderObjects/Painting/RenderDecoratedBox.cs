@@ -1,4 +1,4 @@
-using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Geometory;
 using FloatSoda.Painting;
 
 namespace FloatSoda.RenderObjects.Painting;

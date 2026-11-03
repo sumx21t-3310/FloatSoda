@@ -1,4 +1,3 @@
-using FloatSoda.Rendering;
 using FloatSoda.Rendering.Layers;
 using SkiaSharp;
 

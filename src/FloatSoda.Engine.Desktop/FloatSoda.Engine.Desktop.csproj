@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\FloatSoda.Geometry\FloatSoda.Geometry.csproj" />
+        <ProjectReference Include="..\FloatSoda.Engine.Abstractions\FloatSoda.Engine.Abstractions.csproj" />
+        <ProjectReference Include="..\FloatSoda.Engine\FloatSoda.Engine.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="PublicAPI.Shipped.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OpenTK.Windowing.GraphicsLibraryFramework" Version="4.9.4" />
+    </ItemGroup>
+</Project>

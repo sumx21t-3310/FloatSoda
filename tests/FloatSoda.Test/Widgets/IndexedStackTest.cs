@@ -1,4 +1,4 @@
-using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Geometory;
 using FloatSoda.Geometrics;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects;
@@ -6,7 +6,6 @@ using FloatSoda.RenderObjects.Gesture;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Testing;
-using FloatSoda.Widgets.Gesture;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;
 using SkiaSharp;

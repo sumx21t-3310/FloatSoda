@@ -1,4 +1,4 @@
-using FloatSoda.Abstractions.Input;
+using FloatSoda.Engine.Abstractions.Input;
 
 namespace FloatSoda.Gesture;
 

@@ -1,21 +1,7 @@
 #nullable enable
-FloatSoda.Engine.DesktopWindow
-FloatSoda.Engine.DesktopWindow.DesktopWindow(FloatSoda.Engine.Renderer! renderer) -> void
-FloatSoda.Engine.DesktopWindow.Dispose() -> void
-FloatSoda.Engine.DesktopWindow.PointerSource.get -> FloatSoda.Abstractions.Input.IRawPointerSource?
-FloatSoda.Engine.DesktopWindow.Present(FloatSoda.Rendering.Layers.ILayer! layer) -> void
-FloatSoda.Engine.DesktopWindow.Resize(SkiaSharp.SKSizeI size) -> void
-FloatSoda.Engine.EngineShell
-FloatSoda.Engine.EngineShell.Dispose() -> void
-FloatSoda.Engine.EngineShell.EngineShell() -> void
-FloatSoda.Engine.EngineShell.Start(System.Threading.CancellationToken token) -> void
 FloatSoda.Engine.FramePacer
 FloatSoda.Engine.FramePacer.FramePacer(int targetFrameRate = 60) -> void
 FloatSoda.Engine.FramePacer.WaitForNextFrame(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> void
-FloatSoda.Engine.GLFWRawPointerSource
-FloatSoda.Engine.GLFWRawPointerSource.Dispose() -> void
-FloatSoda.Engine.GLFWRawPointerSource.GLFWRawPointerSource(OpenTK.Windowing.GraphicsLibraryFramework.Window* handle) -> void
-FloatSoda.Engine.GLFWRawPointerSource.OnPointerEvent -> System.Action<FloatSoda.Abstractions.Input.RawPointerEvent>?
 FloatSoda.Engine.GLView
 FloatSoda.Engine.GLView.Clear() -> void
 FloatSoda.Engine.GLView.Dispose() -> void
@@ -44,29 +30,14 @@ FloatSoda.Engine.ITaskRunner.IsRunning.get -> bool
 FloatSoda.Engine.ITaskRunner.Start(System.Threading.CancellationToken token) -> void
 FloatSoda.Engine.ITaskRunner.Stop() -> void
 FloatSoda.Engine.ITaskRunner.ThreadName.get -> string!
-FloatSoda.Engine.OverlayMouseRawPointerSource
-FloatSoda.Engine.OverlayMouseRawPointerSource.Dispose() -> void
-FloatSoda.Engine.OverlayMouseRawPointerSource.OnPointerEvent -> System.Action<FloatSoda.Abstractions.Input.RawPointerEvent>?
-FloatSoda.Engine.OverlayMouseRawPointerSource.OverlayMouseRawPointerSource(FloatSoda.OVR.VREventDispatcher! dispatcher) -> void
-FloatSoda.Engine.OverlayWindow
-FloatSoda.Engine.OverlayWindow.Dispose() -> void
-FloatSoda.Engine.OverlayWindow.Overlay.get -> FloatSoda.OVR.Overlay.IOverlay!
-FloatSoda.Engine.OverlayWindow.OverlayWindow(FloatSoda.OVR.Overlay.IOverlay! overlay, FloatSoda.Engine.Renderer! renderer, FloatSoda.Abstractions.Geometries.Dpm dpm) -> void
-FloatSoda.Engine.OverlayWindow.PointerSource.get -> FloatSoda.Abstractions.Input.IRawPointerSource?
-FloatSoda.Engine.OverlayWindow.PollInputEvents() -> void
-FloatSoda.Engine.OverlayWindow.Present(FloatSoda.Rendering.Layers.ILayer! layer) -> void
-FloatSoda.Engine.OverlayWindow.Resize(SkiaSharp.SKSizeI size) -> void
 FloatSoda.Engine.PostTaskRunner
 FloatSoda.Engine.PostTaskRunner.DrainPendingTasks() -> void
 FloatSoda.Engine.PostTaskRunner.IsRunning.get -> bool
 FloatSoda.Engine.PostTaskRunner.Logger.get -> Microsoft.Extensions.Logging.ILogger?
-FloatSoda.Engine.PostTaskRunner.PostTaskRunner(string! threadName, FloatSoda.Abstractions.Scheduling.IFramePacer! pacer, Microsoft.Extensions.Logging.ILogger? logger = null) -> void
 FloatSoda.Engine.PostTaskRunner.Start(System.Threading.CancellationToken ct) -> void
 FloatSoda.Engine.PostTaskRunner.Stop() -> void
 FloatSoda.Engine.PostTaskRunner.ThreadName.get -> string!
 FloatSoda.Engine.RenderPostTaskRunner
-FloatSoda.Engine.RenderPostTaskRunner.PostRender(FloatSoda.Abstractions.Engine.IEngineWindow! window, FloatSoda.Rendering.Layers.ILayer! layer) -> void
-FloatSoda.Engine.RenderPostTaskRunner.RenderPostTaskRunner(string! threadName, FloatSoda.Abstractions.Scheduling.IFramePacer! pacer, Microsoft.Extensions.Logging.ILogger? logger = null) -> void
 FloatSoda.Engine.Renderer
 FloatSoda.Engine.Renderer.Dispose() -> void
 FloatSoda.Engine.Renderer.GLView.get -> FloatSoda.Engine.GLView!

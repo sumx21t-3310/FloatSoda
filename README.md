@@ -19,7 +19,7 @@ FloatSoda では、「状態がこうなら、画面はこう見える」を C# 
 
 ## 使い方
 
-次のコードは、SteamVR のダッシュボードに 100×100 の青い四角を出す、最小のオーバーレイです。[`samples/FloatSoda.Samples.GettingStarted`](samples/FloatSoda.Samples.GettingStarted/Program.cs) の `Program.cs` と同じ中身です。
+次のコードは、SteamVR のダッシュボードに 100×100 の青い四角を出す、最小のオーバーレイです。[`samples/Showcase/FloatSoda.Samples.GettingStarted`](samples/Showcase/FloatSoda.Samples.GettingStarted/Program.cs) の `Program.cs` と同じ中身です。
 
 ```csharp
 using FloatSoda;
@@ -63,7 +63,7 @@ await host.RunAsync();
 リポジトリを取得していれば、SteamVR を起動してから次のコマンドで同じサンプルを動かせます。
 
 ```bash
-dotnet run --project samples/FloatSoda.Samples.GettingStarted
+dotnet run --project samples/Showcase/FloatSoda.Samples.GettingStarted
 ```
 
 FloatSoda が裏で何をしているかは、ガイドの [FloatSoda の仕組み](docs/guide/4-build/mechanics/how-floatsoda-works.md)にあります。

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
-using FloatSoda.Abstractions.Geometries;
-using FloatSoda.Abstractions.Input;
 using FloatSoda.Core;
+using FloatSoda.Engine.Abstractions.Input;
+using FloatSoda.Geometory;
 using FloatSoda.Geometrics;
 using FloatSoda.Gesture;
 using FloatSoda.Rendering.Layers;

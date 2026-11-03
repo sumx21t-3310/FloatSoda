@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
-using FloatSoda.Abstractions.Engine;
-using FloatSoda.Abstractions.Scheduling;
+using FloatSoda.Engine.Abstractions;
+using FloatSoda.Engine.Abstractions.Scheduling;
 using FloatSoda.Rendering.Layers;
 using Microsoft.Extensions.Logging;
 using OpenTK.Windowing.GraphicsLibraryFramework;

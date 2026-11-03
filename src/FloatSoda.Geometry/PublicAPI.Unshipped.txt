@@ -1,0 +1,59 @@
+﻿FloatSoda.Geometory.Angle
+FloatSoda.Geometory.Angle.Angle() -> void
+FloatSoda.Geometory.Angle.Angle(float Radians) -> void
+FloatSoda.Geometory.Angle.Deconstruct(out float Radians) -> void
+FloatSoda.Geometory.Angle.Degrees.get -> float
+FloatSoda.Geometory.Angle.Equals(FloatSoda.Geometory.Angle other) -> bool
+FloatSoda.Geometory.Angle.Radians.get -> float
+FloatSoda.Geometory.Angle.Radians.init -> void
+FloatSoda.Geometory.Dpm
+FloatSoda.Geometory.Dpm.Deconstruct(out float Value) -> void
+FloatSoda.Geometory.Dpm.Dpm() -> void
+FloatSoda.Geometory.Dpm.Dpm(float Value) -> void
+FloatSoda.Geometory.Dpm.Equals(FloatSoda.Geometory.Dpm other) -> bool
+FloatSoda.Geometory.Dpm.ToMeters(float pixels) -> float
+FloatSoda.Geometory.Dpm.Value.get -> float
+FloatSoda.Geometory.Dpm.Value.init -> void
+FloatSoda.Geometory.GeometryExtension
+FloatSoda.Geometory.Offset
+FloatSoda.Geometory.Offset.Deconstruct(out double X, out double Y) -> void
+FloatSoda.Geometory.Offset.Equals(FloatSoda.Geometory.Offset other) -> bool
+FloatSoda.Geometory.Offset.Offset() -> void
+FloatSoda.Geometory.Offset.Offset(double X = 0, double Y = 0) -> void
+FloatSoda.Geometory.Offset.X.get -> double
+FloatSoda.Geometory.Offset.X.init -> void
+FloatSoda.Geometory.Offset.Y.get -> double
+FloatSoda.Geometory.Offset.Y.init -> void
+override FloatSoda.Geometory.Angle.Equals(object obj) -> bool
+override FloatSoda.Geometory.Angle.GetHashCode() -> int
+override FloatSoda.Geometory.Angle.ToString() -> string
+override FloatSoda.Geometory.Dpm.Equals(object obj) -> bool
+override FloatSoda.Geometory.Dpm.GetHashCode() -> int
+override FloatSoda.Geometory.Dpm.ToString() -> string
+override FloatSoda.Geometory.Offset.Equals(object obj) -> bool
+override FloatSoda.Geometory.Offset.GetHashCode() -> int
+override FloatSoda.Geometory.Offset.ToString() -> string
+static FloatSoda.Geometory.Angle.FromDegrees(float degrees) -> FloatSoda.Geometory.Angle
+static FloatSoda.Geometory.Angle.FromRadians(float radians) -> FloatSoda.Geometory.Angle
+static FloatSoda.Geometory.Angle.operator !=(FloatSoda.Geometory.Angle left, FloatSoda.Geometory.Angle right) -> bool
+static FloatSoda.Geometory.Angle.operator ==(FloatSoda.Geometory.Angle left, FloatSoda.Geometory.Angle right) -> bool
+static FloatSoda.Geometory.Angle.Zero.get -> FloatSoda.Geometory.Angle
+static FloatSoda.Geometory.Dpm.Default.get -> FloatSoda.Geometory.Dpm
+static FloatSoda.Geometory.Dpm.FromMillimetersPerPixel(float millimeters) -> FloatSoda.Geometory.Dpm
+static FloatSoda.Geometory.Dpm.operator !=(FloatSoda.Geometory.Dpm left, FloatSoda.Geometory.Dpm right) -> bool
+static FloatSoda.Geometory.Dpm.operator ==(FloatSoda.Geometory.Dpm left, FloatSoda.Geometory.Dpm right) -> bool
+static FloatSoda.Geometory.GeometryExtension.Contains(this SkiaSharp.SKSize size, FloatSoda.Geometory.Offset offset) -> bool
+static FloatSoda.Geometory.GeometryExtension.MakeOffset(this SkiaSharp.SKRoundRect roundRect, float dx, float dy) -> SkiaSharp.SKRoundRect
+static FloatSoda.Geometory.GeometryExtension.MakeOffset(this SkiaSharp.SKRoundRect roundRect, FloatSoda.Geometory.Offset offset) -> SkiaSharp.SKRoundRect
+static FloatSoda.Geometory.Offset.implicit operator FloatSoda.Geometory.Offset(SkiaSharp.SKPoint point) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.implicit operator SkiaSharp.SKPoint(FloatSoda.Geometory.Offset offset) -> SkiaSharp.SKPoint
+static FloatSoda.Geometory.Offset.One.get -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator !=(FloatSoda.Geometory.Offset left, FloatSoda.Geometory.Offset right) -> bool
+static FloatSoda.Geometory.Offset.operator *(double a, FloatSoda.Geometory.Offset b) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator *(FloatSoda.Geometory.Offset a, double b) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator +(FloatSoda.Geometory.Offset a, FloatSoda.Geometory.Offset b) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator -(FloatSoda.Geometory.Offset a) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator -(FloatSoda.Geometory.Offset a, FloatSoda.Geometory.Offset b) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator /(FloatSoda.Geometory.Offset a, double b) -> FloatSoda.Geometory.Offset
+static FloatSoda.Geometory.Offset.operator ==(FloatSoda.Geometory.Offset left, FloatSoda.Geometory.Offset right) -> bool
+static FloatSoda.Geometory.Offset.Zero.get -> FloatSoda.Geometory.Offset

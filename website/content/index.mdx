@@ -16,7 +16,7 @@ hero:
 */}
 
 import { Card, CardGrid, Code, LinkCard } from "@astrojs/starlight/components";
-import program from "../../samples/FloatSoda.Samples.GettingStarted/Program.cs?raw";
+import program from "../../samples/Showcase/FloatSoda.Samples.GettingStarted/Program.cs?raw";
 
 ## オーバーレイを1枚作るだけで、こんなにコードを書くの?
 
@@ -32,7 +32,7 @@ SteamVR のオーバーレイは、VR の中に浮かぶ 2D のパネルです�
 
 FloatSoda では、「状態がこうなら、画面はこう見える」を C# のコードで書きます。並べ方の計算、描画、SteamVR への受け渡し、状態が変わったときの描き直しは、FloatSoda が受け持ちます。書き方は Flutter と同じ形で、Unity のシーンやプレハブの代わりに、画面をコードで組み立てます。
 
-次のコードは、SteamVR のダッシュボードに出す、最小のオーバーレイです。`samples/FloatSoda.Samples.GettingStarted` の `Program.cs` そのもので、ビルドのたびにここへ読み込まれます。
+次のコードは、SteamVR のダッシュボードに出す、最小のオーバーレイです。`samples/Showcase/FloatSoda.Samples.GettingStarted` の `Program.cs` そのもので、ビルドのたびにここへ読み込まれます。
 
 {/* Program.cs は BOM 付き UTF-8 なので、先頭の BOM(U+FEFF)を落としてから表示する */}
 <Code code={program.charCodeAt(0) === 0xfeff ? program.slice(1) : program} lang="csharp" title="Program.cs" />

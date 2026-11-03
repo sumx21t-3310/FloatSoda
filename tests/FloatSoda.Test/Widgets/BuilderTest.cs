@@ -46,6 +46,36 @@ public class BuilderTest
         Assert.Throws<ArgumentNullException>(() => new Builder { ChildBuilder = null! });
     }
 
+    [Fact]
+    public void Build_値が等しい新しいBuilderへ更新_もう一度呼び出す()
+    {
+        var buildCount = 0;
+
+        Widget Build(IBuildContext context)
+        {
+            buildCount++;
+            return new SizedBox();
+        }
+
+        var owner = new BuildOwner(() => { });
+        var view = new RenderView();
+        var root = new RenderObjectToWidgetAdapter
+        {
+            Container = view,
+            Child = new Builder { ChildBuilder = Build },
+        }.AttachToRenderTree(owner, null);
+        Assert.Equal(1, buildCount);
+
+        _ = new RenderObjectToWidgetAdapter
+        {
+            Container = view,
+            Child = new Builder { ChildBuilder = Build },
+        }.AttachToRenderTree(owner, root);
+        owner.BuildScope();
+
+        Assert.Equal(2, buildCount);
+    }
+
     private static void Mount(Widget widget)
     {
         var renderView = new RenderView(100, 100);

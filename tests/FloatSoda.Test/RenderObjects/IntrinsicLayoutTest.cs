@@ -1,5 +1,5 @@
 using System.Reflection;
-using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Geometory;
 using FloatSoda.Geometrics;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.RenderObjects;

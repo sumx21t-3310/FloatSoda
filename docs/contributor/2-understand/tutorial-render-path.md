@@ -32,7 +32,7 @@
 - FloatSoda を clone したフォルダー
 - SteamVR と HMD(段2だけは、HMD なしで進められる)
 
-4段のコードは、1つの作例 [samples/FloatSoda.Samples.RenderPath](../../../samples/FloatSoda.Samples.RenderPath/) にまとまっています。コードの全文は、このページに載せません。作例のファイルを読みながら進めます。リポジトリのルートで、`--step N` を付けて段を選びます。準備の詳細は [開発環境を用意する](../3-prepare/dev-environment.md) にあります。SteamVR が起動できない、HMD がつながらない場合の直し方は、ここでは扱いません。
+4段のコードは、1つの作例 [samples/Experiments/FloatSoda.Samples.RenderPath](../../../samples/Experiments/FloatSoda.Samples.RenderPath/) にまとまっています。コードの全文は、このページに載せません。作例のファイルを読みながら進めます。リポジトリのルートで、`--step N` を付けて段を選びます。準備の詳細は [開発環境を用意する](../3-prepare/dev-environment.md) にあります。SteamVR が起動できない、HMD がつながらない場合の直し方は、ここでは扱いません。
 
 <!-- ※要確認: 作例は #313 で main に入った。--step N と png の引数は #313 の実際の引数に合わせた。各段の出力は、移す前のコードに基づくので、#313 がマージされたら実物と照らす -->
 
@@ -41,13 +41,13 @@
 段1は、FloatSoda のほかの層を使わず、`FloatSoda.OVR` だけで、png の画像をオーバーレイとして HMD の前に出します。出す png は段2が作るので、先に次のコマンドを1回動かします。png は、カレントディレクトリの `my_layer_tree.png` に保存されます。段2の内容は、次の節で説明します。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.RenderPath -- --step 2
+dotnet run --project samples/Experiments/FloatSoda.Samples.RenderPath -- --step 2
 ```
 
 SteamVR を起動してから、動かします。HMD の中で、オーバーレイを探します。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.RenderPath -- --step 1
+dotnet run --project samples/Experiments/FloatSoda.Samples.RenderPath -- --step 1
 ```
 
 別の png を出したいときは、`-- --step 1 <png のパス>` の形でパスを渡します。省略すると、カレントディレクトリの `my_layer_tree.png` を使います。
@@ -83,10 +83,10 @@ OVR 層の型の詳細は、[OVR 層](ovr-layer.md) にあります。
 
 ## 2. Layer ツリーを組んで png に描く
 
-段2は、HMD も SteamVR も使わずに、自分で組んだ Layer ツリーを png にします。`FloatSoda.Rendering` だけを使います。Layer ツリーを組んで png にする基本は、[samples/FloatSoda.Samples.PaintingSample](../../../samples/FloatSoda.Samples.PaintingSample/) のコードで読めます。このページでは、同じ説明を繰り返しません。段2の作例は、その流れを最小にしたものです。
+段2は、HMD も SteamVR も使わずに、自分で組んだ Layer ツリーを png にします。`FloatSoda.Rendering` だけを使います。Layer ツリーを組んで png にする基本は、[samples/Showcase/FloatSoda.Samples.PaintingSample](../../../samples/Showcase/FloatSoda.Samples.PaintingSample/) のコードで読めます。このページでは、同じ説明を繰り返しません。段2の作例は、その流れを最小にしたものです。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.RenderPath -- --step 2
+dotnet run --project samples/Experiments/FloatSoda.Samples.RenderPath -- --step 2
 ```
 
 コンソールに、png の保存先のパスが出ます。保存先を変えたいときは、`-- --step 2 <png の保存先>` の形で渡します。省略すると、カレントディレクトリの `my_layer_tree.png` です。保存される絵は、白っぽい地に緑の四角です。
@@ -120,7 +120,7 @@ Layer の種類と `Clone` の共有範囲は、[描画層](rendering-layer.md) 
 段3は、段2で組んだ Layer ツリーを、png ではなく GL テクスチャとしてオーバーレイに出します。段1の `FromFile` の代わりに、エンジン層の `RenderPostTaskRunner`、`GLView`、`Renderer`、`OverlayWindow` を使います。`FloatSoda.Engine` は、フレームワーク(`FloatSoda`)を参照しないので、フレームワークなしで書けます。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.RenderPath -- --step 3
+dotnet run --project samples/Experiments/FloatSoda.Samples.RenderPath -- --step 3
 ```
 
 作例のコードの要点は3つです。
@@ -167,7 +167,7 @@ dotnet run --project samples/FloatSoda.Samples.RenderPath -- --step 3
 SteamVR を起動してから、動かします。HMD の中でダッシュボードを開き、`RenderPath` のタブを選びます。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.RenderPath -- --step 4
+dotnet run --project samples/Experiments/FloatSoda.Samples.RenderPath -- --step 4
 ```
 
 段3で書いた処理は、フレームワークの次の箇所が受け持っています。

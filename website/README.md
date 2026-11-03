@@ -42,7 +42,7 @@
 - `editUrl`(GitHub の編集ページ)と `lastUpdated`(`docs/` 側の最終コミット日時)を付ける
 - ランディングが参照するページ(`GettingStarted` など)をファイル名で探し、見つからなければ失敗する(改名・削除の検出)
 
-ランディングのコード例(「欲しいのは画面のレイアウト」の節)は、`samples/FloatSoda.Samples.GettingStarted/Program.cs` をビルド時に読み込んで表示します。サンプルを直せばランディングも追従します。
+ランディングのコード例(「欲しいのは画面のレイアウト」の節)は、`samples/Showcase/FloatSoda.Samples.GettingStarted/Program.cs` をビルド時に読み込んで表示します。サンプルを直せばランディングも追従します。
 
 ドキュメントの公開先は、このサイトだけです。以前は同じ `docs/` を GitHub Wiki にも同期していましたが、#319 で止めました。
 

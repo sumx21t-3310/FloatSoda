@@ -18,7 +18,7 @@ SteamVR のオーバーレイを作る方法は、FloatSoda のほかに、Unity
 
 FloatSoda は、レイアウト、描画、ポインタ入力、差分更新を肩代わりします。画面を作る人は、部品を入れ子にして書き、値を変えたいときは `State` の中で `SetState` を呼びます。数字とボタンの画面は、[最初のオーバーレイを作る](../../tutorials/first-overlay.md)のコードの量で見積もれます。
 
-OpenVR を直接呼ぶ方法では、ウィジェットの層がありません。`samples/FloatSoda.Samples.PrimitiveOverlay` は、PNG のファイルをテクスチャにしてオーバーレイを出しています。画像の描画、レイアウト、押された位置の判定は、自分で書きます。
+OpenVR を直接呼ぶ方法では、ウィジェットの層がありません。`samples/Showcase/FloatSoda.Samples.PrimitiveOverlay` は、PNG のファイルをテクスチャにしてオーバーレイを出しています。画像の描画、レイアウト、押された位置の判定は、自分で書きます。
 
 uGUI で UI を作る方法の手間は、リポジトリに比べる材料がないので、ここでは書きません。
 

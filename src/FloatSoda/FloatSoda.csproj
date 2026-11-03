@@ -8,7 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FloatSoda.Abstractions\FloatSoda.Abstractions.csproj" />
+        <ProjectReference Include="..\FloatSoda.Geometry\FloatSoda.Geometry.csproj" />
+        <ProjectReference Include="..\FloatSoda.Engine.Desktop\FloatSoda.Engine.Desktop.csproj" />
+        <ProjectReference Include="..\FloatSoda.Engine.OVR\FloatSoda.Engine.OVR.csproj" />
         <ProjectReference Include="..\FloatSoda.Engine\FloatSoda.Engine.csproj" />
         <ProjectReference Include="..\FloatSoda.Rendering\FloatSoda.Rendering.csproj" />
     </ItemGroup>
