@@ -18,6 +18,8 @@ PR の CI が落ちたときに、落ちたステップを見つけ、手元で�
 | Build | `dotnet build --configuration Release` |
 | Test (FloatSoda.Rendering.Test) | `dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build` |
 | Test (FloatSoda.Test) | `dotnet test tests/FloatSoda.Test --configuration Release --no-build` |
+| Test (FloatSoda.Engine.Test) | `dotnet test tests/FloatSoda.Engine.Test --configuration Release --no-build` |
+| Test (FloatSoda.OVR.Test) | `dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build` |
 
 CI は SteamVR を使いません。実機でしか分からない失敗は、CI には出ません。CI が通っても、実機が要る変更は別に実機で確かめる必要があります。
 
