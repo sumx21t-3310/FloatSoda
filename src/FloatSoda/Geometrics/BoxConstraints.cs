@@ -48,6 +48,23 @@ public readonly record struct BoxConstraints(
             MaxHeight = height ?? PositiveInfinity,
         };
 
+    /// <summary>指定された軸だけを固定し、未指定の軸を親の制約いっぱいまで広げる制約を作成します。</summary>
+    /// <param name="width">固定する論理ピクセル単位の幅。<see langword="null"/>の場合は幅を親の最大幅まで広げます。</param>
+    /// <param name="height">固定する論理ピクセル単位の高さ。<see langword="null"/>の場合は高さを親の最大高さまで広げます。</param>
+    /// <returns>未指定の軸の最小値と最大値を正の無限大にした制約。</returns>
+    /// <remarks>
+    /// <see cref="Enforce"/>で親の制約の範囲へ収めると、未指定の軸は親の最大値に固定されます。
+    /// 親の最大値が無限の軸では、結果も無限になります。
+    /// </remarks>
+    public static BoxConstraints Expand(double? width = null, double? height = null) =>
+        new()
+        {
+            MinWidth = width ?? PositiveInfinity,
+            MaxWidth = width ?? PositiveInfinity,
+            MinHeight = height ?? PositiveInfinity,
+            MaxHeight = height ?? PositiveInfinity,
+        };
+
     /// <summary>最小値を0とし、指定値までを許容する緩い制約を作成します。</summary>
     /// <param name="width">許容する論理ピクセル単位の最大幅。</param>
     /// <param name="height">許容する論理ピクセル単位の最大高さ。</param>

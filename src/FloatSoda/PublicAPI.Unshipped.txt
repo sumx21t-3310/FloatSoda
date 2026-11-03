@@ -1,3 +1,4 @@
 #nullable enable
 *REMOVED*override FloatSoda.Elements.MultiChildRenderObjectElement<T>.InsertRenderObjectChild(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.Elements.MultiChildRenderObjectElement<T>.InsertRenderObjectChild(FloatSoda.RenderObjects.RenderObject? child) -> void
+static FloatSoda.Geometrics.BoxConstraints.Expand(double? width = null, double? height = null) -> FloatSoda.Geometrics.BoxConstraints

@@ -34,7 +34,7 @@ public class RenderConstrainedBox : RenderProxyBox
         var enforcedConstraints = AdditionalConstraints.Enforce(Constraints);
         Child?.Layout(enforcedConstraints, parentUseSize: true);
 
-        Size = Child?.Size ?? enforcedConstraints.Constrain(Size);
+        Size = Child?.Size ?? enforcedConstraints.Smallest;
     }
 
     /// <inheritdoc/>
@@ -62,27 +62,37 @@ public class RenderConstrainedBox : RenderProxyBox
 
     private double ComputeIntrinsicWidth(double height, bool minimum)
     {
-        if (AdditionalConstraints.HasTightWidth)
+        if (double.IsFinite(AdditionalConstraints.MaxWidth) && AdditionalConstraints.HasTightWidth)
             return AdditionalConstraints.MinWidth;
 
-        var constrainedHeight = AdditionalConstraints.ConstrainHeight(height);
+        var constrainedHeight = double.IsInfinity(AdditionalConstraints.MinHeight)
+            ? height
+            : AdditionalConstraints.ConstrainHeight(height);
         var childWidth =
             Child is null ? 0
             : minimum ? Child.GetMinIntrinsicWidth(constrainedHeight)
             : Child.GetMaxIntrinsicWidth(constrainedHeight);
-        return AdditionalConstraints.ConstrainWidth(childWidth);
+        return double.IsInfinity(AdditionalConstraints.MinWidth)
+            ? childWidth
+            : AdditionalConstraints.ConstrainWidth(childWidth);
     }
 
     private double ComputeIntrinsicHeight(double width, bool minimum)
     {
-        if (AdditionalConstraints.HasTightHeight)
+        if (
+            double.IsFinite(AdditionalConstraints.MaxHeight) && AdditionalConstraints.HasTightHeight
+        )
             return AdditionalConstraints.MinHeight;
 
-        var constrainedWidth = AdditionalConstraints.ConstrainWidth(width);
+        var constrainedWidth = double.IsInfinity(AdditionalConstraints.MinWidth)
+            ? width
+            : AdditionalConstraints.ConstrainWidth(width);
         var childHeight =
             Child is null ? 0
             : minimum ? Child.GetMinIntrinsicHeight(constrainedWidth)
             : Child.GetMaxIntrinsicHeight(constrainedWidth);
-        return AdditionalConstraints.ConstrainHeight(childHeight);
+        return double.IsInfinity(AdditionalConstraints.MinHeight)
+            ? childHeight
+            : AdditionalConstraints.ConstrainHeight(childHeight);
     }
 }

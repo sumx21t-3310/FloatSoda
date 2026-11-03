@@ -16,6 +16,9 @@ public record Container : StatelessWidget
 {
     /// <summary>
     /// コンテナー内へ配置する子ウィジェットを取得します。
+    /// <see langword="null"/>の場合、コンテナーは親の制約が有限の軸で最大まで広がり、無限の軸で0になります。
+    /// ただし、寸法を指定していない無限の軸には、<see cref="Padding"/>と<see cref="Decoration"/>の余白を加算します。
+    /// <see cref="Width"/>または<see cref="Height"/>を指定した軸は、その値を親の制約の範囲に収めた大きさになります。
     /// </summary>
     public Widget? Child { get; init; }
 
@@ -168,7 +171,14 @@ public record Container : StatelessWidget
             );
         }
 
-        Widget current = Child ?? new SizedBox();
+        Widget current =
+            Child
+            ?? new LimitedBox
+            {
+                MaxWidth = 0,
+                MaxHeight = 0,
+                Child = new ConstrainedBox { AdditionalConstraints = BoxConstraints.Expand() },
+            };
 
         if (Child is not null && Alignment is { } alignment)
         {

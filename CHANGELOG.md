@@ -7,6 +7,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- `BoxConstraints.Expand(width, height)` を追加。Flutter の `BoxConstraints.expand` に当たる。指定した軸を固定し、未指定の軸を親の制約いっぱいまで広げる(#268)
+
+### Changed (Breaking)
+
+- `Child` の無い `Container` の大きさを Flutter に揃えた。親の制約が有限の軸では最大まで広がり、無限の軸では 0 になる。従来は緩い制約の下で 0 に縮んでいた。`Width` か `Height` の片方だけを指定した場合も、未指定の軸が広がる。0 のままにするなら、`Width = 0` と `Height = 0` を指定する(#268)
+
+### Fixed
+
+- `RenderConstrainedBox` の `AdditionalConstraints` の上限が無限のとき、固有サイズ(intrinsic)が無限大になる問題を修正。Flutter と同じく、子の固有サイズを返す。子へ問い合わせる交差軸の値も、無限大に変えずにそのまま渡す(#268)
+- 子のない `RenderConstrainedBox` が前回のレイアウトの大きさを引き継ぎ、制約が緩くなっても縮まない問題を修正。子なしの `SizedBox` と `ConstrainedBox` も同じ影響を受けていた。Flutter と同じく、制約が許す最小の大きさになる(#268)
+
 ## [0.5.0] - 2026-10-30
 
 ### Added

@@ -56,7 +56,7 @@ new SizedBoxWidget
 | 項目 | FloatSoda | Flutter |
 |---|---|---|
 | 生成方法 | `Width` / `Height` の `init` プロパティのみ | `SizedBox.expand` / `SizedBox.shrink` / `SizedBox.square` の名前付きコンストラクタがある |
-| 領域いっぱいに広げる | 名前付きの手段はない。`Width` / `Height` を省略して親の制約に従わせるか、`Align` などで広げる | `SizedBox.expand()` |
+| 領域いっぱいに広げる | `SizedBox` に名前付きの手段はない。`ConstrainedBox` の `AdditionalConstraints` に `BoxConstraints.Expand()` を指定する | `SizedBox.expand()` |
 | 最小に縮める | 名前付きの手段はない。`Width = 0, Height = 0` を指定する | `SizedBox.shrink()` |
 | 正方形 | `Width` と `Height` に同じ値を書く | `SizedBox.square(dimension: 48)` |
 

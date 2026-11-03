@@ -60,7 +60,7 @@ FloatSoda は、Flutter の3つの木(ウィジェット、Element、RenderObjec
 | `FontWeight.w700` | `FontWeight = 700`(`int`) | 列挙型を持たない | [Text](../../samples/FloatSoda.Samples.Text/README.md) |
 | `Matrix4` | `Matrix3x2`(2次元のアフィン変換だけ) | 3次元の変換を持たない | [Transform](../../samples/FloatSoda.Samples.Transform/README.md) |
 | `addListener` | 通知元ごとの `event`(`AnimationController` は `Changed`、`INotifyPropertyChanged` は `PropertyChanged`。`+=` で登録し、`-=` で解除する) | C# の標準の仕組みを使う方針 | [API_DESIGN.md の 3.6](../../API_DESIGN.md) |
-| `SizedBox.square()`、`SizedBox.expand()` | `square()` は `Width` と `Height` に同じ値を指定して書く。`expand()` に当たる手段はない。`Width` と `Height` を省略すると、親の制約がそのまま子に渡るだけで、親の制約が緩いときは領域いっぱいに広がらない(`BoxConstraints.TightFor(null, null)`) | 名前付きコンストラクタを持たない | [SizedBox](../../samples/FloatSoda.Samples.SizedBox/README.md) |
+| `SizedBox.square()`、`SizedBox.expand()` | `square()` は `Width` と `Height` に同じ値を指定して書く。`expand()` は、`ConstrainedBox` の `AdditionalConstraints` に `BoxConstraints.Expand()` を指定して書く。`SizedBox` の `Width` と `Height` を省略すると、親の制約がそのまま子に渡るだけで、親の制約が緩いときは領域いっぱいに広がらない(`BoxConstraints.TightFor(null, null)`) | 名前付きコンストラクタを持たない | [SizedBox](../../samples/FloatSoda.Samples.SizedBox/README.md) |
 | `Padding` の `EdgeInsets.only(left: 48)` | `new EdgeInsets(Left: 48)` | 名前付きコンストラクタを持たない | [Padding](../../samples/FloatSoda.Samples.Padding/README.md) |
 
 <!-- ※要確認: 改名の一覧に漏れがないか(作例のない型の改名は README から拾えない) -->
@@ -101,7 +101,6 @@ Flutter のウィジェットが取る引数のうち、FloatSoda にないも�
 | ウィジェット | 症状 | 直し方 | 追跡 | 詳細 |
 | :-- | :-- | :-- | :-- | :-- |
 | `Stack` | 範囲を超えた子も、切り取られずに見える | `Stack` を `ClipRect` で包む | #257 | [Stack](../../samples/FloatSoda.Samples.Stack/README.md) |
-| `Container` | 子がないと、緩い制約の下で 0 に縮む | `Width` と `Height` を指定する | #268 | [Container](../../samples/FloatSoda.Samples.Container/README.md) |
 | `Expanded` | `Flex` に 0 以下を指定すると例外になる。主軸の長さが決まらない場所の `Expanded` も、常に例外になる | `Flex` に 1 以上を指定する | なし | [Expanded](../../samples/FloatSoda.Samples.Expanded/README.md) |
 
 <!-- ※要確認: 各行の「直し方」が今も有効か。実際に試していない -->
