@@ -1,6 +1,6 @@
 using FloatSoda.Engine.Abstractions;
 using FloatSoda.Engine.Abstractions.Input;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Rendering.Layers;

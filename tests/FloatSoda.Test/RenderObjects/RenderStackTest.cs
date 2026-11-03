@@ -1,5 +1,5 @@
-using FloatSoda.Geometory;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.RenderObjects.Layout;
 using FloatSoda.Widgets.Layout;
 using SkiaSharp;

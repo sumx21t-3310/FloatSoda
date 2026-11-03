@@ -1,5 +1,5 @@
 using FloatSoda.Engine.Abstractions.Input;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.OVR;
 
 namespace FloatSoda.Engine.OVR;

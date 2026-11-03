@@ -1,6 +1,6 @@
 using FloatSoda.Core;
 using FloatSoda.Engine.Abstractions.Input;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects.Gesture;
 

@@ -5,7 +5,7 @@
         <Nullable>enable</Nullable>
         <PackageId>FloatSoda.Geometry</PackageId>
         <Description>Shared contracts and primitives for FloatSoda, including engine abstractions, geometry types, input events, and frame pacing.</Description>
-        <RootNamespace>FloatSoda.Geometory</RootNamespace>
+        <RootNamespace>FloatSoda.Geometry</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

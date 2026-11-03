@@ -1,4 +1,4 @@
-namespace FloatSoda.Geometory;
+namespace FloatSoda.Geometry;
 
 /// <summary>
 /// 角度を表す値型。内部的にはラジアンで保持します。

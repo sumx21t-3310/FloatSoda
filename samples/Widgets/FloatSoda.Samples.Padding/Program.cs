@@ -1,5 +1,5 @@
 using FloatSoda;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.OVR;
 using FloatSoda.Samples.Padding;
 using FloatSoda.Widgets;

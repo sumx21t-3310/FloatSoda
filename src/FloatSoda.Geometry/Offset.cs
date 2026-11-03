@@ -1,6 +1,6 @@
 using SkiaSharp;
 
-namespace FloatSoda.Geometory;
+namespace FloatSoda.Geometry;
 
 /// <summary>二次元座標または移動量を倍精度の成分で表します。</summary>
 /// <param name="X">水平方向の成分。単位は利用する座標系に従い、既定値は0です。</param>

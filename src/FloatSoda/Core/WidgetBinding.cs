@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
-using FloatSoda.Abstractions.Input;
 using FloatSoda.Elements;
 using FloatSoda.Engine;
 using FloatSoda.Engine.Abstractions;
 using FloatSoda.Engine.Abstractions.Input;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Rendering.Layers;

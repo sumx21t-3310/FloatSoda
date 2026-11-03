@@ -1,4 +1,4 @@
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 
 namespace FloatSoda.Engine.Abstractions.Input;
 

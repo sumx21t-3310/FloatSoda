@@ -1,5 +1,5 @@
 using FloatSoda;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.OVR;
 using FloatSoda.Samples.PointerRegion;
 using FloatSoda.Widgets;

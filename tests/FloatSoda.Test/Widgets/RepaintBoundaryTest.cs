@@ -1,6 +1,6 @@
 using FloatSoda.Core;
 using FloatSoda.Elements;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Painting;
 using FloatSoda.Widgets;

@@ -1,6 +1,6 @@
 using SkiaSharp;
 
-namespace FloatSoda.Geometory;
+namespace FloatSoda.Geometry;
 
 /// <summary>幾何型の移動および範囲判定を補助する拡張メソッドを提供します。</summary>
 public static class GeometryExtension

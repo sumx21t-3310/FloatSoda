@@ -1,4 +1,4 @@
-namespace FloatSoda.Geometory;
+namespace FloatSoda.Geometry;
 
 /// <summary>
 /// テクスチャの物理密度（dots per meter）を表す値型。

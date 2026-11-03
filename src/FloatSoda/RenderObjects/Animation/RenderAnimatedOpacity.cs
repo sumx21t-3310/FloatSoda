@@ -1,6 +1,6 @@
 using FloatSoda.Animation;
 using FloatSoda.Core;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.Rendering.Layers;
 
 namespace FloatSoda.RenderObjects.Animation;

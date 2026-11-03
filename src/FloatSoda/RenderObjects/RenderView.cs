@@ -1,7 +1,7 @@
 ﻿using FloatSoda.Core;
 using FloatSoda.Engine.Abstractions.Input;
-using FloatSoda.Geometory;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.Rendering.Layers;
 using SkiaSharp;

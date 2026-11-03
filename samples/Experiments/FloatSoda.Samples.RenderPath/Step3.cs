@@ -1,7 +1,7 @@
 using System.Numerics;
 using FloatSoda.Engine;
 using FloatSoda.Engine.OVR;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 using FloatSoda.OVR;
 using FloatSoda.OVR.Overlay;
 using FloatSoda.Rendering.Layers;

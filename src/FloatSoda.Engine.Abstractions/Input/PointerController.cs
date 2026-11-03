@@ -1,9 +1,8 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using FloatSoda.Engine.Abstractions.Input;
-using FloatSoda.Geometory;
+using FloatSoda.Geometry;
 
-namespace FloatSoda.Abstractions.Input;
+namespace FloatSoda.Engine.Abstractions.Input;
 
 /// <summary>
 /// <see cref="IRawPointerSource"/> の生イベント列を <see cref="PointerEvent"/>（Add/Remove 合成・PointerId 採番済み）へ変換する状態機械。
