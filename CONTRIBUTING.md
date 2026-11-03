@@ -86,6 +86,8 @@ dotnet csharpier check .
 dotnet build --configuration Release
 dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 dotnet test tests/FloatSoda.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.Engine.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build
 ```
 
 バグ報告や機能要望は、`.github/ISSUE_TEMPLATE/` のテンプレートを使って Issue を作成してください。PR の本文は [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) に沿って記入してください。
