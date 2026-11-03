@@ -85,5 +85,3 @@ frontmatter の `description` は、エージェントが skill を使うかを�
 正本に合わせて、スタブを直してください。
 
 </details>
-
-<!-- ※要確認: .agents/skills/hello に対応するスタブが .claude/skills/ に無い。意図した例外か抜けか。確かめ方: オーナーに確認する -->

@@ -1,30 +1,28 @@
-← [Home](docs/Home.md)
-
 # Localization
 
-このドキュメントは、FloatSoda のローカライゼーション方針(言語の優先順位・リソースの持ち方・翻訳の追加手順)をまとめたものです。
+このドキュメントは、FloatSoda におけるローカライゼーション方針(言語の優先順位、リソースの管理方法、翻訳の追加手順)をまとめたものです。
 
 ## 1. 基本方針: 日本語がデフォルト
 
 FloatSoda は**日本語をニュートラル(既定)言語**とし、英語をサテライトリソースとして提供します。
 
-これは意図的な選択です。[TargetUsers](AGENTS.md#target-users) が定義する3ペルソナ(バイブコーディングする VRChatter・Booth 創作者・uGUI を避けたいエンジニア)は、いずれも日本語話者を第一に想定しているため、`docs/` も日本語で書かれています。例外メッセージ・ドキュメントコメント・ドキュメントの言語が日本語で揃っているため、バイブコーディング時に LLM がユーザーへ提示するエラー説明の言語も一致します。
+これは意図的な選択です。[AGENTS.md の Target Users](AGENTS.md#target-users) が定義する3ペルソナ(バイブコーディングする VRChatter、Booth 創作者、uGUI を避けたいエンジニア)は、いずれも日本語話者を第一に想定しているため、`docs/` も日本語で書かれています。例外メッセージ、ドキュメントコメント、ドキュメントの言語を日本語で揃えることで、バイブコーディング時に LLM がユーザーへ提示するエラー説明の言語も一致します。
 
 対象ごとの方針は次の通りです。
 
 | 対象 | 方針 |
 |---|---|
 | 例外メッセージ | resx でローカライズ。ニュートラル = 日本語、`en` サテライト = 英語(実装済み) |
-| XML ドキュメントコメント | ソースには**日本語のみ**を書く。英語版は将来サテライト XML で後付け(未実装、§4) |
+| XML ドキュメントコメント | ソースコードには**日本語のみ**を書く。英語版は将来サテライト XML で後から追加する(未実装、§4) |
 | `docs/` 配下のドキュメント | 日本語のみ |
 | テストメソッド名 | `対象メンバー名_条件_期待結果` の条件・期待結果を日本語で書く(規約は [CONTRIBUTING.md](CONTRIBUTING.md)) |
 | API 識別子(型名・プロパティ名) | 英語(.NET の慣習通り。ローカライズ対象外) |
 
-> **コントリビュータへ**: 「英語がデフォルトであるべき」と直したくなるかもしれませんが、ニュートラル = 日本語は意図的な設計判断です。変更する場合は必ず issue で議論してください。
+> **コントリビュータへ**: 「英語がデフォルトであるべき」と直したくなるかもしれませんが、ニュートラル = 日本語という指定は意図的な設計判断です。変更する場合は必ず issue で議論してください。
 
 ## 2. フォールバックの仕組み
 
-リソース解決は `CultureInfo.CurrentUICulture`(通常は OS の表示言語)に基づく .NET 標準のフォールバックに従います。
+リソースの解決は、`CultureInfo.CurrentUICulture`(通常は OS の表示言語)に基づく .NET 標準のフォールバックに従います。
 
 ```mermaid
 graph LR
@@ -33,7 +31,7 @@ graph LR
     C["CurrentUICulture = de-DE など<br/>(未対応言語)"] -->|"de サテライトなし →<br/>ニュートラルへ"| N
 ```
 
-重要な点として、**日本語でも英語でもない環境(ドイツ語 Windows など)では日本語が表示されます**。国際展開を最優先するなら「ニュートラル = 英語、`ja` サテライト = 日本語」が定石ですが、FloatSoda は主客層と Booth 流通を優先して「迷ったら日本語」を選んでいます。
+特に重要な点として、**日本語でも英語でもない環境(ドイツ語 Windows など)では日本語が表示されます**。国際展開を最優先するなら「ニュートラル = 英語、`ja` サテライト = 日本語」とするのが定石ですが、FloatSoda は主な対象ユーザーと Booth での流通を優先し、「迷ったら日本語」という方針を選択しています。
 
 ## 3. 例外メッセージ (実装済み)
 
@@ -45,7 +43,7 @@ graph LR
 | `src/FloatSoda.OVR/Exceptions/Resources/ExceptionMessages.en.resx` | 英語サテライト。`en/FloatSoda.OVR.resources.dll` として出力される |
 | `src/FloatSoda.OVR/Exceptions/Resources/ExceptionMessages.cs` | 強い型付けアクセサ。`ResourceManager.GetString(key, CurrentUICulture)` で解決し、見つからなければキー文字列そのものを返す |
 
-キーの命名は `{例外クラス名}_{OpenVRエラー列挙子}` です(例: `VRApplicationException_NoManifest`)。OpenVR のエラー列挙値と1対1対応させています。
+キーの命名規則は `{例外クラス名}_{OpenVRエラー列挙子}` です(例: `VRApplicationException_NoManifest`)。OpenVR のエラー列挙値と1対1で対応させています。
 
 ```xml
 <!-- ExceptionMessages.resx (ニュートラル = 日本語) -->
@@ -74,13 +72,13 @@ graph LR
 
 ### 既知の未対応事項
 
-`[assembly: NeutralResourcesLanguage("ja")]` は現在未設定です。設定すると、日本語環境で存在しない `ja` サテライトを探すコストを省けます。「ニュートラル = 日本語」という設計判断をコード上にも明示できます。
+`[assembly: NeutralResourcesLanguage("ja")]` は現在未設定です。設定すると、日本語環境で存在しない `ja` サテライトを探すコストを省けます。また、「ニュートラル = 日本語」という設計判断をコード上でも明示できます。
 
 ## 4. XML ドキュメントコメント
 
-ソースコードの XML ドキュメントコメントを**日本語のみ**で書く方針は [DocumentationComments](DOCUMENTATION_COMMENTS.md) に移動しました。ここではローカライズの仕組みだけを扱います。
+ソースコードの XML ドキュメントコメントを**日本語のみ**で書く方針は [DOCUMENTATION_COMMENTS.md](DOCUMENTATION_COMMENTS.md) に移動しました。ここではローカライズの仕組みだけを扱います。
 
-resx と違い、XML ドキュメントコメントはビルド時に `FloatSoda.OVR.xml` のような単一の XML ファイルに書き出されるため、resx の仕組みではローカライズできません。ローカライズする場合は、NuGet パッケージの `lib/net10.0/{culture}/FloatSoda.OVR.xml` に翻訳済みの XML を同梱します(サテライト XML)。Visual Studio / Rider の IntelliSense はこの配置を認識します。
+resx と異なり、XML ドキュメントコメントはビルド時に `FloatSoda.OVR.xml` のような単一の XML ファイルとして書き出されるため、resx の仕組みではローカライズできません。ローカライズする場合は、翻訳済みの XML をサテライト XML として NuGet パッケージの `lib/net10.0/{culture}/FloatSoda.OVR.xml` に同梱します。Visual Studio / Rider の IntelliSense はこの配置を認識します。
 
 英語版サテライト XML の生成は**未実装**です。将来的にはビルドパイプラインで機械翻訳(LLM)による生成を検討しています。それまでは、ソースコードには日本語だけを書いてください。
 
@@ -92,11 +90,11 @@ resx と違い、XML ドキュメントコメントはビルド時に `FloatSoda
 - 強い型付けアクセサクラスを手書きし、`GetString(key, CurrentUICulture) ?? key` のフォールバックを付ける
 - キー欠落で例外を投げない(リソース解決の失敗でアプリを落とさない)
 
-ただし [APIDesign](API_DESIGN.md) の設計哲学に注意してください。**UI に表示する文字列はフレームワークが持たない**のが原則です。たとえば `new Text(...)` に渡す文字列は利用者のアプリに属します。フレームワークのローカライズ対象はエラーメッセージと診断メッセージに限られます。
+ただし [API_DESIGN.md](API_DESIGN.md) の設計哲学に注意してください。**UI に表示する文字列はフレームワークが持たない**のが原則です。たとえば `new Text(...)` に渡す文字列は利用者のアプリに属します。フレームワークのローカライズ対象はエラーメッセージと診断メッセージに限られます。
 
 ## 6. RTL(右から左へのレイアウト)は現時点でスコープ外
 
-FloatSoda v0.x は日本語・英語・中国語・韓国語を対象とした水平 LTR レイアウトのみをサポートします。`Directionality`、`PositionedDirectional`、`EdgeInsetsDirectional`、`AlignmentDirectional` など start/end ベースのレイアウト API は導入していません。RTL レイアウトへの対応は、利用者からの要望が確認できるまで見送ります。
+FloatSoda v0.x は、日本語・英語・中国語・韓国語を対象とした水平 LTR レイアウトのみをサポートします。`Directionality`、`PositionedDirectional`、`EdgeInsetsDirectional`、`AlignmentDirectional` など start/end ベースのレイアウト API は導入していません。RTL レイアウトへの対応は、利用者からの要望が確認できるまで見送ります。
 
 これは、VRChat エコシステムで日本語・英語・中国語・韓国語を使う層を初期の対象言語とする製品判断です。RTL より優先する項目は次の通りです。
 
@@ -106,10 +104,10 @@ FloatSoda v0.x は日本語・英語・中国語・韓国語を対象とした�
 - 日本語とラテン文字の混在
 - テキストの折り返しと省略
 
-なお、UI レベルの RTL ミラーリングと、ユーザー生成文字列内の Unicode 双方向テキスト処理は別の関心事です。VRChat のユーザー生成コンテンツが双方向テキスト処理を要求する場合、RTL 対応より先に双方向テキスト処理が必要になる可能性があります。
+なお、UI レベルでの RTL ミラーリングと、ユーザー生成文字列内の Unicode 双方向テキスト処理は別の関心事です。VRChat のユーザー生成コンテンツが双方向テキスト処理を要求する場合、RTL 対応より先に双方向テキスト処理が必要になる可能性があります。
 
 ## 関連ページ
 
-- [TargetUsers](AGENTS.md#target-users) — 日本語デフォルトの根拠となる想定利用者
-- [APIDesign](API_DESIGN.md) — API 設計規約(識別子は英語)
-- [OVRIntegration](docs/contributor/2-understand/ovr-layer.md) — 例外型の全体像
+- [AGENTS.md の Target Users](AGENTS.md#target-users) — 日本語デフォルトの根拠となる想定利用者
+- [API_DESIGN.md](API_DESIGN.md) — API 設計規約(識別子は英語)
+- [OVR 層](docs/contributor/2-understand/ovr-layer.md) — 例外型の全体像

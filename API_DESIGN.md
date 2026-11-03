@@ -1,32 +1,30 @@
-← [Home](docs/Home.md)
-
 # API Design Guidelines
 
-このドキュメントは、本フレームワークのコンポーネントAPIを設計・実装する際の規約とベストプラクティスを定めます。
+このドキュメントでは、本フレームワークのコンポーネントAPIを設計・実装する際の規約とベストプラクティスを定めます。
 
 ## 1. 基本設計哲学
 
-本フレームワークは、Flutterのウィジェットツリーモデルを参考にしています。**宣言的UI**、**イミュータブルな構成**、**ツリー構造による合成**を設計の中心に置きます。
+本フレームワークは、Flutterのウィジェットツリーモデルを参考にしています。**宣言的UI**、**イミュータブルな構成**、**ツリー構造による合成**を設計の中心に据えています。
 
-C# のオブジェクト初期化子構文を活用し、マークアップに近い読みやすいUIコードを実現します。
+C# のオブジェクト初期化子構文を活用し、マークアップに近く読みやすいUIコードを実現します。
 
 ### 判断原則: 概念とツリーの語彙は Flutter に、その表現手段は C# に従う
 
-Flutter を参考にする範囲と、C# の慣習を優先する範囲を次のように使い分けます。
+Flutter を参考にする範囲と、C# の慣習を優先する範囲は、次のように使い分けます。
 
-- **UIドメインの語彙の層** — Flutter に準拠します。ウィジェット名、レイアウト用語（`MainAxisAlignment`, `CrossAxisAlignment`）、`Child` / `Children` などの木構造の語彙は Flutter の名前をそのまま使います。Flutter を参照する利用者やコード生成AIが自然に書く形を、そのまま正解とするためです。
-- **言語機構・実装パターンの層** — C# として自然な API や慣習があれば、そちらを優先します。Dart の言語制約に由来する実装パターン（例: `addListener` / `removeListener`）は直訳せず、C# の言語機構（`event`, `init`, `required`, `record struct`, `extension` プロパティなど）で同じ意図を表現します。
+- **UIドメインの語彙の層** — Flutter に準拠します。ウィジェット名やレイアウト用語（`MainAxisAlignment`, `CrossAxisAlignment`）、`Child` / `Children` などのツリー構造を表す語彙は、Flutter の名前をそのまま使います。Flutter を参照する利用者やコード生成AIが自然に書いたコードを、そのまま正解として扱えるようにするためです。
+- **言語機構・実装パターンの層** — C# として自然な API や慣習がある場合は、そちらを優先します。Dart の言語制約に由来する実装パターン（例: `addListener` / `removeListener`）は直訳せず、C# の言語機構（`event`, `init`, `required`, `record struct`, `extension` プロパティなど）を用いて同じ意図を表現します。
 
-本ドキュメントの個別ルールの多くは、この原則の適用例です。リスナーパターンではなく `event`（セクション3.6）、`is null` パターン（3.5）、ジオメトリの `record struct`（8）、単位リテラルの拡張プロパティ（7.5）、`init` / `required` によるイミュータビリティと必須値の表現（4・5）などが該当します。
+本ドキュメントに記載された個別ルールの多くは、この原則を適用したものです。リスナーパターンではなく `event` を採用する（セクション3.6）、`is null` パターンを用いる（3.5）、ジオメトリを `record struct` で表現する（8）、単位リテラルに拡張プロパティを使う（7.5）、`init` / `required` によってイミュータビリティと必須値を表現する（4・5）などが該当します。
 
-ただし、C# の一般慣習を常に優先するわけではありません。フレームワークの読みやすさを優先して意図的に逸脱する場合は、その理由を明記します（例: 兄弟ウィジェットの同一ファイル配置は StyleCop SA1402 から意図的に外れる — セクション2.5）。
+ただし、C# の一般的な慣習を常に優先するわけではありません。フレームワークとしての読みやすさを重視し、意図的に慣習から逸脱する場合はその理由を明記します（例: 兄弟ウィジェットの同一ファイル配置は StyleCop SA1402 から意図的に外れる — セクション2.5）。
 
 ### 判断原則: .NET が標準で提供する機構を再実装しない
 
-一つ前の原則の後半（表現手段は C# に従う）を、判定可能な手順にしたものです。「C# として自然か」という判断は主観に流れやすいため、次の順で判定します。
+前述の原則の後半（表現手段は C# に従う）を、客観的に判定できる手順に落とし込んだものです。「C# として自然か」という判断は主観に偏りやすいため、次の手順で判定します。
 
 1. その機構と **同等のもの** を .NET が標準で提供していないか確認します。
-2. 提供されていれば、それを使います。Flutter 側に対応する独自実装があっても移植しません。
+2. 提供されていれば、それを使います。Flutter 側に該当する独自実装があっても移植しません。
 3. なければ自前で実装し、**なぜ同等でないのか** をドキュメントコメントに残します。
 
 ここでの「標準」は厳密な BCL に限らず、.NET が標準として提供する機構（`Microsoft.Extensions.*` を含む）を指します。
@@ -41,7 +39,7 @@ Flutter を参考にする範囲と、C# の慣習を優先する範囲を次の
 | HTTP の同時接続数制御 | `SocketsHttpHandler.MaxConnectionsPerServer` | 実装しない |
 | 処理を直列化するための専用スレッド | `Channel<T>` と単一の reader ループ | 立てない。専用スレッドはスレッド親和性が要求される場合（GL コンテキスト等）に限る |
 
-最後の行で `Channel<T>` と reader ループの組み合わせだけを挙げているのは、**「投入順に1件ずつ」まで満たせる標準機構が他にない**からです。似て見える機構でも、保証する契約が異なります。
+上記の表の最後の行で `Channel<T>` と reader ループの組み合わせだけを挙げているのは、**「投入順に1件ずつ」まで満たせる標準機構が他にない**ためです。一見似ている機構であっても、保証する契約が異なります。
 
 | 機構 | 保証すること | 保証しないこと |
 |---|---|---|
@@ -50,33 +48,33 @@ Flutter を参考にする範囲と、C# の慣習を優先する範囲を次の
 | `SemaphoreSlim(1, 1)` | 排他実行 | **待機の順序**。先に待った側が先に通るとは限らない |
 | `ConcurrentExclusiveSchedulerPair.ExclusiveScheduler` | 同期的なタスク本体どうしの排他 | **`await` をまたぐ排他**（継続は別タスクとして再スケジュールされる）と順序 |
 
-`Channel<T>` が保証するのは**投入順での取り出し**までです。1件ずつの処理は reader 側の書き方で決まります。`SingleReader = true` は「呼び出し側が単一リーダーを守る」ことを前提にした最適化指示であり、複数リーダーや並行処理を禁止しません。**単一の reader ループが各要素の処理を `await` し切ってから次を読む**形にして初めて、直列化が成立します。producer が複数ある場合、ここでの「投入順」は enqueue が成立した順を指します。
+`Channel<T>` が保証するのは、あくまで**投入順での取り出し**までです。1件ずつ処理されるかどうかは reader 側の書き方で決まります。`SingleReader = true` は「呼び出し側が単一リーダーを守る」ことを前提にした最適化指示に過ぎず、複数リーダーによる読み出しや並行処理を禁止しません。**単一の reader ループが各要素の処理を `await` し切ってから次を読む**形にして初めて、直列化が成立します。なお、producer が複数ある場合、ここでの「投入順」は enqueue が成立した順を指します。
 
-`IOTaskRunner` のように「投入順に1件ずつ」を契約しているものを、排他だけを保証する機構へ置き換えると、順序が逆転して壊れます。**要件が排他だけなのか、順序まで含むのかを先に確定させてください。**
+`IOTaskRunner` のように「投入順に1件ずつ」を契約しているものを、排他実行だけを保証する機構へ置き換えると、順序が逆転して破綻します。**要件が排他だけなのか、順序まで含むのかを先に確定させてください。**
 
 #### 「同等」の判定
 
-この原則の難しさは「同等」の判定にあります。**形が似ているだけで契約が違うものを同等と見なすと、逆向きに壊れます。** 同等かどうかは API の形ではなく、**満たすべき契約が一致するか** で判定します。
+この原則の難しさは、「同等」の判定にあります。**形が似ているだけで契約が違うものを同等とみなすと、かえって破綻を招きます。** 同等かどうかは API の形ではなく、**満たすべき契約が一致するか** で判定します。
 
-非同等と判定した例として、画像キャッシュに `Microsoft.Extensions.Caching.Memory` を使えるか検討した場合を挙げます。LRU と容量上限は満たせますが、**「参照中のエントリは容量に関係なく退避しない」という動的な契約**を表現できません。
+非同等と判定した具体例として、画像キャッシュに `Microsoft.Extensions.Caching.Memory` を使えるか検討した場合を挙げます。LRU と容量上限は満たせますが、**「参照中のエントリは容量に関係なく退避しない」という動的な契約**を表現できません。
 
-似た機能として `CacheItemPriority.NeverRemove` がありますが、これは**エントリ登録時に決まる静的な優先度**です。必要なのは、「貸出が1つ以上ある間だけ退避を禁止し、最後の貸出が返された時点で通常の退避対象へ戻す」という、参照カウントに追従して切り替わる契約です。`NeverRemove` と既定値を出し入れして模倣することは理屈のうえでは可能ですが、切り替えの間に退避が走る隙間が残るため、契約を満たしません。
+似た機能として `CacheItemPriority.NeverRemove` がありますが、これは**エントリ登録時に決まる静的な優先度**です。実際に必要なのは、「貸出が1つ以上ある間だけ退避を禁止し、最後の貸出が返された時点で通常の退避対象へ戻す」という、参照カウントに追従して動的に切り替わる契約です。`NeverRemove` と既定値を出し入れして模倣することは理論上可能ですが、切り替えの合間に退避が走る隙間が残るため、契約を満たせません。
 
-したがって同等とは見なせず、自前で実装したうえで理由を残します。
+したがって同等とはみなせず、自前で実装したうえでその理由を残します。
 
 #### 依存関係の増減とは独立
 
-この原則は「依存関係を増やさない」という意味ではありません。標準機構を使うために依存が一つ増えることも、標準機構で足りるために既存の依存を落とせることも、どちらも正しい結果です。判断の対象は依存の数ではなく、**同じものを二度実装していないか** です。
+この原則は「依存関係を増やさない」という意味ではありません。標準機構を使うために依存が一つ増えることも、標準機構で足りるために既存の依存を削減できることも、どちらも正しい結果です。判断の対象とすべきは依存の数ではなく、**同じものを二度実装していないか** です。
 
 ### 判断原則: Flutter 由来の observable behavior に差異を作らない
 
-最初の原則の前半（語彙は Flutter に従う）を、**挙動**まで広げた原則です。
+最初の原則の前半（語彙は Flutter に従う）の対象を、**挙動**にまで広げた原則です。
 
-**Flutter 由来の Widget / RenderObject は、明示された FloatSoda 固有の理由がない限り、Flutter との observable behavior の差異を作りません。**
+**Flutter 由来の Widget / RenderObject は、明示された FloatSoda 固有の理由がない限り、Flutter との observable behavior に差異を設けません。**
 
-FloatSoda の docs は、Flutter の語彙で概念を説明します。読者やコード生成 AI は Flutter の挙動を期待して使うため、**差異がバグでも意図的な設計判断でも、利用者が払うコストは同じ**です。
+FloatSoda の docs では、概念の説明に Flutter の語彙を用いています。読者やコード生成 AI は Flutter と同じ挙動を期待して利用するため、**その差異がバグによるものか意図的な設計判断によるものかにかかわらず、利用者が負うコストは同じ**です。
 
-少なくとも次は parity の対象です。
+少なくとも次の項目は parity の対象です。
 
 - property semantics
 - default values
@@ -91,34 +89,34 @@ FloatSoda の docs は、Flutter の語彙で概念を説明します。読者�
 
 #### Flutter-derived の判定
 
-この原則の適用開始点である、「何が Flutter 由来か」の判定基準です。
+本原則を適用する前提となる、「何が Flutter 由来か」についての判定基準です。
 
-- Flutter に対応する public concept / Widget / RenderObject / lifecycle semantics が存在し、それを FloatSoda へ持ち込むものは **Flutter-derived** として扱い、この原則を適用します。
-- Flutter の型やアルゴリズムを内部実装として利用していても、FloatSoda 独自の利用者向け概念や API であれば、その API 自体は **FloatSoda 固有**として扱います (例: オーバーレイ種別)。
-- Flutter-derived かどうかの判断が割れる場合は、実装開始前に Issue 上で基準 (対応する Flutter API か、FloatSoda 固有か) を明示します。
+- Flutter に対応する public concept / Widget / RenderObject / lifecycle semantics が存在し、それを FloatSoda へ持ち込むものは **Flutter-derived** として扱い、本原則を適用します。
+- Flutter の型やアルゴリズムを内部実装として利用している場合でも、FloatSoda 独自の利用者向け概念や API であれば、その API 自体は **FloatSoda 固有**として扱います (例: オーバーレイ種別)。
+- Flutter-derived かどうかの判断が分かれる場合は、実装を開始する前に Issue 上で基準 (対応する Flutter API か、FloatSoda 固有か) を明示します。
 
 #### 理由にならないもの
 
-**「実装しやすい」「こちらの方が安全」「こちらの方が自然」といった理由だけで、独自仕様にしないでください。** これらの理由は差異を正当化しません。Flutter がその挙動を選んだ背景（多くは実際のアプリで発生した事故）を、FloatSoda が再発見する必要はありません。
+**「実装しやすい」「こちらのほうが安全」「こちらのほうが自然」といった理由だけで、独自仕様にしないでください。** こうした理由は差異を正当化する根拠にはなりません。Flutter がその挙動を採用した背景（多くは実際のアプリで発生した事故）を、FloatSoda がわざわざ再発見する必要はありません。
 
 #### behavioral difference とみなさないもの
 
-C# や .NET として自然な表現への置換は、差異とは見なしません。
+C# や .NET として自然な表現への置き換えは、差異とはみなしません。
 
 - `event`
 - `init` / `required`
 - `record` / `record struct`
 - .NET 標準機構の利用
 
-これは一つ前の2つの原則（表現手段は C# に従う／標準機構を再実装しない）の裏返しです。判断に迷った場合は、**利用者から見た挙動が変わるか**で切り分けてください。`addListener` を `event` に置き換えても、購読と解除という観測可能な挙動は同じです。
+これは直前にある2つの原則（表現手段は C# に従う／標準機構を再実装しない）の裏返しです。判断に迷った場合は、**利用者から見た挙動が変わるかどうか**で切り分けてください。たとえば `addListener` を `event` に置き換えても、購読と解除という観測可能な挙動は同じです。
 
 #### 既に決めた非移植方針を壊さない
 
-FloatSoda のランタイムや対象ユーザーに存在しない機能について、**既に明示された非移植方針を parity を理由に覆さないでください。** 特に Semantics（次節）との整合性を確認してください。「Flutter にあるから」は、次節の判断を覆す理由になりません。
+FloatSoda のランタイムや対象ユーザーに存在しない機能について、**すでに明示された非移植方針を parity を理由に覆さないでください。** 特に Semantics（次節）との整合性を確認してください。「Flutter にあるから」という理由は、次節の判断を覆す根拠にはなりません。
 
 #### 差異が必要な場合の記録義務
 
-差異が必要と判断した場合は、**次の5点を恒久的に記録します**。
+差異が必要だと判断した場合は、**次の5点を恒久的に記録します**。
 
 1. **Flutter の挙動**
 2. **FloatSoda の挙動**
@@ -126,55 +124,55 @@ FloatSoda のランタイムや対象ユーザーに存在しない機能につ�
 4. **差異を固定するテスト**（ファイルとテストメソッド名）
 5. **利用者に影響する場合のドキュメント**
 
-記録先は [`known-divergences.md`](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理する台帳のマスター**であり、本ドキュメントは判断原則だけを持ちます。
+記録先は [`known-divergences.md`](.agents/skills/floatsoda-device-test-gen/references/known-divergences.md) です。このファイルが **FloatSoda と Flutter の確認済み差異を管理するマスター台帳**であり、本ドキュメントには判断原則のみを記載します。
 
-5 について、利用者から見える差異は台帳に記録するだけでは不十分です。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](CONTRIBUTING.md)）にも記載してください。台帳はコントリビュータ向け、docs とサンプルは利用者向けです。
+5 について、利用者から見える差異は台帳に記録するだけでは不十分です。該当する `docs/` のページと、対応するサンプルの `## Flutterとの違い` 節（→ [CONTRIBUTING.md](CONTRIBUTING.md)）にも記載してください。台帳はコントリビュータ向け、docs やサンプルは利用者向けです。
 
-4 が無い差異は、次の移植で気づかずに戻されてしまいます。**テストで固定されていない差異は、記録されていないのと同じ**と考えてください。
+4 がない差異は、次の移植で気づかないまま元に戻されてしまいます。**テストで固定されていない差異は、記録されていないのと同じ**と考えてください。
 
 #### 参照の追跡可能性
 
-Flutter を参照して移植や修正を行う場合、可能な範囲で次の情報を **PR から追跡可能にしてください**（推奨）。PR テンプレートの `## Flutter reference` 欄が該当します。
+Flutter を参照して移植や修正を行う場合は、可能な範囲で次の情報を **PR から追跡可能にしてください**（推奨）。PR テンプレートの `## Flutter reference` 欄がこれに該当します。
 
 - Flutter version または commit
 - 参照した Flutter source
 - 参照した Flutter tests
 - 関連する Flutter API documentation
 
-ローカル参照クローンは `~/code_reading/flutter_reference` です。対応する Widget / Element / RenderObject の特定には `flutter-widget-source` skill が使えます。
+ローカルの参照用クローンは `~/code_reading/flutter_reference` です。対応する Widget / Element / RenderObject の特定には `flutter-widget-source` skill が利用できます。
 
 #### 仕様が食い違ったときの優先順位
 
-既存実装を無条件に正しいものとして扱わないでください。**上から順に**確認します。
+既存の実装を無条件に正しいものとして扱わないでください。**上から順に**確認します。
 
-1. **FloatSoda で明示的に定義された差異・設計判断** — 本ドキュメント、台帳、`docs/` の明記
-2. **Flutter の仕様・実装・公式テスト** — 1 に該当する記述が無ければ、Flutter を基準とします。
-3. **既存の FloatSoda 実装は根拠になりません** — そう実装されていることは、それが正しいことを意味しません。
+1. **FloatSoda で明示的に定義された差異・設計判断** — 本ドキュメント、台帳、`docs/` への明記
+2. **Flutter の仕様・実装・公式テスト** — 1 に該当する記述がなければ、Flutter を基準とします。
+3. **既存の FloatSoda 実装は根拠になりません** — そう実装されていること自体は、それが正しい根拠にはなりません。
 
-**古い Issue や既存実装だけを根拠に、新しい挙動を決めないでください。** Issue が書かれた時点の前提が今も成り立つかを確認してください。
+**古い Issue や既存の実装だけを根拠にして、新しい挙動を決めないでください。** Issue が作成された当時の前提が、現在も成り立っているかを確認してください。
 
 ### 判断原則: 対象ユーザー・ランタイムに不要な Flutter API は移植しない
 
-Flutter の API がすべて FloatSoda に必要なわけではありません。対象ユーザー (→ [TargetUsers](AGENTS.md#target-users)) の需要がなく、かつ FloatSoda のランタイム (Skia → OpenGL → OpenVR オーバーレイテクスチャ) に受け皿がない機能は移植しません。Flutter 由来のコードからフックだけを先に置くことはせず、削除します。
+Flutter のすべての API が FloatSoda に必要なわけではありません。対象ユーザー (→ [AGENTS.md の Target Users](AGENTS.md#target-users)) における需要がなく、かつ FloatSoda のランタイム (Skia → OpenGL → OpenVR オーバーレイテクスチャ) に受け皿がない機能は移植しません。Flutter 由来のコードからフックだけを先行して配置することはせず、削除します。
 
 #### 実装しない API — Semantics (アクセシビリティツリー)
 
-Flutter の `SemanticsNode` / `SemanticsConfiguration` / `PipelineOwner.semanticsOwner` に相当する **並行ツリー** は FloatSoda では実装しません。
+Flutter の `SemanticsNode` / `SemanticsConfiguration` / `PipelineOwner.semanticsOwner` に相当する**並行ツリー**は、FloatSoda では実装しません。
 
 理由:
 
-- **出力先がない** — VR オーバーレイテクスチャは、OS ネイティブのアクセシビリティ API (Windows Narrator / UI Automation / macOS VoiceOver など) に接続する自然なフックを持っていません。SteamVR / OpenVR にもスクリーンリーダー統合の仕組みは存在しません。
+- **出力先がない** — VR オーバーレイテクスチャには、OS ネイティブのアクセシビリティ API (Windows Narrator / UI Automation / macOS VoiceOver など) に接続する適切なフックがありません。SteamVR / OpenVR にもスクリーンリーダーと統合する仕組みは存在しません。
 - **ターゲットユーザーに需要がない** — FloatSoda の3ペルソナ (バイブコーディング VRChatter / Booth 創作者 / uGUI 回避エンジニア) の要件に、アクセシビリティ需要は含まれていません。
-- **部分導入は無意味** — `markNeedsSemanticsUpdate()` だけ実装しても、`SemanticsNode` ツリーと `SemanticsOwner` が無ければ実質 no-op になります。本格的に導入する場合は Semantics ツリー全体の設計が必要になり、その時点で改めて設計し直す方が自然です。
+- **部分導入は無意味** — `markNeedsSemanticsUpdate()` だけを実装しても、`SemanticsNode` ツリーと `SemanticsOwner` がなければ実質的に no-op となります。本格的に導入する場合は Semantics ツリー全体の設計が必要となるため、その時点で改めて設計し直すほうが自然です。
 
 したがって、Flutter 本家から移植する際は、以下のような API やプロパティは **持ち込みません**。
 
 - `RenderObject.markNeedsSemanticsUpdate()`
 - `describeSemanticsConfiguration(SemanticsConfiguration config)`
-- `SemanticsConfiguration` / `SemanticsNode` 系型
+- `SemanticsConfiguration` / `SemanticsNode` 系の型
 - ウィジェット側の `ignoringSemantics` / `excludeSemantics` / `semanticContainer` などのフラグ
 
-将来、VR 空間内でアクセシビリティ情報を表現する自然な方法が見つかった時点で、個別に設計します。それまでは、Flutter 側コードの semantics 関連の呼び出しは移植せずに削除することを規約とします。
+将来、VR 空間内でアクセシビリティ情報を表現する適切な方法が見つかった時点で、個別に設計します。それまでは、Flutter 側コードの semantics 関連の呼び出しは移植せずに削除することを規約とします。
 
 ```csharp
 // 推奨: オブジェクト初期化子によるツリー構造
@@ -200,7 +198,7 @@ var ui = new Column
 
 ### 2.1 オブジェクト初期化子ファーストの原則
 
-すべてのコンポーネントは、**コンストラクタ引数を使わず**オブジェクト初期化子だけで完全に構成できるよう設計します。
+すべてのコンポーネントは、**コンストラクタ引数を使わず**、オブジェクト初期化子だけで完全に構成できるよう設計します。
 
 ```csharp
 // ✅ 良い例: 初期化子のみで完結
@@ -216,40 +214,40 @@ var card = new Card("タイトル", new Text("本文"), 4);
 ```
 
 **理由:**
-- コードがツリー構造として視覚的に読める
-- 引数の順序を覚える必要がない
-- 将来的なプロパティ追加時に後方互換性を保ちやすい
+- コードのツリー構造を視覚的に把握しやすいため
+- 引数の順序を覚える必要がないため
+- 将来プロパティが追加された際にも、後方互換性を保ちやすいため
 
 #### 例外: 末端ウィジェットの単一値コンストラクタ
 
-**末端ウィジェット**に限り、主たる値1つを取るコンストラクタを容認します。末端ウィジェットとは、次の**両方**を満たすものです。
+**末端ウィジェット**に限り、主たる値1つを受け取るコンストラクタを容認します。末端ウィジェットとは、次の**両方**を満たすものです。
 
-1. **ウィジェットを引数(`Child` / `Children`)に取らない** — 合成ではなく、それ自体が葉になる
-2. **データそのものが表示対象** — 文字列・グリフ・画像・数値など「表示される値」を持つ(レイアウトの指示は該当しない)
+1. **ウィジェットを引数(`Child` / `Children`)に取らない** — 他のウィジェットを合成するのではなく、それ自体がツリーの末端(葉)になる
+2. **データそのものが表示対象である** — 文字列・グリフ・画像・数値など「表示される値そのもの」を保持している(レイアウトの指示は該当しない)
 
 ```csharp
 // ✅ 容認: Text はデータそのものが表示対象で、子を取らない
 new Text("Hello, World!")
 ```
 
-**現在の該当例:** `Text(string)`。将来 `Icon` や `ProgressBar` などの末端ウィジェットを追加するときも、この基準を適用します。
-**該当しない例:** `Padding` / `Container` (ウィジェットを子に取るため)、`Spacer` (`size` はレイアウトの指示であり、データではないため)。
+**現在該当する例:** `Text(string)`。将来 `Icon` や `ProgressBar` などの末端ウィジェットを追加する場合も、この基準を適用します。
+**該当しない例:** `Padding` / `Container` (他のウィジェットを子に取るため)、`Spacer` (`size` はレイアウトの指示であり、表示データではないため)。
 
 **付帯ルール:**
 
-- コンストラクタ引数は**主たる値1つのみ**とする。スタイルやオプションは従来どおり `init` プロパティで受ける
-- コンストラクタを持つ末端ウィジェットは、その引数以外に `required` メンバーを**持たない**。追加のスタイルやオプションが必要な場合は `init` プロパティで受ける
-- 情報源が曖昧なもの(`Image` のパスかプロバイダかなど)はコンストラクタを増やさず、型付きのプロバイダで受ける(現行 API は `new Image { Provider = new FileImageProvider(path) }`。`FileImageProvider` は `FloatSoda.Core.Providers` 名前空間)。将来ショートカットを追加する場合は、[セクション7](#7-ファクトリメソッドの方針)に従って静的ファクトリにする
+- コンストラクタ引数は**主たる値1つのみ**とします。スタイルやオプションは、従来どおり `init` プロパティで受け取ります。
+- コンストラクタを持つ末端ウィジェットは、その引数以外に `required` メンバーを**持たない**ようにします。追加のスタイルやオプションが必要な場合は `init` プロパティで受け取ります。
+- 情報源が曖昧なもの(`Image` におけるパスかプロバイダかなど)は、コンストラクタを増やさず、型付きプロバイダで受け取ります(現行 API は `new Image { Provider = new FileImageProvider(path) }`。`FileImageProvider` は `FloatSoda.Core.Providers` 名前空間)。将来ショートカットを追加する場合は、[セクション7](#7-ファクトリメソッドの方針)に従って静的ファクトリとして提供します。
 
 **理由:**
 
-- `Text` の本体は文字列そのもの、`Icon` はグリフそのものであり、位置引数の意味が曖昧になる余地がない。これにより、初期化子ファースト規約の目的である「引数の意味の自明性」を損なわない。
-- 末端ウィジェットは `Children` の深部に大量に現れるため、`new Text("OK")` と書けることによる視覚的なノイズ削減効果が極めて大きい。
-- Flutter が末端ウィジェットを `Text('hello')` / `Icon(Icons.add)` の形で提供しているため、Flutter を参考にする利用者やコード生成AIが自然に書く形をそのまま正解にできる。
+- `Text` の本体は文字列そのものであり、`Icon` の本体はグリフそのものであるため、位置引数の意味が曖昧になる余地がありません。これにより、初期化子ファースト規約の目的である「引数の意味の自明性」を損なわずに済みます。
+- 末端ウィジェットは `Children` の深い階層に多数出現するため、`new Text("OK")` と簡潔に記述できることによる視覚的なノイズ削減効果が極めて大きくなります。
+- Flutter においても末端ウィジェットは `Text('hello')` や `Icon(Icons.add)` の形で提供されているため、Flutter に親しんだ利用者やコード生成AIが自然に書くコードを、そのまま正解として受け入れられます。
 
 ### 2.2 子要素の表現
 
-単一の子を持つコンポーネントは `Child` プロパティ、複数の子を持つコンポーネントは `Children` プロパティ(`IList<Widget>` 型)を使用します。
+単一の子要素を持つコンポーネントには `Child` プロパティを、複数の子要素を持つコンポーネントには `Children` プロパティ(`IList<Widget>` 型)を使用します。
 
 ```csharp
 // 単一の子（SizedBox）
@@ -274,7 +272,7 @@ new Row
 
 ### 2.3 ネストの深さと可読性
 
-ツリーが深くなる場合は、**ローカル変数への分割**を推奨します。
+ツリーのネストが深くなる場合は、**ローカル変数への分割**によるフラット化を推奨します。
 
 ```csharp
 // ✅ 推奨: 変数に切り出してフラット化
@@ -295,7 +293,7 @@ var tile = new Row
 
 ### 2.4 スタイルの分離
 
-視覚的な属性はコンポーネント本体に持たせず、専用の `*Style` クラスに分離します。`*Style` レコードや `Button` などのスタイル付きコンポーネントは、デザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)に配置します(→ [UILayering](docs/contributor/2-understand/ui-layer.md))。
+見た目に関する属性はコンポーネント本体に持たせず、専用の `*Style` クラスへ分離します。`*Style` レコードや `Button` などのスタイル付きコンポーネントは、デザインシステム層(`FloatSoda.UI.Cream` / `FloatSoda.UI.FizzyPop`)に配置します(→ [UI 層](docs/contributor/2-understand/ui-layer.md))。
 
 ```csharp
 new FloatSoda.UI.Cream.Button
@@ -313,7 +311,7 @@ new FloatSoda.UI.Cream.Button
 
 ### 2.5 ファイル構成 — 兄弟ウィジェットは同じファイルに置く
 
-密接に関連するウィジェット群(**兄弟ウィジェット**)は、1型1ファイルに分割せず、同一のファイルにまとめます。
+密接に関連するウィジェット群(**兄弟ウィジェット**)は、1型1ファイルに細かく分割せず、同一ファイルにまとめます。
 
 ```csharp
 // Flex.cs — Flex とその薄い特殊化をまとめて定義
@@ -326,25 +324,25 @@ public sealed record Column() : FlexWrapper(Axis.Vertical);
 public sealed record Row() : FlexWrapper(Axis.Horizontal);
 ```
 
-**兄弟と見なす基準(以下のいずれかを満たす場合):**
+**兄弟とみなす基準(以下のいずれかを満たす場合):**
 
-1. 同一ファイル内にある共通基底の薄い特殊化である(`Column` / `Row` → `FlexWrapper`)
-2. 単独では意味を持たず、必ず対で使う(`Stack` + `Positioned` のような関係)
-3. 同じ実装詳細(private なヘルパーや共通の RenderObject)を共有する
+1. 同一ファイル内にある共通基底に対する、薄い特殊化である(`Column` / `Row` → `FlexWrapper`)
+2. 単独では成立せず、必ず対で使用する(`Stack` + `Positioned` のような関係)
+3. 同じ実装詳細(private なヘルパーメソッドや共通の RenderObject)を共有している
 
-**兄弟と見なさない基準:** 単に同じカテゴリや同じフォルダに属するというだけの関係は該当しません。たとえば `Padding` と `SizedBox` はどちらも Layout に属しますが、独立したファイルに分けます。
+**兄弟とみなさない基準:** 単に同じカテゴリや同じフォルダに属しているだけの場合は該当しません。たとえば `Padding` と `SizedBox` はどちらも Layout に属しますが、それぞれ独立したファイルに分割します。
 
 **ファイル名の規則:**
 
 | 状況 | ファイル名 | 例 |
 |---|---|---|
-| 基底・代表となるウィジェットがある | 代表のウィジェット名 | `Flex.cs`, `Text.cs`, `Align.cs` |
-| 対等なグループで代表が決めがたい | グループの概念名 | `Clip.cs`(`ClipOval` / `ClipRect` / `ClipRoundRect` / `ClipCustomPath`) |
+| 基底・代表となるウィジェットがある場合 | 代表となるウィジェット名 | `Flex.cs`, `Text.cs`, `Align.cs` |
+| 対等なグループで代表を決めにくい場合 | グループを表す概念名 | `Clip.cs`(`ClipOval` / `ClipRect` / `ClipRoundRect` / `ClipCustomPath`) |
 
 **理由:**
 
-- `Column` / `Row` のような数行のレコードを個別のファイルに分けるより、基底と並べて読めるほうが設計意図(薄いラッパーであること)が伝わる。これは Flutter の `basic.dart` が関連ウィジェットをまとめているのと同じ発想である。
-- C# の一般慣習である「1型1ファイル」(StyleCop SA1402)からは意図的に逸脱する。本フレームワークのウィジェットは小さな `record` が多く、機械的に分割するとファイル数だけが増え、全体の見通しが悪化するためである。
+- `Column` や `Row` のような数行のレコードを個別のファイルに分けるよりも、基底定義と並べて読めるようにしたほうが、「薄いラッパーである」という設計意図が明確に伝わります。これは、Flutter の `basic.dart` が関連ウィジェットをひとまとめにしている思想と同じです。
+- C# の一般的な慣習である「1型1ファイル」(StyleCop SA1402)からは意図的に逸脱しています。本フレームワークのウィジェットには小さな `record` が多く、機械的に分割するとファイル数ばかりが増加し、コードベース全体の見通しがかえって損なわれるためです。
 
 ## 3. プロパティ命名規則
 
@@ -353,9 +351,9 @@ public sealed record Row() : FlexWrapper(Axis.Horizontal);
 | コンテンツ系 | 意味のある名詞 | `Content`, `Label`, `Title`, `ImageUrl` |
 | 子要素 | `Child` / `Children` | `Child`, `Children` |
 | イベントハンドラ | `On` + 動詞 (PascalCase) | `OnPressed`, `OnChanged`, `OnSubmit` |
-| ブール型フラグ | `Is` / `Has` / `Can` プレフィックス | `IsEnabled`, `HasBorder`, `IsVisible` |
-| スタイル | `Style` サフィックス | `TextStyle`, `ButtonStyle` |
-| レイアウト | Flutterに準拠した名前 | `MainAxisAlignment`, `CrossAxisAlignment` |
+| ブール型フラグ | 接頭辞 `Is` / `Has` / `Can` | `IsEnabled`, `HasBorder`, `IsVisible` |
+| スタイル | 接尾辞 `Style` | `TextStyle`, `ButtonStyle` |
+| レイアウト | Flutter に準拠した名前 | `MainAxisAlignment`, `CrossAxisAlignment` |
 
 ### イベントハンドラの型
 
@@ -372,7 +370,7 @@ public Func<Task>? OnSubmitAsync { get; init; }
 
 ### 入力語彙は「ポインター (Pointer)」で統一する
 
-FloatSoda で定義する型、メンバー、ドキュメントでは、入力デバイスの語彙として「マウス (Mouse)」を使用せず、「ポインター (Pointer)」に統一します。VR ではレーザーポインターが、デスクトップ環境ではマウスが同じ役割を担うため、デバイスに依存しない語彙を採用します(Flutter の `PointerEvent` 系とも一致します)。
+FloatSoda で定義する型、メンバー、ドキュメントでは、入力デバイスを表す語彙として「マウス (Mouse)」を使用せず、「ポインター (Pointer)」に統一します。VR 環境のレーザーポインターとデスクトップ環境のマウスはどちらも同じ役割を担うため、特定のデバイスに依存しない語彙を採用します(Flutter の `PointerEvent` 系の設計とも一致します)。
 
 ```csharp
 // ✅ 良い例: FloatSoda が命名するものはすべて Pointer
@@ -383,13 +381,13 @@ public enum PointerButton { Left, Middle, Right }
 public enum MouseButton { Left, Middle, Right }
 ```
 
-**例外**: 外部 API(OpenVR / GLFW)の固有名詞をそのまま使用する層は対象外とします。`FloatSoda.OVR` の `SetMouseScale` のように、下位 API(`SetOverlayMouseScale`)との対応がわかることに価値がある薄いラッパーでは、元の語彙を維持します。
+**例外**: 外部 API(OpenVR / GLFW)の固有名詞をそのまま使用する層は対象外とします。たとえば `FloatSoda.OVR` の `SetMouseScale` のように、下位 API(`SetOverlayMouseScale`)との対応関係が明確であることに価値がある薄いラッパーでは、元の語彙を維持します。
 
-ドキュメントコメントの説明文でも「マウス」と単独で書かず、「ポインター(レーザーポインター / マウス)」のように記述します(→ [DocumentationComments](DOCUMENTATION_COMMENTS.md))。
+ドキュメントコメントの説明文においても、「マウス」と単独で表記せず、「ポインター(レーザーポインター / マウス)」のように記述します(→ [DOCUMENTATION_COMMENTS.md](DOCUMENTATION_COMMENTS.md))。
 
 ## 3.5 null チェックは `is null` / `is not null` を使う
 
-参照の null 判定には `==` / `!=` 演算子ではなく、パターンマッチの `is null` / `is not null` を使用します。
+参照の null 判定には `==` / `!=` 演算子を使用せず、パターンマッチングの `is null` / `is not null` を使用します。
 
 ```csharp
 // ✅ 推奨
@@ -402,15 +400,15 @@ if (Child != null) context.PaintChild(Child, offset);
 ```
 
 **理由:**
-- `==` / `!=` はユーザー定義の演算子オーバーロードに解決される可能性があり、意図しない比較ロジックが実行される恐れがある。一方 `is null` は常に参照の同一性(厳密な null 判定)を評価するため、型に依存せず安全である。
-- `is null` / `is not null` は、「null かどうかを判定する」という意図を明確に表現できる。
-- 等値演算子をオーバーロードする `record` や `record struct`(セクション8・9)が多い本フレームワークでは、特にこの違いが問題になりやすい。
+- `==` / `!=` 演算子はユーザー定義のオーバーロードに解決される可能性があり、意図しない比較ロジックが実行される恐れがあります。一方、`is null` は常に参照の同一性(厳密な null 判定)を評価するため、型の実装に左右されず安全です。
+- `is null` / `is not null` を使用することで、「null かどうかを判定している」というコードの意図を明確に表現できます。
+- 等値演算子をオーバーロードする `record` や `record struct`(セクション8・9)を多用する本フレームワークでは、この挙動の差異が特に問題になりやすいためです。
 
-> **補足:** 値型(`record struct` など)の比較や、null 以外の値との比較には従来どおり `==` / `!=` を使用します。本ルールは、**参照の null 判定**に限定した規約です。
+> **補足:** 値型(`record struct` など)同士の比較や、null 以外の値との比較には従来どおり `==` / `!=` を使用します。本ルールは、あくまで**参照の null 判定**に限定した規約です。
 
 ## 3.6 リスナーパターンを実装せず `event` を使う
 
-マルチキャストデリゲート(`event`)で表現できる通知は、Flutter 流のリスナーパターン(`AddListener` / `RemoveListener` メソッドやリスナー用インターフェース)を独自に実装せず、C# の `event` として公開します。
+マルチキャストデリゲート(`event`)で表現できる通知には、Flutter 流のリスナーパターン(`AddListener` / `RemoveListener` メソッドやリスナー用インターフェース)を独自に実装せず、C# 標準の `event` を公開します。
 
 ```csharp
 // ✅ 推奨: event による通知
@@ -431,21 +429,21 @@ public class AnimationController
 ```
 
 **理由:**
-- Dart の `addListener` / `removeListener` は言語にイベント機構がないために必要な実装だが、C# ではマルチキャストデリゲートが同等の機能を言語レベルで提供している。これにより、リスナーリストの管理や通知中の購読解除の安全性(invocation list のスナップショット)も、独自実装なしで得られる。
-- `+=` / `-=` による購読と解除は、C# 開発者にとって最も予測しやすい API である。
-- 購読側にインターフェースの実装を強制せず、ラムダ式やメソッド参照を直接渡せる。
+- Dart の `addListener` / `removeListener` は言語組み込みのイベント機構がないために必要な設計ですが、C# ではマルチキャストデリゲートが同等の機能を言語レベルで提供しています。これにより、リスナーリストの管理や通知処理中の購読解除に伴う安全性(invocation list のスナップショット)も、独自に実装することなく得られます。
+- `+=` / `-=` による購読と解除は、C# 開発者にとって最も予測しやすい API です。
+- 購読側に専用インターフェースの実装を強制せず、ラムダ式やメソッド参照を直接渡せます。
 
 **適用範囲の整理:**
 
-| 対象 | 使うもの |
+| 対象 | 使用するもの |
 |---|---|
-| Widget のコールバック(単一ハンドラを `init` で受ける) | `On` プレフィックスの `Action?` プロパティ(セクション3) |
+| Widget のコールバック(単一ハンドラを `init` で受ける) | 接頭辞 `On` を付与した `Action?` プロパティ(セクション3) |
 | 長寿命のミュータブルなオブジェクト(Controller 等)からの通知(購読者が複数・動的に増減) | `event` |
 
 **補足:**
-- 通知元の共通抽象が必要な場合も、リスナー側ではなく通知元側のインターフェースに `event` を宣言する(例: `interface IListenable { event Action? Changed; }`)。
-- ラッパー型が親の通知をそのまま中継する場合は、カスタムイベントアクセサ(`add` / `remove`)を使って親の `event` に委譲すると、購読の付け替えミスや解除漏れを防げる。
-- `Dispose()` ではイベントフィールドに `null` を代入し、購読を破棄する。
+- 通知元の共通抽象を定義する場合も、リスナー側ではなく通知元側のインターフェースに `event` を宣言します(例: `interface IListenable { event Action? Changed; }`)。
+- ラッパー型が親の通知をそのまま中継する場合は、カスタムイベントアクセサ(`add` / `remove`)を使って親の `event` に委譲することで、購読の付け替えミスや解除漏れを防止できます。
+- `Dispose()` ではイベントフィールドに `null` を代入し、すべての購読を破棄します。
 
 ## 4. イミュータビリティと `init` アクセサ
 
@@ -463,8 +461,8 @@ public record Text : Widget
 
 ## 5. デフォルト値の方針
 
-- すべてのプロパティに**合理的なデフォルト値**を設定し、最小限の記述でコンポーネントを使用できるようにする
-- 必須プロパティは `required` キーワードで明示する
+- すべてのプロパティに**合理的なデフォルト値**を設定し、最小限の記述でコンポーネントを使用できるようにします。
+- 必須プロパティは `required` キーワードで明示します。
 
 ```csharp
 public record AspectRatio : Widget
@@ -475,7 +473,7 @@ public record AspectRatio : Widget
 }
 ```
 
-> **末端ウィジェットの必須値は `required` にしない:** 上記の `AspectRatio` はウィジェット(`Child`)を子に取る合成ウィジェットであるため、初期化子と `required` の組み合わせで必須値を表現します。一方 `Text` / `Icon` / `Image` のような**末端ウィジェット**は、必須値をコンストラクタで受けるため `required` を使用しません(→ [セクション2.1 の例外](#例外-末端ウィジェットの単一値コンストラクタ))。両者で必須値の受け取り方が異なる点に注意してください。
+> **末端ウィジェットの必須値は `required` にしない:** 上記の `AspectRatio` はウィジェット(`Child`)を子に取る合成ウィジェットであるため、オブジェクト初期化子と `required` の組み合わせで必須値を表現します。一方、`Text` / `Icon` / `Image` のような**末端ウィジェット**は、必須値をコンストラクタで受けるため `required` を使用しません(→ [セクション2.1 の例外](#例外-末端ウィジェットの単一値コンストラクタ))。両者で必須値の受け取り方が異なる点に注意してください。
 
 ## 6. バージョニングと後方互換性
 
@@ -489,7 +487,7 @@ public record AspectRatio : Widget
 - プロパティの削除やリネーム
 - プロパティの型変更
 - `required` の追加
-- **observable behavior の変更** — 既存の正しい利用コードから観測できる挙動の変化。layout、paint / clipping、hit testing、Widget update behavior、invalid / degenerate input handling、Element / state lifecycle semantics など、セクション1の parity 対象リストに挙げた挙動が判定の観点となる。
+- **observable behavior の変更** — 既存の正しい利用コードから観測できる挙動の変化。layout、paint / clipping、hit testing、Widget update behavior、invalid / degenerate input handling、Element / state lifecycle semantics など、セクション1の parity 対象リストに挙げた挙動が判定の観点となります。
 
 observable behavior に関しては、**互換性の基準を文書化された契約**(本ドキュメント、docs、Flutter parity)とします。契約から逸脱していた挙動を本来の契約へ戻す修正は、挙動が変化しても破壊的変更ではなくバグ修正として扱います。反対に、契約どおりに動いていた挙動を変更する場合は破壊的変更となります。
 
@@ -503,10 +501,10 @@ public Color? TextColor { get; init; }
 
 ### 6.4 Alpha 段階での判定と許容の分離
 
-Alpha 段階であることは、breaking change の**判定**を省略する理由になりません。判定と許容は分けて行います。
+Alpha 段階の開発中であることは、breaking change の**判定**を省略する理由になりません。判定と許容は分けて行います。
 
-1. まず public API / observable behavior に対して、6.1 と 6.2 の基準で breaking change に該当するかを通常どおり判定する
-2. そのうえで、Alpha 段階としてその変更を現時点で受け入れるかを別途判断する
+1. まず public API / observable behavior に対して、6.1 と 6.2 の基準で breaking change に該当するかを通常どおり判定します。
+2. そのうえで、Alpha 段階としてその変更を現時点で受け入れるかを別途判断します。
 
 「Alpha 版だから breaking change ではない」という扱いはしません。判定の結果は PR の本文に記載し(→ [CONTRIBUTING.md](CONTRIBUTING.md))、breaking change を伴う Issue には `breaking-change` ラベルを付与します。
 
@@ -518,9 +516,9 @@ Alpha 段階であることは、breaking change の**判定**を省略する理
 
 | パターン | メソッド名の例 | 用途 |
 |---|---|---|
-| 全辺・全軸に同じ値 | `All(value)` | `EdgeInsets.All(16)` |
+| 全辺・全軸に同じ値を指定 | `All(value)` | `EdgeInsets.All(16)` |
 | 軸ごとに指定 | `Symmetric(h, v)` | `EdgeInsets.Symmetric(horizontal: 8)` |
-| 一辺・一方向のみ | `Only(...)` | `EdgeInsets.Only(top: 4)` |
+| 一辺・一方向のみ指定 | `Only(...)` | `EdgeInsets.Only(top: 4)` |
 | ゼロ・空・デフォルト | `Zero` / `Empty` / `Default` | `EdgeInsets.Zero`, `Size.Empty` |
 | 単位値 | `One` / `Unit` | `Size.One` |
 | 既存値からの変換・導出 | `From*(...)` | `Rect.FromPoints(a, b)` |
@@ -587,7 +585,7 @@ public record ThemeContext
 ### 7.4 ファクトリメソッドを追加すべき判断基準
 
 - 3つ以上のプロパティを毎回同じパターンで設定する組み合わせがある
-- ゼロ・空・単位といった「自明な定数」がある
+- ゼロ・空・単位といった「自明な定数」が存在する
 - 別の表現形式(座標2点→矩形など)から変換する必要がある
 - `with` 式と組み合わせて「ベースに少し手を加える」用途が想定される
 
@@ -642,18 +640,18 @@ public static class AngleUnits
 
 **理由:**
 
-- オブジェクト初期化子ベースのマークアップ(セクション1)では、`Angle.FromDegrees(45)` より `45.Deg` のほうが視覚的ノイズが少なく、単位付きリテラルとして自然に読める。
-- 従来の拡張メソッドと異なり、C# 14 の `extension` ブロックは**プロパティ**を定義できるため、`45.Deg()` の `()` も不要になる。値を返すだけの純粋変換であり、プロパティのセマンティクスにも合致する。
-- 数値型への拡張は、名前空間をインポートしたすべてのコードで数値リテラルの補完候補に現れる。専用名前空間に隔離すると、単位リテラルを使いたいファイルだけがオプトインでき、IntelliSense の汚染を防げる。
+- オブジェクト初期化子ベースのマークアップ(セクション1)では、`Angle.FromDegrees(45)` より `45.Deg` のほうが視覚的ノイズが少なく、単位付きリテラルとして自然に読めるためです。
+- 従来の拡張メソッドと異なり、C# 14 の `extension` ブロックは**プロパティ**を定義できるため、`45.Deg()` の `()` も不要になります。値を返すだけの純粋変換であり、プロパティのセマンティクスにも合致しています。
+- 数値型への拡張は、名前空間をインポートしたすべてのコードで数値リテラルの補完候補に現れます。専用名前空間に隔離すると、単位リテラルを使いたいファイルだけがオプトインでき、IntelliSense の汚染を防げます。
 
 **注意点:**
 
-- 拡張ブロックのレシーバー解決には数値の暗黙変換(`int` → `double` 等)が**効かない**。`double` にだけ定義すると `45.Deg`(`int` リテラル)がコンパイルエラーになるため、レシーバー型は必ず規約どおり `double` と `int` の両方に定義する。
-- 単位の解釈が自明でない変換(例: `Dpm.FromMillimetersPerPixel` のような逆数系)は拡張プロパティにせず、正準の `FromXxx` のみとする。拡張プロパティは「数値がそのまま単位値になる」変換に限定する。
+- 拡張ブロックのレシーバー解決には数値の暗黙変換(`int` → `double` 等)が**効かない**点に注意してください。`double` にだけ定義すると `45.Deg`(`int` リテラル)がコンパイルエラーになるため、レシーバー型は必ず規約どおり `double` と `int` の両方に定義します。
+- 単位の解釈が自明でない変換(例: `Dpm.FromMillimetersPerPixel` のような逆数系)は拡張プロパティにせず、正準の `FromXxx` のみとします。拡張プロパティは「数値がそのまま単位値になる」変換に限定します。
 
 ## 8. ジオメトリオブジェクトには `record struct` を使う
 
-座標・サイズ・余白などのジオメトリ型は `record struct` で定義します。値型のためヒープ割り当てが不要でレイアウト計算時のパフォーマンスに優れ、`record` の等値比較・分解・`with` 式の恩恵を受けられます。
+座標・サイズ・余白といったジオメトリ型は `record struct` で定義します。値型であるためヒープ割り当てが発生せず、レイアウト計算時のパフォーマンスに優れているほか、`record` による等値比較や分解、`with` 式の恩恵も受けられます。
 
 ```csharp
 // ✅ 推奨
@@ -663,14 +661,14 @@ public readonly record struct Rect(double X, double Y, double Width, double Heig
 public readonly record struct EdgeInsets(double Left, double Top, double Right, double Bottom);
 ```
 
-ファクトリメソッドの定義方針はセクション7を参照してください。`with` 式を使うと、既存の値から一部だけ変えた新しい値を簡潔に作れます。
+ファクトリメソッドの定義方針についてはセクション7を参照してください。`with` 式を使用すると、既存の値をベースに一部のプロパティのみを変更した新しい値を簡潔に生成できます。
 
 ```csharp
 var insets = EdgeInsets.All(16);
 var wider = insets with { Left = 32, Right = 32 };
 ```
 
-**ジオメトリ型に `class` や通常の `struct` を使わない理由:**
+**ジオメトリ型に `class` や通常の `struct` を採用しない理由:**
 
 | | `record struct` | `class` | `struct` |
 |---|---|---|---|
@@ -681,9 +679,9 @@ var wider = insets with { Left = 32, Right = 32 };
 
 ### 自分と同じ型を返す計算プロパティには `PrintMembers` を書く
 
-record が自動生成する `ToString()` は、public なインスタンスプロパティをすべて出力します。`EdgeInsets.Flipped` のように、自分と同じ型の値を毎回作って返す計算プロパティがあると、その値を出力するために再度 `ToString()` を呼び出すため、処理が終了しなくなります。`record struct` ではスタックオーバーフローになり、プロセスごと異常終了します(catch できません)。`$"{padding}"` やログ出力の1行で起きます。
+record が自動生成する `ToString()` は、すべての public インスタンスプロパティを出力します。そのため、`EdgeInsets.Flipped` のように自分と同じ型の値を都度生成して返す計算プロパティが存在すると、その値を出力しようとして再帰的に `ToString()` が呼ばれ続け、処理が終了しなくなります。特に `record struct` ではスタックオーバーフローを引き起こし、プロセスごと異常終了します(catch できません)。これは `$"{padding}"` のような文字列補間や、わずか1行のログ出力でも発生します。
 
-このようなプロパティを追加するときは、`PrintMembers` を自分で実装して、出力するメンバーを選びます。
+このようなプロパティを追加するときは、`PrintMembers` を自前で実装し、出力対象とするメンバーを明示的に選択します。
 
 ```csharp
 public readonly record struct EdgeInsets(double Left = 0, double Top = 0, double Right = 0, double Bottom = 0)
@@ -698,15 +696,15 @@ public readonly record struct EdgeInsets(double Left = 0, double Top = 0, double
 }
 ```
 
-`abstract record` の基底型では `protected virtual bool PrintMembers(StringBuilder builder)` にします(`Curve` を参照)。`ToString()` そのものを上書きしても構いません。
+`abstract record` の基底型では、`protected virtual bool PrintMembers(StringBuilder builder)` として定義します(`Curve` を参照)。なお、`ToString()` そのものをオーバーライドしても構いません。
 
-書き忘れは `tests/FloatSoda.Test/RecordToStringTest.cs` が検出します。公開アセンブリの record をリフレクションで調べ、該当するプロパティを持つのに `PrintMembers` も `ToString` も自動生成のままの型があると、テストが落ちます。
+この実装漏れは `tests/FloatSoda.Test/RecordToStringTest.cs` によって検出されます。このテストは公開アセンブリ内の record をリフレクションで走査し、該当するプロパティを持つにもかかわらず `PrintMembers` も `ToString` も自動生成のままになっている型が存在する場合に失敗します。
 
 ## 8.5 実数は `double` を基本とし、Skia型を公開APIに出さない
 
 ### 実数型の方針
 
-公開APIに現れる実数(座標・サイズ・角度・比率など)には **`double`** を使います。`float` はプラットフォーム境界(SkiaSharp / OpenVR / OpenGL への受け渡し)でのみ使い、境界での変換はフレームワーク内部で行います。
+公開APIに現れる実数(座標・サイズ・角度・比率など)には **`double`** を使用します。`float` の利用はプラットフォーム境界(SkiaSharp / OpenVR / OpenGL への受け渡し)のみにとどめ、境界での型変換はフレームワーク内部で行います。
 
 ```csharp
 // ✅ 推奨: 公開APIは double
@@ -719,15 +717,15 @@ public readonly record struct Angle(float Radians);
 
 **理由:**
 
-- C# の浮動小数リテラルはデフォルトで `double` のため、`Rotation = 45.5.Deg` のように接尾辞 `f` なしで書ける。`float` 基準のAPIはマークアップ全体に `f` のノイズを強いる(セクション7.5の単位リテラルと相乗)。
-- レイアウト計算や角度から行列への変換といった合成計算は、`double` で保持するほうが誤差が蓄積しにくい。
-- Flutterも公開API(`dart:ui` / framework層)はすべて `double` であり、エンジン境界で `float` へ変換している。
+- C# の浮動小数点リテラルはデフォルトで `double` とみなされるため、`Rotation = 45.5.Deg` のように接尾辞 `f` なしで記述できます。一方、`float` を基準としたAPIにすると、マークアップ全体の至る所に `f` の記述を強いることになります(セクション7.5の単位リテラルと組み合わせると、この差がさらに大きくなります)。
+- レイアウト計算や、角度から行列への変換といった合成計算において、`double` で値を保持したほうが計算誤差が蓄積しにくくなります。
+- Flutter でも公開API(`dart:ui` / framework層)はすべて `double` で統一されており、エンジン境界で `float` へ変換する設計が採られています。
 
-**性能に関する補足:** 値オブジェクトのサイズは倍になるが、UIのプロパティ用途では実害はない。SIMD化されたホットパスなど `float` が正当化される箇所は、公開APIではなく内部実装に限定する。
+**性能に関する補足:** 値オブジェクトのサイズは倍になりますが、UIプロパティの用途では実害はありません。SIMD化されたホットパスなど、`float` の採用が妥当とされる箇所は、公開APIではなく内部実装に限定します。
 
 ### Skia型を公開APIに出さない
 
-`SKCanvas` / `SKPicture` / `SKSize` / `SKColor` などの SkiaSharp 型は、公開API(Widget のプロパティ、RenderObject の公開メンバー、ジオメトリ型、デザインシステムの Style レコード)に露出させません。描画の語彙はフレームワーク自前の型(`Size`, `Color`, `Paint` 等)で定義し、Skia型への変換は `FloatSoda.Engine` 側の境界で行います。
+`SKCanvas`、`SKPicture`、`SKSize`、`SKColor` といった SkiaSharp の型は、公開API(Widget のプロパティ、RenderObject の公開メンバー、ジオメトリ型、デザインシステムの Style レコード)に露出させません。描画に関する語彙はフレームワーク自前の型(`Size`, `Color`, `Paint` 等)として定義し、Skia 型への変換は `FloatSoda.Engine` 側の境界で行います。
 
 ```csharp
 // ✅ 推奨: 自前の語彙型
@@ -745,18 +743,18 @@ public record ButtonStyle
 
 **理由:**
 
-- レンダリングバックエンドを実装詳細に保つため。Flutter が framework 層と `dart:ui` の境界を維持していたからこそ、Skia から Impeller への差し替えが可能だった。同じ境界を引くことで、将来のバックエンド変更を公開APIを破壊せずに行える。
-- 利用者に SkiaSharp への直接依存を強制しない。
+- レンダリングバックエンドを実装詳細にとどめるためです。Flutter が framework 層と `dart:ui` の境界を維持していたからこそ、Skia から Impeller への差し替えが可能でした。同様の境界を設けることで、将来バックエンドを変更する際にも公開APIを壊すことなく移行できます。
+- 利用者に SkiaSharp への直接依存を強制しないためです。
 
 **例外: `Color` と `SKColor` の暗黙変換**
 
-`Color` は、`SKColor` との暗黙変換を両方向とも公開しています。`SKColor` から `Color` への変換があるため、SkiaSharp が定義する名前付きの色を、`Color` 型のプロパティにそのまま渡せます。samples と tests には SkiaSharp の名前付きの色を渡す書き方が多く(#367 の時点で 34 ファイルに 156 か所)、変換を外すとそのすべてがコンパイルできなくなるため残しています。`Color` から `SKColor` への変換は、フレームワークの内部で Skia に色を渡すために使います。
+`Color` は、`SKColor` との双方向の暗黙変換を公開しています。`SKColor` から `Color` への変換が提供されているため、SkiaSharp が定義する名前付きの色を、`Color` 型のプロパティへそのまま渡すことができます。現状、samples や tests には SkiaSharp の名前付きの色を渡す記述が多く存在しており(#367 の時点で 34 ファイルに 156 か所)、この変換を削除するとそれらすべてがコンパイルできなくなるため残しています。また、`Color` から `SKColor` への変換は、フレームワーク内部から Skia へ色情報を渡すために使用します。
 
-> **移行中の注記:** 既存コードにはこの規約に違反する箇所が残っている(`RenderBox.Size` の `SKSize`、`Angle` / `Dpm` / `Alignment` の `float` など)。段階的な解消は [Issue #131](https://github.com/sumx21t-3310/FloatSoda/issues/131) のロードマップに従う。新規APIはこの規約に従うこと。
+> **移行中の注記:** 既存コードには本規約に違反する箇所が一部残っています(`RenderBox.Size` の `SKSize`、`Angle` / `Dpm` / `Alignment` の `float` など)。これらは [Issue #131](https://github.com/sumx21t-3310/FloatSoda/issues/131) のロードマップに従って段階的に解消していきます。新規APIはこの規約に従うこと。
 
 ## 9. Contextオブジェクトには `record` を使う
 
-テーマ・ロケール・アクセシビリティ設定など、ツリーを通じて伝播するコンテキスト情報は `record`(参照型)で定義します。`with` 式によるコピー変形でスコープごとに一部を上書きでき、等値比較によって再描画の必要性を効率よく判定できます。
+テーマやロケール、アクセシビリティ設定のように、ツリーを通じて伝播するコンテキスト情報は `record`(参照型)で定義します。`with` 式によるコピー変形を用いることで、スコープごとに一部の値を容易に上書きできるほか、等値比較によって再描画の要否を効率よく判定できます。
 
 ```csharp
 public record ThemeContext
@@ -798,25 +796,25 @@ var darkSection = parentTheme with
 
 **`record struct` ではなく `record`(参照型)を選ぶ理由:**
 
-コンテキストオブジェクトはツリー全体で共有参照されるため、値型のコピーが多発するとオーバーヘッドになります。参照型の `record` にすると、`with` 式で変形したときだけ新しいインスタンスを生成し、変化のないサブツリーへは同じ参照を引き渡せます。
+コンテキストオブジェクトはツリー全体で参照を共有して使われるため、値型を採用してコピーが多発するとオーバーヘッドにつながります。参照型の `record` を用いることで、`with` 式で値を変更したときだけ新しいインスタンスが生成され、変更のないサブツリーには同一の参照をそのまま引き渡せます。
 
 ## 10. ドキュメントコメント規約
 
-ドキュメントコメント(XML ドキュメントコメント)の規約は独立したページに分離しました。適用範囲・契約の書き方・Dirty フラグなどの副作用の明記・関連型への参照・記述言語などは [DocumentationComments](DOCUMENTATION_COMMENTS.md) を参照してください。
+ドキュメントコメント(XML ドキュメントコメント)の規約は、独立した別ページに分離しました。適用範囲、契約の記述方法、Dirty フラグなどの副作用の明記、関連型への参照方法、記述言語などについては、[DOCUMENTATION_COMMENTS.md](DOCUMENTATION_COMMENTS.md) を参照してください。
 
 要点は次の通りです。
 
-- アクセス修飾子を問わず、原則としてすべての型およびメンバーに記述する(`public` だけでなく `private` も対象)。
-- ドキュメントコメントは正式な API Reference の原稿として扱い、役割・契約・副作用を完結させる。使い方・チュートリアルはドキュメントサイト側へ分離する。
+- アクセス修飾子にかかわらず、原則としてすべての型およびメンバーに記述する(`public` だけでなく `private` も対象)。
+- ドキュメントコメントは正式な API Reference の原稿として扱い、その型やメンバーの役割・契約・副作用の説明をそれ自身で完結させる。具体的な使い方やチュートリアルはドキュメントサイト側へ分離する。
 - `<example>` は原則として使用しない。
 
 ## 11. ネイティブAPIラップの方針
 
-`FloatSoda.OVR` などでネイティブAPI(OpenVR等)をラップする際の規約です。
+`FloatSoda.OVR` などにおいて、ネイティブAPI(OpenVR等)をラップする際の規約です。
 
 ### 11.1 enum の名前を返すだけの API は高レベルラッパーに追加しない
 
-OpenVR には `GetApplicationsErrorNameFromEnum` / `GetOverlayErrorNameFromEnum` / `GetSceneApplicationStateNameFromEnum` / `GetEventTypeNameFromEnum` など、enum 値を人間が読める名前文字列へ変換するだけの `*NameFromEnum` 系 API が各インターフェースに存在します。**列挙子名を返すだけで、説明文・ローカライズ・プロトコル上の意味を追加で持たないもの**は、`FloatSoda.OVR` の高レベルラッパーに同等のメソッドを追加しません。
+OpenVR の各インターフェースには、`GetApplicationsErrorNameFromEnum`、`GetOverlayErrorNameFromEnum`、`GetSceneApplicationStateNameFromEnum`、`GetEventTypeNameFromEnum` のように、enum 値を人間が読める名前文字列へ変換するだけの `*NameFromEnum` 系 API が存在します。**単に列挙子名を返すだけであり、説明文やローカライズ、プロトコル上の追加の意味を持たないもの**については、`FloatSoda.OVR` の高レベルラッパーに同等のメソッドを追加しません。
 
 ```csharp
 // ✅ 推奨: 既知の値をログへ出す通常用途は C# の文字列補間で十分
@@ -830,19 +828,19 @@ public string GetErrorName(EVRApplicationError err)
 
 **理由:**
 
-- 既知の enum 値をログへ表示する通常用途には `enum.ToString()`(および文字列補間)で十分であり、`FloatSoda.OVR` の高レベル API として別の文字列化メソッドを追加する価値は小さい。
-- `FloatSoda.OVR` のエラーモデルは `ThrowIfError()` による例外化であり、エラーは例外と型付きの `ErrorCode` で扱い、メッセージは診断情報として提供する。文字列化 API を高レベルラッパーとして公開すると、「エラーは文字列で扱う」という誤ったシグナルになる。
-- 高レベルラッパーの公開 API に存在するものは、「使うべきもの」と解釈される(特にコード生成 AI)。不要な API を増やさないことが誤用の防止になる。
+- 既知の enum 値をログに表示するような一般的な用途には、`enum.ToString()`(および文字列補間)で十分であり、`FloatSoda.OVR` の高レベル API として個別に文字列化メソッドを追加する価値が小さいため。
+- `FloatSoda.OVR` のエラー処理モデルは `ThrowIfError()` による例外化を基本としており、エラーは例外と型付きの `ErrorCode` で扱い、メッセージは診断情報として提供する方針をとっているため。文字列化 API を高レベルラッパーとして公開すると、「エラーを文字列で扱うべきである」という誤ったシグナルを与えてしまいます。
+- 高レベルラッパーの公開 API にメソッドが存在すると、(特にコード生成 AI などによって)「使うべきもの」と解釈されやすいため。不要な API を増やさないこと自体が誤用の防止につながります。
 
 **注意点:**
 
-- C# の `enum.ToString()` とネイティブ側の `*NameFromEnum` が返す文字列は、完全一致を**保証しません**(例: ネイティブ側は `VRApplicationError_AppKeyAlreadyExists`、C# バインディングは `AppKeyAlreadyExists` と表現が既に異なります)。また、未定義の将来値に対して `enum.ToString()` は数値文字列(例: `"117"`)を返しますが、ランタイム側の `*NameFromEnum` はその値の名前を認識できる場合があります。診断上どうしてもネイティブ側の名前が必要な場合は、低レベルバインディング(`OpenVR.Applications.GetApplicationsErrorNameFromEnum` 等)を直接呼び出してください。
+- C# の `enum.ToString()` とネイティブ側の `*NameFromEnum` が返す文字列は、完全な一致を**保証しません**(例: ネイティブ側は `VRApplicationError_AppKeyAlreadyExists` であるのに対し、C# バインディングは `AppKeyAlreadyExists` と表現が既に異なります)。また、未定義の将来値に対して `enum.ToString()` は数値文字列(例: `"117"`)を返しますが、ランタイム側の `*NameFromEnum` であればその値の名前を認識できる場合があります。診断上どうしてもネイティブ側の名前が必要な場合は、低レベルバインディング(`OpenVR.Applications.GetApplicationsErrorNameFromEnum` 等)を直接呼び出してください。
 - この規約は `FloatSoda.OVR` の**高レベルラッパー**に適用します。`openvr_api.cs` に生成される低レベルバインディングから `*NameFromEnum` を削除するわけではありません。
-- 単なる列挙子名ではなく、説明文・対処方法・ローカライズ済みの表示文を返す API(例: `VR_GetVRInitErrorAsEnglishDescription` のような記述系 API)はこの規約の対象外です。個別に検討してください。
+- 単なる列挙子名にとどまらず、説明文や対処方法、ローカライズ済みの表示文を返す API(例: `VR_GetVRInitErrorAsEnglishDescription` のような記述系 API)はこの規約の対象外です。個別に検討してください。
 
 ### 11.2 ライフサイクルを持つ型は単数形、ステートレスなユーティリティは複数形
 
-ネイティブ API のラッパー型を命名する際、**そのインスタンスが `Init`/`Dispose` のようなライフサイクルを持つかどうか**で単数形と複数形を使い分けます。
+ネイティブ API のラッパー型を命名する際は、**そのインスタンスが `Init`/`Dispose` のようなライフサイクルを持つかどうか**に応じて、単数形と複数形を使い分けます。
 
 ```csharp
 // ✅ ライフサイクルを持つ: 単数形 (OVRApplication)
@@ -878,13 +876,13 @@ public static class OVRApplications
 
 **理由:**
 
-- OpenVR 自身の命名(`IVRSystem` = 単数、`IVRApplications` = 複数)と対応させることで、ラップ元の API との対応関係を名前から読み取れる。
-- `OVRApplication.Launch(appKey)` のように単数形インスタンスから他アプリを起動する形にすると、「自分」と「他アプリ」の操作が同じ型に混在し、`this` を参照しない操作か自己参照系の操作かを型名だけで区別できない。複数形の独立した静的クラスに分離することで、その曖昧さを型レベルで解消する。
-- 将来 `IVROverlay` など他のネイティブインターフェースをラップする際にも、同じ基準(ライフサイクル所有の有無)で単数形か複数形かを機械的に判断できる。
+- OpenVR 自身の命名(`IVRSystem` = 単数、`IVRApplications` = 複数)と対応させることで、ラップ元 API との対応関係を型名から読み取れるようにするため。
+- `OVRApplication.Launch(appKey)` のように単数形インスタンスから他アプリを起動する形式にすると、「自分」と「他アプリ」を対象とする操作が同じ型に混在してしまい、`this` を参照しない操作なのか自己参照系の操作なのかを型名だけで区別できなくなります。複数形の独立した static クラスへと分離することで、その曖昧さを型レベルで解消するため。
+- 将来 `IVROverlay` など他のネイティブインターフェースをラップする際にも、同じ基準(ライフサイクル所有の有無)に基づいて単数形か複数形かを機械的に判断できるようにするため。
 
 ## 関連ページ
 
-- [WidgetSystem](docs/reference/find-widgets.md) — この規約で実装された組み込みウィジェット
-- [Home](docs/Home.md) — ドキュメント一覧
+- [部品を目的から探す](docs/reference/find-widgets.md) — 本規約に基づいて実装された組み込みウィジェット
+- [FloatSoda ドキュメント](docs/Home.md) — docs のトップページ
 - [CONTRIBUTING.md](CONTRIBUTING.md) — 開発・コントリビューション規約(ブランチ命名、namespace、テスト観点、PR運用)
 - [REVIEW.md](REVIEW.md) — コードレビューの判断基準。本ドキュメントの原則をレビュー基準として参照する
