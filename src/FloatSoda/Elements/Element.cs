@@ -16,6 +16,9 @@ public abstract class Element : IBuildContext, IComparable<Element>
     /// </summary>
     public Widget? Widget { get; set; }
 
+    /// <inheritdoc/>
+    Widget IBuildContext.Widget => Widget!;
+
     /// <summary>
     /// Elementツリー上の親を取得または設定します。
     /// ルートまたはツリーから切り離されたElementでは<see langword="null"/>です。
@@ -79,7 +82,7 @@ public abstract class Element : IBuildContext, IComparable<Element>
     {
         Dependencies.Add(ancestor);
         ancestor.UpdateDependencies(this);
-        return ancestor.Widget as InheritedWidget;
+        return (InheritedWidget)ancestor.Widget!;
     }
 
     /// <inheritdoc/>
@@ -206,7 +209,7 @@ public abstract class Element : IBuildContext, IComparable<Element>
             return child;
         }
 
-        if (Widget.CanUpdate(child.Widget, newWidget))
+        if (Widget.CanUpdate(child.Widget!, newWidget))
         {
             UpdateSlotForChild(child, newSlot);
             child.Update(newWidget);
@@ -366,6 +369,8 @@ public abstract class Element : IBuildContext, IComparable<Element>
     /// </returns>
     public int CompareTo(Element? other)
     {
+        ArgumentNullException.ThrowIfNull(other);
+
         if (Depth < other.Depth)
             return -1;
         if (Depth > other.Depth)

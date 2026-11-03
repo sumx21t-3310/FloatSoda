@@ -52,10 +52,10 @@ public class InheritedElement : ComponentElement
     /// </remarks>
     public override void Update(Widget newWidget)
     {
-        var oldWidget = Widget as InheritedWidget;
+        var oldWidget = (InheritedWidget)Widget!;
         base.Update(newWidget);
 
-        if ((Widget as InheritedWidget).UpdateShouldNotify(oldWidget))
+        if (((InheritedWidget)Widget!).UpdateShouldNotify(oldWidget))
         {
             NotifyClients();
         }

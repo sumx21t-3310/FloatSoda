@@ -4,6 +4,11 @@
 // This file is auto-generated, do not edit it.
 //
 //=============================================================================
+
+// FloatSoda: 再生成したときは、名前空間の書き換えと合わせてこの行も残す。
+// nullable の警告だけを止め、注釈は有効のままにする (PublicAPI.*.txt の ! を変えないため)。
+#nullable disable warnings
+
 #if !OPENVR_XR_API
 
 using System.Runtime.InteropServices;
