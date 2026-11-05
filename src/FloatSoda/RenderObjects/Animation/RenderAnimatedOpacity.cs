@@ -1,6 +1,6 @@
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Animation;
 using FloatSoda.Core;
+using FloatSoda.Geometry;
 using FloatSoda.Rendering.Layers;
 
 namespace FloatSoda.RenderObjects.Animation;
@@ -12,7 +12,7 @@ namespace FloatSoda.RenderObjects.Animation;
 /// </summary>
 public class RenderAnimatedOpacity : RenderProxyBox
 {
-    private byte? Alpha = null;
+    private byte? _alpha = null;
 
     /// <summary>不透明度を駆動するアニメーションを取得または設定します。</summary>
     /// <remarks>
@@ -31,18 +31,18 @@ public class RenderAnimatedOpacity : RenderProxyBox
             if (ReferenceEquals(field, value))
                 return;
 
-            if (Attached && field is not null)
+            if (Attached)
             {
                 field.Changed -= UpdateOpacity;
             }
 
             field = value;
 
-            if (Attached)
-            {
-                value.Changed += UpdateOpacity;
-                UpdateOpacity();
-            }
+            if (!Attached)
+                return;
+
+            value.Changed += UpdateOpacity;
+            UpdateOpacity();
         }
     }
 
@@ -65,11 +65,11 @@ public class RenderAnimatedOpacity : RenderProxyBox
 
     private void UpdateOpacity()
     {
-        var oldAlpha = Alpha;
+        var oldAlpha = _alpha;
 
-        Alpha = (byte)double.Round(Opacity.Value * 255);
+        _alpha = (byte)double.Round(Opacity.Value * 255);
 
-        if (oldAlpha != Alpha)
+        if (oldAlpha != _alpha)
             MarkNeedsPaint();
     }
 
@@ -79,10 +79,10 @@ public class RenderAnimatedOpacity : RenderProxyBox
         if (Child is null)
             return;
 
-        Layer = Alpha switch
+        Layer = _alpha switch
         {
             0 => null,
-            _ => context.PushOpacity(offset, Alpha ?? 0, base.Paint, Layer as OpacityLayer),
+            _ => context.PushOpacity(offset, _alpha ?? 0, base.Paint, Layer as OpacityLayer),
         };
     }
 }

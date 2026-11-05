@@ -1,4 +1,4 @@
-using FloatSoda.Abstractions.Geometries;
+using FloatSoda.Geometry;
 
 namespace FloatSoda.Animation;
 

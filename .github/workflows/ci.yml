@@ -30,3 +30,9 @@ jobs:
 
       - name: Test (FloatSoda.Test)
         run: dotnet test tests/FloatSoda.Test --configuration Release --no-build
+
+      - name: Test (FloatSoda.Engine.Test)
+        run: dotnet test tests/FloatSoda.Engine.Test --configuration Release --no-build
+
+      - name: Test (FloatSoda.OVR.Test)
+        run: dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build

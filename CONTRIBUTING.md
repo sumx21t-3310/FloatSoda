@@ -31,7 +31,7 @@ dotnet build
 dotnet test
 
 # サンプルアプリの起動(SteamVRを起動してから)
-dotnet run --project samples/FloatSoda.Samples.OverlayApp
+dotnet run --project samples/Showcase/FloatSoda.Samples.OverlayApp
 ```
 
 ---
@@ -86,6 +86,8 @@ dotnet csharpier check .
 dotnet build --configuration Release
 dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 dotnet test tests/FloatSoda.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.Engine.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build
 ```
 
 バグ報告や機能要望は、`.github/ISSUE_TEMPLATE/` のテンプレートを使って Issue を作成してください。PR の本文は [`.github/PULL_REQUEST_TEMPLATE.md`](.github/PULL_REQUEST_TEMPLATE.md) に沿って記入してください。
@@ -317,7 +319,7 @@ FloatSoda が第一に想定する利用者は、「コードを自分では書�
 
 ### ディレクトリとファイル構成
 
-1つのサンプルにつき1プロジェクトを作成し、`samples/FloatSoda.Samples.<Name>/` に配置します。
+1つのサンプルにつき1プロジェクトを作成し、`samples/<Group>/FloatSoda.Samples.<Name>/` に配置します。`<Group>` は `Widgets`(ウィジェットごとのカタログ)、`Showcase`(アプリ全体の作例)、`Experiments`(フレームワーク開発者向けの実験)のいずれかです。
 
 | ファイル | 役割 |
 |---|---|
@@ -327,11 +329,11 @@ FloatSoda が第一に想定する利用者は、「コードを自分では書�
 | `checks/items.jsonl` | 目視確認手順(JSON Lines、1行1項目)。**結合テストのシナリオそのもの**。[`floatsoda-device-test-gen`](.agents/skills/floatsoda-device-test-gen/SKILL.md) スキルが `<Name>Demo.cs` から機械生成する。サイトへは転用しない |
 | `FloatSoda.Samples.<Name>.csproj` | `TargetFramework` を明示する(`samples/Directory.Build.props` は TFM を設定しない) |
 
-**ディレクトリ名・プロジェクト名・ルート名前空間は一致させます。** たとえば `samples/FloatSoda.Samples.Wrap/` の場合、プロジェクトファイルは `FloatSoda.Samples.Wrap.csproj`、名前空間は `FloatSoda.Samples.Wrap` となります。`Sample` のようなサフィックスを付け足したり、言い換えたりしないでください。
+**ディレクトリ名・プロジェクト名・ルート名前空間は一致させます。** たとえば `samples/Widgets/FloatSoda.Samples.Wrap/` の場合、プロジェクトファイルは `FloatSoda.Samples.Wrap.csproj`、名前空間は `FloatSoda.Samples.Wrap` となります。`Sample` のようなサフィックスを付け足したり、言い換えたりしないでください。
 
-作成したら、`FloatSoda.slnx` の `<Folder Name="/samples/">` へ登録します。
+作成したら、`FloatSoda.slnx` の `<Group>` に対応する `<Folder>`(`/samples/widgets/`、`/samples/showcase/`、`/samples/experiments/`)へ登録します。
 
-参考実装は [`samples/FloatSoda.Samples.Image`](samples/FloatSoda.Samples.Image) です。
+参考実装は [`samples/Widgets/FloatSoda.Samples.Image`](samples/Widgets/FloatSoda.Samples.Image) です。
 
 ### 表示先の切り替え
 

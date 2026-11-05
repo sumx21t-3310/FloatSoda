@@ -1,5 +1,5 @@
-using FloatSoda.Abstractions.Geometries;
-using FloatSoda.Abstractions.Input;
+using FloatSoda.Engine.Abstractions.Input;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.Gesture.Recognizers;
 

@@ -1,5 +1,5 @@
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using SkiaSharp;
 
 namespace FloatSoda.Painting;

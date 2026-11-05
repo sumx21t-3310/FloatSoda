@@ -17,12 +17,12 @@
 
 ## 作例を動かす
 
-作例は [samples/FloatSoda.Samples.ExperimentFramework](../../../samples/FloatSoda.Samples.ExperimentFramework/) にあります。コードの全文は、このページに載せず、作例のファイルを読みます。作例は、パイプラインを自分で組み、`BuildScope`、`FlushLayout`、`FlushPaint` を順に呼びます。2つの四角を `Column` に並べ、上の四角の色を `SetState` で切り替えます。それぞれの四角は `RepaintBoundary` で包みます。
+作例は [samples/Experiments/FloatSoda.Samples.ExperimentFramework](../../../samples/Experiments/FloatSoda.Samples.ExperimentFramework/) にあります。コードの全文は、このページに載せず、作例のファイルを読みます。作例は、パイプラインを自分で組み、`BuildScope`、`FlushLayout`、`FlushPaint` を順に呼びます。2つの四角を `Column` に並べ、上の四角の色を `SetState` で切り替えます。それぞれの四角は `RepaintBoundary` で包みます。
 
 リポジトリのルートで、次のコマンドを実行します。.NET の SDK のバージョンなど、開発の準備は [開発環境を用意する](../3-prepare/dev-environment.md) にあります。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.ExperimentFramework
+dotnet run --project samples/Experiments/FloatSoda.Samples.ExperimentFramework
 ```
 
 **できた?** 「初回フレーム後」「SetState 直後」「BuildScope 後」「FlushPaint 後」の4つの行が出た。
@@ -69,7 +69,7 @@ FlushPaint 後: NodesNeedingPaint = []
 境界を外すと、結果がどう変わるかを予想してから実行します。引数 `no-boundary` を付けると、作例は四角を `RepaintBoundary` で包まずに、そのまま並べます。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.ExperimentFramework -- no-boundary
+dotnet run --project samples/Experiments/FloatSoda.Samples.ExperimentFramework -- no-boundary
 ```
 
 <!-- ※要確認: 作例は #313 で main に入った。引数 no-boundary は #313 の実際の引数に合わせた。出力の4行の形は、移す前のコードに基づくので、#313 がマージされたら実物と照らす -->

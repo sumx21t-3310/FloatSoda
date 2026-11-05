@@ -1,15 +1,15 @@
 ﻿using System.Collections.Concurrent;
-using FloatSoda.Abstractions.Scheduling;
 using FloatSoda.Core;
 using FloatSoda.Engine;
+using FloatSoda.Engine.Abstractions.Scheduling;
 using FloatSoda.OVR;
 using FloatSoda.OVR.Exceptions;
 using FloatSoda.OVR.Input;
 using FloatSoda.Widgets;
 using Microsoft.Extensions.Logging;
 using DesktopWindow = FloatSoda.Widgets.DesktopWindow;
-using EngineDesktopWindow = FloatSoda.Engine.DesktopWindow;
-using EngineOverlayWindow = FloatSoda.Engine.OverlayWindow;
+using EngineDesktopWindow = FloatSoda.Engine.Desktop.DesktopWindow;
+using EngineOverlayWindow = FloatSoda.Engine.OVR.OverlayWindow;
 using OverlayWindow = FloatSoda.Widgets.OverlayWindow;
 
 namespace FloatSoda;

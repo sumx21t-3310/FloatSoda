@@ -119,18 +119,11 @@ FloatSoda.Animation.SawTooth.Deconstruct(out int Count) -> void
 FloatSoda.Animation.SawTooth.SawTooth(FloatSoda.Animation.SawTooth! original) -> void
 FloatSoda.Animation.SawTooth.SawTooth(int Count) -> void
 FloatSoda.Animation.ThreePointCubic
-FloatSoda.Animation.ThreePointCubic.A1.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Animation.ThreePointCubic.A1.init -> void
-FloatSoda.Animation.ThreePointCubic.A2.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Animation.ThreePointCubic.A2.init -> void
-FloatSoda.Animation.ThreePointCubic.B1.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Animation.ThreePointCubic.B1.init -> void
-FloatSoda.Animation.ThreePointCubic.B2.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Animation.ThreePointCubic.B2.init -> void
-FloatSoda.Animation.ThreePointCubic.Deconstruct(out FloatSoda.Abstractions.Geometries.Offset A1, out FloatSoda.Abstractions.Geometries.Offset B1, out FloatSoda.Abstractions.Geometries.Offset Midpoint, out FloatSoda.Abstractions.Geometries.Offset A2, out FloatSoda.Abstractions.Geometries.Offset B2) -> void
-FloatSoda.Animation.ThreePointCubic.Midpoint.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Animation.ThreePointCubic.Midpoint.init -> void
-FloatSoda.Animation.ThreePointCubic.ThreePointCubic(FloatSoda.Abstractions.Geometries.Offset A1, FloatSoda.Abstractions.Geometries.Offset B1, FloatSoda.Abstractions.Geometries.Offset Midpoint, FloatSoda.Abstractions.Geometries.Offset A2, FloatSoda.Abstractions.Geometries.Offset B2) -> void
 FloatSoda.Animation.ThreePointCubic.ThreePointCubic(FloatSoda.Animation.ThreePointCubic! original) -> void
 FloatSoda.Animation.Threshold
 FloatSoda.Animation.Threshold.Deconstruct(out double ThresholdValue) -> void
@@ -227,10 +220,8 @@ FloatSoda.Core.WidgetBinding.AttachRootWidget(FloatSoda.Widgets.Widget! rootWidg
 FloatSoda.Core.WidgetBinding.BeginFrame(System.TimeSpan elapsedTime) -> void
 FloatSoda.Core.WidgetBinding.CancelFrameCallback(int id) -> void
 FloatSoda.Core.WidgetBinding.DrawFrame() -> void
-FloatSoda.Core.WidgetBinding.EnsureInitialized(string! windowName, FloatSoda.Engine.RenderPostTaskRunner! renderPostTaskRunner, System.Func<FloatSoda.Engine.Renderer!, FloatSoda.Abstractions.Engine.IEngineWindow!>! windowFactory, bool visible = false) -> void
 FloatSoda.Core.WidgetBinding.EnsureVisualUpdate() -> void
 FloatSoda.Core.WidgetBinding.GestureArena.get -> FloatSoda.Gesture.GestureArenaManager!
-FloatSoda.Core.WidgetBinding.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
 FloatSoda.Core.WidgetBinding.Initialized.get -> bool
 FloatSoda.Core.WidgetBinding.NeedsVisualUpdate.get -> bool
 FloatSoda.Core.WidgetBinding.NextFrameCallbackId.get -> int
@@ -346,13 +337,11 @@ FloatSoda.FloatSodaServiceCollectionExtensions
 FloatSoda.Geometrics.Alignment
 FloatSoda.Geometrics.Alignment.Alignment() -> void
 FloatSoda.Geometrics.Alignment.Alignment(float X = 0, float Y = 0) -> void
-FloatSoda.Geometrics.Alignment.ComputeOffset(SkiaSharp.SKSize parent, SkiaSharp.SKSize child) -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Geometrics.Alignment.Deconstruct(out float X, out float Y) -> void
 FloatSoda.Geometrics.Alignment.Equals(FloatSoda.Geometrics.Alignment other) -> bool
 FloatSoda.Geometrics.Alignment.FlipAll() -> FloatSoda.Geometrics.Alignment
 FloatSoda.Geometrics.Alignment.FlipX() -> FloatSoda.Geometrics.Alignment
 FloatSoda.Geometrics.Alignment.FlipY() -> FloatSoda.Geometrics.Alignment
-FloatSoda.Geometrics.Alignment.Pivot(SkiaSharp.SKSize size) -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Geometrics.Alignment.X.get -> float
 FloatSoda.Geometrics.Alignment.X.init -> void
 FloatSoda.Geometrics.Alignment.Y.get -> float
@@ -430,8 +419,6 @@ FloatSoda.Geometrics.CrossAxisAlignment.Stretch = 3 -> FloatSoda.Geometrics.Cros
 FloatSoda.Geometrics.EdgeInsets
 FloatSoda.Geometrics.EdgeInsets.Bottom.get -> double
 FloatSoda.Geometrics.EdgeInsets.Bottom.init -> void
-FloatSoda.Geometrics.EdgeInsets.BottomLeft.get -> FloatSoda.Abstractions.Geometries.Offset
-FloatSoda.Geometrics.EdgeInsets.BottomRight.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Geometrics.EdgeInsets.Deconstruct(out double Left, out double Top, out double Right, out double Bottom) -> void
 FloatSoda.Geometrics.EdgeInsets.EdgeInsets() -> void
 FloatSoda.Geometrics.EdgeInsets.EdgeInsets(double Left = 0, double Top = 0, double Right = 0, double Bottom = 0) -> void
@@ -443,8 +430,6 @@ FloatSoda.Geometrics.EdgeInsets.Right.get -> double
 FloatSoda.Geometrics.EdgeInsets.Right.init -> void
 FloatSoda.Geometrics.EdgeInsets.Top.get -> double
 FloatSoda.Geometrics.EdgeInsets.Top.init -> void
-FloatSoda.Geometrics.EdgeInsets.TopLeft.get -> FloatSoda.Abstractions.Geometries.Offset
-FloatSoda.Geometrics.EdgeInsets.TopRight.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Geometrics.FlexFit
 FloatSoda.Geometrics.FlexFit.Loose = 1 -> FloatSoda.Geometrics.FlexFit
 FloatSoda.Geometrics.FlexFit.Tight = 0 -> FloatSoda.Geometrics.FlexFit
@@ -510,7 +495,6 @@ FloatSoda.Gesture.GestureDisposition
 FloatSoda.Gesture.GestureDisposition.Accepted = 0 -> FloatSoda.Gesture.GestureDisposition
 FloatSoda.Gesture.GestureDisposition.Rejected = 1 -> FloatSoda.Gesture.GestureDisposition
 FloatSoda.Gesture.GestureRecognizer
-FloatSoda.Gesture.GestureRecognizer.AddPointer(FloatSoda.Abstractions.Input.PointerEvent downEvent) -> void
 FloatSoda.Gesture.GestureRecognizer.Arena.get -> FloatSoda.Gesture.GestureArenaManager!
 FloatSoda.Gesture.GestureRecognizer.GestureRecognizer() -> void
 FloatSoda.Gesture.GestureRecognizer.Resolve(int pointer, FloatSoda.Gesture.GestureDisposition disposition) -> void
@@ -535,13 +519,10 @@ FloatSoda.Gesture.HitTestEntry.Transform.get -> System.Numerics.Matrix3x2?
 FloatSoda.Gesture.HitTestEntry.Transform.init -> void
 FloatSoda.Gesture.HitTestResult
 FloatSoda.Gesture.HitTestResult.Add(FloatSoda.Gesture.HitTestEntry entry) -> void
-FloatSoda.Gesture.HitTestResult.AddWidthPaintOffset(FloatSoda.Abstractions.Geometries.Offset? offset, FloatSoda.Abstractions.Geometries.Offset position, System.Func<FloatSoda.Gesture.HitTestResult!, FloatSoda.Abstractions.Geometries.Offset, bool>! hitTest) -> bool
-FloatSoda.Gesture.HitTestResult.AddWithPaintTransform(System.Numerics.Matrix3x2 transform, FloatSoda.Abstractions.Geometries.Offset position, System.Func<FloatSoda.Gesture.HitTestResult!, FloatSoda.Abstractions.Geometries.Offset, bool>! hitTest) -> bool
 FloatSoda.Gesture.HitTestResult.HitTestResult() -> void
 FloatSoda.Gesture.HitTestResult.LastTransform.get -> System.Numerics.Matrix3x2
 FloatSoda.Gesture.HitTestResult.Path.get -> System.Collections.Generic.IReadOnlyList<FloatSoda.Gesture.HitTestEntry>!
 FloatSoda.Gesture.HitTestResult.PopTransform() -> void
-FloatSoda.Gesture.HitTestResult.PushOffset(FloatSoda.Abstractions.Geometries.Offset offset) -> void
 FloatSoda.Gesture.HitTestResult.PushTransform(System.Numerics.Matrix3x2 transform) -> void
 FloatSoda.Gesture.IGestureArenaMember
 FloatSoda.Gesture.IGestureArenaMember.AcceptGesture(int pointer) -> void
@@ -550,18 +531,12 @@ FloatSoda.Gesture.IGestureBinding
 FloatSoda.Gesture.IGestureBinding.GestureArena.get -> FloatSoda.Gesture.GestureArenaManager!
 FloatSoda.Gesture.IGestureBinding.PointerRouter.get -> FloatSoda.Gesture.PointerRouter!
 FloatSoda.Gesture.IHitTestTarget
-FloatSoda.Gesture.IHitTestTarget.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
 FloatSoda.Gesture.PointerRouter
-FloatSoda.Gesture.PointerRouter.AddRoute(int pointer, System.Action<FloatSoda.Abstractions.Input.PointerEvent>! route) -> void
 FloatSoda.Gesture.PointerRouter.PointerRouter() -> void
-FloatSoda.Gesture.PointerRouter.RemoveRoute(int pointer, System.Action<FloatSoda.Abstractions.Input.PointerEvent>! route) -> void
-FloatSoda.Gesture.PointerRouter.Route(FloatSoda.Abstractions.Input.PointerEvent pointerEvent) -> void
 FloatSoda.Gesture.Recognizers.PanGestureRecognizer
 FloatSoda.Gesture.Recognizers.PanGestureRecognizer.OnPanEnd.get -> System.Action?
 FloatSoda.Gesture.Recognizers.PanGestureRecognizer.OnPanEnd.set -> void
-FloatSoda.Gesture.Recognizers.PanGestureRecognizer.OnPanStart.get -> System.Action<FloatSoda.Abstractions.Geometries.Offset>?
 FloatSoda.Gesture.Recognizers.PanGestureRecognizer.OnPanStart.set -> void
-FloatSoda.Gesture.Recognizers.PanGestureRecognizer.OnPanUpdate.get -> System.Action<FloatSoda.Abstractions.Geometries.Offset>?
 FloatSoda.Gesture.Recognizers.PanGestureRecognizer.OnPanUpdate.set -> void
 FloatSoda.Gesture.Recognizers.PanGestureRecognizer.PanGestureRecognizer() -> void
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer
@@ -569,9 +544,7 @@ FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTap.get -> System.Action?
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTap.set -> void
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTapCancel.get -> System.Action?
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTapCancel.set -> void
-FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTapDown.get -> System.Action<FloatSoda.Abstractions.Geometries.Offset>?
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTapDown.set -> void
-FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTapUp.get -> System.Action<FloatSoda.Abstractions.Geometries.Offset>?
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer.OnTapUp.set -> void
 FloatSoda.Gesture.Recognizers.TapGestureRecognizer.TapGestureRecognizer() -> void
 FloatSoda.Painting.Border
@@ -628,8 +601,6 @@ FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.Opacity.get -> FloatSoda
 FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.Opacity.set -> void
 FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.RenderAnimatedOpacity() -> void
 FloatSoda.RenderObjects.BoxParentData
-FloatSoda.RenderObjects.BoxParentData.BoxParentData(FloatSoda.Abstractions.Geometries.Offset offset = default(FloatSoda.Abstractions.Geometries.Offset)) -> void
-FloatSoda.RenderObjects.BoxParentData.Offset.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.RenderObjects.BoxParentData.Offset.set -> void
 FloatSoda.RenderObjects.Gesture.RenderAbsorbPointer
 FloatSoda.RenderObjects.Gesture.RenderAbsorbPointer.Absorbing.get -> bool
@@ -642,17 +613,11 @@ FloatSoda.RenderObjects.Gesture.RenderIgnorePointer.RenderIgnorePointer() -> voi
 FloatSoda.RenderObjects.Gesture.RenderPointerListener
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.Behaviour.get -> FloatSoda.Gesture.HitTestBehaviour
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.Behaviour.set -> void
-FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerCancel.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerCancel.set -> void
-FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerDown.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerDown.set -> void
-FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerEnter.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerEnter.set -> void
-FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerExit.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerExit.set -> void
-FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerMove.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerMove.set -> void
-FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerUp.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.OnPointerUp.set -> void
 FloatSoda.RenderObjects.Gesture.RenderPointerListener.RenderPointerListener() -> void
 FloatSoda.RenderObjects.Gesture.RenderPointerRegion
@@ -899,7 +864,6 @@ FloatSoda.RenderObjects.Painting.RenderRepaintBoundary.RenderRepaintBoundary() -
 FloatSoda.RenderObjects.Painting.RenderTransform
 FloatSoda.RenderObjects.Painting.RenderTransform.Alignment.get -> FloatSoda.Geometrics.Alignment?
 FloatSoda.RenderObjects.Painting.RenderTransform.Alignment.set -> void
-FloatSoda.RenderObjects.Painting.RenderTransform.Origin.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.RenderObjects.Painting.RenderTransform.Origin.set -> void
 FloatSoda.RenderObjects.Painting.RenderTransform.RenderTransform() -> void
 FloatSoda.RenderObjects.Painting.RenderTransform.Transform.get -> System.Numerics.Matrix3x2
@@ -908,15 +872,7 @@ FloatSoda.RenderObjects.Painting.RenderTransform.TransformHitTests.get -> bool
 FloatSoda.RenderObjects.Painting.RenderTransform.TransformHitTests.set -> void
 FloatSoda.RenderObjects.PaintingContext
 FloatSoda.RenderObjects.PaintingContext.Canvas.get -> SkiaSharp.SKCanvas!
-FloatSoda.RenderObjects.PaintingContext.CompositeChild(FloatSoda.RenderObjects.RenderObject! child, FloatSoda.Abstractions.Geometries.Offset offset) -> void
-FloatSoda.RenderObjects.PaintingContext.PaintChild(FloatSoda.RenderObjects.RenderObject! child, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 FloatSoda.RenderObjects.PaintingContext.PaintingContext(FloatSoda.Rendering.Layers.ContainerLayer! containerLayer, SkiaSharp.SKRect estimatedBounds) -> void
-FloatSoda.RenderObjects.PaintingContext.PushClipPath(FloatSoda.Abstractions.Geometries.Offset offset, SkiaSharp.SKRect bounds, SkiaSharp.SKPath! clipPath, System.Action<FloatSoda.RenderObjects.PaintingContext!, FloatSoda.Abstractions.Geometries.Offset>! painter, FloatSoda.Rendering.Layers.Clip clipBehavior = FloatSoda.Rendering.Layers.Clip.Antialias, FloatSoda.Rendering.Layers.ClipPathLayer? oldLayer = null) -> FloatSoda.Rendering.Layers.ClipPathLayer!
-FloatSoda.RenderObjects.PaintingContext.PushClipRect(FloatSoda.Abstractions.Geometries.Offset offset, SkiaSharp.SKRect clipRect, System.Action<FloatSoda.RenderObjects.PaintingContext!, FloatSoda.Abstractions.Geometries.Offset>! painter, FloatSoda.Rendering.Layers.Clip clipBehavior = FloatSoda.Rendering.Layers.Clip.Antialias, FloatSoda.Rendering.Layers.ClipRectLayer? oldLayer = null) -> FloatSoda.Rendering.Layers.ClipRectLayer!
-FloatSoda.RenderObjects.PaintingContext.PushClipRoundRect(FloatSoda.Abstractions.Geometries.Offset offset, SkiaSharp.SKRect bounds, SkiaSharp.SKRoundRect! clipRect, System.Action<FloatSoda.RenderObjects.PaintingContext!, FloatSoda.Abstractions.Geometries.Offset>! painter, FloatSoda.Rendering.Layers.Clip clipBehavior = FloatSoda.Rendering.Layers.Clip.Antialias, FloatSoda.Rendering.Layers.ClipRoundRectLayer? oldLayer = null) -> FloatSoda.Rendering.Layers.ClipRoundRectLayer!
-FloatSoda.RenderObjects.PaintingContext.PushLayer(FloatSoda.Rendering.Layers.ContainerLayer! childLayer, System.Action<FloatSoda.RenderObjects.PaintingContext!, FloatSoda.Abstractions.Geometries.Offset>! painter, FloatSoda.Abstractions.Geometries.Offset offset, SkiaSharp.SKRect? childPaintBounds = null) -> void
-FloatSoda.RenderObjects.PaintingContext.PushOpacity(FloatSoda.Abstractions.Geometries.Offset offset, byte alpha, System.Action<FloatSoda.RenderObjects.PaintingContext!, FloatSoda.Abstractions.Geometries.Offset>! painter, FloatSoda.Rendering.Layers.OpacityLayer? oldLayer = null) -> FloatSoda.Rendering.Layers.OpacityLayer!
-FloatSoda.RenderObjects.PaintingContext.PushTransform(SkiaSharp.SKMatrix transform, System.Action<FloatSoda.RenderObjects.PaintingContext!, FloatSoda.Abstractions.Geometries.Offset>! painter, FloatSoda.Rendering.Layers.TransformLayer? oldLayer = null) -> FloatSoda.Rendering.Layers.TransformLayer!
 FloatSoda.RenderObjects.PaintingContext.StopRecordingIfNeeded() -> void
 FloatSoda.RenderObjects.RenderBox
 FloatSoda.RenderObjects.RenderBox.GetMaxIntrinsicHeight(double width) -> double
@@ -967,7 +923,6 @@ FloatSoda.RenderObjects.RenderView.Child.get -> FloatSoda.RenderObjects.RenderBo
 FloatSoda.RenderObjects.RenderView.Child.set -> void
 FloatSoda.RenderObjects.RenderView.FixedSize.get -> SkiaSharp.SKSize?
 FloatSoda.RenderObjects.RenderView.FixedSize.set -> void
-FloatSoda.RenderObjects.RenderView.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
 FloatSoda.RenderObjects.RenderView.PrepareInitialFrame() -> void
 FloatSoda.RenderObjects.RenderView.RenderView(float width = 1000, float height = 1000) -> void
 FloatSoda.RenderObjects.SingleChildContainer<T>
@@ -980,7 +935,6 @@ FloatSoda.RenderObjects.SingleChildContainer<T>.VisitChildren(System.Action<Floa
 FloatSoda.RenderObjects.TextPainter
 FloatSoda.RenderObjects.TextPainter.Height.get -> double
 FloatSoda.RenderObjects.TextPainter.Layout(double minWidth, double maxWidth) -> void
-FloatSoda.RenderObjects.TextPainter.Paint(SkiaSharp.SKCanvas! canvas, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 FloatSoda.RenderObjects.TextPainter.Size.get -> SkiaSharp.SKSize
 FloatSoda.RenderObjects.TextPainter.Text.get -> FloatSoda.RenderObjects.TextSpan?
 FloatSoda.RenderObjects.TextPainter.Text.set -> void
@@ -1037,9 +991,7 @@ FloatSoda.Widgets.Gesture.GestureDetector.GestureDetector() -> void
 FloatSoda.Widgets.Gesture.GestureDetector.GestureDetector(FloatSoda.Widgets.Gesture.GestureDetector! original) -> void
 FloatSoda.Widgets.Gesture.GestureDetector.OnPanEnd.get -> System.Action?
 FloatSoda.Widgets.Gesture.GestureDetector.OnPanEnd.init -> void
-FloatSoda.Widgets.Gesture.GestureDetector.OnPanStart.get -> System.Action<FloatSoda.Abstractions.Geometries.Offset>?
 FloatSoda.Widgets.Gesture.GestureDetector.OnPanStart.init -> void
-FloatSoda.Widgets.Gesture.GestureDetector.OnPanUpdate.get -> System.Action<FloatSoda.Abstractions.Geometries.Offset>?
 FloatSoda.Widgets.Gesture.GestureDetector.OnPanUpdate.init -> void
 FloatSoda.Widgets.Gesture.GestureDetector.OnTap.get -> System.Action?
 FloatSoda.Widgets.Gesture.GestureDetector.OnTap.init -> void
@@ -1053,24 +1005,16 @@ FloatSoda.Widgets.Gesture.Listener.Behaviour.get -> FloatSoda.Gesture.HitTestBeh
 FloatSoda.Widgets.Gesture.Listener.Behaviour.init -> void
 FloatSoda.Widgets.Gesture.Listener.Listener() -> void
 FloatSoda.Widgets.Gesture.Listener.Listener(FloatSoda.Widgets.Gesture.Listener! original) -> void
-FloatSoda.Widgets.Gesture.Listener.OnPointerCancel.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.Listener.OnPointerCancel.init -> void
-FloatSoda.Widgets.Gesture.Listener.OnPointerDown.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.Listener.OnPointerDown.init -> void
-FloatSoda.Widgets.Gesture.Listener.OnPointerEnter.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.Listener.OnPointerEnter.init -> void
-FloatSoda.Widgets.Gesture.Listener.OnPointerExit.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.Listener.OnPointerExit.init -> void
-FloatSoda.Widgets.Gesture.Listener.OnPointerMove.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.Listener.OnPointerMove.init -> void
-FloatSoda.Widgets.Gesture.Listener.OnPointerUp.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.Listener.OnPointerUp.init -> void
 FloatSoda.Widgets.Gesture.PointerRegion
 FloatSoda.Widgets.Gesture.PointerRegion.Behaviour.get -> FloatSoda.Gesture.HitTestBehaviour
 FloatSoda.Widgets.Gesture.PointerRegion.Behaviour.init -> void
-FloatSoda.Widgets.Gesture.PointerRegion.OnPointerEnter.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.PointerRegion.OnPointerEnter.init -> void
-FloatSoda.Widgets.Gesture.PointerRegion.OnPointerExit.get -> System.Action<FloatSoda.Abstractions.Input.PointerEvent>?
 FloatSoda.Widgets.Gesture.PointerRegion.OnPointerExit.init -> void
 FloatSoda.Widgets.Gesture.PointerRegion.PointerRegion() -> void
 FloatSoda.Widgets.Gesture.PointerRegion.PointerRegion(FloatSoda.Widgets.Gesture.PointerRegion! original) -> void
@@ -1359,7 +1303,6 @@ FloatSoda.Widgets.MultiChildRenderObjectWidget<T>.Children.get -> System.Collect
 FloatSoda.Widgets.MultiChildRenderObjectWidget<T>.Children.init -> void
 FloatSoda.Widgets.MultiChildRenderObjectWidget<T>.MultiChildRenderObjectWidget() -> void
 FloatSoda.Widgets.OverlayWindow
-FloatSoda.Widgets.OverlayWindow.Dpm.get -> FloatSoda.Abstractions.Geometries.Dpm
 FloatSoda.Widgets.OverlayWindow.Dpm.init -> void
 FloatSoda.Widgets.OverlayWindow.OverlayWindow() -> void
 FloatSoda.Widgets.OverlayWindow.OverlayWindow(FloatSoda.Widgets.OverlayWindow! original) -> void
@@ -1440,7 +1383,6 @@ FloatSoda.Widgets.Paint.Transform.Alignment.get -> FloatSoda.Geometrics.Alignmen
 FloatSoda.Widgets.Paint.Transform.Alignment.init -> void
 FloatSoda.Widgets.Paint.Transform.Matrix.get -> System.Numerics.Matrix3x2
 FloatSoda.Widgets.Paint.Transform.Matrix.init -> void
-FloatSoda.Widgets.Paint.Transform.Origin.get -> FloatSoda.Abstractions.Geometries.Offset
 FloatSoda.Widgets.Paint.Transform.Origin.init -> void
 FloatSoda.Widgets.Paint.Transform.Transform() -> void
 FloatSoda.Widgets.Paint.Transform.Transform(FloatSoda.Widgets.Paint.Transform! original) -> void
@@ -1568,16 +1510,12 @@ abstract FloatSoda.Core.Providers.ImageProvider.LoadAsync(System.Threading.Cance
 abstract FloatSoda.Elements.ComponentElement.Build() -> FloatSoda.Widgets.Widget!
 abstract FloatSoda.Elements.Element.PerformRebuild() -> void
 abstract FloatSoda.Gesture.GestureRecognizer.AcceptGesture(int pointer) -> void
-abstract FloatSoda.Gesture.GestureRecognizer.AddAllowedPointer(FloatSoda.Abstractions.Input.PointerEvent downEvent) -> void
-abstract FloatSoda.Gesture.GestureRecognizer.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent) -> void
 abstract FloatSoda.Gesture.GestureRecognizer.RejectGesture(int pointer) -> void
 abstract FloatSoda.Gesture.GestureRecognizerFactory.ConstructRaw() -> FloatSoda.Gesture.GestureRecognizer!
 abstract FloatSoda.Gesture.GestureRecognizerFactory.InitializeRaw(FloatSoda.Gesture.GestureRecognizer! recognizer) -> void
 abstract FloatSoda.RenderObjects.Painting.CustomClipper<T>.GetClip(SkiaSharp.SKSize size) -> T
 abstract FloatSoda.RenderObjects.Painting.CustomClipper<T>.ShouldReclip(FloatSoda.RenderObjects.Painting.CustomClipper<T>! oldClipper) -> bool
 abstract FloatSoda.RenderObjects.Painting.RenderCustomClip<T>.DefaultClip.get -> T
-abstract FloatSoda.RenderObjects.RenderObject.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
-abstract FloatSoda.RenderObjects.RenderObject.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 abstract FloatSoda.RenderObjects.RenderObject.PerformLayout() -> void
 abstract FloatSoda.RenderObjects.RenderObject.Size.get -> SkiaSharp.SKSize
 abstract FloatSoda.RenderObjects.RenderObject.Size.set -> void
@@ -1801,12 +1739,6 @@ override FloatSoda.Painting.TextStyle.GetHashCode() -> int
 override FloatSoda.Painting.TextStyle.ToString() -> string!
 override FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.Detach() -> void
-override FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
-override FloatSoda.RenderObjects.Gesture.RenderAbsorbPointer.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Gesture.RenderIgnorePointer.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Gesture.RenderPointerListener.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
-override FloatSoda.RenderObjects.Gesture.RenderPointerListener.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Gesture.RenderPointerListener.HitTestSelf(FloatSoda.Abstractions.Geometries.Offset position) -> bool
 override FloatSoda.RenderObjects.Layout.RenderAspectRatio.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedBox.ComputeMaxIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Layout.RenderConstrainedBox.ComputeMaxIntrinsicWidth(double height) -> double
@@ -1815,17 +1747,11 @@ override FloatSoda.RenderObjects.Layout.RenderConstrainedBox.ComputeMinIntrinsic
 override FloatSoda.RenderObjects.Layout.RenderConstrainedBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.Layout.RenderConstrainedOverflowBox.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
-override FloatSoda.RenderObjects.Layout.RenderConstraintsTransformBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderConstraintsTransformBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderConstraintsTransformBox.PerformLayout() -> void
-override FloatSoda.RenderObjects.Layout.RenderFittedBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderFittedBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderFittedBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderFlex.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Layout.RenderFlex.ComputeMaxIntrinsicHeight(double width) -> double
@@ -1833,35 +1759,25 @@ override FloatSoda.RenderObjects.Layout.RenderFlex.ComputeMaxIntrinsicWidth(doub
 override FloatSoda.RenderObjects.Layout.RenderFlex.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Layout.RenderFlex.ComputeMinIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.Layout.RenderFlex.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderFlex.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderFlex.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderFlex.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderFlex.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderFlex.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.Layout.RenderFlex.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
 override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.Layout.RenderFractionallySizedOverflowBox.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
-override FloatSoda.RenderObjects.Layout.RenderIndexedStack.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderIndexedStack.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderIndexedStack.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderIntrinsicHeight.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderIntrinsicWidth.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderLimitedBox.PerformLayout() -> void
-override FloatSoda.RenderObjects.Layout.RenderOffstage.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderOffstage.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderOffstage.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderPadding.ComputeMaxIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Layout.RenderPadding.ComputeMaxIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.Layout.RenderPadding.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Layout.RenderPadding.ComputeMinIntrinsicWidth(double height) -> double
-override FloatSoda.RenderObjects.Layout.RenderPadding.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderPadding.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderPadding.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.ComputeMaxIntrinsicHeight(double width) -> double
@@ -1869,27 +1785,19 @@ override FloatSoda.RenderObjects.Layout.RenderPositionedBox.ComputeMaxIntrinsicW
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.ComputeMinIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderPositionedBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderPositionedBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.Layout.RenderPositionedBox.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
-override FloatSoda.RenderObjects.Layout.RenderRotatedBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderRotatedBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderRotatedBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.Layout.RenderSizedOverflowBox.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
 override FloatSoda.RenderObjects.Layout.RenderStack.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.Layout.RenderStack.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderStack.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderStack.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderStack.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderStack.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderStack.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
@@ -1900,43 +1808,21 @@ override FloatSoda.RenderObjects.Layout.RenderWrap.ComputeMaxIntrinsicWidth(doub
 override FloatSoda.RenderObjects.Layout.RenderWrap.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Layout.RenderWrap.ComputeMinIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.Layout.RenderWrap.Detach() -> void
-override FloatSoda.RenderObjects.Layout.RenderWrap.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Layout.RenderWrap.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Layout.RenderWrap.PerformLayout() -> void
 override FloatSoda.RenderObjects.Layout.RenderWrap.RedepthChildren() -> void
 override FloatSoda.RenderObjects.Layout.RenderWrap.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.Layout.RenderWrap.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
 override FloatSoda.RenderObjects.Painting.RenderClipOval.DefaultClip.get -> SkiaSharp.SKRect
-override FloatSoda.RenderObjects.Painting.RenderClipOval.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderClipOval.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderClipPath.DefaultClip.get -> SkiaSharp.SKPath!
-override FloatSoda.RenderObjects.Painting.RenderClipPath.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderClipPath.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderClipRect.DefaultClip.get -> SkiaSharp.SKRect
-override FloatSoda.RenderObjects.Painting.RenderClipRect.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderClipRect.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderClipRoundRect.DefaultClip.get -> SkiaSharp.SKRoundRect!
-override FloatSoda.RenderObjects.Painting.RenderClipRoundRect.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderClipRoundRect.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
-override FloatSoda.RenderObjects.Painting.RenderColoredBox.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderColoredBox.HitTestSelf(FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderColoredBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderCustomClip<T>.PerformLayout() -> void
-override FloatSoda.RenderObjects.Painting.RenderDecoratedBox.HitTestSelf(FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderDecoratedBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderImage.ComputeMaxIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Painting.RenderImage.ComputeMaxIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.Painting.RenderImage.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.Painting.RenderImage.ComputeMinIntrinsicWidth(double height) -> double
-override FloatSoda.RenderObjects.Painting.RenderImage.HitTestSelf(FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderImage.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderImage.PerformLayout() -> void
-override FloatSoda.RenderObjects.Painting.RenderOpacity.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.Painting.RenderRepaintBoundary.IsRepaintBoundary.get -> bool
-override FloatSoda.RenderObjects.Painting.RenderTransform.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderTransform.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.Painting.RenderTransform.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
-override FloatSoda.RenderObjects.RenderBox.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
 override FloatSoda.RenderObjects.RenderBox.Size.get -> SkiaSharp.SKSize
 override FloatSoda.RenderObjects.RenderBox.Size.set -> void
 override FloatSoda.RenderObjects.RenderParagraph.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
@@ -1945,9 +1831,6 @@ override FloatSoda.RenderObjects.RenderParagraph.ComputeMaxIntrinsicWidth(double
 override FloatSoda.RenderObjects.RenderParagraph.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.RenderParagraph.ComputeMinIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.RenderParagraph.Detach() -> void
-override FloatSoda.RenderObjects.RenderParagraph.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.RenderParagraph.HitTestSelf(FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.RenderParagraph.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.RenderParagraph.PerformLayout() -> void
 override FloatSoda.RenderObjects.RenderParagraph.RedepthChildren() -> void
 override FloatSoda.RenderObjects.RenderParagraph.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
@@ -1958,17 +1841,13 @@ override FloatSoda.RenderObjects.RenderProxyBox.ComputeMaxIntrinsicWidth(double 
 override FloatSoda.RenderObjects.RenderProxyBox.ComputeMinIntrinsicHeight(double width) -> double
 override FloatSoda.RenderObjects.RenderProxyBox.ComputeMinIntrinsicWidth(double height) -> double
 override FloatSoda.RenderObjects.RenderProxyBox.Detach() -> void
-override FloatSoda.RenderObjects.RenderProxyBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-override FloatSoda.RenderObjects.RenderProxyBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.RenderProxyBox.PerformLayout() -> void
 override FloatSoda.RenderObjects.RenderProxyBox.RedepthChildren() -> void
 override FloatSoda.RenderObjects.RenderProxyBox.SetupParentData(FloatSoda.RenderObjects.RenderObject! child) -> void
 override FloatSoda.RenderObjects.RenderProxyBox.VisitChildren(System.Action<FloatSoda.RenderObjects.RenderObject!>! visitor) -> void
 override FloatSoda.RenderObjects.RenderView.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 override FloatSoda.RenderObjects.RenderView.Detach() -> void
-override FloatSoda.RenderObjects.RenderView.HandleEvent(FloatSoda.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
 override FloatSoda.RenderObjects.RenderView.IsRepaintBoundary.get -> bool
-override FloatSoda.RenderObjects.RenderView.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Abstractions.Geometries.Offset offset) -> void
 override FloatSoda.RenderObjects.RenderView.PerformLayout() -> void
 override FloatSoda.RenderObjects.RenderView.RedepthChildren() -> void
 override FloatSoda.RenderObjects.RenderView.Size.get -> SkiaSharp.SKSize
@@ -3053,9 +2932,6 @@ virtual FloatSoda.RenderObjects.RenderBox.ComputeMaxIntrinsicHeight(double width
 virtual FloatSoda.RenderObjects.RenderBox.ComputeMaxIntrinsicWidth(double height) -> double
 virtual FloatSoda.RenderObjects.RenderBox.ComputeMinIntrinsicHeight(double width) -> double
 virtual FloatSoda.RenderObjects.RenderBox.ComputeMinIntrinsicWidth(double height) -> double
-virtual FloatSoda.RenderObjects.RenderBox.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-virtual FloatSoda.RenderObjects.RenderBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Abstractions.Geometries.Offset position) -> bool
-virtual FloatSoda.RenderObjects.RenderBox.HitTestSelf(FloatSoda.Abstractions.Geometries.Offset position) -> bool
 virtual FloatSoda.RenderObjects.RenderObject.Attach(FloatSoda.Core.RenderPipeline? owner) -> void
 virtual FloatSoda.RenderObjects.RenderObject.Detach() -> void
 virtual FloatSoda.RenderObjects.RenderObject.IsRepaintBoundary.get -> bool

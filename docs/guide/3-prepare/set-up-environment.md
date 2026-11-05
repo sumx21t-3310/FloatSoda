@@ -111,5 +111,5 @@ SteamVR のダッシュボードを開く。
 
 <!-- ※要確認: 手順5の結果(ダッシュボードに青い四角が出る)。HMD と SteamVR でしか確かめられない。確かめ方: 空のコンソールアプリにチュートリアル段1のコードを貼って実行し、ダッシュボードを開く -->
 
-最後まで進めたら、チュートリアル[最初のオーバーレイを作る](../../tutorials/first-overlay.md)へ進んでください。リポジトリを取得した人は、リポジトリのルートに移動して `dotnet run --project samples/FloatSoda.Samples.GettingStarted` を実行すると、色の四角を出す作例も動かせます。
+最後まで進めたら、チュートリアル[最初のオーバーレイを作る](../../tutorials/first-overlay.md)へ進んでください。リポジトリを取得した人は、リポジトリのルートに移動して `dotnet run --project samples/Showcase/FloatSoda.Samples.GettingStarted` を実行すると、色の四角を出す作例も動かせます。
 

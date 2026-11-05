@@ -1,5 +1,6 @@
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Elements;
+using FloatSoda.Engine.Abstractions.Input;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.Gesture.Recognizers;
 
@@ -145,7 +146,7 @@ internal class RawGestureDetectorState : State<RawGestureDetector>
 
     /// <summary>Downイベントを現在のすべての認識器へ渡して監視を開始します。</summary>
     /// <param name="downEvent">監視を開始するDownフェーズのポインターイベント。</param>
-    private void HandlePointerDown(Abstractions.Input.PointerEvent downEvent)
+    private void HandlePointerDown(PointerEvent downEvent)
     {
         foreach (var recognizer in _recognizers.Values)
         {

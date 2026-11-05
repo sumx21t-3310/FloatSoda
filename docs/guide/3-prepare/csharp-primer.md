@@ -93,7 +93,7 @@ var subtitle = title with { FontSize = 30 };
 
 `() => ...` は、名前のない小さな関数を、その場で書く書き方です。ラムダと呼びます。FloatSoda では、ボタンが押されたときの処理を渡すときに使います。
 
-`samples/FloatSoda.Samples.OverlayApp/CounterWidget.cs` に、次の1行があります。
+`samples/Showcase/FloatSoda.Samples.OverlayApp/CounterWidget.cs` に、次の1行があります。
 
 ```csharp
 OnTap = () => SetState(() => _count = 0),

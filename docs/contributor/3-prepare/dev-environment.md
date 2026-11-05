@@ -60,6 +60,8 @@ PR を出す前に、CI と同じ手順を手元で通すことが規約です�
 dotnet build --configuration Release
 dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 dotnet test tests/FloatSoda.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.Engine.Test --configuration Release --no-build
+dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build
 ```
 
 特定のテストだけを動かすには、`--filter` を使います。

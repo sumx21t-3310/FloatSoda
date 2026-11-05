@@ -1,0 +1,4 @@
+﻿FloatSoda.Engine.Abstractions.IEngineWindow
+FloatSoda.Engine.Abstractions.IEngineWindow.PointerSource.get -> FloatSoda.Engine.Abstractions.Input.IRawPointerSource
+FloatSoda.Engine.Abstractions.IEngineWindow.Present(FloatSoda.Rendering.Layers.ILayer layer) -> void
+FloatSoda.Engine.Abstractions.IEngineWindow.Resize(SkiaSharp.SKSizeI size) -> void

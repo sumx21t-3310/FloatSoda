@@ -187,7 +187,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   `RenderStack.paint`(`rendering/stack.dart:717-719`)は
   `clipBehavior != Clip.none && _hasVisualOverflow` のときだけ `pushClipRect` する。
 - **Test**: — (not set)
-- **Docs**: `samples/FloatSoda.Samples.Stack/README.md` の `## Flutterとの違い`(回避策として
+- **Docs**: `samples/Widgets/FloatSoda.Samples.Stack/README.md` の `## Flutterとの違い`(回避策として
   `ClipRect` で包む案内)。差異が解消したら行を削除する。
 - **Observation**: `HEADLESS`(はみ出し子の描画有無はビットマップで判定できる)
 - **Label**: not ported — 2026-09-14 にオーナーが確定。修正は #257(`ClipBehavior` を追加し、
@@ -208,7 +208,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   `Container_BorderありでPaddingを省略_子がボーダーの内側に収まる`、
   `Container_PaddingとBorderを指定_余白とボーダーの太さの和だけ子が内側へ寄る`、
   `Container_上辺だけにBorderを指定_上辺の太さだけ子が下へ寄る`。
-- **Docs**: `samples/FloatSoda.Samples.Container/README.md` の `## Flutterとの違い` から行を削除した。
+- **Docs**: `samples/Widgets/FloatSoda.Samples.Container/README.md` の `## Flutterとの違い` から行を削除した。
 - **Observation**: `HEADLESS`(子の配置位置はビットマップで判定できる)
 - **Label**: port mistake — 余白合成は実装済みで加算だけが抜けていた。PR #264 の Codex レビューで発見。
 
@@ -232,7 +232,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   `tests/FloatSoda.Test/RenderObjects/IntrinsicLayoutTest.cs` の
   `GetIntrinsicDimension_ConstrainedBoxのExpandで*` の各テスト。
   `tests/FloatSoda.Test/Widgets/ConstrainedBoxTest.cs` の `*子なし*` の各テスト。
-- **Docs**: `samples/FloatSoda.Samples.Container/README.md` の `## Flutterとの違い` と、
+- **Docs**: `samples/Widgets/FloatSoda.Samples.Container/README.md` の `## Flutterとの違い` と、
   `docs/reference/flutter-mapping.md` の「挙動が違うもの」から行を削除した。
 - **Observation**: `HEADLESS`(サイズはレイアウト結果で判定できる)
 - **Label**: port mistake — 修正は #268(breaking)。PR #264 の Codex レビューで発見。
@@ -265,7 +265,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   「読み込み中に表示するもの」に限定すると、取り違えても完成した画像が消えない。2026-09-20 にオーナーが #214 で確定。
 - **Test**: `tests/FloatSoda.Test/Widgets/ImageTest.cs` の `Build_読み込みが完了_LoadingBuilderの結果を画像へ置き換える` と
   `Build_読み込みが未完了_LoadingBuilderへnullの進捗を渡して結果を表示する`。
-- **Docs**: `samples/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
+- **Docs**: `samples/Widgets/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
 - **Observation**: `HEADLESS`
 - **Label**: deliberate
 
@@ -278,7 +278,7 @@ FloatSoda の挙動 / 理由 / 差異を固定するテスト / 利用者向け 
   保持する(`painting/image_cache.dart:86`、`:490`)。
 - **Why**: —(差異を意図していない。LRU は #214 の対象外として後続 Issue に分けた)
 - **Test**: — (not set)
-- **Docs**: `samples/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
+- **Docs**: `samples/Widgets/FloatSoda.Samples.Image/README.md` の `## Flutterとの違い`。
 - **Observation**: `HEADLESS`
 - **Label**: not ported(#275)— `ImageHandle` の貸し借りの形は LRU を足しても変わらないので、public API を壊さずに追加できる。
 

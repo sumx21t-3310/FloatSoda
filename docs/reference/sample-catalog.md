@@ -9,13 +9,13 @@
 作例は [FloatSoda のリポジトリ](https://github.com/sumx21t-3310/FloatSoda)に入っています。リポジトリを clone し、SteamVR を起動してから、リポジトリのルートで次のコマンドを実行します。`<名前>` を、下の表の作例の名前(`FloatSoda.Samples.` に続く部分)に置き換えます。`PaintingSample` のように、画面を PNG に書き出すだけの作例は、SteamVR を起動しなくても動きます。SteamVR が要らない場面は、[動作環境](requirements.md#steamvr-が要らない場面)で確かめられます。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.<名前>
+dotnet run --project samples/<グループ>/FloatSoda.Samples.<名前>
 ```
 
 ウィジェットの作例には、`--desktop` を付けられます。ダッシュボードの代わりに、PC のデスクトップのウィンドウに表示します。HMD を被らずに見た目を確かめるときに使います。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.Flex -- --desktop
+dotnet run --project samples/Widgets/FloatSoda.Samples.Flex -- --desktop
 ```
 
 `--desktop` を付けても、SteamVR の起動と HMD の接続は要ります。起動時に OpenVR を初期化するためです。
@@ -35,10 +35,10 @@ dotnet run --project samples/FloatSoda.Samples.Flex -- --desktop
 
 | 作例 | 示すもの | SteamVR |
 | :-- | :-- | :-- |
-| [FloatSoda.Samples.OverlayApp](../../samples/FloatSoda.Samples.OverlayApp/README.md) | レイアウト、時計、アニメーション、カウンター、ドラッグの総合デモ。3種類のオーバーレイを同時に作る | 要る |
-| [FloatSoda.Samples.GettingStarted](../../samples/FloatSoda.Samples.GettingStarted/README.md) | 色の四角を1つ出す最小のアプリ。チュートリアルの段1に近い | 要る |
-| [FloatSoda.Samples.PrimitiveOverlay](../../samples/FloatSoda.Samples.PrimitiveOverlay/README.md) | ウィジェットを使わず、`FloatSoda.OVR` の低レベル API だけでオーバーレイを出す。デスクトップにある `layer_tree_output.png` を貼るので、先に PaintingSample を実行しておく | 要る |
-| [FloatSoda.Samples.PaintingSample](../../samples/FloatSoda.Samples.PaintingSample/README.md) | ウィジェット、RenderObject、レイヤーの3つのツリーを、PNG の画像に書き出す。デスクトップに保存する | 要らない |
+| [FloatSoda.Samples.OverlayApp](../../samples/Showcase/FloatSoda.Samples.OverlayApp/README.md) | レイアウト、時計、アニメーション、カウンター、ドラッグの総合デモ。3種類のオーバーレイを同時に作る | 要る |
+| [FloatSoda.Samples.GettingStarted](../../samples/Showcase/FloatSoda.Samples.GettingStarted/README.md) | 色の四角を1つ出す最小のアプリ。チュートリアルの段1に近い | 要る |
+| [FloatSoda.Samples.PrimitiveOverlay](../../samples/Showcase/FloatSoda.Samples.PrimitiveOverlay/README.md) | ウィジェットを使わず、`FloatSoda.OVR` の低レベル API だけでオーバーレイを出す。デスクトップにある `layer_tree_output.png` を貼るので、先に PaintingSample を実行しておく | 要る |
+| [FloatSoda.Samples.PaintingSample](../../samples/Showcase/FloatSoda.Samples.PaintingSample/README.md) | ウィジェット、RenderObject、レイヤーの3つのツリーを、PNG の画像に書き出す。デスクトップに保存する | 要らない |
 
 チュートリアルを先に通したいときは、[最初のオーバーレイを作る](../tutorials/first-overlay.md)を開いてください。
 
@@ -48,22 +48,22 @@ dotnet run --project samples/FloatSoda.Samples.Flex -- --desktop
 
 | 作例 | 扱うウィジェット |
 | :-- | :-- |
-| [Flex](../../samples/FloatSoda.Samples.Flex/README.md) | `Flex`、`Row`、`Column` |
-| [Expanded](../../samples/FloatSoda.Samples.Expanded/README.md) | `Expanded`、`Flexible`、`Spacer` |
-| [Wrap](../../samples/FloatSoda.Samples.Wrap/README.md) | `Wrap` |
-| [Align](../../samples/FloatSoda.Samples.Align/README.md) | `Align`、`Center` |
-| [Padding](../../samples/FloatSoda.Samples.Padding/README.md) | `Padding` |
-| [Container](../../samples/FloatSoda.Samples.Container/README.md) | `Container` |
-| [SizedBox](../../samples/FloatSoda.Samples.SizedBox/README.md) | `SizedBox` |
-| [LimitedBox](../../samples/FloatSoda.Samples.LimitedBox/README.md) | `LimitedBox` |
-| [ConstraintsTransformBox](../../samples/FloatSoda.Samples.ConstraintsTransformBox/README.md) | `ConstraintsTransformBox`、`UnconstrainedBox` |
-| [Stack](../../samples/FloatSoda.Samples.Stack/README.md) | `Stack`、`Positioned` |
-| [AspectRatio](../../samples/FloatSoda.Samples.AspectRatio/README.md) | `AspectRatio` |
-| [FittedBox](../../samples/FloatSoda.Samples.FittedBox/README.md) | `FittedBox`、`BoxFit` |
-| [FractionallySizedBox](../../samples/FloatSoda.Samples.FractionallySizedBox/README.md) | `FractionallySizedBox` |
-| [OverflowBox](../../samples/FloatSoda.Samples.OverflowBox/README.md) | `OverflowBox`、`SizedOverflowBox` |
-| [IntrinsicWidth](../../samples/FloatSoda.Samples.IntrinsicWidth/README.md) | `IntrinsicWidth`、`IntrinsicHeight` |
-| [Visibility](../../samples/FloatSoda.Samples.Visibility/README.md) | `Visibility`、`Offstage`、`IndexedStack`、`RotatedBox` |
+| [Flex](../../samples/Widgets/FloatSoda.Samples.Flex/README.md) | `Flex`、`Row`、`Column` |
+| [Expanded](../../samples/Widgets/FloatSoda.Samples.Expanded/README.md) | `Expanded`、`Flexible`、`Spacer` |
+| [Wrap](../../samples/Widgets/FloatSoda.Samples.Wrap/README.md) | `Wrap` |
+| [Align](../../samples/Widgets/FloatSoda.Samples.Align/README.md) | `Align`、`Center` |
+| [Padding](../../samples/Widgets/FloatSoda.Samples.Padding/README.md) | `Padding` |
+| [Container](../../samples/Widgets/FloatSoda.Samples.Container/README.md) | `Container` |
+| [SizedBox](../../samples/Widgets/FloatSoda.Samples.SizedBox/README.md) | `SizedBox` |
+| [LimitedBox](../../samples/Widgets/FloatSoda.Samples.LimitedBox/README.md) | `LimitedBox` |
+| [ConstraintsTransformBox](../../samples/Widgets/FloatSoda.Samples.ConstraintsTransformBox/README.md) | `ConstraintsTransformBox`、`UnconstrainedBox` |
+| [Stack](../../samples/Widgets/FloatSoda.Samples.Stack/README.md) | `Stack`、`Positioned` |
+| [AspectRatio](../../samples/Widgets/FloatSoda.Samples.AspectRatio/README.md) | `AspectRatio` |
+| [FittedBox](../../samples/Widgets/FloatSoda.Samples.FittedBox/README.md) | `FittedBox`、`BoxFit` |
+| [FractionallySizedBox](../../samples/Widgets/FloatSoda.Samples.FractionallySizedBox/README.md) | `FractionallySizedBox` |
+| [OverflowBox](../../samples/Widgets/FloatSoda.Samples.OverflowBox/README.md) | `OverflowBox`、`SizedOverflowBox` |
+| [IntrinsicWidth](../../samples/Widgets/FloatSoda.Samples.IntrinsicWidth/README.md) | `IntrinsicWidth`、`IntrinsicHeight` |
+| [Visibility](../../samples/Widgets/FloatSoda.Samples.Visibility/README.md) | `Visibility`、`Offstage`、`IndexedStack`、`RotatedBox` |
 
 表は、`samples/` のディレクトリから手で写したものです。作例が増えたときは、`samples/` の一覧が正になります。部品を目的から探したいときは、[部品を目的から探す](find-widgets.md)を開いてください。
 
@@ -73,15 +73,15 @@ dotnet run --project samples/FloatSoda.Samples.Flex -- --desktop
 
 | 作例 | 扱うウィジェット |
 | :-- | :-- |
-| [ColoredBox](../../samples/FloatSoda.Samples.ColoredBox/README.md) | `ColoredBox` |
-| [DecoratedBox](../../samples/FloatSoda.Samples.DecoratedBox/README.md) | `DecoratedBox`、`BoxDecoration` |
-| [Opacity](../../samples/FloatSoda.Samples.Opacity/README.md) | `Opacity` |
-| [Transform](../../samples/FloatSoda.Samples.Transform/README.md) | `Transform` |
-| [Clip](../../samples/FloatSoda.Samples.Clip/README.md) | `ClipRect`、`ClipRoundRect`、`ClipOval`、`ClipCustomPath` |
-| [Text](../../samples/FloatSoda.Samples.Text/README.md) | `Text`、`RichText`、`TextSpan`、`TextStyle` |
-| [DefaultTextStyle](../../samples/FloatSoda.Samples.DefaultTextStyle/README.md) | `DefaultTextStyle` |
-| [Icon](../../samples/FloatSoda.Samples.Icon/README.md) | `Icon`、`IconData` |
-| [Image](../../samples/FloatSoda.Samples.Image/README.md) | `Image`、`FileImageProvider`、`BoxFit` |
+| [ColoredBox](../../samples/Widgets/FloatSoda.Samples.ColoredBox/README.md) | `ColoredBox` |
+| [DecoratedBox](../../samples/Widgets/FloatSoda.Samples.DecoratedBox/README.md) | `DecoratedBox`、`BoxDecoration` |
+| [Opacity](../../samples/Widgets/FloatSoda.Samples.Opacity/README.md) | `Opacity` |
+| [Transform](../../samples/Widgets/FloatSoda.Samples.Transform/README.md) | `Transform` |
+| [Clip](../../samples/Widgets/FloatSoda.Samples.Clip/README.md) | `ClipRect`、`ClipRoundRect`、`ClipOval`、`ClipCustomPath` |
+| [Text](../../samples/Widgets/FloatSoda.Samples.Text/README.md) | `Text`、`RichText`、`TextSpan`、`TextStyle` |
+| [DefaultTextStyle](../../samples/Widgets/FloatSoda.Samples.DefaultTextStyle/README.md) | `DefaultTextStyle` |
+| [Icon](../../samples/Widgets/FloatSoda.Samples.Icon/README.md) | `Icon`、`IconData` |
+| [Image](../../samples/Widgets/FloatSoda.Samples.Image/README.md) | `Image`、`FileImageProvider`、`BoxFit` |
 
 見た目をまとめて整える手順は、ガイドの[見た目を整える](../guide/4-build/screen/style-appearance.md)にあります。
 
@@ -91,9 +91,9 @@ dotnet run --project samples/FloatSoda.Samples.Flex -- --desktop
 
 | 作例 | 扱うウィジェット |
 | :-- | :-- |
-| [GestureDetector](../../samples/FloatSoda.Samples.GestureDetector/README.md) | `GestureDetector`(タップとドラッグ) |
-| [Listener](../../samples/FloatSoda.Samples.Listener/README.md) | `Listener`(生のポインターイベント) |
-| [PointerRegion](../../samples/FloatSoda.Samples.PointerRegion/README.md) | `PointerRegion`(ホバーの出入りと、`Listener`・`GestureDetector` を重ねたときのイベントの順序) |
+| [GestureDetector](../../samples/Widgets/FloatSoda.Samples.GestureDetector/README.md) | `GestureDetector`(タップとドラッグ) |
+| [Listener](../../samples/Widgets/FloatSoda.Samples.Listener/README.md) | `Listener`(生のポインターイベント) |
+| [PointerRegion](../../samples/Widgets/FloatSoda.Samples.PointerRegion/README.md) | `PointerRegion`(ホバーの出入りと、`Listener`・`GestureDetector` を重ねたときのイベントの順序) |
 
 ポインタの座標が届くのは、ダッシュボードのオーバーレイだけです。詳しくは、[できないこと・まだ使えないもの](limitations.md#置く場所と入力)を開いてください。ボタンの組み立て方は、ガイドの[ボタンやトグルを組み立てる](../guide/4-build/screen/build-buttons-toggles.md)にあります。
 
@@ -103,8 +103,8 @@ context を受け渡す、並べ替えても状態を保つ、モデルの変更
 
 | 作例 | 扱うウィジェット |
 | :-- | :-- |
-| [Builder](../../samples/FloatSoda.Samples.Builder/README.md) | `Builder`、`KeyedSubtree`、`RepaintBoundary` |
-| [ListenableBuilder](../../samples/FloatSoda.Samples.ListenableBuilder/README.md) | `ListenableBuilder`(`INotifyPropertyChanged` のモデルで作り直す) |
+| [Builder](../../samples/Widgets/FloatSoda.Samples.Builder/README.md) | `Builder`、`KeyedSubtree`、`RepaintBoundary` |
+| [ListenableBuilder](../../samples/Widgets/FloatSoda.Samples.ListenableBuilder/README.md) | `ListenableBuilder`(`INotifyPropertyChanged` のモデルで作り直す) |
 
 ## 目的から作例を探す
 
@@ -113,4 +113,4 @@ context を受け渡す、並べ替えても状態を保つ、モデルの変更
 近い作例がないときは、次の2つから選べます。
 
 - 通しで1つのパネルを作る: ガイドの[表情切り替えパネルを作る](../guide/4-build/screen/expression-switcher.md)
-- コードを AI に書かせる: ガイドの[AI に FloatSoda を書かせる](../guide/3-prepare/write-with-llm.md)
+- コードを AI に書かせる: ガイドの[AI に FloatSoda を書かせる](../guide/3-prepare/write-with-llm.md)

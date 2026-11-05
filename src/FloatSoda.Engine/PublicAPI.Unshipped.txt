@@ -1,1 +1,5 @@
 #nullable enable
+FloatSoda.Engine.GLView.WindowHandle.get -> OpenTK.Windowing.GraphicsLibraryFramework.Window*
+FloatSoda.Engine.PostTaskRunner.PostTaskRunner(string! threadName, FloatSoda.Engine.Abstractions.Scheduling.IFramePacer! pacer, Microsoft.Extensions.Logging.ILogger? logger = null) -> void
+FloatSoda.Engine.RenderPostTaskRunner.PostRender(FloatSoda.Engine.Abstractions.IEngineWindow! window, FloatSoda.Rendering.Layers.ILayer! layer) -> void
+FloatSoda.Engine.RenderPostTaskRunner.RenderPostTaskRunner(string! threadName, FloatSoda.Engine.Abstractions.Scheduling.IFramePacer! pacer, Microsoft.Extensions.Logging.ILogger? logger = null) -> void

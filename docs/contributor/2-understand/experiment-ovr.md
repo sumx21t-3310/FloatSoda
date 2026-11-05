@@ -19,7 +19,7 @@
 SteamVR と HMD を使える状態にします。FloatSoda を clone したフォルダーで、オーバーレイに出す画像 `layer_tree_output.png` を作ります。サンプルの `PaintingSample` を1回動かすと、デスクトップに `layer_tree_output.png` ができます。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.PaintingSample
+dotnet run --project samples/Showcase/FloatSoda.Samples.PaintingSample
 ```
 
 **できた?** デスクトップに `layer_tree_output.png` ができた。
@@ -33,7 +33,7 @@ dotnet run --project samples/FloatSoda.Samples.PaintingSample
 
 ## サンプルを動かす
 
-実験には、[samples/FloatSoda.Samples.PrimitiveOverlay](../../../samples/FloatSoda.Samples.PrimitiveOverlay/) を使います。プロジェクトが参照するのは `FloatSoda.OVR` だけです。`Program.cs` の流れは次のとおりです。
+実験には、[samples/Showcase/FloatSoda.Samples.PrimitiveOverlay](../../../samples/Showcase/FloatSoda.Samples.PrimitiveOverlay/) を使います。プロジェクトが参照するのは `FloatSoda.OVR` だけです。`Program.cs` の流れは次のとおりです。
 
 1. `OVRApplication` を作って、SteamVR に接続し、`Identify()` を呼ぶ
 2. `VRSystemEventDispatcher` に、終了を知らせる `VREvent_Quit` の処理を登録する
@@ -46,7 +46,7 @@ dotnet run --project samples/FloatSoda.Samples.PaintingSample
 画像のパスは、第1引数で渡せます。省略すると、デスクトップの `layer_tree_output.png` を使います。SteamVR を起動してから、サンプルを動かします。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.PrimitiveOverlay
+dotnet run --project samples/Showcase/FloatSoda.Samples.PrimitiveOverlay
 ```
 
 **できた?** 初期化エラーで終了せず、動き続けている。

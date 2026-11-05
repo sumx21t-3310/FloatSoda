@@ -12,7 +12,7 @@ public class RecordToStringTest
         [
             typeof(FloatSoda.Core.WidgetBinding).Assembly.GetName().Name!,
             typeof(FloatSoda.Rendering.Layers.ILayer).Assembly.GetName().Name!,
-            typeof(FloatSoda.Abstractions.Geometries.Offset).Assembly.GetName().Name!,
+            typeof(FloatSoda.Geometry.Offset).Assembly.GetName().Name!,
             typeof(FloatSoda.Engine.IOTaskRunner).Assembly.GetName().Name!,
             typeof(FloatSoda.OVR.OVRAppInfo).Assembly.GetName().Name!,
             typeof(FloatSoda.Testing.WidgetBitmapRenderer).Assembly.GetName().Name!,

@@ -140,7 +140,7 @@ new GestureDetector
 
 **できた?** 文字の周りの余白を押しても、押した回数が増えれば、手順3は完了です。
 
-ボタンを押したまま動かすドラッグは、`OnPanUpdate` で受け取ります。コードは[サンプルの DragBoxWidget.cs](../../../../samples/FloatSoda.Samples.OverlayApp/DragBoxWidget.cs) にあります。ホバーや生のポインターイベントが要るときは、`Listener` と `PointerRegion` を使います。
+ボタンを押したまま動かすドラッグは、`OnPanUpdate` で受け取ります。コードは[サンプルの DragBoxWidget.cs](../../../../samples/Showcase/FloatSoda.Samples.OverlayApp/DragBoxWidget.cs) にあります。ホバーや生のポインターイベントが要るときは、`Listener` と `PointerRegion` を使います。
 
 ## 結果を確かめる
 

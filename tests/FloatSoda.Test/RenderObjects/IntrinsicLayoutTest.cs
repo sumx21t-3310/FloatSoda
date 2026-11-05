@@ -1,6 +1,6 @@
 using System.Reflection;
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Layout;

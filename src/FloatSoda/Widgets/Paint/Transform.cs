@@ -1,6 +1,6 @@
 using System.Numerics;
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.RenderObjects.Painting;
 
 namespace FloatSoda.Widgets.Paint;

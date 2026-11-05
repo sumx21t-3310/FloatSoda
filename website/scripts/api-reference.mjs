@@ -22,9 +22,12 @@ import { HOME, apiDir, repoRoot, websiteDir } from "./docs-source.mjs";
 /** API リファレンスに載せるプロジェクト(src/ からの相対パス)。NuGet で配布しているもの */
 const PROJECTS = [
   "FloatSoda/FloatSoda.csproj",
-  "FloatSoda.Abstractions/FloatSoda.Abstractions.csproj",
+  "FloatSoda.Geometry/FloatSoda.Geometry.csproj",
+  "FloatSoda.Engine.Abstractions/FloatSoda.Engine.Abstractions.csproj",
   "FloatSoda.Rendering/FloatSoda.Rendering.csproj",
   "FloatSoda.Engine/FloatSoda.Engine.csproj",
+  "FloatSoda.Engine.Desktop/FloatSoda.Engine.Desktop.csproj",
+  "FloatSoda.Engine.OVR/FloatSoda.Engine.OVR.csproj",
   "FloatSoda.OVR/FloatSoda.OVR.csproj",
   "FloatSoda.Testing/FloatSoda.Testing.csproj",
 ];

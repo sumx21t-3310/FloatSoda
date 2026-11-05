@@ -1,9 +1,9 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Core;
 using FloatSoda.Elements;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.Rendering.Layers;
 using FloatSoda.RenderObjects;

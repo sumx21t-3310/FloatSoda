@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using FloatSoda.Abstractions.Scheduling;
+using FloatSoda.Engine.Abstractions.Scheduling;
 
 namespace FloatSoda.Engine;
 

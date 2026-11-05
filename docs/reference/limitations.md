@@ -21,7 +21,7 @@ FloatSoda で作りたいものが今できるかを、このページで確か�
 | `Size` を省略したウィンドウは、ルートの制約に幅の上限がない | 途中の部品が幅の上限を渡さない場合、`Wrap` が折り返さず横一列に並ぶ | `Size` を指定する。または `Wrap` を、幅を決めた `SizedBox` で包む | 追跡先なし(仕様) |
 | 実行中にオーバーレイの種類を切り替えられない | `DashboardWindow` から `WorldSpaceWindow` への切り替えのような API がない | 起動時に、使う種類ごとにウィンドウを作る | #90 |
 
-<!-- ※要確認: Size 省略時に Wrap が折り返さないこと。再編前の GettingStarted.md の記述が根拠で、samples/FloatSoda.Samples.Wrap で Size を省略して動かして確かめていない。ルートが Loosen(無限上限)の制約でレイアウトされることは、src/FloatSoda/RenderObjects/RenderView.cs のコメントで確かめた。`SizedBox` で包む回避は動かして確かめていない -->
+<!-- ※要確認: Size 省略時に Wrap が折り返さないこと。再編前の GettingStarted.md の記述が根拠で、samples/Widgets/FloatSoda.Samples.Wrap で Size を省略して動かして確かめていない。ルートが Loosen(無限上限)の制約でレイアウトされることは、src/FloatSoda/RenderObjects/RenderView.cs のコメントで確かめた。`SizedBox` で包む回避は動かして確かめていない -->
 
 置き場所の選び方は、ガイドの[オーバーレイの種類と選び方](../guide/4-build/mechanics/overlay-types.md)にあります。コントローラーの入力は[コントローラーの入力を受け取る](../guide/4-build/input/controller-input.md)、押しても反応しないときの切り分けは[反応しないときに切り分ける](../guide/5-troubleshoot/not-responding.md)を開いてください。
 

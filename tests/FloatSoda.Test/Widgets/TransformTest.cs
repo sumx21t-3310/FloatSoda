@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
-using FloatSoda.Abstractions.Input;
 using FloatSoda.Core;
+using FloatSoda.Engine.Abstractions.Input;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.RenderObjects;
 using FloatSoda.RenderObjects.Painting;
@@ -66,21 +67,11 @@ public class TransformTest
         };
         renderTransform.Layout(BoxConstraints.Tight(20, 20));
 
-        Assert.False(
-            renderTransform.HitTest(
-                new HitTestResult(),
-                new FloatSoda.Abstractions.Geometries.Offset(15, 15)
-            )
-        );
+        Assert.False(renderTransform.HitTest(new HitTestResult(), new Offset(15, 15)));
 
         renderTransform.TransformHitTests = false;
 
-        Assert.True(
-            renderTransform.HitTest(
-                new HitTestResult(),
-                new FloatSoda.Abstractions.Geometries.Offset(15, 15)
-            )
-        );
+        Assert.True(renderTransform.HitTest(new HitTestResult(), new Offset(15, 15)));
     }
 
     [Fact]
@@ -162,7 +153,5 @@ public class TransformTest
     }
 
     private static void Send(WidgetBinding binding, PointerEventPhase phase, double x, double y) =>
-        binding.HandlePointerEvent(
-            new PointerEvent(1, phase, new FloatSoda.Abstractions.Geometries.Offset(x, y))
-        );
+        binding.HandlePointerEvent(new PointerEvent(1, phase, new Offset(x, y)));
 }

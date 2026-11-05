@@ -1,0 +1,59 @@
+﻿FloatSoda.Geometry.Angle
+FloatSoda.Geometry.Angle.Angle() -> void
+FloatSoda.Geometry.Angle.Angle(float Radians) -> void
+FloatSoda.Geometry.Angle.Deconstruct(out float Radians) -> void
+FloatSoda.Geometry.Angle.Degrees.get -> float
+FloatSoda.Geometry.Angle.Equals(FloatSoda.Geometry.Angle other) -> bool
+FloatSoda.Geometry.Angle.Radians.get -> float
+FloatSoda.Geometry.Angle.Radians.init -> void
+FloatSoda.Geometry.Dpm
+FloatSoda.Geometry.Dpm.Deconstruct(out float Value) -> void
+FloatSoda.Geometry.Dpm.Dpm() -> void
+FloatSoda.Geometry.Dpm.Dpm(float Value) -> void
+FloatSoda.Geometry.Dpm.Equals(FloatSoda.Geometry.Dpm other) -> bool
+FloatSoda.Geometry.Dpm.ToMeters(float pixels) -> float
+FloatSoda.Geometry.Dpm.Value.get -> float
+FloatSoda.Geometry.Dpm.Value.init -> void
+FloatSoda.Geometry.GeometryExtension
+FloatSoda.Geometry.Offset
+FloatSoda.Geometry.Offset.Deconstruct(out double X, out double Y) -> void
+FloatSoda.Geometry.Offset.Equals(FloatSoda.Geometry.Offset other) -> bool
+FloatSoda.Geometry.Offset.Offset() -> void
+FloatSoda.Geometry.Offset.Offset(double X = 0, double Y = 0) -> void
+FloatSoda.Geometry.Offset.X.get -> double
+FloatSoda.Geometry.Offset.X.init -> void
+FloatSoda.Geometry.Offset.Y.get -> double
+FloatSoda.Geometry.Offset.Y.init -> void
+override FloatSoda.Geometry.Angle.Equals(object obj) -> bool
+override FloatSoda.Geometry.Angle.GetHashCode() -> int
+override FloatSoda.Geometry.Angle.ToString() -> string
+override FloatSoda.Geometry.Dpm.Equals(object obj) -> bool
+override FloatSoda.Geometry.Dpm.GetHashCode() -> int
+override FloatSoda.Geometry.Dpm.ToString() -> string
+override FloatSoda.Geometry.Offset.Equals(object obj) -> bool
+override FloatSoda.Geometry.Offset.GetHashCode() -> int
+override FloatSoda.Geometry.Offset.ToString() -> string
+static FloatSoda.Geometry.Angle.FromDegrees(float degrees) -> FloatSoda.Geometry.Angle
+static FloatSoda.Geometry.Angle.FromRadians(float radians) -> FloatSoda.Geometry.Angle
+static FloatSoda.Geometry.Angle.operator !=(FloatSoda.Geometry.Angle left, FloatSoda.Geometry.Angle right) -> bool
+static FloatSoda.Geometry.Angle.operator ==(FloatSoda.Geometry.Angle left, FloatSoda.Geometry.Angle right) -> bool
+static FloatSoda.Geometry.Angle.Zero.get -> FloatSoda.Geometry.Angle
+static FloatSoda.Geometry.Dpm.Default.get -> FloatSoda.Geometry.Dpm
+static FloatSoda.Geometry.Dpm.FromMillimetersPerPixel(float millimeters) -> FloatSoda.Geometry.Dpm
+static FloatSoda.Geometry.Dpm.operator !=(FloatSoda.Geometry.Dpm left, FloatSoda.Geometry.Dpm right) -> bool
+static FloatSoda.Geometry.Dpm.operator ==(FloatSoda.Geometry.Dpm left, FloatSoda.Geometry.Dpm right) -> bool
+static FloatSoda.Geometry.GeometryExtension.Contains(this SkiaSharp.SKSize size, FloatSoda.Geometry.Offset offset) -> bool
+static FloatSoda.Geometry.GeometryExtension.MakeOffset(this SkiaSharp.SKRoundRect roundRect, float dx, float dy) -> SkiaSharp.SKRoundRect
+static FloatSoda.Geometry.GeometryExtension.MakeOffset(this SkiaSharp.SKRoundRect roundRect, FloatSoda.Geometry.Offset offset) -> SkiaSharp.SKRoundRect
+static FloatSoda.Geometry.Offset.implicit operator FloatSoda.Geometry.Offset(SkiaSharp.SKPoint point) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.implicit operator SkiaSharp.SKPoint(FloatSoda.Geometry.Offset offset) -> SkiaSharp.SKPoint
+static FloatSoda.Geometry.Offset.One.get -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator !=(FloatSoda.Geometry.Offset left, FloatSoda.Geometry.Offset right) -> bool
+static FloatSoda.Geometry.Offset.operator *(double a, FloatSoda.Geometry.Offset b) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator *(FloatSoda.Geometry.Offset a, double b) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator +(FloatSoda.Geometry.Offset a, FloatSoda.Geometry.Offset b) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator -(FloatSoda.Geometry.Offset a) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator -(FloatSoda.Geometry.Offset a, FloatSoda.Geometry.Offset b) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator /(FloatSoda.Geometry.Offset a, double b) -> FloatSoda.Geometry.Offset
+static FloatSoda.Geometry.Offset.operator ==(FloatSoda.Geometry.Offset left, FloatSoda.Geometry.Offset right) -> bool
+static FloatSoda.Geometry.Offset.Zero.get -> FloatSoda.Geometry.Offset

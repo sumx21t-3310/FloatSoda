@@ -1,6 +1,6 @@
-﻿using FloatSoda.Abstractions.Geometries;
-using FloatSoda.Core;
+﻿using FloatSoda.Core;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using SkiaSharp;
 

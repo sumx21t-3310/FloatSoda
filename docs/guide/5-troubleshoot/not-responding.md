@@ -119,7 +119,7 @@ new Image
 
 </details>
 
-<!-- ※要確認: 文字が出ない原因として、Text の既定色(黒)と背景色の一致、FontSize 0、Title 重複を挙げた。いずれもコード(TextStyle の既定値、CHANGELOG、FloatSodaApp.CreateWindow の _bindings.TryAdd)を読んで書いたもので、samples/FloatSoda.Samples.Text で再現して確かめていない。フォント未解決など、ほかの原因は確かめていない -->
+<!-- ※要確認: 文字が出ない原因として、Text の既定色(黒)と背景色の一致、FontSize 0、Title 重複を挙げた。いずれもコード(TextStyle の既定値、CHANGELOG、FloatSodaApp.CreateWindow の _bindings.TryAdd)を読んで書いたもので、samples/Widgets/FloatSoda.Samples.Text で再現して確かめていない。フォント未解決など、ほかの原因は確かめていない -->
 
 ## 表示の大きさが更新されない
 

@@ -147,7 +147,7 @@ _controller.StatusChanged += status =>
 _controller.Forward();
 ```
 
-`StatusChanged` の購読は、`Forward()` を呼ぶ前に書きます。書き終えた `InitState()` と `Dispose()` は、[サンプルの PulseWidget.cs](../../../../samples/FloatSoda.Samples.OverlayApp/PulseWidget.cs) と同じ形です。
+`StatusChanged` の購読は、`Forward()` を呼ぶ前に書きます。書き終えた `InitState()` と `Dispose()` は、[サンプルの PulseWidget.cs](../../../../samples/Showcase/FloatSoda.Samples.OverlayApp/PulseWidget.cs) と同じ形です。
 
 **できた?** フェードインとフェードアウトが、止まらずに続けば、手順4は完了です。
 

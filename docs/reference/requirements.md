@@ -41,7 +41,7 @@ FloatSoda で開発する PC と、作ったアプリを動かす PC に要る�
 
 ## SteamVR が要らない場面
 
-[PaintingSample](../../samples/FloatSoda.Samples.PaintingSample/Program.cs)は、`FloatSoda.Testing` でツリーを画像に書き出す作例で、SteamVR が要りません。この作例は `AddFloatSoda` も OpenVR も呼びません。
+[PaintingSample](../../samples/Showcase/FloatSoda.Samples.PaintingSample/Program.cs)は、`FloatSoda.Testing` でツリーを画像に書き出す作例で、SteamVR が要りません。この作例は `AddFloatSoda` も OpenVR も呼びません。
 
 デスクトップのウィンドウに表示する `--desktop` 付きの作例も、SteamVR の起動が要ります。起動時に OpenVR を初期化するためです。この場合も HMD の接続が要ります。
 

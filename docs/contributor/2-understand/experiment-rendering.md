@@ -19,14 +19,14 @@
 
 ## 4通りに包んで png に出す
 
-作例は [samples/FloatSoda.Samples.ExperimentRendering](../../../samples/FloatSoda.Samples.ExperimentRendering/) にあります。コードの全文は、このページに載せず、作例のファイルを読みます。作例は、同じ絵を4通りに包み、`LayerBitmapRenderer.Render` で `SKBitmap` にして、png で保存します。あわせて、3つの点の色を出力します。
+作例は [samples/Experiments/FloatSoda.Samples.ExperimentRendering](../../../samples/Experiments/FloatSoda.Samples.ExperimentRendering/) にあります。コードの全文は、このページに載せず、作例のファイルを読みます。作例は、同じ絵を4通りに包み、`LayerBitmapRenderer.Render` で `SKBitmap` にして、png で保存します。あわせて、3つの点の色を出力します。
 
-Layer ツリーを組んで png にする基本は、[samples/FloatSoda.Samples.PaintingSample](../../../samples/FloatSoda.Samples.PaintingSample/) のコードで読めます。この実験は、その流れに、絵を包む Layer を1枚足したものです。
+Layer ツリーを組んで png にする基本は、[samples/Showcase/FloatSoda.Samples.PaintingSample](../../../samples/Showcase/FloatSoda.Samples.PaintingSample/) のコードで読めます。この実験は、その流れに、絵を包む Layer を1枚足したものです。
 
 リポジトリのルートで、次のコマンドを実行します。.NET の SDK のバージョンなど、開発の準備は [開発環境を用意する](../3-prepare/dev-environment.md) にあります。
 
 ```powershell
-dotnet run --project samples/FloatSoda.Samples.ExperimentRendering -- <出力先フォルダー>
+dotnet run --project samples/Experiments/FloatSoda.Samples.ExperimentRendering -- <出力先フォルダー>
 ```
 
 出力先フォルダーは省略できます。省略すると、カレントディレクトリに png を保存します。

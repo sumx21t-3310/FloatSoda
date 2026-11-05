@@ -1,6 +1,6 @@
 using System.Numerics;
-using FloatSoda.Abstractions.Geometries;
 using FloatSoda.Geometrics;
+using FloatSoda.Geometry;
 using FloatSoda.Gesture;
 using FloatSoda.Rendering.Layers;
 using SkiaSharp;
@@ -100,7 +100,7 @@ public class RenderTransform : RenderProxyBox
     /// <inheritdoc/>
     /// <remarks>
     /// <see cref="TransformHitTests"/>が<see langword="true"/>の場合は、変換を<paramref name="result"/>へ積んでから子を判定します。
-    /// そのため、子へ届く<see cref="FloatSoda.Abstractions.Input.PointerEvent.Transform"/>に拡大や回転が反映されます。
+    /// そのため、子へ届く<see cref="Widgets.Paint.Transform"/>に拡大や回転が反映されます。
     /// </remarks>
     public override bool HitTestChildren(HitTestResult result, Offset position)
     {

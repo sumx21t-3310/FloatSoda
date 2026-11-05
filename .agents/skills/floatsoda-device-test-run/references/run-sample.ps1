@@ -41,7 +41,9 @@ if ($Scenario) {
     $exe = Join-Path $repo 'tests/FloatSoda.DeviceTest/bin/Debug/net10.0/FloatSoda.DeviceTest.exe'
     $args = @('--scenario', $Name)
 } else {
-    $exe = Join-Path $repo "samples/FloatSoda.Samples.$Name/bin/Debug/net10.0/FloatSoda.Samples.$Name.exe"
+    $exe = Join-Path $repo "samples/*/FloatSoda.Samples.$Name/bin/Debug/net10.0/FloatSoda.Samples.$Name.exe"
+    $resolved = Resolve-Path $exe -ErrorAction SilentlyContinue
+    if ($resolved) { $exe = $resolved.Path }
     $args = if ($Desktop) { @('--desktop') } else { @() }
 }
 if (-not (Test-Path $exe)) { throw "not built: $exe (run dotnet build first)" }

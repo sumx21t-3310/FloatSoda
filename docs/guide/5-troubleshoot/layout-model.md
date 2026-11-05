@@ -56,9 +56,9 @@ Child = new Center
 },
 ```
 
-`Center` は子に「0 から 400 x 300 までの好きな大きさでよい」という制約を渡すので、`SizedBox` の 100 x 100 がそのまま通ります。`SizedBox` の挙動は、サンプル [FloatSoda.Samples.SizedBox](../../../samples/FloatSoda.Samples.SizedBox/README.md) でも確かめられます。
+`Center` は子に「0 から 400 x 300 までの好きな大きさでよい」という制約を渡すので、`SizedBox` の 100 x 100 がそのまま通ります。`SizedBox` の挙動は、サンプル [FloatSoda.Samples.SizedBox](../../../samples/Widgets/FloatSoda.Samples.SizedBox/README.md) でも確かめられます。
 
-<!-- ※要確認: 上の 2 つのコードの描画結果(400 x 300 に広がる、100 x 100 になる)は、RenderConstrainedBox の Enforce の実装を読んで書いた。実行して画像で確かめていない。WidgetBitmapRenderer か samples/FloatSoda.Samples.SizedBox を実行して確かめる -->
+<!-- ※要確認: 上の 2 つのコードの描画結果(400 x 300 に広がる、100 x 100 になる)は、RenderConstrainedBox の Enforce の実装を読んで書いた。実行して画像で確かめていない。WidgetBitmapRenderer か samples/Widgets/FloatSoda.Samples.SizedBox を実行して確かめる -->
 
 ## Align で包んだら、中央に寄る
 
@@ -68,7 +68,7 @@ Child = new Center
 
 親の最大の幅や高さが無限大の軸では、`Align` は広がる先がないので、その軸だけ子の大きさに合わせます。もう一方の軸は、その軸の制約に従います。`Size` を省略したウィンドウのルートに `Align` を置くと、この状態になります。位置の指定は `Alignment.TopLeft` などの 9 つのプリセットか、`new Alignment(0.5f, -0.25f)` のような任意の値で行います。
 
-<!-- ※要確認: 「最大が無限大のとき子にぴったり合う」は RenderPositionedBox の PerformLayout を読んで書いた。samples/FloatSoda.Samples.Align を実行して確かめていない -->
+<!-- ※要確認: 「最大が無限大のとき子にぴったり合う」は RenderPositionedBox の PerformLayout を読んで書いた。samples/Widgets/FloatSoda.Samples.Align を実行して確かめていない -->
 
 ## Row と Column で、余りの領域を分ける
 
@@ -81,7 +81,7 @@ Child = new Center
 
 `Expanded` は割り当てられた領域を使い切るように子を引き伸ばし、`Flexible` は割り当てられた領域を上限として子に大きさを選ばせます。`Spacer` は何も描かない `Expanded` で、子の間の空白に使います。
 
-子の大きさの合計が主軸の最大を超えると、領域からはみ出します。はみ出すときは、固定の幅や高さの子を小さくします。主軸の最大が有限であれば、`Expanded` / `Flexible` で包んで、残りの領域に収める方法もあります。`Expanded` の使い方は、サンプル [FloatSoda.Samples.Expanded](../../../samples/FloatSoda.Samples.Expanded/README.md) にあります。
+子の大きさの合計が主軸の最大を超えると、領域からはみ出します。はみ出すときは、固定の幅や高さの子を小さくします。主軸の最大が有限であれば、`Expanded` / `Flexible` で包んで、残りの領域に収める方法もあります。`Expanded` の使い方は、サンプル [FloatSoda.Samples.Expanded](../../../samples/Widgets/FloatSoda.Samples.Expanded/README.md) にあります。
 
 `Stack` は並べずに重ねるウィジェットで、`Positioned` で、`Stack` の各辺からの距離として子の位置を指定します。子へ渡す制約を作り替えたいときは、`ConstrainedBox`、`LimitedBox`、`ConstraintsTransformBox`、`UnconstrainedBox` を使います。
 

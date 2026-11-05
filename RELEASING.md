@@ -55,6 +55,14 @@ dotnet test tests/FloatSoda.Rendering.Test --configuration Release --no-build
 dotnet test tests/FloatSoda.Test --configuration Release --no-build
 ```
 
+```bash
+dotnet test tests/FloatSoda.Engine.Test --configuration Release --no-build
+```
+
+```bash
+dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build
+```
+
 あわせて、CI に投げる前にローカルで潰せるものを潰します。
 
 - **タグ整合の事前確認** — release.yml と同じ判定(タグ名から先頭 `v` を除いた文字列 == `Directory.Build.props` の `<Version>`)をローカルで確認する。切ろうとしているタグが既に存在しないことも確認する

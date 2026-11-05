@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
-using FloatSoda.Abstractions.Geometries;
-using FloatSoda.Abstractions.Input;
+using FloatSoda.Engine.Abstractions.Input;
+using FloatSoda.Geometry;
 
 namespace FloatSoda.Gesture;
 

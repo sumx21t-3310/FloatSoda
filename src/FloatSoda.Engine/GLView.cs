@@ -38,7 +38,7 @@ public class GLView : IDisposable
     /// </summary>
     public bool Visible { get; }
 
-    internal unsafe Window* WindowHandle => _window;
+    public unsafe Window* WindowHandle => _window;
     private readonly unsafe Window* _window;
     private bool _disposed;
 
@@ -161,7 +161,7 @@ public class GLView : IDisposable
         }
 
         Size = new SKSizeI(width, height);
-        (var newTextureHandle, var newSurface) = CreateTextureAndSurface(Size);
+        var (newTextureHandle, newSurface) = CreateTextureAndSurface(Size);
 
         TextureHandle = newTextureHandle;
         Surface = newSurface;

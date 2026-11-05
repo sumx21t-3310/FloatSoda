@@ -36,10 +36,10 @@ FloatSoda は Flutter に合わせて作ってあるので、Flutter の言葉�
 | `InheritedWidget` | 子孫のウィジェットから参照できる値を持つウィジェット | `DashboardWindow`、`DefaultTextStyle` | [FloatSoda の仕組み](../guide/4-build/mechanics/how-floatsoda-works.md) |
 | `Key` | 同じウィジェットかどうかを見分ける印(`ValueKey<T>` と `UniqueKey` がある) | 子のリストを並べ替えるとき | [FloatSoda の仕組み](../guide/4-build/mechanics/how-floatsoda-works.md) |
 | 制約(`BoxConstraints`) | 親が子に渡す幅と高さの上限と下限(制約が親から子へ下り、大きさが子から親へ上る) | 思った大きさにならないとき | [レイアウトの考え方](../guide/5-troubleshoot/layout-model.md) |
-| 主軸と交差軸 | `Row` や `Column` で、並べる向きと、それに直角な向き | `MainAxisAlignment`、`CrossAxisAlignment` | [Flex の作例](../../samples/FloatSoda.Samples.Flex/README.md) |
-| ポインター | レーザーポインターとマウスをまとめた呼び方 | `PointerRegion`、`Listener` | [PointerRegion の作例](../../samples/FloatSoda.Samples.PointerRegion/README.md) |
-| ヒットテスト | ポインターの位置で、どのウィジェットが反応するかを決める処理 | 押しても反応しないとき | [GestureDetector の作例](../../samples/FloatSoda.Samples.GestureDetector/README.md) |
-| ジェスチャー | ポインターの動きに付けた意味(タップとドラッグ) | `GestureDetector` | [GestureDetector の作例](../../samples/FloatSoda.Samples.GestureDetector/README.md) |
+| 主軸と交差軸 | `Row` や `Column` で、並べる向きと、それに直角な向き | `MainAxisAlignment`、`CrossAxisAlignment` | [Flex の作例](../../samples/Widgets/FloatSoda.Samples.Flex/README.md) |
+| ポインター | レーザーポインターとマウスをまとめた呼び方 | `PointerRegion`、`Listener` | [PointerRegion の作例](../../samples/Widgets/FloatSoda.Samples.PointerRegion/README.md) |
+| ヒットテスト | ポインターの位置で、どのウィジェットが反応するかを決める処理 | 押しても反応しないとき | [GestureDetector の作例](../../samples/Widgets/FloatSoda.Samples.GestureDetector/README.md) |
+| ジェスチャー | ポインターの動きに付けた意味(タップとドラッグ) | `GestureDetector` | [GestureDetector の作例](../../samples/Widgets/FloatSoda.Samples.GestureDetector/README.md) |
 | `AnimationController` | 時間に合わせて、0 から 1 の値を動かす部品 | アニメーション | [アニメーションを付ける](../guide/4-build/screen/add-animation.md) |
 | `WidgetTicker` | フレームごとに、開始からの経過時間を渡す時計 | アニメーション、チュートリアル | [アニメーションを付ける](../guide/4-build/screen/add-animation.md) |
 | `Curve` | アニメーションの動きの緩急(`Curves` に定義済みのものがある) | アニメーション | [アニメーションを付ける](../guide/4-build/screen/add-animation.md) |

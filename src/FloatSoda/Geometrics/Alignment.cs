@@ -1,4 +1,4 @@
-﻿using FloatSoda.Abstractions.Geometries;
+﻿using FloatSoda.Geometry;
 using SkiaSharp;
 
 namespace FloatSoda.Geometrics;
