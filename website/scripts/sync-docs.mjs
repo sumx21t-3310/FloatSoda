@@ -244,7 +244,6 @@ function landingData() {
     whatIsFloatSoda: hrefOfRel("guide/1-discover/what-is-floatsoda"),
     troubleshoot: hrefOfRel("guide/5-troubleshoot/read-errors"),
     findWidgets: hrefOfRel("reference/find-widgets"),
-    howItWorks: hrefOfRel("guide/4-build/mechanics/how-floatsoda-works"),
     requirements: hrefOfRel("reference/requirements"),
     limitations: hrefOfRel("reference/limitations"),
   };

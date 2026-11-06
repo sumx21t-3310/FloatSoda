@@ -7,57 +7,15 @@ hero:
 ---
 
 {/*
-  サイト専用の入口(ランディング)。src/pages/index.astro が StarlightPage で描画し、
+  docs の入口(ランディング)。src/pages/index.astro が StarlightPage で描画し、
   hero のボタンと本文中のリンク先(props.links / props.tracks)は docs/ の実在から計算して渡してくる。
-  節は PASONA の順(困りごと → 解決 → 提案 → 対象 → 行動)に並べる。
-  載せてよいのは、コードが変わっても誤りにならない紹介だけにする。今の制約、バージョン、件数は書かず、docs/ のページへリンクする。
-  カードの並びは、読み手のやりたいこと(まず動かしたい、詰まった、など)の順にする。
+  FloatSoda の紹介(困りごと、解決、コード例)は floatsoda.dev のランディングが受け持つので、ここには書かない。
+  節は、読み手のやりたいこと(どこから読むか → 使う前に確かめること → AI に読ませる)の順に並べる。
+  載せてよいのは、コードが変わっても誤りにならない案内だけにする。今の制約、バージョン、件数は書かず、docs/ のページへリンクする。
   docs コレクションの外にあるので、サイドバーにも llms-*.txt にも入らない。
 */}
 
-import { Card, CardGrid, Code, LinkCard } from "@astrojs/starlight/components";
-import program from "../../samples/Showcase/FloatSoda.Samples.GettingStarted/Program.cs?raw";
-
-## オーバーレイを1枚作るだけで、こんなにコードを書くの?
-
-SteamVR のオーバーレイは、VR の中に浮かぶ 2D のパネルです。自分用のオーバーレイを作るときの主な作り方は、これまで次の3つでした。
-
-- Unity で作る。オーバーレイ1枚のために、ゲームエンジンを丸ごと動かす
-- C++ で OpenVR を直接呼ぶ。並べ方の計算も描画も、自分で書く
-- Qt などのデスクトップ向けの UI を、自分で OpenVR につなぐ
-
-時計を1つ浮かべたいだけでも、この3つのどれかから始めることになります。
-
-## 欲しいのは画面のレイアウト
-
-FloatSoda では、「状態がこうなら、画面はこう見える」を C# のコードで書きます。並べ方の計算、描画、SteamVR への受け渡し、状態が変わったときの描き直しは、FloatSoda が受け持ちます。書き方は Flutter と同じ形で、Unity のシーンやプレハブの代わりに、画面をコードで組み立てます。
-
-次のコードは、SteamVR のダッシュボードに出す、最小のオーバーレイです。`samples/Showcase/FloatSoda.Samples.GettingStarted` の `Program.cs` そのもので、ビルドのたびにここへ読み込まれます。
-
-{/* Program.cs は BOM 付き UTF-8 なので、先頭の BOM(U+FEFF)を落としてから表示する */}
-<Code code={program.charCodeAt(0) === 0xfeff ? program.slice(1) : program} lang="csharp" title="Program.cs" />
-
-FloatSoda が裏で何をしているかは、「<a href={props.links.howItWorks}>FloatSoda の仕組み</a>」にあります。
-
-## コードだから、全部読めるし探しやすい
-
-FloatSoda の UI はすべて C# のコードで、シーンもプレハブも持ちません。画面がどこで組まれているかは、コードを検索すれば見つかります。変更は diff で追え、コードを AI に書かせることもできます。このサイトは、コーディングエージェントがそのまま読めるように作ってあります。
-
-<CardGrid>
-  <LinkCard title="llms.txt" href="/llms.txt" description="サイトの索引。エージェントにはまずこれを渡す" />
-  <LinkCard title="llms-full.txt" href="/llms-full.txt" description="全ページを 1 ファイルにまとめた全文" />
-</CardGrid>
-
-各ページは URL 末尾の `/` を `.md` に置き換えると素の Markdown で取得できます(例: <code>{props.links.firstOverlay}</code> のページは <code>{props.links.exampleMd}</code>)。
-
-## どうやって使うの?
-
-FloatSoda は、SteamVR で動くオーバーレイを作るためのフレームワークです。作ったアプリを動かすときは、SteamVR を起動しておきます。開発に要る環境と、今の FloatSoda でできないことは、次のページにまとめています。
-
-<CardGrid>
-  <LinkCard title="動作環境" href={props.links.requirements} description="開発する PC と、実行する PC に要るもの" />
-  <LinkCard title="できないこと・まだ使えないもの" href={props.links.limitations} description="使う前に確かめたい制約と、その回避" />
-</CardGrid>
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
 
 ## やりたいことから選ぶ
 
@@ -75,3 +33,23 @@ FloatSoda は、SteamVR で動くオーバーレイを作るためのフレー�
   )}
   <LinkCard title="FloatSoda に関わりたい" href={props.tracks.contributor.href} description="コントリビューター" />
 </CardGrid>
+
+## 使う前に確かめる
+
+作ったアプリを動かすときは、SteamVR を起動しておきます。開発に要る環境と、今の FloatSoda でできないことは、次のページにまとめています。
+
+<CardGrid>
+  <LinkCard title="動作環境" href={props.links.requirements} description="開発する PC と、実行する PC に要るもの" />
+  <LinkCard title="できないこと・まだ使えないもの" href={props.links.limitations} description="使う前に確かめたい制約と、その回避" />
+</CardGrid>
+
+## AI に読ませる
+
+このサイトは、コーディングエージェントがそのまま読めるように作ってあります。
+
+<CardGrid>
+  <LinkCard title="llms.txt" href="/llms.txt" description="サイトの索引。エージェントにはまずこれを渡す" />
+  <LinkCard title="llms-full.txt" href="/llms-full.txt" description="全ページを 1 ファイルにまとめた全文" />
+</CardGrid>
+
+各ページは URL 末尾の `/` を `.md` に置き換えると素の Markdown で取得できます(例: <code>{props.links.firstOverlay}</code> のページは <code>{props.links.exampleMd}</code>)。

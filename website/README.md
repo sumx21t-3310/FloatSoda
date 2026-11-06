@@ -9,7 +9,7 @@
 | 場所 | 役割 | Git 管理 |
 |---|---|---|
 | `../docs/**/*.md` | ドキュメントの唯一のソース。ページを直すときはここを編集する | あり |
-| `content/index.mdx` | ランディング(`/`)の本文と hero。FloatSoda の短い紹介(困りごと → 解決 → 提案 → 対象 → 行動の順)と導線を書く。コードが変わると誤りになる事実(今の制約、バージョン、件数)は書かず、`docs/` へリンクする | あり |
+| `content/index.mdx` | ランディング(`/`)の本文と hero。docs の入口としての導線を書く。コードが変わると誤りになる事実(今の制約、バージョン、件数)は書かず、`docs/` へリンクする | あり |
 | `src/pages/index.astro` | ランディングを Starlight の `StarlightPage` で描画する。docs コレクションの外なので、サイドバーと `llms-*.txt` には入らない | あり |
 | `scripts/sync-docs.mjs` | `docs/` → Starlight 形式への変換と、ランディングの導線データの生成(`npm run build` / `npm run dev` の前に自動実行) | あり |
 | `scripts/api-reference.mjs` | `src/` の XML ドキュメントコメント → API リファレンスのページの生成(`npm run build` の前に自動実行。`npm run dev` では実行しない) | あり |
