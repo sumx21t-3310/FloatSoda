@@ -1,6 +1,6 @@
 # FloatSoda ドキュメントサイト
 
-`https://floatsoda.sumx21t.com` で公開するドキュメントサイトです。[Astro Starlight](https://starlight.astro.build/) で組み、LLM 向けに `llms.txt`(索引)/ `llms-full.txt`(全文)/ `_llms-txt/<系統>.txt`(系統ごとの分割)と各ページの素の Markdown も配信します(Issue #219)。
+`https://docs.floatsoda.dev` で公開するドキュメントサイトです。[Astro Starlight](https://starlight.astro.build/) で組み、LLM 向けに `llms.txt`(索引)/ `llms-full.txt`(全文)/ `_llms-txt/<系統>.txt`(系統ごとの分割)と各ページの素の Markdown も配信します(Issue #219)。
 
 ## ソースは `docs/` と、ランディングだけ
 
@@ -15,7 +15,7 @@
 | `scripts/api-reference.mjs` | `src/` の XML ドキュメントコメント → API リファレンスのページの生成(`npm run build` の前に自動実行。`npm run dev` では実行しない) | あり |
 | `generated/api/` | 生成結果。`docs/` と同じ形の Markdown で、`sync-docs.mjs` が `api` のタブとして変換する | **なし(生成物)** |
 | `src/content/docs/` | 変換結果。Starlight が読む | **なし(生成物)** |
-| `public/<slug>.md` | 変換結果。LLM 向けの素の Markdown(`https://floatsoda.sumx21t.com/<slug>.md`) | **なし(生成物)** |
+| `public/<slug>.md` | 変換結果。LLM 向けの素の Markdown(`https://docs.floatsoda.dev/<slug>.md`) | **なし(生成物)** |
 | `src/generated/landing.json` | ランディングの導線(3 系統の入口と主要ページへのリンク先)。`docs/` の実在から計算する | **なし(生成物)** |
 | `dist/` | ビルド出力。GitHub Pages へそのままデプロイされる | なし |
 
@@ -91,8 +91,8 @@ npm run verify    # dist/ の検査。ページ・llms-*.txt の網羅と索引�
 初回だけ、リポジトリのオーナーによる設定と手動デプロイが必要です。
 
 1. GitHub の Settings → Pages → Source を **GitHub Actions** にする
-2. Cloudflare DNS に `floatsoda` の CNAME レコード(値 `sumx21t-3310.github.io`)を追加する
-3. Settings → Pages → Custom domain に `floatsoda.sumx21t.com` を入れ、Enforce HTTPS を有効にする
+2. Cloudflare DNS の `floatsoda.dev` のゾーンに `docs` の CNAME レコード(値 `sumx21t-3310.github.io`、プロキシはオフ)を追加する
+3. Settings → Pages → Custom domain に `docs.floatsoda.dev` を入れ、Enforce HTTPS を有効にする
 4. Settings → Environments → `github-pages` → Deployment branches and tags に、Tag のルール `v*` を追加する(`main` のルールは残す)。許可が `main` だけだと、タグの push のデプロイが `Tag "vX.Y.Z" is not allowed to deploy to github-pages due to environment protection rules.` で拒否される(#288)
 5. Actions → Docs Site → Run workflow を `main` で実行する(過去のタグにはこの workflow が無いので、最初の1回だけ `main` から公開する。次のリリースからはタグで自動)
 

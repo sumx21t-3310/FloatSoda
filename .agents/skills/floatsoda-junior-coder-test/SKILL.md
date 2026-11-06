@@ -94,7 +94,7 @@ docs/API の品質を測っておらず、それが目的のすべてだった�
 
 - タスク。VRChatter の声で。
 - **docs へのポインタのみ**: 検証するコミットの `docs/` フォルダ(入口は `docs/Home.md`)。PR と
-  リリース前のゲートでは必ずこれを渡す。公開サイト(`https://floatsoda.sumx21t.com/`)はタグを
+  リリース前のゲートでは必ずこれを渡す。公開サイト(`https://docs.floatsoda.dev/`)はタグを
   push したときにしか更新されず、新しい API や今回のリリース向けの docs がまだ載っていないため、
   公開済みのバージョンを検証するときだけ使う。まず `docs/Home.md`(FloatSoda ドキュメント)、
   `docs/tutorials/first-overlay.md`(最初のオーバーレイを作る)、`docs/reference/find-widgets.md`

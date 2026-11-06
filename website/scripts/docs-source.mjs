@@ -37,7 +37,7 @@ export function sourceFileOf(rel) {
     : path.join(docsDir, `${rel}.md`);
 }
 
-export const siteUrl = "https://floatsoda.sumx21t.com";
+export const siteUrl = "https://docs.floatsoda.dev";
 
 /**
  * #219 の作り直しで消した旧ページのスラッグ → 中身が移った新しいページのサイト内パス。

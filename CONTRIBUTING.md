@@ -409,7 +409,7 @@ Widget/Element 層は `StatelessWidget` / `StatefulWidget` / `InheritedWidget` �
 
 ## ドキュメントを更新する場合の注意
 
-ドキュメントの公開先は、公開サイト(<https://floatsoda.sumx21t.com>)です。サイトは `docs/*.md` から `.github/workflows/docs-site.yml` でビルドされます(`website/`)。ドキュメントの変更は必ず `docs/` 配下のファイルに対して行ってください。GitHub Wiki への同期は #319 で止めたため、Wiki は更新されません。
+ドキュメントの公開先は、公開サイト(<https://docs.floatsoda.dev>)です。サイトは `docs/*.md` から `.github/workflows/docs-site.yml` でビルドされます(`website/`)。ドキュメントの変更は必ず `docs/` 配下のファイルに対して行ってください。GitHub Wiki への同期は #319 で止めたため、Wiki は更新されません。
 
 ## ドキュメントのトンマナ
 

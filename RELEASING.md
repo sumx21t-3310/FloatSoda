@@ -126,7 +126,7 @@ git push origin vX.Y.Z
 
 - GitHub Actions の Release ワークフローが緑であること
 - NuGet 上に新バージョンが公開されたこと(反映まで数分かかることがあります)
-- Docs Site ワークフローの `deploy` ジョブが緑で、[公開サイト](https://floatsoda.sumx21t.com)がタグ時点の docs に更新されたこと。`deploy` だけが失敗したときは、NuGet のバージョンに影響しないので、新しいバージョンは要りません。環境の保護ルールで拒否されたときは、[`website/README.md`](website/README.md) の「デプロイ」にある `github-pages` 環境の設定を直してから、同じ実行の失敗したジョブを再実行します
+- Docs Site ワークフローの `deploy` ジョブが緑で、[公開サイト](https://docs.floatsoda.dev)がタグ時点の docs に更新されたこと。`deploy` だけが失敗したときは、NuGet のバージョンに影響しないので、新しいバージョンは要りません。環境の保護ルールで拒否されたときは、[`website/README.md`](website/README.md) の「デプロイ」にある `github-pages` 環境の設定を直してから、同じ実行の失敗したジョブを再実行します
 
 ### 9. GitHub Release を作成する
 

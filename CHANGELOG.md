@@ -7,6 +7,12 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-11-06
+
+### Changed
+
+- ドキュメントサイトの URL を <https://floatsoda.sumx21t.com> から <https://docs.floatsoda.dev> へ変更。`llms.txt` / `llms-full.txt` も新しい URL で配信する。旧 URL は新しい URL へ転送する。ライブラリのコードは 0.5.0 から変えていない
+
 ## [0.5.0] - 2026-10-30
 
 ### Added
@@ -173,7 +179,8 @@
 - メインスレッドとレンダースレッドのレイヤークローンによる分離
 - NuGetパッケージのメタデータ整備・リリース自動化(Directory.Build.props / CHANGELOG / Trusted Publishingによるリリースワークフロー)
 
-[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.5.0...main
+[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.5.1...main
+[0.5.1]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.5.1
 [0.5.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.5.0
 [0.4.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.4.0
 [0.3.1]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.3.1

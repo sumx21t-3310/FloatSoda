@@ -7,7 +7,7 @@
 
 **FloatSoda** is a UI framework for building SteamVR overlays with a **Flutter-like declarative API** in C# / .NET. It renders via SkiaSharp → OpenGL → OpenVR, and manages multiple overlays (dashboard, world-space, and device-tracked) in a unified way. Currently in alpha — APIs may change without notice.
 
-> 📖 The documentation below is in Japanese. See the [documentation site](https://floatsoda.sumx21t.com/) for details — LLM agents can read [llms.txt](https://floatsoda.sumx21t.com/llms.txt) or [llms-full.txt](https://floatsoda.sumx21t.com/llms-full.txt) — or check the [minimal example](#最小構成のコード); the code speaks for itself.
+> 📖 The documentation below is in Japanese. See the [documentation site](https://docs.floatsoda.dev/) for details — LLM agents can read [llms.txt](https://docs.floatsoda.dev/llms.txt) or [llms-full.txt](https://docs.floatsoda.dev/llms-full.txt) — or check the [minimal example](#最小構成のコード); the code speaks for itself.
 
 **FloatSoda** は、SteamVR Overlay を **Flutter のような宣言的な書き心地** で作成できるように開発中の UI フレームワークです。SkiaSharp → OpenGL → OpenVR という流れでレンダリングし、複数のオーバーレイを統一的に管理できます。
 
@@ -181,7 +181,7 @@ sequenceDiagram
 
 ## ドキュメント
 
-公開サイトは **[floatsoda.sumx21t.com](https://floatsoda.sumx21t.com/)** です。ソースは **[docs/Home.md](docs/Home.md)** 以下の Markdown で、サイトはリリースごとに更新されます。コーディングエージェントに読ませるときは [llms.txt](https://floatsoda.sumx21t.com/llms.txt)(索引)か [llms-full.txt](https://floatsoda.sumx21t.com/llms-full.txt)(全文)を渡してください。
+公開サイトは **[docs.floatsoda.dev](https://docs.floatsoda.dev/)** です。ソースは **[docs/Home.md](docs/Home.md)** 以下の Markdown で、サイトはリリースごとに更新されます。コーディングエージェントに読ませるときは [llms.txt](https://docs.floatsoda.dev/llms.txt)(索引)か [llms-full.txt](https://docs.floatsoda.dev/llms-full.txt)(全文)を渡してください。
 
 | タブ | 内容 |
 |---|---|
