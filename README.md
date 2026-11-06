@@ -5,17 +5,17 @@
 [![CI](https://github.com/sumx21t-3310/FloatSoda/actions/workflows/ci.yml/badge.svg)](https://github.com/sumx21t-3310/FloatSoda/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/github/license/sumx21t-3310/FloatSoda)](LICENSE)
 
-FloatSoda is a UI framework for building SteamVR overlays in C# / .NET with a Flutter-like declarative API, and it is currently in alpha. The rest of this README and the [documentation site](https://floatsoda.sumx21t.com/) are written in Japanese; coding agents can read [llms.txt](https://floatsoda.sumx21t.com/llms.txt) instead.
+FloatSoda is a UI framework for building SteamVR overlays in C# / .NET with a Flutter-like declarative API, and it is currently in alpha. The rest of this README and the [documentation site](https://docs.floatsoda.dev/) are written in Japanese; coding agents can read [llms.txt](https://docs.floatsoda.dev/llms.txt) instead.
 
 SteamVR のオーバーレイを、Flutter のような宣言的 UI で作る .NET 10 / C# 14 向けのフレームワークです。
 
 SteamVR のオーバーレイは、VR の中に浮かぶ 2D のパネルです。これまでは、パネルを1枚出すだけでも、Unity を丸ごと動かすか、C++ で OpenVR を直接呼ぶ必要がありました。Qt のようなデスクトップ向けの UI を、自分で OpenVR につなぐ方法もあります。
 
-FloatSoda では、「状態がこうなら、画面はこう見える」を C# のコードで書きます。並べ方の計算、描画、SteamVR への受け渡し、状態が変わったときの描き直しは、FloatSoda が受け持ちます。UI はすべてコードなので、シーンもプレハブもありません。変更を diff で追えます。書き方が Flutter と同じ形なので、Flutter を知っている AI にもコードを書かせやすくなっています。AI に書かせるときは、ガイドの [AI に FloatSoda を書かせる](https://floatsoda.sumx21t.com/guide/3-prepare/write-with-llm/)を開いてください。
+FloatSoda では、「状態がこうなら、画面はこう見える」を C# のコードで書きます。並べ方の計算、描画、SteamVR への受け渡し、状態が変わったときの描き直しは、FloatSoda が受け持ちます。UI はすべてコードなので、シーンもプレハブもありません。変更を diff で追えます。書き方が Flutter と同じ形なので、Flutter を知っている AI にもコードを書かせやすくなっています。AI に書かせるときは、ガイドの [AI に FloatSoda を書かせる](https://docs.floatsoda.dev/guide/3-prepare/write-with-llm/)を開いてください。
 
 自分用のツールを作りたい VRChatter、Booth でオーバーレイを売りたいクリエイター、uGUI を避けたいエンジニアに向けて作っています。開発段階は Alpha で、API は予告なく変わります。
 
-まず動かすなら、チュートリアルの[最初のオーバーレイを作る](docs/tutorials/first-overlay.md)へ進んでください。コーディングエージェントには [llms.txt](https://floatsoda.sumx21t.com/llms.txt) を渡します。紹介の全文は[ドキュメントサイト](https://floatsoda.sumx21t.com/)のトップにあります。
+まず動かすなら、チュートリアルの[最初のオーバーレイを作る](docs/tutorials/first-overlay.md)へ進んでください。コーディングエージェントには [llms.txt](https://docs.floatsoda.dev/llms.txt) を渡します。紹介の全文は[ドキュメントサイト](https://docs.floatsoda.dev/)のトップにあります。
 
 ## 使い方
 
@@ -70,7 +70,7 @@ FloatSoda が裏で何をしているかは、ガイドの [FloatSoda の仕組�
 
 ## できること・できないこと
 
-オーバーレイは、ダッシュボードに出す `DashboardWindow`、ワールド座標に固定する `WorldSpaceWindow`、デバイスに追従する `DeviceTrackedWindow` の3種類を、同時に出せます。並べる・描く・入力を受け取る部品は、ドキュメントサイトの[部品を目的から探す](https://floatsoda.sumx21t.com/reference/find-widgets/)で探せます。開発の予定は、GitHub の[マイルストーン](https://github.com/sumx21t-3310/FloatSoda/milestones)で確かめられます。
+オーバーレイは、ダッシュボードに出す `DashboardWindow`、ワールド座標に固定する `WorldSpaceWindow`、デバイスに追従する `DeviceTrackedWindow` の3種類を、同時に出せます。並べる・描く・入力を受け取る部品は、ドキュメントサイトの[部品を目的から探す](https://docs.floatsoda.dev/reference/find-widgets/)で探せます。開発の予定は、GitHub の[マイルストーン](https://github.com/sumx21t-3310/FloatSoda/milestones)で確かめられます。
 
 使う前に確かめたい主な制約は、次の3つです。
 
@@ -103,7 +103,7 @@ dotnet add package FloatSoda
 
 ## ドキュメント
 
-ドキュメントは [floatsoda.sumx21t.com](https://floatsoda.sumx21t.com/) で公開しています。ソースは `docs/` の Markdown です。サイトは次の4つのタブに分かれています。
+ドキュメントは [docs.floatsoda.dev](https://docs.floatsoda.dev/) で公開しています。ソースは `docs/` の Markdown です。サイトは次の4つのタブに分かれています。
 
 | タブ | 開くとき |
 | :-- | :-- |
@@ -112,7 +112,7 @@ dotnet add package FloatSoda
 | [リファレンス](docs/reference/Home.md) | 作例、制約、動作環境、用語、部品を引きたい |
 | [コントリビューター](docs/contributor/Home.md) | FloatSoda の開発に加わりたい |
 
-コーディングエージェントには、索引の [llms.txt](https://floatsoda.sumx21t.com/llms.txt) か、全文の [llms-full.txt](https://floatsoda.sumx21t.com/llms-full.txt) を渡します。
+コーディングエージェントには、索引の [llms.txt](https://docs.floatsoda.dev/llms.txt) か、全文の [llms-full.txt](https://docs.floatsoda.dev/llms-full.txt) を渡します。
 
 ## コントリビュート
 
@@ -134,6 +134,6 @@ FloatSoda を使ったアプリを配るときは、次の2つのファイルを
 - [`LICENSE`](LICENSE): FloatSoda の著作権表示と許諾表示
 - [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md): Flutter、OpenVR SDK、OVRSharp のライセンスの全文
 
-SkiaSharp のように、配布物に入るほかのライブラリのライセンスは、それぞれの配布元で確かめてください。上の2つのファイルだけで足りるとは限りません。配るときの手順は、ドキュメントサイトの [Booth で売る準備](https://floatsoda.sumx21t.com/guide/6-distribute/booth-release/)にあります。
+SkiaSharp のように、配布物に入るほかのライブラリのライセンスは、それぞれの配布元で確かめてください。上の2つのファイルだけで足りるとは限りません。配るときの手順は、ドキュメントサイトの [Booth で売る準備](https://docs.floatsoda.dev/guide/6-distribute/booth-release/)にあります。
 
 この節はライセンスの要約で、法的な判断ではありません。条件の正しい文面は、`LICENSE` の全文です。

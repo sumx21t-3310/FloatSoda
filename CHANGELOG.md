@@ -20,6 +20,12 @@
 - `RenderConstrainedBox` の `AdditionalConstraints` の上限が無限のとき、固有サイズ(intrinsic)が無限大になる問題を修正。Flutter と同じく、子の固有サイズを返す。子へ問い合わせる交差軸の値も、無限大に変えずにそのまま渡す(#268)
 - 子のない `RenderConstrainedBox` が前回のレイアウトの大きさを引き継ぎ、制約が緩くなっても縮まない問題を修正。子なしの `SizedBox` と `ConstrainedBox` も同じ影響を受けていた。Flutter と同じく、制約が許す最小の大きさになる(#268)
 
+## [0.5.1] - 2026-11-06
+
+### Changed
+
+- ドキュメントサイトの URL を <https://floatsoda.sumx21t.com> から <https://docs.floatsoda.dev> へ変更。`llms.txt` / `llms-full.txt` も新しい URL で配信する。旧 URL は新しい URL へ転送する。ライブラリのコードは 0.5.0 から変えていない
+
 ## [0.5.0] - 2026-10-30
 
 ### Added
@@ -186,7 +192,8 @@
 - メインスレッドとレンダースレッドのレイヤークローンによる分離
 - NuGetパッケージのメタデータ整備・リリース自動化(Directory.Build.props / CHANGELOG / Trusted Publishingによるリリースワークフロー)
 
-[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.5.0...main
+[Unreleased]: https://github.com/sumx21t-3310/FloatSoda/compare/v0.5.1...main
+[0.5.1]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.5.1
 [0.5.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.5.0
 [0.4.0]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.4.0
 [0.3.1]: https://github.com/sumx21t-3310/FloatSoda/releases/tag/v0.3.1
