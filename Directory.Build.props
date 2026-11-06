@@ -18,7 +18,7 @@
         <Authors>Sumx21t</Authors>
         <Copyright>Copyright (c) 2026 Sumx21t</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/sumx21t-3310/FloatSoda</PackageProjectUrl>
+        <PackageProjectUrl>https://docs.floatsoda.dev</PackageProjectUrl>
         <RepositoryUrl>https://github.com/sumx21t-3310/FloatSoda</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>steamvr;openvr;overlay;vr;ui;skiasharp;declarative-ui</PackageTags>
