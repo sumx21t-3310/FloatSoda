@@ -7,7 +7,7 @@
 すべてのプロンプトに同じ3つのガードレールを載せる(docs の URL とスクラッチパスは埋める):
 
 - **docs を先に読む**: 検証するコミットの `docs/`(公開済みのバージョンを検証するときだけ
-  `https://floatsoda.sumx21t.com/`) — 何か書く前に `docs/Home.md`、`docs/tutorials/first-overlay.md`、
+  `https://docs.floatsoda.dev/`) — 何か書く前に `docs/Home.md`、`docs/tutorials/first-overlay.md`、
   `docs/reference/find-widgets.md`、`docs/guide/4-build/mechanics/overlay-types.md` を読む。
 - **ブラックボックス**: docs だけを使う。`src/` 配下は開かない・読まない・grep しない。
   docs がカバーしていなければ、推測せずそう言う。

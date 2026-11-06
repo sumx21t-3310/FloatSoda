@@ -14,8 +14,8 @@ FloatSoda の公開サイトは、AI 向けに2つのファイルを配信して
 
 | ファイル | 中身 | 向く場面 |
 | :-- | :-- | :-- |
-| `llms.txt` (<https://floatsoda.sumx21t.com/llms.txt>) | 索引 | AI が自分でページを開ける(コーディングエージェントなど) |
-| `llms-full.txt` (<https://floatsoda.sumx21t.com/llms-full.txt>) | 全文 | チャットに貼る、またはファイルとして取り込む |
+| `llms.txt` (<https://docs.floatsoda.dev/llms.txt>) | 索引 | AI が自分でページを開ける(コーディングエージェントなど) |
+| `llms-full.txt` (<https://docs.floatsoda.dev/llms-full.txt>) | 全文 | チャットに貼る、またはファイルとして取り込む |
 
 渡し方は、URL を貼るか、ファイルを取り込みます。URL を開けない AI には、ファイルの本文を貼ってください。あわせて、リファレンスの[できないこと・まだ使えないもの](../../reference/limitations.md)を読むように伝えてください。作例の README にも、ウィジェットごとの使い方と「Flutterとの違い」があります。AI が部品を迷うときは、`samples/` の該当する作例の `README.md` を渡せます。
 
