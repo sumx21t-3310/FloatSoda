@@ -393,6 +393,12 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     /// ウィンドウを持たないまま、ビルド、レイアウト、ペイントを1回ずつ実行します。
     /// <see cref="DrawFrame"/>はウィンドウの作成前にレイアウトとペイントを飛ばすため、ヘッドレスのテストではこちらを使います。
     /// </summary>
+    /// <remarks>
+    /// <see cref="NeedsVisualUpdate"/>を<see langword="false"/>に戻し、再構築を要求されたElementと、
+    /// Layout DirtyおよびPaint DirtyのRenderObjectを処理します。
+    /// レイアウトのあと、ポインターのホバー状態を新しい配置で更新します。
+    /// 作ったレイヤーはレンダースレッドへ送りません。フレームコールバックも発火しません。
+    /// </remarks>
     internal void FlushBuildLayoutAndPaint()
     {
         NeedsVisualUpdate = false;
@@ -403,6 +409,10 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     /// <summary>
     /// ルートWidgetを外し、ツリー内のStateを破棄します。
     /// </summary>
+    /// <remarks>
+    /// ルートElementは残し、その子だけを外します。外した子孫のElementはアンマウントされ、Stateの<c>Dispose</c>が呼ばれます。
+    /// ルートを接続していないとき、またはパイプラインがないときは何もしません。
+    /// </remarks>
     internal void DetachRootWidget()
     {
         if (RenderViewElement is not RenderObjectToWidgetElement<RenderView> root || Pipeline is null)

@@ -53,9 +53,17 @@ public sealed record IndexedStack : MultiChildRenderObjectWidget<RenderIndexedSt
         }
     }
 
-    // Flutter の _IndexedStackElement に当たる。Index の位置の子だけを画面に出ているものとして扱う。
+    /// <summary>
+    /// <see cref="IndexedStack"/>に対応するElementです。Flutterの<c>_IndexedStackElement</c>に当たります。
+    /// </summary>
+    /// <seealso cref="RenderIndexedStack"/>
     private sealed class IndexedStackElement : MultiChildRenderObjectElement<RenderIndexedStack>
     {
+        /// <summary>
+        /// <see cref="Index"/>の位置の子だけを列挙します。
+        /// </summary>
+        /// <param name="visitor">画面に出ている子Elementに一度だけ適用する処理。</param>
+        /// <remarks><see cref="Index"/>が<see langword="null"/>のときは、どの子も列挙しません。</remarks>
         internal override void VisitOnstageChildren(Action<Element> visitor)
         {
             if (Widget is not IndexedStack { Index: { } index })

@@ -1,9 +1,12 @@
 ﻿namespace FloatSoda.Testing;
 
 /// <summary>
-/// Represents an error raised when a widget assertion fails during widget testing.
+/// <see cref="WidgetTester"/>でWidgetを取り出せなかったときに投げられる例外です。
 /// </summary>
-/// This exception is thrown by <see cref="WidgetTester"/> when a lookup does not produce the expected widget.
-/// This happens when a <see cref="Finder"/> matches no widgets, matches more than one widget,
-/// or matches a single widget whose type is not the requested type.
+/// <remarks>
+/// <see cref="Finder"/>の一致が0件のとき、2件以上のとき、一致した1件が求めた型でないときに、
+/// <see cref="WidgetTester.Widget{T}"/>が投げます。
+/// </remarks>
+/// <param name="type">取り出そうとしたWidgetの型。</param>
+/// <param name="message">探した条件と、失敗した理由を含むメッセージ。</param>
 public class WidgetAssertionException(Type type, string message) : Exception(message);

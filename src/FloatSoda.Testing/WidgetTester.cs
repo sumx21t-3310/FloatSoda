@@ -9,27 +9,47 @@ namespace FloatSoda.Testing;
 /// Flutterの<c>WidgetTester</c>に相当し、<c>pumpWidget</c>、<c>pump</c>、<c>find</c>と同じ書き方でテストを書けます。
 /// 特定のテストフレームワークには依存しません。
 /// </summary>
+/// <remarks>
+/// ウィンドウとSteamVRを使わずに、800x600のRenderViewへマウントします。
+/// 使い終わったら<see cref="Dispose"/>を呼び、ツリー内のStateを破棄してください。
+/// このクラスはスレッドセーフではありません。1つのテストの中で、1つのスレッドから使ってください。
+/// </remarks>
+/// <seealso cref="Finder"/>
+/// <seealso cref="CommonFinders"/>
 public sealed class WidgetTester : IDisposable
 {
     // Flutter の _kDefaultTestViewportSize と同じ大きさ。
     private const float DefaultViewportWidth = 800;
     private const float DefaultViewportHeight = 600;
 
-    // ウィンドウを持たないバインディング。FrameScheduler と GestureBinding を本番と同じ形で BuildOwner に渡す。
+    /// <summary>
+    /// ウィンドウを持たないバインディング。
+    /// 本番と同じく、FrameSchedulerとGestureBindingをBuildOwnerに渡します。
+    /// </summary>
     private readonly WidgetBinding _binding = new(
         new RenderView(DefaultViewportWidth, DefaultViewportHeight)
     );
 
+    /// <summary>
+    /// <see cref="Dispose"/>を呼んだかどうか。<see langword="true"/>のあいだ、<see cref="PumpWidget"/>などは<see cref="ObjectDisposedException"/>を投げます。
+    /// </summary>
     private bool _disposed;
 
     /// <summary>
     /// ウィジェットをまだマウントしていないテストハーネスを初期化します。
     /// </summary>
+    /// <remarks>
+    /// 初期化した時点ではルートがありません。<see cref="PumpWidget"/>を呼ぶ前の<see cref="Finder.Evaluate"/>は、空の列を返します。
+    /// </remarks>
     public WidgetTester() => Find = new CommonFinders(() => _binding.RenderViewElement);
 
     /// <summary>
     /// Elementツリーを探すためのFinderの入口を取得します。
     /// </summary>
+    /// <value>
+    /// このtesterに結び付いた<see cref="CommonFinders"/>。呼ぶたびに同じインスタンスを返します。
+    /// 作ったFinderは、<see cref="Finder.Evaluate"/>のたびにこのtesterの現在のツリーを探し直します。
+    /// </value>
     // 挙動:
     // - 作成済みのCommonFindersを返す。呼ぶたびに新しく作らない。
     // - CommonFindersが作るFinderは、Evaluate()のたびにこのtesterの現在のルートElementから探し直す。
@@ -40,8 +60,14 @@ public sealed class WidgetTester : IDisposable
     /// Widgetをルートとしてマウントし、1フレーム回します。
     /// 再び呼ぶと、ルートを新しいWidgetに差し替えます。
     /// </summary>
-    /// <param name="widget">ルートとしてマウントするWidget。</param>
-    /// <returns>1フレームの処理が終わると完了するタスク。</returns>
+    /// <param name="widget">ルートとしてマウントするWidget。<see langword="null"/>は指定できません。</param>
+    /// <returns>1フレームの処理が終わると完了するタスク。現在の実装では、完了済みのタスクを返します。</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="widget"/>が<see langword="null"/>のとき。</exception>
+    /// <exception cref="ObjectDisposedException"><see cref="Dispose"/>のあとに呼んだとき。</exception>
+    /// <remarks>
+    /// 前のルートと<paramref name="widget"/>の型とキーが同じなら、ElementとStateを引き継ぎます。
+    /// 違う場合は、前のツリーを破棄して作り直します。前のツリーのStateは、このフレームの中で破棄されます。
+    /// </remarks>
     public Task PumpWidget(Widget widget)
     {
         // 挙動:
@@ -63,8 +89,13 @@ public sealed class WidgetTester : IDisposable
     /// <summary>
     /// ビルド、レイアウト、ペイントを1回回します。
     /// </summary>
-    /// <returns>1フレームの処理が終わると完了するタスク。</returns>
+    /// <returns>1フレームの処理が終わると完了するタスク。現在の実装では、完了済みのタスクを返します。</returns>
     /// <exception cref="InvalidOperationException"><see cref="PumpWidget"/>をまだ呼んでいないとき。</exception>
+    /// <exception cref="ObjectDisposedException"><see cref="Dispose"/>のあとに呼んだとき。</exception>
+    /// <remarks>
+    /// <c>SetState</c>などで再構築を要求されたElementを再構築し、Layout DirtyとPaint DirtyのRenderObjectを処理します。
+    /// フレームコールバックの発火と時間の経過は扱いません。
+    /// </remarks>
     public Task Pump()
     {
         // 破棄済みの判定を先に行う。マウントせずに破棄したtesterでも、ObjectDisposedExceptionにするため。
@@ -85,10 +116,15 @@ public sealed class WidgetTester : IDisposable
     /// <summary>
     /// <paramref name="finder"/>に一致したWidgetを返します。
     /// </summary>
-    /// <typeparam name="T">取り出すWidgetの型。</typeparam>
-    /// <param name="finder">Widgetを探すFinder。</param>
-    /// <returns>一致したWidget。</returns>
-    /// <exception cref="WidgetAssertionException">一致が0件、または2件以上のとき。</exception>
+    /// <typeparam name="T">取り出すWidgetの型。一致したWidgetが、この型か派生型である必要があります。</typeparam>
+    /// <param name="finder">Widgetを探すFinder。<see langword="null"/>は指定できません。</param>
+    /// <returns>一致したただ1つのWidget。</returns>
+    /// <exception cref="ArgumentNullException"><paramref name="finder"/>が<see langword="null"/>のとき。</exception>
+    /// <exception cref="ObjectDisposedException"><see cref="Dispose"/>のあとに呼んだとき。</exception>
+    /// <exception cref="WidgetAssertionException">
+    /// 一致が0件、または2件以上のとき。一致した1件が<typeparamref name="T"/>でないときも投げます。
+    /// </exception>
+    /// <remarks>呼んだ時点のツリーで<see cref="Finder.Evaluate"/>を1回実行します。ツリーは変更しません。</remarks>
     public T Widget<T>(Finder finder) where T : Widget
     {
         // 挙動:
@@ -135,6 +171,11 @@ public sealed class WidgetTester : IDisposable
     /// <summary>
     /// マウントしたツリーを破棄します。
     /// </summary>
+    /// <remarks>
+    /// ルートの子を外し、ツリー内のすべてのStateの<c>Dispose</c>を呼びます。
+    /// 2回目以降の呼び出しは何もしません。
+    /// 以後、<see cref="PumpWidget"/>、<see cref="Pump"/>、<see cref="Widget{T}"/>は<see cref="ObjectDisposedException"/>を投げます。
+    /// </remarks>
     public void Dispose()
     {
         // 挙動:
