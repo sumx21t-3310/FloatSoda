@@ -30,8 +30,7 @@ public sealed record RichText : MultiChildRenderObjectWidget<RenderParagraph>
     /// 次のパイプライン更新時に段落のサイズを再計算します。
     /// 値が変更されなかった場合、Dirty状態は変更されません。
     /// </remarks>
-    public override void UpdateRenderObject(RenderParagraph renderObject) =>
-        renderObject.Text = Text;
+    public override void UpdateRenderObject(RenderParagraph renderObject) => renderObject.Text = Text;
 }
 
 /// <summary>

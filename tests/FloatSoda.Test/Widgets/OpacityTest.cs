@@ -1,4 +1,4 @@
-﻿using FloatSoda.Geometrics;
+using FloatSoda.Geometrics;
 using FloatSoda.Testing;
 using FloatSoda.Widgets.Layout;
 using FloatSoda.Widgets.Paint;

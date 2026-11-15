@@ -19,6 +19,15 @@ FloatSoda.Geometrics.EdgeInsets.BottomLeft.get -> FloatSoda.Geometry.Offset
 FloatSoda.Geometrics.EdgeInsets.BottomRight.get -> FloatSoda.Geometry.Offset
 FloatSoda.Geometrics.EdgeInsets.TopLeft.get -> FloatSoda.Geometry.Offset
 FloatSoda.Geometrics.EdgeInsets.TopRight.get -> FloatSoda.Geometry.Offset
+FloatSoda.Geometrics.SizeI
+FloatSoda.Geometrics.SizeI.Deconstruct(out int Width, out int Height) -> void
+FloatSoda.Geometrics.SizeI.Equals(FloatSoda.Geometrics.SizeI other) -> bool
+FloatSoda.Geometrics.SizeI.Height.get -> int
+FloatSoda.Geometrics.SizeI.Height.init -> void
+FloatSoda.Geometrics.SizeI.SizeI() -> void
+FloatSoda.Geometrics.SizeI.SizeI(int Width, int Height) -> void
+FloatSoda.Geometrics.SizeI.Width.get -> int
+FloatSoda.Geometrics.SizeI.Width.init -> void
 FloatSoda.Gesture.GestureRecognizer.AddPointer(FloatSoda.Engine.Abstractions.Input.PointerEvent downEvent) -> void
 FloatSoda.Gesture.HitTestResult.AddWidthPaintOffset(FloatSoda.Geometry.Offset? offset, FloatSoda.Geometry.Offset position, System.Func<FloatSoda.Gesture.HitTestResult!, FloatSoda.Geometry.Offset, bool>! hitTest) -> bool
 FloatSoda.Gesture.HitTestResult.AddWithPaintTransform(System.Numerics.Matrix3x2 transform, FloatSoda.Geometry.Offset position, System.Func<FloatSoda.Gesture.HitTestResult!, FloatSoda.Geometry.Offset, bool>! hitTest) -> bool
@@ -63,6 +72,7 @@ FloatSoda.Widgets.Gesture.PointerRegion.OnPointerExit.get -> System.Action<Float
 FloatSoda.Widgets.OverlayWindow.Dpm.get -> FloatSoda.Geometry.Dpm
 FloatSoda.Widgets.Paint.Transform.Origin.get -> FloatSoda.Geometry.Offset
 override FloatSoda.Elements.MultiChildRenderObjectElement<T>.InsertRenderObjectChild(FloatSoda.RenderObjects.RenderObject? child) -> void
+override FloatSoda.Geometrics.SizeI.GetHashCode() -> int
 override FloatSoda.RenderObjects.Animation.RenderAnimatedOpacity.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Geometry.Offset offset) -> void
 override FloatSoda.RenderObjects.Gesture.RenderAbsorbPointer.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Geometry.Offset position) -> bool
 override FloatSoda.RenderObjects.Gesture.RenderIgnorePointer.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Geometry.Offset position) -> bool
@@ -122,7 +132,17 @@ override FloatSoda.RenderObjects.RenderProxyBox.HitTestChildren(FloatSoda.Gestur
 override FloatSoda.RenderObjects.RenderProxyBox.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Geometry.Offset offset) -> void
 override FloatSoda.RenderObjects.RenderView.HandleEvent(FloatSoda.Engine.Abstractions.Input.PointerEvent pointerEvent, FloatSoda.Gesture.HitTestEntry entry) -> void
 override FloatSoda.RenderObjects.RenderView.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Geometry.Offset offset) -> void
+override FloatSoda.Widgets.Layout.IndexedStack.CreateElement() -> FloatSoda.Elements.Element!
+override FloatSoda.Widgets.Layout.Offstage.CreateElement() -> FloatSoda.Elements.Element!
+static FloatSoda.Geometrics.Size.implicit operator FloatSoda.Geometrics.Size(FloatSoda.Geometrics.SizeI sizeI) -> FloatSoda.Geometrics.Size
+static FloatSoda.Geometrics.Size.implicit operator FloatSoda.Geometrics.SizeI(FloatSoda.Geometrics.Size size) -> FloatSoda.Geometrics.SizeI
+static FloatSoda.Geometrics.SizeI.implicit operator FloatSoda.Geometrics.Size(FloatSoda.Geometrics.SizeI sizeI) -> FloatSoda.Geometrics.Size
+static FloatSoda.Geometrics.SizeI.implicit operator FloatSoda.Geometrics.SizeI(FloatSoda.Geometrics.Size size) -> FloatSoda.Geometrics.SizeI
+static FloatSoda.Geometrics.SizeI.operator !=(FloatSoda.Geometrics.SizeI left, FloatSoda.Geometrics.SizeI right) -> bool
+static FloatSoda.Geometrics.SizeI.operator ==(FloatSoda.Geometrics.SizeI left, FloatSoda.Geometrics.SizeI right) -> bool
 virtual FloatSoda.RenderObjects.RenderBox.HitTest(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Geometry.Offset position) -> bool
 virtual FloatSoda.RenderObjects.RenderBox.HitTestChildren(FloatSoda.Gesture.HitTestResult! result, FloatSoda.Geometry.Offset position) -> bool
 virtual FloatSoda.RenderObjects.RenderBox.HitTestSelf(FloatSoda.Geometry.Offset position) -> bool
 static FloatSoda.Geometrics.BoxConstraints.Expand(double? width = null, double? height = null) -> FloatSoda.Geometrics.BoxConstraints
+~override FloatSoda.Geometrics.SizeI.Equals(object obj) -> bool
+~override FloatSoda.Geometrics.SizeI.ToString() -> string

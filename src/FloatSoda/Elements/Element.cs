@@ -133,6 +133,16 @@ public abstract class Element : IBuildContext, IComparable<Element>
     public virtual void VisitChildren(Action<Element> visitor) { }
 
     /// <summary>
+    /// このElementが直接管理する子Elementのうち、画面に出ている子だけを列挙します。
+    /// Flutterの<c>Element.debugVisitOnstageChildren</c>に相当します。
+    /// </summary>
+    /// <param name="visitor">画面に出ている子Elementに一度ずつ適用する処理。</param>
+    /// <remarks>
+    /// 既定ではすべての子を列挙します。子を画面に出さないElement(<c>Offstage</c>、<c>IndexedStack</c>)が上書きします。
+    /// </remarks>
+    internal virtual void VisitOnstageChildren(Action<Element> visitor) => VisitChildren(visitor);
+
+    /// <summary>
     /// このElementを指定した親の子としてElementツリーへ接続します。
     /// </summary>
     /// <param name="parent">接続先の親Element。ルートとして接続する場合は<see langword="null"/>。</param>

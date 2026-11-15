@@ -389,6 +389,32 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
         UpdatePointerHoverAfterLayout();
     }
 
+    /// <summary>
+    /// ウィンドウを持たないまま、ビルド、レイアウト、ペイントを1回ずつ実行します。
+    /// <see cref="DrawFrame"/>はウィンドウの作成前にレイアウトとペイントを飛ばすため、ヘッドレスのテストではこちらを使います。
+    /// </summary>
+    internal void FlushBuildLayoutAndPaint()
+    {
+        NeedsVisualUpdate = false;
+        FlushBuildAndLayout();
+        Pipeline?.FlushPaint();
+    }
+
+    /// <summary>
+    /// ルートWidgetを外し、ツリー内のStateを破棄します。
+    /// </summary>
+    internal void DetachRootWidget()
+    {
+        if (RenderViewElement is not RenderObjectToWidgetElement<RenderView> root || Pipeline is null)
+            return;
+
+        new RenderObjectToWidgetAdapter { Container = Pipeline.RenderView, Child = null }.AttachToRenderTree(
+            BuildOwner,
+            root
+        );
+        BuildOwner.BuildScope();
+    }
+
     private void UpdatePointerHoverAfterLayout()
     {
         foreach (var (pointerId, position) in _pointerPositions)
