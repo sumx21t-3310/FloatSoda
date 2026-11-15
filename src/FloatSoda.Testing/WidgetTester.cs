@@ -1,6 +1,7 @@
 using FloatSoda.Core;
 using FloatSoda.RenderObjects;
 using FloatSoda.Widgets;
+using SkiaSharp;
 
 namespace FloatSoda.Testing;
 
@@ -26,8 +27,15 @@ public sealed class WidgetTester : IDisposable
     /// ウィンドウを持たないバインディング。
     /// 本番と同じく、FrameSchedulerとGestureBindingをBuildOwnerに渡します。
     /// </summary>
+    /// <remarks>
+    /// RenderViewの<see cref="RenderView.FixedSize"/>を800x600にし、ルートのWidgetをこの大きさのTight制約でレイアウトします。
+    /// コンストラクターの引数は初期サイズにすぎず、FixedSizeがないと子に無限の制約が渡るためです。
+    /// </remarks>
     private readonly WidgetBinding _binding = new(
         new RenderView(DefaultViewportWidth, DefaultViewportHeight)
+        {
+            FixedSize = new SKSize(DefaultViewportWidth, DefaultViewportHeight),
+        }
     );
 
     /// <summary>

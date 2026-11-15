@@ -90,6 +90,18 @@ public class WidgetTesterTest
     }
 
     [Fact]
+    public async Task PumpWidget_Expandedを含むFlexをルートにしたとき_800x600の制約でレイアウトすること()
+    {
+        using var tester = new WidgetTester();
+
+        // ビューポートの制約が無限だと、RenderFlex が Expanded を割り当てられずに例外を投げる。
+        await tester.PumpWidget(new Flex { Children = [new Expanded { Child = new Text("a") }] });
+
+        var root = tester.Find.ByType<Flex>().Evaluate().Single().RenderObject!;
+        Assert.Equal(new SkiaSharp.SKSize(800, 600), root.Size);
+    }
+
+    [Fact]
     public async Task PumpWidget_再呼び出しのとき_ルートが差し替わること()
     {
         using var tester = new WidgetTester();
