@@ -17,6 +17,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="FloatSoda.Test" />
+        <InternalsVisibleTo Include="FloatSoda.Testing" />
     </ItemGroup>
 
     <ItemGroup>

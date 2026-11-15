@@ -1,3 +1,4 @@
+using FloatSoda.Elements;
 using FloatSoda.Geometrics;
 using FloatSoda.RenderObjects.Layout;
 
@@ -15,6 +16,9 @@ public sealed record IndexedStack : MultiChildRenderObjectWidget<RenderIndexedSt
 
     /// <summary>表示する子の0始まりの位置を取得します。<see langword="null"/>の場合はどの子も表示しません。</summary>
     public int? Index { get; init; } = 0;
+
+    /// <inheritdoc/>
+    public override Element CreateElement() => new IndexedStackElement { Widget = this };
 
     /// <inheritdoc/>
     public override RenderIndexedStack CreateRenderObject()
@@ -46,6 +50,31 @@ public sealed record IndexedStack : MultiChildRenderObjectWidget<RenderIndexedSt
                 Index,
                 "IndexにはChildren内の位置またはnullを指定してください。"
             );
+        }
+    }
+
+    /// <summary>
+    /// <see cref="IndexedStack"/>に対応するElementです。Flutterの<c>_IndexedStackElement</c>に当たります。
+    /// </summary>
+    /// <seealso cref="RenderIndexedStack"/>
+    private sealed class IndexedStackElement : MultiChildRenderObjectElement<RenderIndexedStack>
+    {
+        /// <summary>
+        /// <see cref="Index"/>の位置の子だけを列挙します。
+        /// </summary>
+        /// <param name="visitor">画面に出ている子Elementに一度だけ適用する処理。</param>
+        /// <remarks><see cref="Index"/>が<see langword="null"/>のときは、どの子も列挙しません。</remarks>
+        internal override void VisitOnstageChildren(Action<Element> visitor)
+        {
+            if (Widget is not IndexedStack { Index: { } index })
+                return;
+
+            var position = 0;
+            VisitChildren(child =>
+            {
+                if (position++ == index)
+                    visitor(child);
+            });
         }
     }
 }
