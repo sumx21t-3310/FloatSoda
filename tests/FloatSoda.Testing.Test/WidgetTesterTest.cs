@@ -38,7 +38,8 @@ public class WidgetTesterTest
 
         public override void Dispose() => Widget!.Counter.DisposeCount++;
 
-        public override Widget Build(IBuildContext context) => new Text($"count {Widget!.Counter.Value}");
+        public override Widget Build(IBuildContext context) =>
+            new Text($"count {Widget!.Counter.Value}");
     }
 
     [Fact]
@@ -68,7 +69,9 @@ public class WidgetTesterTest
         using var tester = new WidgetTester();
         await tester.PumpWidget(new Text("Hello"));
 
-        Assert.Throws<WidgetAssertionException>(() => tester.Widget<Text>(tester.Find.Text("nothing")));
+        Assert.Throws<WidgetAssertionException>(() =>
+            tester.Widget<Text>(tester.Find.Text("nothing"))
+        );
     }
 
     [Fact]
@@ -77,7 +80,9 @@ public class WidgetTesterTest
         using var tester = new WidgetTester();
         await tester.PumpWidget(new Flex { Children = [new Text("a"), new Text("b")] });
 
-        Assert.Throws<WidgetAssertionException>(() => tester.Widget<Text>(tester.Find.ByType<Text>()));
+        Assert.Throws<WidgetAssertionException>(() =>
+            tester.Widget<Text>(tester.Find.ByType<Text>())
+        );
     }
 
     [Fact]
@@ -86,7 +91,9 @@ public class WidgetTesterTest
         using var tester = new WidgetTester();
         await tester.PumpWidget(new Text("a"));
 
-        Assert.Throws<WidgetAssertionException>(() => tester.Widget<Flex>(tester.Find.ByType<Text>()));
+        Assert.Throws<WidgetAssertionException>(() =>
+            tester.Widget<Flex>(tester.Find.ByType<Text>())
+        );
     }
 
     [Fact]

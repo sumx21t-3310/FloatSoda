@@ -137,7 +137,9 @@ public class FindersTest
     public async Task FirstLastAt_複数件一致したとき_先頭_末尾_指定位置を返すこと()
     {
         using var tester = new WidgetTester();
-        await tester.PumpWidget(new Flex { Children = [new Text("a"), new Text("b"), new Text("c")] });
+        await tester.PumpWidget(
+            new Flex { Children = [new Text("a"), new Text("b"), new Text("c")] }
+        );
         Finder texts = tester.Find.ByType<Text>();
 
         Assert.Equal("a", tester.Widget<Text>(texts.First).Data);
@@ -151,8 +153,12 @@ public class FindersTest
         using var tester = new WidgetTester();
         await tester.PumpWidget(new Text("a"));
 
-        Assert.Throws<InvalidOperationException>(() => tester.Find.ByType<Flex>().First.Evaluate().ToList());
-        Assert.Throws<InvalidOperationException>(() => tester.Find.ByType<Flex>().Last.Evaluate().ToList());
+        Assert.Throws<InvalidOperationException>(() =>
+            tester.Find.ByType<Flex>().First.Evaluate().ToList()
+        );
+        Assert.Throws<InvalidOperationException>(() =>
+            tester.Find.ByType<Flex>().Last.Evaluate().ToList()
+        );
     }
 
     [Fact]
@@ -161,8 +167,12 @@ public class FindersTest
         using var tester = new WidgetTester();
         await tester.PumpWidget(new Text("a"));
 
-        Assert.Throws<ArgumentOutOfRangeException>(() => tester.Find.ByType<Text>().At(5).Evaluate().ToList());
-        Assert.Throws<ArgumentOutOfRangeException>(() => tester.Find.ByType<Text>().At(-1).Evaluate().ToList());
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            tester.Find.ByType<Text>().At(5).Evaluate().ToList()
+        );
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            tester.Find.ByType<Text>().At(-1).Evaluate().ToList()
+        );
     }
 
     [Fact]
@@ -241,7 +251,9 @@ public class FindersTest
     public async Task ByType_Offstageの深い子孫のとき_既定では見つからないこと()
     {
         using var tester = new WidgetTester();
-        await tester.PumpWidget(new Offstage { Child = new Flex { Children = [new Text("deep")] } });
+        await tester.PumpWidget(
+            new Offstage { Child = new Flex { Children = [new Text("deep")] } }
+        );
 
         Assert.Empty(tester.Find.ByType<Flex>().Evaluate());
         Assert.Single(tester.Find.ByType<Flex>(skipOffstage: false).Evaluate());

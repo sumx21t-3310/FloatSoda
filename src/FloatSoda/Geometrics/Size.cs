@@ -12,7 +12,6 @@ public readonly record struct Size(double Width, double Height)
     /// <returns></returns>
     public static implicit operator Size(SizeI sizeI) => new(sizeI.Width, sizeI.Height);
 
-
     /// <summary>
     ///
     /// </summary>
@@ -32,7 +31,6 @@ public readonly record struct SizeI(int Width, int Height)
     /// <param name="sizeI"></param>
     /// <returns></returns>
     public static implicit operator Size(SizeI sizeI) => new(sizeI.Width, sizeI.Height);
-
 
     /// <summary>
     ///

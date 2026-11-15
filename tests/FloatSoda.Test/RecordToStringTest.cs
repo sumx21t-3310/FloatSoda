@@ -9,14 +9,14 @@ public class RecordToStringTest
 {
     /// <summary>recordを検査するアセンブリ。型を1つ参照して取得する。</summary>
     public static TheoryData<string> AssemblyNames =>
-    [
-        typeof(FloatSoda.Core.WidgetBinding).Assembly.GetName().Name!,
-        typeof(FloatSoda.Rendering.Layers.ILayer).Assembly.GetName().Name!,
-        typeof(FloatSoda.Geometry.Offset).Assembly.GetName().Name!,
-        typeof(FloatSoda.Engine.IOTaskRunner).Assembly.GetName().Name!,
-        typeof(FloatSoda.OVR.OVRAppInfo).Assembly.GetName().Name!,
-        typeof(FloatSoda.Testing.WidgetBitmapRenderer).Assembly.GetName().Name!
-    ];
+        [
+            typeof(FloatSoda.Core.WidgetBinding).Assembly.GetName().Name!,
+            typeof(FloatSoda.Rendering.Layers.ILayer).Assembly.GetName().Name!,
+            typeof(FloatSoda.Geometry.Offset).Assembly.GetName().Name!,
+            typeof(FloatSoda.Engine.IOTaskRunner).Assembly.GetName().Name!,
+            typeof(FloatSoda.OVR.OVRAppInfo).Assembly.GetName().Name!,
+            typeof(FloatSoda.Testing.WidgetBitmapRenderer).Assembly.GetName().Name!,
+        ];
 
     /// <summary>
     /// recordが自動生成するToString(PrintMembers)は、publicなインスタンスプロパティをすべて出力する。
@@ -92,18 +92,18 @@ public class RecordToStringTest
         type.GetMethod(
             "PrintMembers",
             BindingFlags.Instance
-            | BindingFlags.Public
-            | BindingFlags.NonPublic
-            | BindingFlags.DeclaredOnly,
+                | BindingFlags.Public
+                | BindingFlags.NonPublic
+                | BindingFlags.DeclaredOnly,
             [typeof(System.Text.StringBuilder)]
         );
 
     /// <summary>自動実装プロパティは保持している値を返すだけなので有限。計算プロパティだけを対象にする。</summary>
     private static bool IsComputed(Type type, PropertyInfo property) =>
         type.GetField(
-                $"<{property.Name}>k__BackingField",
-                BindingFlags.Instance | BindingFlags.NonPublic
-            )
+            $"<{property.Name}>k__BackingField",
+            BindingFlags.Instance | BindingFlags.NonPublic
+        )
             is null;
 
     /// <summary>プロパティの型がrecordで、宣言した型と継承関係にあるかどうか。interfaceは対象外。</summary>
@@ -114,7 +114,7 @@ public class RecordToStringTest
             return false;
 
         return propertyType.IsAssignableFrom(declaringType)
-               || declaringType.IsAssignableFrom(propertyType);
+            || declaringType.IsAssignableFrom(propertyType);
     }
 
     private static bool IsRecord(Type type)

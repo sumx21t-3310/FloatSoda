@@ -87,7 +87,11 @@ public abstract class Finder
     {
         // 挙動: 絞り込み前のEvaluate()のindex番目だけを返すFinder。
         // 範囲外や負のindexは、Evaluate()でElementAtが投げるArgumentOutOfRangeExceptionのまま通す(FlutterのelementAt(index)と同じ)。
-        return new IndexFinder(this, $"{Description} の{index}番目", elements => elements.ElementAt(index));
+        return new IndexFinder(
+            this,
+            $"{Description} の{index}番目",
+            elements => elements.ElementAt(index)
+        );
     }
 
     /// <summary>ツリーをたどり、条件に合うElementを集めるFinder。<see cref="CommonFinders"/>の各入口が作ります。</summary>

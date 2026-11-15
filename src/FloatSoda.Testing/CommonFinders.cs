@@ -31,7 +31,8 @@ public sealed class CommonFinders
     /// <typeparam name="T">探すWidgetの型。派生型は一致しません。派生型も含めるときは<see cref="BySubtype{T}"/>を使います。</typeparam>
     /// <param name="skipOffstage">画面に出ていない子要素を対象から外すか。既定値は<see langword="true"/>です。</param>
     /// <returns>条件に合うElementを探すFinder。作った時点では探しません。</returns>
-    public Finder ByType<T>(bool skipOffstage = true) where T : Widget
+    public Finder ByType<T>(bool skipOffstage = true)
+        where T : Widget
     {
         // 挙動: element.Widget.GetType() == typeof(T) のElementに一致する。派生型は一致しない。
         return Match(
@@ -45,10 +46,15 @@ public sealed class CommonFinders
     /// <typeparam name="T">探すWidgetの型。派生型も一致します。</typeparam>
     /// <param name="skipOffstage">画面に出ていない子を対象から外すか。既定値は<see langword="true"/>です。</param>
     /// <returns>条件に合うElementを探すFinder。作った時点では探しません。</returns>
-    public Finder BySubtype<T>(bool skipOffstage = true) where T : Widget
+    public Finder BySubtype<T>(bool skipOffstage = true)
+        where T : Widget
     {
         // 挙動: element.Widget is T のElementに一致する。T自身と派生型の両方が一致する。
-        return Match(skipOffstage, element => element.Widget is T, $"{typeof(T).Name} の派生型のWidget");
+        return Match(
+            skipOffstage,
+            element => element.Widget is T,
+            $"{typeof(T).Name} の派生型のWidget"
+        );
     }
 
     /// <summary>キーが一致するWidgetを探します。</summary>
@@ -61,7 +67,11 @@ public sealed class CommonFinders
         // 挙動: Equals(element.Widget.Key, key) のElementに一致する。
         // keyがnullならArgumentNullExceptionを投げる。
         ArgumentNullException.ThrowIfNull(key);
-        return Match(skipOffstage, element => Equals(element.Widget?.Key, key), $"キーが {key} のWidget");
+        return Match(
+            skipOffstage,
+            element => Equals(element.Widget?.Key, key),
+            $"キーが {key} のWidget"
+        );
     }
 
     /// <summary>文字列が一致するテキストを探します。</summary>
@@ -88,6 +98,9 @@ public sealed class CommonFinders
     /// <param name="predicate">一致とみなすElementで<see langword="true"/>を返す条件。</param>
     /// <param name="description">失敗時のメッセージに使う、条件の説明。</param>
     /// <returns>新しいFinder。</returns>
-    private Finder.MatchFinder Match(bool skipOffstage, Func<Element, bool> predicate, string description) =>
-        new(_root, skipOffstage, predicate, description);
+    private Finder.MatchFinder Match(
+        bool skipOffstage,
+        Func<Element, bool> predicate,
+        string description
+    ) => new(_root, skipOffstage, predicate, description);
 }

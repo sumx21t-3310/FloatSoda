@@ -415,13 +415,17 @@ public class WidgetBinding : IFrameScheduler, IHitTestTarget, IGestureBinding
     /// </remarks>
     internal void DetachRootWidget()
     {
-        if (RenderViewElement is not RenderObjectToWidgetElement<RenderView> root || Pipeline is null)
+        if (
+            RenderViewElement is not RenderObjectToWidgetElement<RenderView> root
+            || Pipeline is null
+        )
             return;
 
-        new RenderObjectToWidgetAdapter { Container = Pipeline.RenderView, Child = null }.AttachToRenderTree(
-            BuildOwner,
-            root
-        );
+        new RenderObjectToWidgetAdapter
+        {
+            Container = Pipeline.RenderView,
+            Child = null,
+        }.AttachToRenderTree(BuildOwner, root);
         BuildOwner.BuildScope();
     }
 

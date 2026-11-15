@@ -60,6 +60,5 @@
         <Project Path="tests/FloatSoda.Rendering.Test/FloatSoda.Rendering.Test.csproj" />
         <Project Path="tests/FloatSoda.Test/FloatSoda.Test.csproj" />
         <Project Path="tests/FloatSoda.Testing.Test/FloatSoda.Testing.Test.csproj" />
-
     </Folder>
 </Solution>

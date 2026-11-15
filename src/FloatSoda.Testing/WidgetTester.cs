@@ -133,7 +133,8 @@ public sealed class WidgetTester : IDisposable
     /// 一致が0件、または2件以上のとき。一致した1件が<typeparamref name="T"/>でないときも投げます。
     /// </exception>
     /// <remarks>呼んだ時点のツリーで<see cref="Finder.Evaluate"/>を1回実行します。ツリーは変更しません。</remarks>
-    public T Widget<T>(Finder finder) where T : Widget
+    public T Widget<T>(Finder finder)
+        where T : Widget
     {
         // 挙動:
         // 1. finder.Evaluate()の結果を数える。
