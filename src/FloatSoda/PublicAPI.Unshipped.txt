@@ -134,8 +134,6 @@ override FloatSoda.RenderObjects.RenderView.HandleEvent(FloatSoda.Engine.Abstrac
 override FloatSoda.RenderObjects.RenderView.Paint(FloatSoda.RenderObjects.PaintingContext! context, FloatSoda.Geometry.Offset offset) -> void
 override FloatSoda.Widgets.Layout.IndexedStack.CreateElement() -> FloatSoda.Elements.Element!
 override FloatSoda.Widgets.Layout.Offstage.CreateElement() -> FloatSoda.Elements.Element!
-static FloatSoda.Geometrics.Size.implicit operator FloatSoda.Geometrics.Size(FloatSoda.Geometrics.SizeI sizeI) -> FloatSoda.Geometrics.Size
-static FloatSoda.Geometrics.Size.implicit operator FloatSoda.Geometrics.SizeI(FloatSoda.Geometrics.Size size) -> FloatSoda.Geometrics.SizeI
 static FloatSoda.Geometrics.SizeI.implicit operator FloatSoda.Geometrics.Size(FloatSoda.Geometrics.SizeI sizeI) -> FloatSoda.Geometrics.Size
 static FloatSoda.Geometrics.SizeI.implicit operator FloatSoda.Geometrics.SizeI(FloatSoda.Geometrics.Size size) -> FloatSoda.Geometrics.SizeI
 static FloatSoda.Geometrics.SizeI.operator !=(FloatSoda.Geometrics.SizeI left, FloatSoda.Geometrics.SizeI right) -> bool
