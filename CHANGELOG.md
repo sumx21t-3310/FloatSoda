@@ -11,6 +11,10 @@
 
 - `BoxConstraints.Expand(width, height)` を追加。Flutter の `BoxConstraints.expand` に当たる。指定した軸を固定し、未指定の軸を親の制約いっぱいまで広げる(#268)
 
+### Changed
+
+- NuGet パッケージの Project website(`PackageProjectUrl`)を、GitHub リポジトリからドキュメントサイト <https://docs.floatsoda.dev> へ変更。ソースのリンクは `RepositoryUrl` に残る(#387)
+
 ### Changed (Breaking)
 
 - `Child` の無い `Container` の大きさを Flutter に揃えた。親の制約が有限の軸では最大まで広がり、無限の軸では 0 になる。従来は緩い制約の下で 0 に縮んでいた。`Width` か `Height` の片方だけを指定した場合も、未指定の軸が広がる。0 のままにするなら、`Width = 0` と `Height = 0` を指定する(#268)
