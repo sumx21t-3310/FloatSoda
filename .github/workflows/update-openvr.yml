@@ -32,6 +32,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           tag=$(gh api repos/ValveSoftware/openvr/releases/latest --jq .tag_name)
+          # 想定外の文字を含むタグは、後続のステップに渡さず止める
+          if ! [[ "$tag" =~ ^v[0-9]+(\.[0-9]+)*$ ]]; then
+            echo "Unexpected tag name: $tag" >&2
+            exit 1
+          fi
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "branch=deps/openvr-$tag" >> "$GITHUB_OUTPUT"
 
@@ -57,9 +62,10 @@ jobs:
 
       - name: Fetch and patch OpenVR files
         if: steps.existing.outputs.pr_exists == 'false'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
-          tag="${{ steps.release.outputs.tag }}"
-          base="https://raw.githubusercontent.com/ValveSoftware/openvr/$tag"
+          base="https://raw.githubusercontent.com/ValveSoftware/openvr/$TAG"
           curl -fsSL "$base/bin/win64/openvr_api.dll" -o src/FloatSoda.OVR/openvr_api.dll
           curl -fsSL "$base/headers/openvr_api.cs" -o "$RUNNER_TEMP/openvr_api.upstream.cs"
           node .github/scripts/patch-openvr-api.mjs "$RUNNER_TEMP/openvr_api.upstream.cs" src/FloatSoda.OVR/openvr_api.cs
@@ -67,10 +73,12 @@ jobs:
       - name: Detect changes
         id: changes
         if: steps.existing.outputs.pr_exists == 'false'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
         run: |
           if git diff --quiet -- src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "OpenVR is already at ${{ steps.release.outputs.tag }}"
+            echo "OpenVR is already at $TAG"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
