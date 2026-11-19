@@ -35,18 +35,28 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "branch=deps/openvr-$tag" >> "$GITHUB_OUTPUT"
 
-      - name: Skip if a branch for this release already exists
+      - name: Check for an existing PR or branch for this release
         id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.release.outputs.branch }}
         run: |
-          # マージ済み、または閉じた PR のブランチが残っていれば、同じ版で作り直さない
-          if git ls-remote --exit-code --heads origin "${{ steps.release.outputs.branch }}" > /dev/null; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
+          # マージ済み、または閉じた PR も含めて、同じ版の PR があれば作り直さない
+          prs=$(gh pr list --head "$BRANCH" --state all --json number --jq length)
+          if [ "$prs" -gt 0 ]; then
+            echo "pr_exists=true" >> "$GITHUB_OUTPUT"
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "pr_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          # ブランチだけが残っているとき(push のあとに PR 作成が失敗したとき)は、PR 作成からやり直す
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+            echo "branch_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "branch_exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Fetch and patch OpenVR files
-        if: steps.existing.outputs.exists == 'false'
+        if: steps.existing.outputs.pr_exists == 'false'
         run: |
           tag="${{ steps.release.outputs.tag }}"
           base="https://raw.githubusercontent.com/ValveSoftware/openvr/$tag"
@@ -56,7 +66,7 @@ jobs:
 
       - name: Detect changes
         id: changes
-        if: steps.existing.outputs.exists == 'false'
+        if: steps.existing.outputs.pr_exists == 'false'
         run: |
           if git diff --quiet -- src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -85,16 +95,20 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.release.outputs.tag }}
           BRANCH: ${{ steps.release.outputs.branch }}
+          BRANCH_EXISTS: ${{ steps.existing.outputs.branch_exists }}
           BUILD: ${{ steps.build.outcome }}
           TEST: ${{ steps.test.outcome }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$BRANCH"
-          git add src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs
-          git commit -m "build(deps): update OpenVR to $TAG"
-          git push origin "$BRANCH"
+          # ブランチが残っているときは、前回 push した内容をそのまま使い、PR だけ作る
+          if [ "$BRANCH_EXISTS" != "true" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git switch -c "$BRANCH"
+            git add src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs
+            git commit -m "build(deps): update OpenVR to $TAG"
+            git push origin "$BRANCH"
+          fi
 
           draft=()
           if [ "$BUILD" != "success" ] || [ "$TEST" != "success" ]; then
