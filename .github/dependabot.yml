@@ -1,0 +1,64 @@
+version: 2
+
+updates:
+  # NuGet: src / tests / samples の各 csproj と、ルートの Directory.Build.props
+  - package-ecosystem: "nuget"
+    directories:
+      - "/"
+      - "/src/*"
+      - "/tests/*"
+      - "/samples/*/*"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    labels:
+      - "maintenance"
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      # SkiaSharp 系は版をそろえる必要があるので、まとめて更新する
+      skiasharp:
+        patterns:
+          - "SkiaSharp*"
+      microsoft-extensions:
+        patterns:
+          - "Microsoft.Extensions.*"
+      test-tools:
+        patterns:
+          - "xunit*"
+          - "Microsoft.NET.Test.Sdk"
+          - "coverlet.*"
+          - "BenchmarkDotNet"
+
+  # npm: docs サイト(Astro Starlight)
+  - package-ecosystem: "npm"
+    directory: "/website"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    labels:
+      - "maintenance"
+    commit-message:
+      prefix: "build(deps)"
+    groups:
+      docs-site-minor-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions: .github/workflows の uses:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    labels:
+      - "maintenance"
+    commit-message:
+      prefix: "ci(deps)"
