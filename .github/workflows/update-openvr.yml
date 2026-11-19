@@ -1,0 +1,135 @@
+name: Update OpenVR
+
+# ValveSoftware/openvr の最新リリースを毎週確認し、
+# src/FloatSoda.OVR の openvr_api.dll と openvr_api.cs が古ければ PR を作る。
+# openvr_api.cs には FloatSoda 用の書き換えがあるので、.github/scripts/patch-openvr-api.mjs で再現して当てる。
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 毎週月曜 09:00 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Find latest OpenVR release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh api repos/ValveSoftware/openvr/releases/latest --jq .tag_name)
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "branch=deps/openvr-$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if a branch for this release already exists
+        id: existing
+        run: |
+          # マージ済み、または閉じた PR のブランチが残っていれば、同じ版で作り直さない
+          if git ls-remote --exit-code --heads origin "${{ steps.release.outputs.branch }}" > /dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch and patch OpenVR files
+        if: steps.existing.outputs.exists == 'false'
+        run: |
+          tag="${{ steps.release.outputs.tag }}"
+          base="https://raw.githubusercontent.com/ValveSoftware/openvr/$tag"
+          curl -fsSL "$base/bin/win64/openvr_api.dll" -o src/FloatSoda.OVR/openvr_api.dll
+          curl -fsSL "$base/headers/openvr_api.cs" -o "$RUNNER_TEMP/openvr_api.upstream.cs"
+          node .github/scripts/patch-openvr-api.mjs "$RUNNER_TEMP/openvr_api.upstream.cs" src/FloatSoda.OVR/openvr_api.cs
+
+      - name: Detect changes
+        id: changes
+        if: steps.existing.outputs.exists == 'false'
+        run: |
+          if git diff --quiet -- src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "OpenVR is already at ${{ steps.release.outputs.tag }}"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # PR を GITHUB_TOKEN で作ると、その PR では ci.yml が動かない。
+      # そのため、同じ確認をここで先に実行し、結果を PR に書く。
+      - name: Build
+        id: build
+        if: steps.changes.outputs.changed == 'true'
+        continue-on-error: true
+        run: dotnet build --configuration Release
+
+      - name: Test (FloatSoda.OVR.Test)
+        id: test
+        if: steps.changes.outputs.changed == 'true' && steps.build.outcome == 'success'
+        continue-on-error: true
+        run: dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build
+
+      - name: Open pull request
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          BRANCH: ${{ steps.release.outputs.branch }}
+          BUILD: ${{ steps.build.outcome }}
+          TEST: ${{ steps.test.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$BRANCH"
+          git add src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs
+          git commit -m "build(deps): update OpenVR to $TAG"
+          git push origin "$BRANCH"
+
+          draft=()
+          if [ "$BUILD" != "success" ] || [ "$TEST" != "success" ]; then
+            draft=(--draft)
+          fi
+
+          cat > "$RUNNER_TEMP/body.md" <<EOF
+          ValveSoftware/openvr の [$TAG](https://github.com/ValveSoftware/openvr/releases/tag/$TAG) に更新します。
+          このPRは [Update OpenVR]($RUN_URL) が自動で作りました。
+
+          ## 変更
+
+          - \`src/FloatSoda.OVR/openvr_api.dll\`: 上流の \`bin/win64/openvr_api.dll\` に差し替え
+          - \`src/FloatSoda.OVR/openvr_api.cs\`: 上流の \`headers/openvr_api.cs\` に \`.github/scripts/patch-openvr-api.mjs\` の書き換えを当てて差し替え
+
+          ## このワークフロー内の検証
+
+          | 項目 | 結果 |
+          |---|---|
+          | \`dotnet build --configuration Release\` | $BUILD |
+          | \`dotnet test tests/FloatSoda.OVR.Test\` | ${TEST:-skipped} |
+
+          結果が \`success\` でないときは、Draft にしています。
+          上流の API 変更でビルドが壊れた場合は、このブランチに修正を足してください。
+
+          ## 確認してほしいこと
+
+          - この PR は \`GITHUB_TOKEN\` で作っているため、\`ci.yml\` が自動では走りません。ブランチへ push するか、PR を閉じて開き直すと走ります。
+          - 実機(SteamVR)での動作は確認していません。
+          EOF
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "build(deps): OpenVR を $TAG に更新する" \
+            --body-file "$RUNNER_TEMP/body.md" \
+            --label maintenance \
+            "${draft[@]}"
