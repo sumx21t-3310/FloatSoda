@@ -1,0 +1,166 @@
+name: Update OpenVR
+
+# ValveSoftware/openvr の最新リリースを毎週確認し、
+# src/FloatSoda.OVR の openvr_api.dll と openvr_api.cs が古ければ PR を作る。
+# openvr_api.cs には FloatSoda 用の書き換えがあるので、.github/scripts/patch-openvr-api.mjs で再現して当てる。
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 毎週月曜 09:00 JST
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Find latest OpenVR release
+        id: release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(gh api repos/ValveSoftware/openvr/releases/latest --jq .tag_name)
+          # 想定外の文字を含むタグは、後続のステップに渡さず止める
+          if ! [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Unexpected tag name: $tag" >&2
+            exit 1
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "branch=deps/openvr-$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check for an existing PR or branch for this release
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.release.outputs.branch }}
+        run: |
+          # マージ済み、または閉じた PR も含めて、同じ版の PR があれば作り直さない
+          prs=$(gh pr list --head "$BRANCH" --state all --json number --jq length)
+          if [ "$prs" -gt 0 ]; then
+            echo "pr_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pr_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+          # ブランチだけが残っているとき(push のあとに PR 作成が失敗したとき)は、PR 作成からやり直す
+          if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null; then
+            echo "branch_exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "branch_exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fetch and patch OpenVR files
+        if: steps.existing.outputs.pr_exists == 'false'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          base="https://raw.githubusercontent.com/ValveSoftware/openvr/$TAG"
+          curl -fsSL "$base/bin/win64/openvr_api.dll" -o src/FloatSoda.OVR/openvr_api.dll
+          curl -fsSL "$base/headers/openvr_api.cs" -o "$RUNNER_TEMP/openvr_api.upstream.cs"
+          node .github/scripts/patch-openvr-api.mjs "$RUNNER_TEMP/openvr_api.upstream.cs" src/FloatSoda.OVR/openvr_api.cs
+
+      - name: Detect changes
+        id: changes
+        if: steps.existing.outputs.pr_exists == 'false'
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          if git diff --quiet -- src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "OpenVR is already at $TAG"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # PR を GITHUB_TOKEN で作ると、その PR では ci.yml が動かない。
+      # そのため、同じ確認をここで先に実行し、結果を PR に書く。
+      - name: Build
+        id: build
+        if: steps.changes.outputs.changed == 'true'
+        continue-on-error: true
+        run: dotnet build --configuration Release
+
+      - name: Test (FloatSoda.OVR.Test)
+        id: test
+        if: steps.changes.outputs.changed == 'true' && steps.build.outcome == 'success'
+        continue-on-error: true
+        run: dotnet test tests/FloatSoda.OVR.Test --configuration Release --no-build
+
+      - name: Open pull request
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          BRANCH: ${{ steps.release.outputs.branch }}
+          BRANCH_EXISTS: ${{ steps.existing.outputs.branch_exists }}
+          BUILD: ${{ steps.build.outcome }}
+          TEST: ${{ steps.test.outcome }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          files=(src/FloatSoda.OVR/openvr_api.dll src/FloatSoda.OVR/openvr_api.cs)
+
+          # ブランチが残っているときは、PR だけ作る。
+          # そのブランチのファイルが、いま検証した内容と同じときに限る。
+          if [ "$BRANCH_EXISTS" = "true" ]; then
+            git fetch origin "$BRANCH"
+            if ! git diff --quiet FETCH_HEAD -- "${files[@]}"; then
+              echo "origin/$BRANCH differs from the files verified in this run. Delete the branch and re-run." >&2
+              exit 1
+            fi
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git switch -c "$BRANCH"
+            git add "${files[@]}"
+            git commit -m "build(deps): update OpenVR to $TAG"
+            git push origin "$BRANCH"
+          fi
+
+          draft=()
+          if [ "$BUILD" != "success" ] || [ "$TEST" != "success" ]; then
+            draft=(--draft)
+          fi
+
+          cat > "$RUNNER_TEMP/body.md" <<EOF
+          ValveSoftware/openvr の [$TAG](https://github.com/ValveSoftware/openvr/releases/tag/$TAG) に更新します。
+          このPRは [Update OpenVR]($RUN_URL) が自動で作りました。
+
+          ## 変更
+
+          - \`src/FloatSoda.OVR/openvr_api.dll\`: 上流の \`bin/win64/openvr_api.dll\` に差し替え
+          - \`src/FloatSoda.OVR/openvr_api.cs\`: 上流の \`headers/openvr_api.cs\` に \`.github/scripts/patch-openvr-api.mjs\` の書き換えを当てて差し替え
+
+          ## このワークフロー内の検証
+
+          | 項目 | 結果 |
+          |---|---|
+          | \`dotnet build --configuration Release\` | $BUILD |
+          | \`dotnet test tests/FloatSoda.OVR.Test\` | ${TEST:-skipped} |
+
+          結果が \`success\` でないときは、Draft にしています。
+          上流の API 変更でビルドが壊れた場合は、このブランチに修正を足してください。
+
+          ## 確認してほしいこと
+
+          - この PR は \`GITHUB_TOKEN\` で作っているため、\`ci.yml\` が自動では走りません。ブランチへ push するか、PR を閉じて開き直すと走ります。
+          - 実機(SteamVR)での動作は確認していません。
+          EOF
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "build(deps): OpenVR を $TAG に更新する" \
+            --body-file "$RUNNER_TEMP/body.md" \
+            --label maintenance \
+            "${draft[@]}"
