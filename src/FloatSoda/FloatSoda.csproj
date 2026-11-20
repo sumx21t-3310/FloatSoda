@@ -22,7 +22,7 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
-        <PackageReference Include="SkiaSharp.HarfBuzz" Version="3.119.4" />
+        <PackageReference Include="SkiaSharp.HarfBuzz" Version="4.157.0" />
         <PackageReference Include="Topten.RichTextKit" Version="0.4.167" />
     </ItemGroup>
 </Project>
