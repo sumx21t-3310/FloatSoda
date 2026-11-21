@@ -51,7 +51,7 @@ jobs:
           cache-dependency-path: website/package-lock.json
 
       # API リファレンスの生成(scripts/api-reference.mjs)が docfx で src/ のプロジェクトをビルドする
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: "10.x"
 
