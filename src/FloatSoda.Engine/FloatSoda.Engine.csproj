@@ -12,7 +12,7 @@
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.6" />
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.6" />
         <PackageReference Include="OpenTK" Version="4.9.4" />
-        <PackageReference Include="SkiaSharp" Version="3.119.2" />
+        <PackageReference Include="SkiaSharp" Version="4.157.0" />
     </ItemGroup>
 
     <ItemGroup>
